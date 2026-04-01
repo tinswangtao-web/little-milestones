@@ -1,0 +1,9 @@
+{
+  "id": "kid-score",
+  "name": "Little Milestones 🌱",
+  "version": "2.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Little Milestones：行为打分、自定义加减分、日记、饮食运动记录，结构化数据便于AI分析",
+  "author": "Tins",
+  "isDesktopOnly": false
+}

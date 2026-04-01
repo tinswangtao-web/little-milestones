@@ -1,0 +1,12 @@
+# Plugin data (contains personal information)
+data.json
+
+# Backup files
+*.backup*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
