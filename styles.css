@@ -1482,11 +1482,8 @@
 
   .kid-score-actions {
     flex-direction: column;
-    position: sticky;
-    bottom: 0;
-    background: var(--background-primary);
-    padding: 8px 0 env(safe-area-inset-bottom, 4px);
-    z-index: 10;
+    margin-top: 12px;
+    padding-bottom: env(safe-area-inset-bottom, 4px);
   }
 
   .kid-score-save-btn,

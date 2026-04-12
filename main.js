@@ -631,12 +631,13 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         self.activeTab = "score";
         scoreTab.addClass("is-active"); diaryTab.removeClass("is-active");
         scorePanel.removeClass("is-hidden"); diaryPanel.addClass("is-hidden");
+        contentEl.scrollTop = 0;
       };
       diaryTab.onclick = function() {
         self.activeTab = "diary";
         diaryTab.addClass("is-active"); scoreTab.removeClass("is-active");
         diaryPanel.removeClass("is-hidden"); scorePanel.addClass("is-hidden");
-        if (self.diaryTextarea) self.diaryTextarea.focus();
+        contentEl.scrollTop = 0;
       };
 
       /* ══════════════ Score Panel ══════════════ */
@@ -1014,6 +1015,9 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     };
 
     showScoreMode();
+    popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
+    popup.addEventListener("focusin", function(e) { e.stopPropagation(); });
+    popup.addEventListener("focusout", function(e) { e.stopPropagation(); });
     overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
     getOverlayMount(self.containerEl).appendChild(overlay);
   }
