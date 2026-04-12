@@ -34,13 +34,13 @@ __export(main_exports, { default: () => KidScorePlugin });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian = require("obsidian");
 
+var DEFAULT_DIARY_TEMPLATE = "### \u5929\u6C14\u4E0E\u5FC3\u60C5\n\u5929\u6C14\uFF1A\n\u5FC3\u60C5\uFF1A\n\n### \u4ECA\u65E5\u6D3B\u52A8\n\u5730\u70B9\uFF1A\n\u6D3B\u52A8\uFF1A\n\n### \u996E\u98DF\u8BB0\u5F55\n\u65E9\u9910\uFF1A\n\u5348\u9910\uFF1A\n\u665A\u9910\uFF1A\n\u96F6\u98DF/\u6C34\u679C\uFF1A\n\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426\n\u83DC\u5355\uFF1A\n\u8BC4\u4EF7\uFF1A\n\n### \u8FD0\u52A8\u4E0E\u5065\u5EB7\n\u8FD0\u52A8\u9879\u76EE\uFF1A\n\u8FD0\u52A8\u65F6\u957F\uFF1A\n\u7761\u7720\u60C5\u51B5\uFF1A\n\n### \u5B66\u4E60\u4E0E\u6210\u957F\n\n\n### \u5176\u4ED6\u8BB0\u5F55\n\n";
+function makeDefaultUser() {
+  return { id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), name: "\u5C0F\u670B\u53CB", savePath: "Little Milestones/Daily Records", items: [], categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"], scoringRules: "", diaryTemplate: DEFAULT_DIARY_TEMPLATE };
+}
 var DEFAULT_SETTINGS = {
-  childName: "My Child",
-  savePath: "Little Milestones/Daily Records",
-  items: [],
-  categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
-  scoringRules: "",
-  diaryTemplate: "### \u5929\u6C14\u4E0E\u5FC3\u60C5\n\u5929\u6C14\uFF1A\n\u5FC3\u60C5\uFF1A\n\n### \u4ECA\u65E5\u6D3B\u52A8\n\u5730\u70B9\uFF1A\n\u6D3B\u52A8\uFF1A\n\n### \u996E\u98DF\u8BB0\u5F55\n\u65E9\u9910\uFF1A\n\u5348\u9910\uFF1A\n\u665A\u9910\uFF1A\n\u96F6\u98DF/\u6C34\u679C\uFF1A\n\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426\n\u83DC\u5355\uFF1A\n\u8BC4\u4EF7\uFF1A\n\n### \u8FD0\u52A8\u4E0E\u5065\u5EB7\n\u8FD0\u52A8\u9879\u76EE\uFF1A\n\u8FD0\u52A8\u65F6\u957F\uFF1A\n\u7761\u7720\u60C5\u51B5\uFF1A\n\n### \u5B66\u4E60\u4E0E\u6210\u957F\n\n\n### \u5176\u4ED6\u8BB0\u5F55\n\n"
+  users: [],
+  currentUserId: ""
 };
 
 var DIARY_MARKER = "<!-- DIARY_START -->";
@@ -272,16 +272,18 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
   onload() {
     return __async(this, null, function* () {
       yield this.loadSettings();
-      // Migrate: add category field to old items
+      // Migrate: add category field to old items per user
       var changed = false;
-      if (!this.settings.categories || this.settings.categories.length === 0) {
-        this.settings.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-        changed = true;
-      }
-      for (var it of this.settings.items) {
-        if (!it.category) {
-          it.category = it.points >= 0 ? this.settings.categories[0] : (this.settings.categories[1] || this.settings.categories[0]);
+      for (var u of this.settings.users) {
+        if (!u.categories || u.categories.length === 0) {
+          u.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
           changed = true;
+        }
+        for (var it of u.items) {
+          if (!it.category) {
+            it.category = it.points >= 0 ? u.categories[0] : (u.categories[1] || u.categories[0]);
+            changed = true;
+          }
         }
       }
       if (changed) yield this.saveSettings();
@@ -305,7 +307,29 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
 
   loadSettings() {
     return __async(this, null, function* () {
-      this.settings = Object.assign({}, DEFAULT_SETTINGS, yield this.loadData());
+      var loaded = yield this.loadData() || {};
+      if (loaded.childName !== undefined && !loaded.users) {
+        var mu = makeDefaultUser();
+        mu.name = loaded.childName || "\u5C0F\u670B\u53CB";
+        mu.savePath = loaded.savePath || "Little Milestones/Daily Records";
+        mu.items = loaded.items || [];
+        mu.categories = loaded.categories && loaded.categories.length ? loaded.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+        mu.scoringRules = loaded.scoringRules || "";
+        mu.diaryTemplate = loaded.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+        this.settings = { users: [mu], currentUserId: mu.id };
+      } else {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
+        if (!this.settings.users || !this.settings.users.length) {
+          var du = makeDefaultUser();
+          this.settings.users = [du];
+          this.settings.currentUserId = du.id;
+        } else {
+          var cuid = this.settings.currentUserId;
+          if (!cuid || !this.settings.users.find(function(u) { return u.id === cuid; })) {
+            this.settings.currentUserId = this.settings.users[0].id;
+          }
+        }
+      }
     });
   }
 
@@ -315,8 +339,13 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
     });
   }
 
+  get currentUser() {
+    var cuid = this.settings.currentUserId;
+    return this.settings.users.find(function(u) { return u.id === cuid; }) || this.settings.users[0];
+  }
+
   filePath(dateStr) {
-    return (0, import_obsidian.normalizePath)(this.settings.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
 
   /* ── Read day data (backward compatible) ── */
@@ -338,7 +367,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
           if (kvNum) { scores[kvNum[1]] = parseInt(kvNum[2]); continue; }
           var kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
           if (kvBool) {
-            var itemDef = this.settings.items.find(function(it) { return it.id === kvBool[1]; });
+            var itemDef = this.currentUser.items.find(function(it) { return it.id === kvBool[1]; });
             scores[kvBool[1]] = kvBool[2] === "true" ? (itemDef ? itemDef.points : 1) : 0;
           }
         }
@@ -372,7 +401,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
   /* ── Save day data ── */
   saveDayData(dateStr, scores, customItems, diaryContent) {
     return __async(this, null, function* () {
-      var items = this.settings.items;
+      var items = this.currentUser.items;
       var d = new Date(dateStr + "T00:00:00");
       d.setDate(d.getDate() - 1);
       var yesterdayStr = d.toISOString().slice(0, 10);
@@ -426,7 +455,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
 
       // Build markdown tables — grouped by category
       var hasYesterday = !!yesterdayData;
-      var categories = this.settings.categories || [];
+      var categories = this.currentUser.categories || [];
       var tableHeader = hasYesterday
         ? "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 | \u6628\u65E5 |\n|:---|---:|---:|:---:|:---:|\n"
         : "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n";
@@ -474,9 +503,9 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
         yesterdayRow = "\n| \u{1F4C6} \u6628\u65E5\u603B\u5206 | " + yTotalSign + yesterdayData.total + " \u5206 |";
       }
 
-      var content = "---\ndate: " + dateStr + "\nchild: " + this.settings.childName + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + this.settings.childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n## \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n\n| \u6307\u6807 | \u6570\u503C |\n|:---|---:|\n| \u{1F3C6} \u4ECA\u65E5\u603B\u5206 | " + totalSign + total + " \u5206 |" + yesterdayRow + "\n| \u2705 \u5B8C\u6210\u9879\u76EE | " + earnedCount + "/" + totalItems + " (" + completionRate + "%) |\n| \u{1F4CC} \u4E34\u65F6\u4E8B\u9879 | " + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206) |\n| \u{1F4C8} \u7D2F\u8BA1\u603B\u5206 | " + grandSign + grandTotal + " \u5206 |\n| \u{1F4C5} \u7D2F\u8BA1\u5929\u6570 | " + grandDays + " \u5929 |\n| \u{1F4CA} \u65E5\u5747\u5F97\u5206 | " + grandAvg + " \u5206 |\n\n---\n" + tableContent + "\n---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || this.settings.diaryTemplate) + "\n";
+      var content = "---\ndate: " + dateStr + "\nchild: " + this.currentUser.name + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + this.currentUser.name + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n## \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n\n| \u6307\u6807 | \u6570\u503C |\n|:---|---:|\n| \u{1F3C6} \u4ECA\u65E5\u603B\u5206 | " + totalSign + total + " \u5206 |" + yesterdayRow + "\n| \u2705 \u5B8C\u6210\u9879\u76EE | " + earnedCount + "/" + totalItems + " (" + completionRate + "%) |\n| \u{1F4CC} \u4E34\u65F6\u4E8B\u9879 | " + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206) |\n| \u{1F4C8} \u7D2F\u8BA1\u603B\u5206 | " + grandSign + grandTotal + " \u5206 |\n| \u{1F4C5} \u7D2F\u8BA1\u5929\u6570 | " + grandDays + " \u5929 |\n| \u{1F4CA} \u65E5\u5747\u5F97\u5206 | " + grandAvg + " \u5206 |\n\n---\n" + tableContent + "\n---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || this.currentUser.diaryTemplate) + "\n";
 
-      var dirPath = (0, import_obsidian.normalizePath)(this.settings.savePath);
+      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
       if (!this.app.vault.getAbstractFileByPath(dirPath)) { yield this.app.vault.createFolder(dirPath); }
       var fp = this.filePath(dateStr);
       var existing = this.app.vault.getAbstractFileByPath(fp);
@@ -488,7 +517,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
 
   getAllScores() {
     return __async(this, null, function* () {
-      var dirPath = (0, import_obsidian.normalizePath)(this.settings.savePath);
+      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
       var files = this.app.vault.getFiles().filter(function(f) { return f.path.startsWith(dirPath + "/") && f.extension === "md"; });
       var results = [];
       for (var file of files) {
@@ -545,7 +574,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var existingToday = yield this.plugin.readDayData(this.dateStr);
       var yesterdayData = yield this.plugin.readDayData(yesterdayStr);
 
-      for (var item of this.plugin.settings.items) {
+      for (var item of this.plugin.currentUser.items) {
         if (existingToday && existingToday.scores[item.id] !== undefined) {
           this.scores[item.id] = existingToday.scores[item.id];
         } else {
@@ -559,7 +588,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
 
       // Header with date navigation
       var header = contentEl.createDiv({ cls: "kid-score-header" });
-      header.createEl("h2", { text: this.plugin.settings.childName + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
+      header.createEl("h2", { text: this.plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
 
       var dateNav = header.createDiv({ cls: "kid-score-date-nav" });
       var prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
@@ -617,6 +646,25 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
       }
 
+      /* ── User switcher (multi-user) ── */
+      var allUsers = self.plugin.settings.users;
+      if (allUsers.length > 1) {
+        var userSwitcher = contentEl.createDiv({ cls: "kid-score-user-switcher" });
+        allUsers.forEach(function(u) {
+          var uBtn = userSwitcher.createEl("button", {
+            cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+            text: u.name
+          });
+          uBtn.onclick = function() {
+            return __async(self, null, function* () {
+              self.plugin.settings.currentUserId = u.id;
+              yield self.plugin.saveSettings();
+              yield self.renderModal();
+            });
+          };
+        });
+      }
+
       /* ── Tab bar ── */
       var mainTabs = contentEl.createDiv({ cls: "kid-score-main-tabs" });
       var scoreTab = mainTabs.createEl("button", { text: "\u2B50 \u6253\u5206", cls: "kid-score-main-tab is-active" });
@@ -641,7 +689,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       };
 
       /* ══════════════ Score Panel ══════════════ */
-      if (this.plugin.settings.items.length === 0) {
+      if (this.plugin.currentUser.items.length === 0) {
         scorePanel.createEl("div", { cls: "kid-score-empty", text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01" });
       } else {
         // ── Scoring Rules Section ──
@@ -654,13 +702,13 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         var rulesView = rulesBody.createDiv({ cls: "kid-score-rules-view" });
         var rulesEdit = rulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
         var rulesTextarea = rulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-        rulesTextarea.value = self.plugin.settings.scoringRules || "";
+        rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
         var rulesActRow = rulesEdit.createDiv({ cls: "kid-score-rules-actions" });
         var rulesSaveBtn = rulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
         var rulesCancelBtn = rulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
         var renderRulesView = function() {
           rulesView.empty();
-          var text = self.plugin.settings.scoringRules || "";
+          var text = self.plugin.currentUser.scoringRules || "";
           if (text.trim()) {
             import_obsidian.MarkdownRenderer.render(self.app, text, rulesView, "", self);
           } else {
@@ -668,7 +716,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           }
         };
         renderRulesView();
-        var rulesOpen = !!(self.plugin.settings.scoringRules && self.plugin.settings.scoringRules.trim());
+        var rulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
         if (!rulesOpen) { rulesBody.addClass("is-hidden"); }
         else { rulesToggle.textContent = "\u25BC"; }
         rulesHeader.addEventListener("click", function(e) {
@@ -685,7 +733,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
             rulesOpen = true;
             rulesToggle.textContent = "\u25BC";
             rulesBody.removeClass("is-hidden");
-            rulesTextarea.value = self.plugin.settings.scoringRules || "";
+            rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
             rulesView.addClass("is-hidden");
             rulesEdit.removeClass("is-hidden");
             rulesTextarea.focus();
@@ -696,7 +744,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         });
         rulesSaveBtn.addEventListener("click", function() {
           return __async(self, null, function* () {
-            self.plugin.settings.scoringRules = rulesTextarea.value;
+            self.plugin.currentUser.scoringRules = rulesTextarea.value;
             yield self.plugin.saveSettings();
             rulesIsEditing = false;
             rulesView.removeClass("is-hidden");
@@ -720,10 +768,10 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         this.totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
 
         // Render by category
-        var categories = this.plugin.settings.categories || [];
+        var categories = this.plugin.currentUser.categories || [];
         var catRendered = false;
         for (var cat of categories) {
-          var catItems = this.plugin.settings.items.filter(function(it) { return it.category === cat; });
+          var catItems = this.plugin.currentUser.items.filter(function(it) { return it.category === cat; });
           if (catItems.length > 0) {
             if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
             var catHeader = itemsContainer.createDiv({ cls: "kid-score-cat-header" });
@@ -738,7 +786,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           }
         }
         // Uncategorized
-        var uncatItems = this.plugin.settings.items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
+        var uncatItems = this.plugin.currentUser.items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
         if (uncatItems.length > 0) {
           if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
           itemsContainer.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
@@ -783,7 +831,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     var templateBtn = toolbar.createEl("button", { cls: "diary-tool-btn", text: "\u{1F4CB} \u63D2\u5165\u6A21\u677F" });
     templateBtn.onclick = function() {
       if (!self.diaryTextarea) return;
-      var template = self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate;
+      var template = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
       var current = self.diaryTextarea.value;
       if (current.trim()) {
         var pos = self.diaryTextarea.selectionStart || current.length;
@@ -948,9 +996,9 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       delBtn.onclick = function() {
         return __async(self, null, function* () {
           overlay.remove();
-          var idx = self.plugin.settings.items.findIndex(function(it) { return it.id === item.id; });
+          var idx = self.plugin.currentUser.items.findIndex(function(it) { return it.id === item.id; });
           if (idx !== -1) {
-            self.plugin.settings.items.splice(idx, 1);
+            self.plugin.currentUser.items.splice(idx, 1);
             yield self.plugin.saveSettings();
             yield self.renderModal();
           }
@@ -989,7 +1037,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var catRow = document.createElement("div"); catRow.className = "custom-form-row";
       var catLabel = document.createElement("span"); catLabel.className = "custom-form-label"; catLabel.textContent = "\u5206\u7C7B";
       var catSel = document.createElement("select"); catSel.className = "custom-form-select";
-      var cats = self.plugin.settings.categories || [];
+      var cats = self.plugin.currentUser.categories || [];
       cats.forEach(function(c) { var opt = document.createElement("option"); opt.value = c; opt.textContent = c; if (c === item.category) opt.selected = true; catSel.appendChild(opt); });
       catRow.appendChild(catLabel); catRow.appendChild(catSel); popup.appendChild(catRow);
       var acts = document.createElement("div"); acts.className = "value-popup-actions";
@@ -1053,9 +1101,9 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       return __async(self, null, function* () {
         var n = nameInput.value.trim();
         if (!n) { nameInput.classList.add("is-error"); return; }
-        self.plugin.settings.items.push({ id: "item_" + Date.now(), name: n, points: parseInt(pi.value) || 1, emoji: emojiInput.value.trim() || "\u2B50", category: category, note: "" });
-        var cats = self.plugin.settings.categories || [];
-        self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+        self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: n, points: parseInt(pi.value) || 1, emoji: emojiInput.value.trim() || "\u2B50", category: category, note: "" });
+        var cats = self.plugin.currentUser.categories || [];
+        self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
         yield self.plugin.saveSettings();
         overlay.remove();
         yield self.renderModal();
@@ -1123,7 +1171,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
   updateTotalDisplay() {
     if (!this.totalDisplay) return;
     var total = 0;
-    for (var item of this.plugin.settings.items) { total += (this.scores[item.id] || 0); }
+    for (var item of this.plugin.currentUser.items) { total += (this.scores[item.id] || 0); }
     for (var ci of this.customItems) { total += ci.points; }
     this.totalDisplay.textContent = "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206";
   }
@@ -1140,7 +1188,7 @@ var StatsModal = class extends import_obsidian.Modal {
   onOpen() {
     return __async(this, null, function* () {
       var contentEl = this.contentEl; contentEl.empty(); contentEl.addClass("kid-score-stats-modal");
-      contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.settings.childName + " \u7684\u6253\u5206\u7EDF\u8BA1" });
+      contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
       var allScores = yield this.plugin.getAllScores();
       if (allScores.length === 0) { contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" }); return; }
       var grandTotal = allScores.reduce(function(s, r) { return s + r.total; }, 0);
@@ -1201,10 +1249,10 @@ var StatsModal = class extends import_obsidian.Modal {
         mkCard("\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
         mkCard("\u6700\u9AD8\u5355\u65E5", "+" + max);
         mkCard("\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
-        if (self.plugin.settings.items.length > 0) {
+        if (self.plugin.currentUser.items.length > 0) {
           statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
           var itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-          for (var item of self.plugin.settings.items) {
+          for (var item of self.plugin.currentUser.items) {
             var count = filtered.filter(function(s) { return s.scores[item.id] !== undefined && s.scores[item.id] > 0; }).length;
             var rate = Math.round(count / filtered.length * 100);
             var row = itemList.createDiv({ cls: "completion-row" });
@@ -1258,10 +1306,62 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.addClass("kid-score-settings");
     containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
 
-    new import_obsidian.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u8BB0\u5F55\u6253\u5206\u7684\u5C0F\u670B\u53CB\u540D\u5B57")
-      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.settings.childName).onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.childName = v; yield self.plugin.saveSettings(); }); }); });
+    /* ── User management ── */
+    containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u4E0B\u65B9\u6240\u6709\u8BBE\u7F6E\u5747\u4E3A\u5F53\u524D\u7528\u6237\u3002" });
+    var userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+    var renderUserMgr = function() {
+      userMgrWrap.empty();
+      self.plugin.settings.users.forEach(function(u) {
+        var uBtn = userMgrWrap.createEl("button", {
+          cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+          text: u.name
+        });
+        uBtn.onclick = function() {
+          return __async(self, null, function* () {
+            self.plugin.settings.currentUserId = u.id;
+            yield self.plugin.saveSettings();
+            self.display();
+          });
+        };
+      });
+      var addUBtn = userMgrWrap.createEl("button", { cls: "kid-score-user-add-btn", text: "\uFF0B \u6DFB\u52A0\u7528\u6237" });
+      addUBtn.onclick = function() {
+        return __async(self, null, function* () {
+          var nu = makeDefaultUser();
+          nu.name = "\u65B0\u7528\u6237";
+          self.plugin.settings.users.push(nu);
+          self.plugin.settings.currentUserId = nu.id;
+          yield self.plugin.saveSettings();
+          self.display();
+        });
+      };
+    };
+    renderUserMgr();
+    if (self.plugin.settings.users.length > 1) {
+      new import_obsidian.Setting(containerEl)
+        .setName("\u5220\u9664\u5F53\u524D\u7528\u6237")
+        .setDesc(self.plugin.currentUser.name + " \u7684\u8BBE\u7F6E\u5C06\u88AB\u5220\u9664\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD")
+        .addButton(function(btn) {
+          btn.setButtonText("\u{1F5D1} \u5220\u9664").setWarning().onClick(function() {
+            return __async(self, null, function* () {
+              var users = self.plugin.settings.users;
+              var idx = users.findIndex(function(u) { return u.id === self.plugin.settings.currentUserId; });
+              if (idx !== -1 && users.length > 1) {
+                users.splice(idx, 1);
+                self.plugin.settings.currentUserId = users[Math.max(0, idx - 1)].id;
+                yield self.plugin.saveSettings();
+                self.display();
+              }
+            });
+          });
+        });
+    }
+
+    new import_obsidian.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57")
+      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.currentUser.name).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.name = v.trim() || "\u5C0F\u670B\u53CB"; yield self.plugin.saveSettings(); renderUserMgr(); }); }); });
     new import_obsidian.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939")
-      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0/\u6BCF\u65E5\u6253\u5206").setValue(self.plugin.settings.savePath).onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.savePath = v; yield self.plugin.saveSettings(); }); }); });
+      .addText(function(t) { return t.setPlaceholder("Little Milestones/Daily Records").setValue(self.plugin.currentUser.savePath).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.savePath = v; yield self.plugin.saveSettings(); }); }); });
 
     // ── Category management ──
     containerEl.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
@@ -1302,8 +1402,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       var targetIdx = getCatDragRowIndex(clientY);
       var fromIdx = catDrag.dragIdx;
       if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.settings.categories.length) {
-        var arr = self.plugin.settings.categories;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.categories.length) {
+        var arr = self.plugin.currentUser.categories;
         var moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
         __async(self, null, function* () { yield self.plugin.saveSettings(); renderCategories(); renderItems(); })();
@@ -1322,7 +1422,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     var renderCategories = function() {
       catWrap.empty();
       catDrag.rows = [];
-      var cats = self.plugin.settings.categories || [];
+      var cats = self.plugin.currentUser.categories || [];
       for (var ci = 0; ci < cats.length; ci++) {
         (function(idx) {
           var row = catWrap.createDiv({ cls: "kid-score-cat-row" });
@@ -1360,11 +1460,11 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           input.value = cats[idx];
           input.onchange = function() {
             return __async(self, null, function* () {
-              var oldName = self.plugin.settings.categories[idx];
+              var oldName = self.plugin.currentUser.categories[idx];
               var newName = input.value.trim();
               if (!newName) return;
-              self.plugin.settings.categories[idx] = newName;
-              for (var it of self.plugin.settings.items) { if (it.category === oldName) it.category = newName; }
+              self.plugin.currentUser.categories[idx] = newName;
+              for (var it of self.plugin.currentUser.items) { if (it.category === oldName) it.category = newName; }
               yield self.plugin.saveSettings();
               renderItems();
             });
@@ -1374,10 +1474,10 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           var delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
           delBtn.onclick = function() {
             return __async(self, null, function* () {
-              var removedCat = self.plugin.settings.categories[idx];
-              self.plugin.settings.categories.splice(idx, 1);
-              var fallback = self.plugin.settings.categories[0] || "\u5176\u4ED6";
-              for (var it of self.plugin.settings.items) { if (it.category === removedCat) it.category = fallback; }
+              var removedCat = self.plugin.currentUser.categories[idx];
+              self.plugin.currentUser.categories.splice(idx, 1);
+              var fallback = self.plugin.currentUser.categories[0] || "\u5176\u4ED6";
+              for (var it of self.plugin.currentUser.items) { if (it.category === removedCat) it.category = fallback; }
               yield self.plugin.saveSettings(); renderCategories(); renderItems();
             });
           };
@@ -1391,7 +1491,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     new import_obsidian.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(function(btn) {
       return btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(function() {
         return __async(self, null, function* () {
-          self.plugin.settings.categories.push("\u65B0\u5206\u7C7B");
+          self.plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
           yield self.plugin.saveSettings(); renderCategories(); renderItems();
         });
       });
@@ -1448,8 +1548,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       var targetIdx = getDragRowIndex(clientY);
       var fromIdx = dragState.dragIdx;
       if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.settings.items.length) {
-        var arr = self.plugin.settings.items;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.items.length) {
+        var arr = self.plugin.currentUser.items;
         var moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
         __async(self, null, function* () { yield self.plugin.saveSettings(); renderItems(); })();
@@ -1468,7 +1568,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     var renderItems = function() {
       itemsWrap.empty();
       dragState.rows = [];
-      if (self.plugin.settings.items.length === 0) {
+      if (self.plugin.currentUser.items.length === 0) {
         itemsWrap.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01" });
         return;
       }
@@ -1477,9 +1577,9 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach(function(h) { headerRow.createSpan({ text: h, cls: "col-header" }); });
 
       var lastCat = null;
-      for (var i = 0; i < self.plugin.settings.items.length; i++) {
+      for (var i = 0; i < self.plugin.currentUser.items.length; i++) {
         (function(idx) {
-          var item = self.plugin.settings.items[idx];
+          var item = self.plugin.currentUser.items[idx];
           var thisCat = item.category || "\u5176\u4ED6";
           if (thisCat !== lastCat) {
             lastCat = thisCat;
@@ -1527,7 +1627,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           emojiBtn.onclick = function() {
             showEmojiPicker(function(em) {
               return __async(self, null, function* () {
-                self.plugin.settings.items[idx].emoji = em;
+                self.plugin.currentUser.items[idx].emoji = em;
                 yield self.plugin.saveSettings();
                 emojiBtn.textContent = em;
               });
@@ -1537,25 +1637,25 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           // Name
           var nameInput = row.createEl("input", { cls: "settings-name-input" });
           nameInput.type = "text"; nameInput.value = item.name;
-          nameInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].name = nameInput.value; yield self.plugin.saveSettings(); }); };
+          nameInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].name = nameInput.value; yield self.plugin.saveSettings(); }); };
 
           // Category dropdown
           var catSelect = row.createEl("select", { cls: "settings-cat-select" });
-          var cats = self.plugin.settings.categories || [];
+          var cats = self.plugin.currentUser.categories || [];
           for (var c of cats) {
             var opt = catSelect.createEl("option", { text: c, value: c });
             if (item.category === c) opt.selected = true;
           }
-          catSelect.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].category = catSelect.value; var cats = self.plugin.settings.categories || []; self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; }); yield self.plugin.saveSettings(); renderItems(); }); };
+          catSelect.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].category = catSelect.value; var cats = self.plugin.currentUser.categories || []; self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; }); yield self.plugin.saveSettings(); renderItems(); }); };
 
           // Points
           var pointsInput = row.createEl("input", { cls: "settings-points-input" });
           pointsInput.type = "number"; pointsInput.value = String(item.points);
-          pointsInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].points = parseInt(pointsInput.value) || 0; yield self.plugin.saveSettings(); }); };
+          pointsInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].points = parseInt(pointsInput.value) || 0; yield self.plugin.saveSettings(); }); };
 
           // Delete
           var del = row.createEl("button", { text: "\u{1F5D1}", cls: "settings-delete-btn" });
-          del.onclick = function() { return __async(self, null, function* () { self.plugin.settings.items.splice(idx, 1); yield self.plugin.saveSettings(); renderItems(); }); };
+          del.onclick = function() { return __async(self, null, function* () { self.plugin.currentUser.items.splice(idx, 1); yield self.plugin.saveSettings(); renderItems(); }); };
 
           // Note (below the main row)
           var noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
@@ -1563,7 +1663,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           noteInput.type = "text";
           noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09";
           noteInput.value = item.note || "";
-          noteInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].note = noteInput.value; yield self.plugin.saveSettings(); }); };
+          noteInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].note = noteInput.value; yield self.plugin.saveSettings(); }); };
 
           dragState.rows.push(wrap);
         })(i);
@@ -1580,9 +1680,9 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
         (function(c) {
           addBtn.onclick = function() {
             return __async(self, null, function* () {
-              self.plugin.settings.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: c, note: "" });
-              var cats2 = self.plugin.settings.categories || [];
-              self.plugin.settings.items.sort(function(a, b) { var ai = cats2.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats2.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+              self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: c, note: "" });
+              var cats2 = self.plugin.currentUser.categories || [];
+              self.plugin.currentUser.items.sort(function(a, b) { var ai = cats2.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats2.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
               yield self.plugin.saveSettings();
               renderItems();
             });
@@ -1598,10 +1698,10 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .addButton(function(btn) {
         return btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(function() {
           return __async(self, null, function* () {
-            var defaultCat = self.plugin.settings.categories[0] || "\u52A0\u5206\u9879";
-            self.plugin.settings.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: defaultCat, note: "" });
-            var cats = self.plugin.settings.categories || [];
-            self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+            var defaultCat = self.plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
+            self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: defaultCat, note: "" });
+            var cats = self.plugin.currentUser.categories || [];
+            self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
             yield self.plugin.saveSettings(); renderItems();
           });
         });
@@ -1609,8 +1709,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .addButton(function(btn) {
         return btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(function() {
           return __async(self, null, function* () {
-            var cats = self.plugin.settings.categories || [];
-            self.plugin.settings.items.sort(function(a, b) {
+            var cats = self.plugin.currentUser.categories || [];
+            self.plugin.currentUser.items.sort(function(a, b) {
               var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999;
               var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999;
               return ai - bi;
@@ -1630,9 +1730,9 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     var tmplTextArea;
     tmplSetting.addTextArea(function(t) {
       tmplTextArea = t;
-      t.setValue(self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate);
+      t.setValue(self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE);
       t.inputEl.rows = 8; t.inputEl.style.width = "100%"; t.inputEl.style.fontFamily = "monospace";
-      t.onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.diaryTemplate = v; yield self.plugin.saveSettings(); }); });
+      t.onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.diaryTemplate = v; yield self.plugin.saveSettings(); }); });
       return t;
     });
     var tmplPreviewWrap = containerEl.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
@@ -1644,7 +1744,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
         tmplTextArea.inputEl.rows = 4;
         tmplPreviewWrap.style.display = "";
         tmplPreviewWrap.empty();
-        import_obsidian.MarkdownRenderer.render(self.app, self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate, tmplPreviewWrap, "", self);
+        import_obsidian.MarkdownRenderer.render(self.app, self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE, tmplPreviewWrap, "", self);
         tmplTextArea.inputEl.oninput = function() {
           tmplPreviewWrap.empty();
           import_obsidian.MarkdownRenderer.render(self.app, tmplTextArea.inputEl.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", tmplPreviewWrap, "", self);
@@ -1665,7 +1765,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6")
       .addButton(function(btn) {
         btn.setButtonText("\uD83D\uDCE4 \u5BFC\u51FA").onClick(function() {
-          var data = { categories: self.plugin.settings.categories, items: self.plugin.settings.items };
+          var data = { categories: self.plugin.currentUser.categories, items: self.plugin.currentUser.items };
           var json = JSON.stringify(data, null, 2);
           var blob = new Blob([json], { type: "application/json" });
           var url = URL.createObjectURL(blob);
@@ -1688,8 +1788,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
               try {
                 var text = yield file.text();
                 var data = JSON.parse(text);
-                if (Array.isArray(data.items)) self.plugin.settings.items = data.items;
-                if (Array.isArray(data.categories)) self.plugin.settings.categories = data.categories;
+                if (Array.isArray(data.items)) self.plugin.currentUser.items = data.items;
+                if (Array.isArray(data.categories)) self.plugin.currentUser.categories = data.categories;
                 yield self.plugin.saveSettings();
                 self.display();
                 new import_obsidian.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");

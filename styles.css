@@ -870,6 +870,61 @@
   background: var(--background-modifier-error);
 }
 
+/* ─── User Switcher ─────────────────────────────────────────────────────────── */
+
+.kid-score-user-switcher {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.kid-score-user-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--interactive-accent);
+  background: transparent;
+  color: var(--interactive-accent);
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.kid-score-user-btn:hover {
+  background: var(--background-modifier-hover);
+}
+.kid-score-user-btn.is-active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+/* Settings page user list */
+.kid-score-settings-users {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+
+.kid-score-user-add-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--interactive-accent);
+  background: transparent;
+  color: var(--interactive-accent);
+  font-size: 0.9em;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.kid-score-user-add-btn:hover {
+  opacity: 1;
+}
+
 /* ─── Main Tabs (打分 / 日记) ────────────────────────────────────────────────── */
 
 .kid-score-main-tabs {
@@ -1632,6 +1687,24 @@
     justify-content: center;
     gap: 6px;
     padding: 8px 10px;
+  }
+
+  /* User switcher */
+  .kid-score-user-switcher {
+    gap: 6px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kid-score-user-btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    font-size: 0.88em;
+    min-height: 36px;
+  }
+  .kid-score-user-add-btn {
+    flex-shrink: 0;
   }
 
   /* Main tabs */
