@@ -2,14 +2,15 @@
 
 ## 项目信息
 - **插件仓库**：https://github.com/tinswangtao-web/obsidian-little-milestones
-- **插件目录（Obsidian）**：`C:\Users\Doody\Documents\Obsidian Vault\.obsidian\plugins\little-milestones\`
-- **开发工作目录（git 仓库）**：`C:\Users\Doody\Documents\Claude\Little-Milestones\`
+- **Obsidian Vault 路径（Windows 本机）**：`C:\Users\FinalHome\Documents\Obsidian Vault`
+- **插件目录（Obsidian）**：`C:\Users\FinalHome\Documents\Obsidian Vault\.obsidian\plugins\little-milestones\`
 - **当前版本**：v2.0.0
 
 ## 工作流说明
-- 在开发工作目录修改代码，再复制到插件目录供 Obsidian 使用
-- Obsidian Sync 负责同步插件目录到其他设备（不含 .git）
-- git / GitHub 负责版本管理和 Obsidian 插件市场发布
+- 所有代码修改在此 git 仓库（远程服务器）完成，修改后 commit + push
+- **每次修改完毕后，必须运行 `sync-to-vault.ps1` 将 main.js / styles.css / manifest.json 复制到 Obsidian 插件目录**
+- 复制后在 Obsidian「设置 → 第三方插件」中重载插件，即可测试新功能
+- `sync-to-vault.ps1` 在仓库根目录，双击运行即可（Windows PowerShell）
 
 ## 本次会话完成的功能
 
