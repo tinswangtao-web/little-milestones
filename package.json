@@ -1,0 +1,21 @@
+{
+  "name": "little-milestones",
+  "version": "2.0.0",
+  "description": "Daily record plugin for kids — behavior scoring, diary, diet & activity tracking",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production",
+    "deploy": "node scripts/deploy.mjs"
+  },
+  "keywords": [],
+  "author": "Tins",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.21.0",
+    "obsidian": "latest",
+    "typescript": "^5.0.0",
+    "builtin-modules": "^3.3.0"
+  }
+}

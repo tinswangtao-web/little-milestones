@@ -34,13 +34,20 @@ __export(main_exports, { default: () => KidScorePlugin });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian = require("obsidian");
 
+var DEFAULT_DIARY_TEMPLATE = "### \u5929\u6C14\u4E0E\u5FC3\u60C5\n\u5929\u6C14\uFF1A\n\u5FC3\u60C5\uFF1A\n\n### \u4ECA\u65E5\u6D3B\u52A8\n\u5730\u70B9\uFF1A\n\u6D3B\u52A8\uFF1A\n\n### \u996E\u98DF\u8BB0\u5F55\n\u65E9\u9910\uFF1A\n\u5348\u9910\uFF1A\n\u665A\u9910\uFF1A\n\u96F6\u98DF/\u6C34\u679C\uFF1A\n\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426\n\u83DC\u5355\uFF1A\n\u8BC4\u4EF7\uFF1A\n\n### \u8FD0\u52A8\u4E0E\u5065\u5EB7\n\u8FD0\u52A8\u9879\u76EE\uFF1A\n\u8FD0\u52A8\u65F6\u957F\uFF1A\n\u7761\u7720\u60C5\u51B5\uFF1A\n\n### \u5B66\u4E60\u4E0E\u6210\u957F\n\n\n### \u5176\u4ED6\u8BB0\u5F55\n\n";
+function makeDefaultUser() {
+  return { id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), name: "\u5C0F\u670B\u53CB", savePath: "Little Milestones/Daily Records", items: [], categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"], scoringRules: "", diaryTemplate: DEFAULT_DIARY_TEMPLATE };
+}
 var DEFAULT_SETTINGS = {
-  childName: "My Child",
-  savePath: "Little Milestones/Daily Records",
-  items: [],
-  categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
-  scoringRules: "",
-  diaryTemplate: "### \u5929\u6C14\u4E0E\u5FC3\u60C5\n\u5929\u6C14\uFF1A\n\u5FC3\u60C5\uFF1A\n\n### \u4ECA\u65E5\u6D3B\u52A8\n\u5730\u70B9\uFF1A\n\u6D3B\u52A8\uFF1A\n\n### \u996E\u98DF\u8BB0\u5F55\n\u65E9\u9910\uFF1A\n\u5348\u9910\uFF1A\n\u665A\u9910\uFF1A\n\u96F6\u98DF/\u6C34\u679C\uFF1A\n\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426\n\u83DC\u5355\uFF1A\n\u8BC4\u4EF7\uFF1A\n\n### \u8FD0\u52A8\u4E0E\u5065\u5EB7\n\u8FD0\u52A8\u9879\u76EE\uFF1A\n\u8FD0\u52A8\u65F6\u957F\uFF1A\n\u7761\u7720\u60C5\u51B5\uFF1A\n\n### \u5B66\u4E60\u4E0E\u6210\u957F\n\n\n### \u5176\u4ED6\u8BB0\u5F55\n\n"
+  users: [],
+  currentUserId: "",
+  doubleTapThresholds: {
+    windows: 220,
+    mac: 240,
+    android: 320,
+    ios: 300,
+    fallback: 260
+  }
 };
 
 var DIARY_MARKER = "<!-- DIARY_START -->";
@@ -79,6 +86,10 @@ function formatDate(offset) {
   d.setDate(d.getDate() + offset);
   return d.toISOString().slice(0, 10);
 }
+function toYamlInline(value) {
+  var safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return '"' + safe + '"';
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Shared Emoji Picker
@@ -87,6 +98,25 @@ function getOverlayMount(containerEl) {
   // Mobile: mount to body so position:fixed works against the viewport.
   // Desktop: mount inside containerEl to avoid Obsidian's modal focus trap.
   return document.body.classList.contains("is-mobile") ? document.body : (containerEl || document.body);
+}
+/* ── Mobile keyboard handler: keeps popup above virtual keyboard ── */
+function setupMobileKeyboard(overlay, popup) {
+  if (!window.visualViewport) return;
+  var active = true;
+  var handler = function() {
+    if (!active || !document.contains(overlay)) { active = false; window.visualViewport.removeEventListener("resize", handler); return; }
+    var vv = window.visualViewport;
+    var bottom = window.innerHeight - (vv.offsetTop + vv.height);
+    overlay.style.bottom = Math.max(bottom, 0) + "px";
+  };
+  window.visualViewport.addEventListener("resize", handler);
+  popup.addEventListener("focusin", function(e) {
+    var tgt = e.target;
+    if (!tgt || !tgt.tagName || tgt.tagName === "BUTTON") return;
+    setTimeout(function() {
+      if (active && tgt.scrollIntoView) tgt.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }, 350);
+  });
 }
 function showEmojiPicker(callback, container) {
   var overlay = document.createElement("div");
@@ -272,16 +302,18 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
   onload() {
     return __async(this, null, function* () {
       yield this.loadSettings();
-      // Migrate: add category field to old items
+      // Migrate: add category field to old items per user
       var changed = false;
-      if (!this.settings.categories || this.settings.categories.length === 0) {
-        this.settings.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-        changed = true;
-      }
-      for (var it of this.settings.items) {
-        if (!it.category) {
-          it.category = it.points >= 0 ? this.settings.categories[0] : (this.settings.categories[1] || this.settings.categories[0]);
+      for (var u of this.settings.users) {
+        if (!u.categories || u.categories.length === 0) {
+          u.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
           changed = true;
+        }
+        for (var it of u.items) {
+          if (!it.category) {
+            it.category = it.points >= 0 ? u.categories[0] : (u.categories[1] || u.categories[0]);
+            changed = true;
+          }
         }
       }
       if (changed) yield this.saveSettings();
@@ -305,7 +337,45 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
 
   loadSettings() {
     return __async(this, null, function* () {
-      this.settings = Object.assign({}, DEFAULT_SETTINGS, yield this.loadData());
+      var loaded = yield this.loadData() || {};
+      if (loaded.childName !== undefined && !loaded.users) {
+        var mu = makeDefaultUser();
+        mu.name = loaded.childName || "\u5C0F\u670B\u53CB";
+        mu.savePath = loaded.savePath || "Little Milestones/Daily Records";
+        mu.items = loaded.items || [];
+        mu.categories = loaded.categories && loaded.categories.length ? loaded.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+        mu.scoringRules = loaded.scoringRules || "";
+        mu.diaryTemplate = loaded.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+        this.settings = { users: [mu], currentUserId: mu.id, doubleTapThresholds: Object.assign({}, DEFAULT_SETTINGS.doubleTapThresholds) };
+      } else {
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
+        var dt = Object.assign({}, DEFAULT_SETTINGS.doubleTapThresholds, this.settings.doubleTapThresholds || {});
+        dt.windows = this.sanitizeDoubleTapThreshold(dt.windows, DEFAULT_SETTINGS.doubleTapThresholds.windows);
+        dt.mac = this.sanitizeDoubleTapThreshold(dt.mac, DEFAULT_SETTINGS.doubleTapThresholds.mac);
+        dt.android = this.sanitizeDoubleTapThreshold(dt.android, DEFAULT_SETTINGS.doubleTapThresholds.android);
+        dt.ios = this.sanitizeDoubleTapThreshold(dt.ios, DEFAULT_SETTINGS.doubleTapThresholds.ios);
+        dt.fallback = this.sanitizeDoubleTapThreshold(dt.fallback, DEFAULT_SETTINGS.doubleTapThresholds.fallback);
+        this.settings.doubleTapThresholds = dt;
+        if (!this.settings.users || !this.settings.users.length) {
+          var du = makeDefaultUser();
+          this.settings.users = [du];
+          this.settings.currentUserId = du.id;
+        } else {
+          for (var su of this.settings.users) {
+            if (!su.id) su.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+            if (!su.name) su.name = "小朋友";
+            if (!su.savePath || !String(su.savePath).trim()) su.savePath = "Little Milestones/Daily Records";
+            if (!Array.isArray(su.items)) su.items = [];
+            if (!Array.isArray(su.categories) || !su.categories.length) su.categories = ["加分项", "减分项"];
+            if (typeof su.scoringRules !== "string") su.scoringRules = "";
+            if (!su.diaryTemplate) su.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
+          }
+          var cuid = this.settings.currentUserId;
+          if (!cuid || !this.settings.users.find(function(u) { return u.id === cuid; })) {
+            this.settings.currentUserId = this.settings.users[0].id;
+          }
+        }
+      }
     });
   }
 
@@ -315,8 +385,36 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
     });
   }
 
+  sanitizeDoubleTapThreshold(value, fallback) {
+    var n = parseInt(String(value), 10);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(120, Math.min(600, n));
+  }
+
+  detectPlatformKey() {
+    var ua = (navigator.userAgent || "").toLowerCase();
+    if (/android/.test(ua)) return "android";
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    if (/macintosh|mac os x/.test(ua)) return "mac";
+    if (/windows/.test(ua)) return "windows";
+    return "fallback";
+  }
+
+  getDoubleTapThreshold() {
+    var defaults = DEFAULT_SETTINGS.doubleTapThresholds;
+    var cfg = this.settings.doubleTapThresholds || defaults;
+    var key = this.detectPlatformKey();
+    var fb = this.sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
+    return this.sanitizeDoubleTapThreshold(cfg[key], fb);
+  }
+
+  get currentUser() {
+    var cuid = this.settings.currentUserId;
+    return this.settings.users.find(function(u) { return u.id === cuid; }) || this.settings.users[0];
+  }
+
   filePath(dateStr) {
-    return (0, import_obsidian.normalizePath)(this.settings.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
 
   /* ── Read day data (backward compatible) ── */
@@ -338,7 +436,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
           if (kvNum) { scores[kvNum[1]] = parseInt(kvNum[2]); continue; }
           var kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
           if (kvBool) {
-            var itemDef = this.settings.items.find(function(it) { return it.id === kvBool[1]; });
+            var itemDef = this.currentUser.items.find(function(it) { return it.id === kvBool[1]; });
             scores[kvBool[1]] = kvBool[2] === "true" ? (itemDef ? itemDef.points : 1) : 0;
           }
         }
@@ -372,7 +470,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
   /* ── Save day data ── */
   saveDayData(dateStr, scores, customItems, diaryContent) {
     return __async(this, null, function* () {
-      var items = this.settings.items;
+      var items = this.currentUser.items;
       var d = new Date(dateStr + "T00:00:00");
       d.setDate(d.getDate() - 1);
       var yesterdayStr = d.toISOString().slice(0, 10);
@@ -404,29 +502,29 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
       var scoresYaml = items.map(function(item) { return "  " + item.id + ": " + (scores[item.id] || 0); }).join("\n");
       var customYaml = "";
       if (customItems.length > 0) {
-        customYaml = "\ncustomItems:\n" + customItems.map(function(ci) { return '  - "' + ci.emoji + "|" + ci.name + "|" + ci.points + '"'; }).join("\n");
+        customYaml = "\ncustomItems:\n" + customItems.map(function(ci) { return "  - " + toYamlInline(ci.emoji + "|" + ci.name + "|" + ci.points); }).join("\n");
       }
-      var scoreDetailYaml = "\nscoreDetail:\n" + items.map(function(item) { var v = scores[item.id] || 0; return '  "' + item.name + '": ' + v; }).join("\n");
-      if (customItems.length > 0) { for (var ci of customItems) { scoreDetailYaml += '\n  "\u4E34\u65F6-' + ci.name + '": ' + ci.points; } }
+      var scoreDetailYaml = "\nscoreDetail:\n" + items.map(function(item) { var v = scores[item.id] || 0; return "  " + toYamlInline(item.name) + ": " + v; }).join("\n");
+      if (customItems.length > 0) { for (var ci of customItems) { scoreDetailYaml += "\n  " + toYamlInline("临时-" + ci.name) + ": " + ci.points; } }
       var summaryYaml = "\nsummary:\n  earned: " + earnedCount + "\n  missed: " + missedCount + "\n  customCount: " + customItems.length + "\n  customTotal: " + customTotal + "\n  cumulativeTotal: " + grandTotal + "\n  cumulativeDays: " + grandDays + "\n  cumulativeAvg: " + grandAvg;
       var tagsYaml = "\ntags:";
-      if (weatherMatch) tagsYaml += '\n  weather: "' + weatherMatch[1].trim() + '"';
-      if (moodMatch) tagsYaml += '\n  mood: "' + moodMatch[1].trim() + '"';
-      if (homeCookMatch) tagsYaml += '\n  homeCook: "' + homeCookMatch[1].trim() + '"';
-      if (exerciseMatch) tagsYaml += '\n  exercise: "' + exerciseMatch[1].trim() + '"';
-      if (sleepMatch) tagsYaml += '\n  sleep: "' + sleepMatch[1].trim() + '"';
+      if (weatherMatch) tagsYaml += "\n  weather: " + toYamlInline(weatherMatch[1].trim());
+      if (moodMatch) tagsYaml += "\n  mood: " + toYamlInline(moodMatch[1].trim());
+      if (homeCookMatch) tagsYaml += "\n  homeCook: " + toYamlInline(homeCookMatch[1].trim());
+      if (exerciseMatch) tagsYaml += "\n  exercise: " + toYamlInline(exerciseMatch[1].trim());
+      if (sleepMatch) tagsYaml += "\n  sleep: " + toYamlInline(sleepMatch[1].trim());
       tagsYaml += "\n  hasDiary: " + (diaryText.trim().length > 0);
       var dietYaml = "";
       if (breakfastMatch || lunchMatch || dinnerMatch) {
         dietYaml = "\ndiet:";
-        if (breakfastMatch) dietYaml += '\n  breakfast: "' + breakfastMatch[1].trim() + '"';
-        if (lunchMatch) dietYaml += '\n  lunch: "' + lunchMatch[1].trim() + '"';
-        if (dinnerMatch) dietYaml += '\n  dinner: "' + dinnerMatch[1].trim() + '"';
+        if (breakfastMatch) dietYaml += "\n  breakfast: " + toYamlInline(breakfastMatch[1].trim());
+        if (lunchMatch) dietYaml += "\n  lunch: " + toYamlInline(lunchMatch[1].trim());
+        if (dinnerMatch) dietYaml += "\n  dinner: " + toYamlInline(dinnerMatch[1].trim());
       }
 
       // Build markdown tables — grouped by category
       var hasYesterday = !!yesterdayData;
-      var categories = this.settings.categories || [];
+      var categories = this.currentUser.categories || [];
       var tableHeader = hasYesterday
         ? "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 | \u6628\u65E5 |\n|:---|---:|---:|:---:|:---:|\n"
         : "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n";
@@ -460,8 +558,14 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
         tableContent += "\n### \u5176\u4ED6\n\n" + tableHeader + renderRows(uncatItems) + "\n";
       }
       if (customItems.length > 0) {
-        tableContent += "\n### \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\n\n| \u4E8B\u9879 | \u5F97\u5206 |\n|:---|---:|\n";
-        for (var ci of customItems) { tableContent += "| " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " |\n"; }
+        var hasCustomNotes = customItems.some(function(ci) { return ci.note && ci.note.trim(); });
+        if (hasCustomNotes) {
+          tableContent += "\n### \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\n\n| \u4E8B\u9879 | \u5F97\u5206 | \u5907\u6CE8 |\n|:---|---:|:---|\n";
+          for (var ci of customItems) { tableContent += "| " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " | " + (ci.note || "") + " |\n"; }
+        } else {
+          tableContent += "\n### \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\n\n| \u4E8B\u9879 | \u5F97\u5206 |\n|:---|---:|\n";
+          for (var ci of customItems) { tableContent += "| " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " |\n"; }
+        }
       }
 
       var totalSign = total >= 0 ? "+" : "";
@@ -474,9 +578,9 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
         yesterdayRow = "\n| \u{1F4C6} \u6628\u65E5\u603B\u5206 | " + yTotalSign + yesterdayData.total + " \u5206 |";
       }
 
-      var content = "---\ndate: " + dateStr + "\nchild: " + this.settings.childName + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + this.settings.childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n## \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n\n| \u6307\u6807 | \u6570\u503C |\n|:---|---:|\n| \u{1F3C6} \u4ECA\u65E5\u603B\u5206 | " + totalSign + total + " \u5206 |" + yesterdayRow + "\n| \u2705 \u5B8C\u6210\u9879\u76EE | " + earnedCount + "/" + totalItems + " (" + completionRate + "%) |\n| \u{1F4CC} \u4E34\u65F6\u4E8B\u9879 | " + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206) |\n| \u{1F4C8} \u7D2F\u8BA1\u603B\u5206 | " + grandSign + grandTotal + " \u5206 |\n| \u{1F4C5} \u7D2F\u8BA1\u5929\u6570 | " + grandDays + " \u5929 |\n| \u{1F4CA} \u65E5\u5747\u5F97\u5206 | " + grandAvg + " \u5206 |\n\n---\n" + tableContent + "\n---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || this.settings.diaryTemplate) + "\n";
+      var content = "---\ndate: " + dateStr + "\nchild: " + this.currentUser.name + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + this.currentUser.name + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n## \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n\n| \u6307\u6807 | \u6570\u503C |\n|:---|---:|\n| \u{1F3C6} \u4ECA\u65E5\u603B\u5206 | " + totalSign + total + " \u5206 |" + yesterdayRow + "\n| \u2705 \u5B8C\u6210\u9879\u76EE | " + earnedCount + "/" + totalItems + " (" + completionRate + "%) |\n| \u{1F4CC} \u4E34\u65F6\u4E8B\u9879 | " + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206) |\n| \u{1F4C8} \u7D2F\u8BA1\u603B\u5206 | " + grandSign + grandTotal + " \u5206 |\n| \u{1F4C5} \u7D2F\u8BA1\u5929\u6570 | " + grandDays + " \u5929 |\n| \u{1F4CA} \u65E5\u5747\u5F97\u5206 | " + grandAvg + " \u5206 |\n\n---\n" + tableContent + "\n---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || this.currentUser.diaryTemplate) + "\n";
 
-      var dirPath = (0, import_obsidian.normalizePath)(this.settings.savePath);
+      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
       if (!this.app.vault.getAbstractFileByPath(dirPath)) { yield this.app.vault.createFolder(dirPath); }
       var fp = this.filePath(dateStr);
       var existing = this.app.vault.getAbstractFileByPath(fp);
@@ -488,7 +592,7 @@ var KidScorePlugin = class extends import_obsidian.Plugin {
 
   getAllScores() {
     return __async(this, null, function* () {
-      var dirPath = (0, import_obsidian.normalizePath)(this.settings.savePath);
+      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
       var files = this.app.vault.getFiles().filter(function(f) { return f.path.startsWith(dirPath + "/") && f.extension === "md"; });
       var results = [];
       for (var file of files) {
@@ -545,7 +649,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var existingToday = yield this.plugin.readDayData(this.dateStr);
       var yesterdayData = yield this.plugin.readDayData(yesterdayStr);
 
-      for (var item of this.plugin.settings.items) {
+      for (var item of this.plugin.currentUser.items) {
         if (existingToday && existingToday.scores[item.id] !== undefined) {
           this.scores[item.id] = existingToday.scores[item.id];
         } else {
@@ -559,7 +663,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
 
       // Header with date navigation
       var header = contentEl.createDiv({ cls: "kid-score-header" });
-      header.createEl("h2", { text: this.plugin.settings.childName + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
+      header.createEl("h2", { text: this.plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
 
       var dateNav = header.createDiv({ cls: "kid-score-date-nav" });
       var prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
@@ -617,6 +721,25 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
       }
 
+      /* ── User switcher (multi-user) ── */
+      var allUsers = self.plugin.settings.users;
+      if (allUsers.length > 1) {
+        var userSwitcher = contentEl.createDiv({ cls: "kid-score-user-switcher" });
+        allUsers.forEach(function(u) {
+          var uBtn = userSwitcher.createEl("button", {
+            cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+            text: u.name
+          });
+          uBtn.onclick = function() {
+            return __async(self, null, function* () {
+              self.plugin.settings.currentUserId = u.id;
+              yield self.plugin.saveSettings();
+              yield self.renderModal();
+            });
+          };
+        });
+      }
+
       /* ── Tab bar ── */
       var mainTabs = contentEl.createDiv({ cls: "kid-score-main-tabs" });
       var scoreTab = mainTabs.createEl("button", { text: "\u2B50 \u6253\u5206", cls: "kid-score-main-tab is-active" });
@@ -631,16 +754,17 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         self.activeTab = "score";
         scoreTab.addClass("is-active"); diaryTab.removeClass("is-active");
         scorePanel.removeClass("is-hidden"); diaryPanel.addClass("is-hidden");
+        contentEl.scrollTop = 0;
       };
       diaryTab.onclick = function() {
         self.activeTab = "diary";
         diaryTab.addClass("is-active"); scoreTab.removeClass("is-active");
         diaryPanel.removeClass("is-hidden"); scorePanel.addClass("is-hidden");
-        if (self.diaryTextarea) self.diaryTextarea.focus();
+        contentEl.scrollTop = 0;
       };
 
       /* ══════════════ Score Panel ══════════════ */
-      if (this.plugin.settings.items.length === 0) {
+      if (this.plugin.currentUser.items.length === 0) {
         scorePanel.createEl("div", { cls: "kid-score-empty", text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01" });
       } else {
         // ── Scoring Rules Section ──
@@ -653,13 +777,13 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         var rulesView = rulesBody.createDiv({ cls: "kid-score-rules-view" });
         var rulesEdit = rulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
         var rulesTextarea = rulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-        rulesTextarea.value = self.plugin.settings.scoringRules || "";
+        rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
         var rulesActRow = rulesEdit.createDiv({ cls: "kid-score-rules-actions" });
         var rulesSaveBtn = rulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
         var rulesCancelBtn = rulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
         var renderRulesView = function() {
           rulesView.empty();
-          var text = self.plugin.settings.scoringRules || "";
+          var text = self.plugin.currentUser.scoringRules || "";
           if (text.trim()) {
             import_obsidian.MarkdownRenderer.render(self.app, text, rulesView, "", self);
           } else {
@@ -667,7 +791,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           }
         };
         renderRulesView();
-        var rulesOpen = !!(self.plugin.settings.scoringRules && self.plugin.settings.scoringRules.trim());
+        var rulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
         if (!rulesOpen) { rulesBody.addClass("is-hidden"); }
         else { rulesToggle.textContent = "\u25BC"; }
         rulesHeader.addEventListener("click", function(e) {
@@ -684,7 +808,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
             rulesOpen = true;
             rulesToggle.textContent = "\u25BC";
             rulesBody.removeClass("is-hidden");
-            rulesTextarea.value = self.plugin.settings.scoringRules || "";
+            rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
             rulesView.addClass("is-hidden");
             rulesEdit.removeClass("is-hidden");
             rulesTextarea.focus();
@@ -695,7 +819,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         });
         rulesSaveBtn.addEventListener("click", function() {
           return __async(self, null, function* () {
-            self.plugin.settings.scoringRules = rulesTextarea.value;
+            self.plugin.currentUser.scoringRules = rulesTextarea.value;
             yield self.plugin.saveSettings();
             rulesIsEditing = false;
             rulesView.removeClass("is-hidden");
@@ -714,15 +838,15 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           var ySign = yesterdayData.total >= 0 ? "+" : "";
           scorePanel.createDiv({ cls: "kid-score-yesterday-banner", text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayStr + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206" });
         }
-        scorePanel.createDiv({ cls: "kid-score-hint", text: "\u{1F4A1} \u70B9\u51FB\u6253\u5206 \u00B7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C" });
         var itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
+        itemsContainer.createDiv({ cls: "kid-score-hint", text: "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \u00B7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C" });
         this.totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
 
         // Render by category
-        var categories = this.plugin.settings.categories || [];
+        var categories = this.plugin.currentUser.categories || [];
         var catRendered = false;
         for (var cat of categories) {
-          var catItems = this.plugin.settings.items.filter(function(it) { return it.category === cat; });
+          var catItems = this.plugin.currentUser.items.filter(function(it) { return it.category === cat; });
           if (catItems.length > 0) {
             if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
             var catHeader = itemsContainer.createDiv({ cls: "kid-score-cat-header" });
@@ -737,7 +861,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           }
         }
         // Uncategorized
-        var uncatItems = this.plugin.settings.items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
+        var uncatItems = this.plugin.currentUser.items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
         if (uncatItems.length > 0) {
           if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
           itemsContainer.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
@@ -782,7 +906,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     var templateBtn = toolbar.createEl("button", { cls: "diary-tool-btn", text: "\u{1F4CB} \u63D2\u5165\u6A21\u677F" });
     templateBtn.onclick = function() {
       if (!self.diaryTextarea) return;
-      var template = self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate;
+      var template = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
       var current = self.diaryTextarea.value;
       if (current.trim()) {
         var pos = self.diaryTextarea.selectionStart || current.length;
@@ -893,11 +1017,11 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     } else {
       card.createDiv({ cls: "card-yesterday was-missed", text: "\u6628 -" });
     }
-    var pressTimer = null; var isLongPress = false; var hasMoved = false; var startX = 0; var startY = 0;
+    var pressTimer = null; var isLongPress = false; var hasMoved = false; var startX = 0; var startY = 0; var clickTimer = null; var lastTapAt = 0;
     card.addEventListener("pointerdown", function(e) {
       isLongPress = false; hasMoved = false; startX = e.clientX; startY = e.clientY;
       pressTimer = setTimeout(function() {
-        if (!hasMoved) { isLongPress = true; self.showCustomValuePopup(item, function(v) { self.scores[item.id] = v; self.refreshCard(card, item); self.updateTotalDisplay(); }); }
+        if (!hasMoved) { isLongPress = true; self.showCustomValuePopup(item, function(v) { self.scores[item.id] = v; self.refreshCard(card, item); self.updateTotalDisplay(); }, false); }
       }, 500);
     });
     card.addEventListener("pointermove", function(e) {
@@ -905,8 +1029,32 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         hasMoved = true; clearTimeout(pressTimer);
       }
     });
-    card.addEventListener("pointerup", function() { clearTimeout(pressTimer); if (!isLongPress && !hasMoved) { self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0; self.refreshCard(card, item); self.updateTotalDisplay(); } });
-    card.addEventListener("pointercancel", function() { clearTimeout(pressTimer); hasMoved = true; });
+    card.addEventListener("pointerup", function() {
+      clearTimeout(pressTimer);
+      if (!isLongPress && !hasMoved) {
+        var now = Date.now();
+        var threshold = self.plugin.getDoubleTapThreshold();
+        if (lastTapAt && now - lastTapAt <= threshold) {
+          if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
+          lastTapAt = 0;
+          self.showCustomValuePopup(item, function(v) { self.scores[item.id] = v; self.refreshCard(card, item); self.updateTotalDisplay(); }, true);
+          return;
+        }
+        lastTapAt = now;
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+        }
+        clickTimer = setTimeout(function() {
+          self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0;
+          self.refreshCard(card, item);
+          self.updateTotalDisplay();
+          clickTimer = null;
+          lastTapAt = 0;
+        }, threshold + 20);
+      }
+    });
+    card.addEventListener("pointercancel", function() { clearTimeout(pressTimer); hasMoved = true; lastTapAt = 0; });
     card.addEventListener("pointerleave", function() { clearTimeout(pressTimer); });
     card.addEventListener("contextmenu", function(e) { e.preventDefault(); });
   }
@@ -922,7 +1070,8 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     if (pointsEl) { pointsEl.textContent = scoreVal !== 0 ? ((scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "")) : ((item.points >= 0 ? "+" : "") + item.points + " \u5206"); }
   }
 
-  showCustomValuePopup(item, callback) {
+  showCustomValuePopup(item, callback, quickOnly) {
+    if (quickOnly === void 0) quickOnly = false;
     var self = this;
     var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
     var popup = document.createElement("div"); popup.className = "kid-score-value-popup";
@@ -933,6 +1082,9 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var minus = document.createElement("button"); minus.className = "value-popup-adjust"; minus.textContent = "\u2212";
       var input = document.createElement("input"); input.type = "number"; input.className = "value-popup-input"; input.value = String(self.scores[item.id] || item.points);
       var plus = document.createElement("button"); plus.className = "value-popup-adjust"; plus.textContent = "+";
+      input.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+      input.addEventListener("touchstart", function(e) { e.stopPropagation(); });
+      input.addEventListener("click", function(e) { e.stopPropagation(); input.focus(); });
       minus.onclick = function() { input.value = String(parseInt(input.value || "0") - 1); };
       plus.onclick = function() { input.value = String(parseInt(input.value || "0") + 1); };
       controls.appendChild(minus); controls.appendChild(input); controls.appendChild(plus); popup.appendChild(controls);
@@ -940,22 +1092,24 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
       var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u786E\u5B9A"; ok.onclick = function() { callback(parseInt(input.value) || 0); overlay.remove(); };
       acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-      var delRow = document.createElement("div"); delRow.className = "value-popup-del-row";
-      var editBtn = document.createElement("button"); editBtn.className = "value-popup-edit-btn"; editBtn.textContent = "\u270F\uFE0F \u7F16\u8F91\u6B64\u9879\u76EE";
-      editBtn.onclick = function() { showEditMode(); };
-      var delBtn = document.createElement("button"); delBtn.className = "value-popup-del-btn"; delBtn.textContent = "\uD83D\uDDD1 \u5220\u9664\u6B64\u6253\u5206\u9879";
-      delBtn.onclick = function() {
-        return __async(self, null, function* () {
-          overlay.remove();
-          var idx = self.plugin.settings.items.findIndex(function(it) { return it.id === item.id; });
-          if (idx !== -1) {
-            self.plugin.settings.items.splice(idx, 1);
-            yield self.plugin.saveSettings();
-            yield self.renderModal();
-          }
-        });
-      };
-      delRow.appendChild(editBtn); delRow.appendChild(delBtn); popup.appendChild(delRow);
+      if (!quickOnly) {
+        var delRow = document.createElement("div"); delRow.className = "value-popup-del-row";
+        var editBtn = document.createElement("button"); editBtn.className = "value-popup-edit-btn"; editBtn.textContent = "\u270F\uFE0F \u7F16\u8F91\u6B64\u9879\u76EE";
+        editBtn.onclick = function() { showEditMode(); };
+        var delBtn = document.createElement("button"); delBtn.className = "value-popup-del-btn"; delBtn.textContent = "\uD83D\uDDD1 \u5220\u9664\u6B64\u6253\u5206\u9879";
+        delBtn.onclick = function() {
+          return __async(self, null, function* () {
+            overlay.remove();
+            var idx = self.plugin.currentUser.items.findIndex(function(it) { return it.id === item.id; });
+            if (idx !== -1) {
+              self.plugin.currentUser.items.splice(idx, 1);
+              yield self.plugin.saveSettings();
+              yield self.renderModal();
+            }
+          });
+        };
+        delRow.appendChild(editBtn); delRow.appendChild(delBtn); popup.appendChild(delRow);
+      }
       input.focus(); input.select();
     };
 
@@ -965,12 +1119,18 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
       var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
       var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = item.emoji; emojiInput.maxLength = 2;
+      emojiInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+      emojiInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
+      emojiInput.addEventListener("click", function(e) { e.stopPropagation(); emojiInput.focus(); });
       var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\uD83D\uDD0D"; emojiPickBtn.style.marginLeft = "4px";
       emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
       emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn); popup.appendChild(emojiRow);
       var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
       var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u540D\u79F0";
       var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.value = item.name; nameInput.autocomplete = "off";
+      nameInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+      nameInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
+      nameInput.addEventListener("click", function(e) { e.stopPropagation(); nameInput.focus(); });
       nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
       var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
       var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u9ED8\u8BA4\u5206\u503C";
@@ -978,17 +1138,23 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
       var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = String(item.points);
       var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
+      pi.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+      pi.addEventListener("touchstart", function(e) { e.stopPropagation(); });
+      pi.addEventListener("click", function(e) { e.stopPropagation(); pi.focus(); });
       pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
       pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
       pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp); pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
       var noteRow = document.createElement("div"); noteRow.className = "custom-form-row";
       var noteLabel = document.createElement("span"); noteLabel.className = "custom-form-label"; noteLabel.textContent = "\u5907\u6CE8";
       var noteInput = document.createElement("input"); noteInput.type = "text"; noteInput.className = "custom-form-name-input"; noteInput.value = item.note || ""; noteInput.placeholder = "\u53EF\u9009\uFF0C\u957F\u6309\u65F6\u663E\u793A\u5728\u5361\u7247\u4E0A..."; noteInput.autocomplete = "off";
+      noteInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+      noteInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
+      noteInput.addEventListener("click", function(e) { e.stopPropagation(); noteInput.focus(); });
       noteRow.appendChild(noteLabel); noteRow.appendChild(noteInput); popup.appendChild(noteRow);
       var catRow = document.createElement("div"); catRow.className = "custom-form-row";
       var catLabel = document.createElement("span"); catLabel.className = "custom-form-label"; catLabel.textContent = "\u5206\u7C7B";
       var catSel = document.createElement("select"); catSel.className = "custom-form-select";
-      var cats = self.plugin.settings.categories || [];
+      var cats = self.plugin.currentUser.categories || [];
       cats.forEach(function(c) { var opt = document.createElement("option"); opt.value = c; opt.textContent = c; if (c === item.category) opt.selected = true; catSel.appendChild(opt); });
       catRow.appendChild(catLabel); catRow.appendChild(catSel); popup.appendChild(catRow);
       var acts = document.createElement("div"); acts.className = "value-popup-actions";
@@ -1014,8 +1180,11 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     };
 
     showScoreMode();
+    popup.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+    popup.addEventListener("touchstart", function(e) { e.stopPropagation(); }, { passive: true });
     overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
     getOverlayMount(self.containerEl).appendChild(overlay);
+    setupMobileKeyboard(overlay, popup);
   }
 
   showAddItemPopup(category) {
@@ -1049,9 +1218,9 @@ var DailyScoringModal = class extends import_obsidian.Modal {
       return __async(self, null, function* () {
         var n = nameInput.value.trim();
         if (!n) { nameInput.classList.add("is-error"); return; }
-        self.plugin.settings.items.push({ id: "item_" + Date.now(), name: n, points: parseInt(pi.value) || 1, emoji: emojiInput.value.trim() || "\u2B50", category: category, note: "" });
-        var cats = self.plugin.settings.categories || [];
-        self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+        self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: n, points: parseInt(pi.value) || 1, emoji: emojiInput.value.trim() || "\u2B50", category: category, note: "" });
+        var cats = self.plugin.currentUser.categories || [];
+        self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
         yield self.plugin.saveSettings();
         overlay.remove();
         yield self.renderModal();
@@ -1061,6 +1230,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
     overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
     getOverlayMount(self.containerEl).appendChild(overlay);
+    setupMobileKeyboard(overlay, popup);
     setTimeout(function() { nameInput.focus(); }, 100);
   }
 
@@ -1069,12 +1239,42 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     if (this.customItems.length === 0) { container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" }); return; }
     for (var i = 0; i < this.customItems.length; i++) {
       (function(idx) {
-        var ci = self.customItems[idx]; var row = container.createDiv({ cls: "kid-score-custom-row" });
+        var ci = self.customItems[idx];
+        var wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
+        var row = wrap.createDiv({ cls: "kid-score-custom-row" });
         row.createSpan({ cls: "custom-emoji", text: ci.emoji });
         row.createSpan({ cls: "custom-name", text: ci.name });
         row.createSpan({ cls: "custom-points " + (ci.points >= 0 ? "pos" : "neg"), text: (ci.points >= 0 ? "+" : "") + ci.points + " \u5206" });
+        var edit = row.createEl("button", { cls: "custom-edit-btn", text: "\u270F\uFE0F" });
+        edit.onclick = function(e) { e.stopPropagation(); self.showEditCustomItemPopup(idx); };
         var del = row.createEl("button", { cls: "custom-delete-btn", text: "\u{1F5D1}" });
-        del.onclick = function() { self.customItems.splice(idx, 1); self.renderCustomItems(); self.updateTotalDisplay(); };
+        del.onclick = function(e) { e.stopPropagation(); self.customItems.splice(idx, 1); self.renderCustomItems(); self.updateTotalDisplay(); };
+        if (ci.note) { wrap.createDiv({ cls: "custom-item-note", text: ci.note }); }
+        // Long-press to edit
+        var pressTimer = null; var isLongPress = false; var hasMoved = false; var startX = 0; var startY = 0; var lastTapAt = 0;
+        row.addEventListener("pointerdown", function(e) {
+          if (e.target === del || del.contains(e.target) || e.target === edit || edit.contains(e.target)) return;
+          isLongPress = false; hasMoved = false; startX = e.clientX; startY = e.clientY;
+          pressTimer = setTimeout(function() { if (!hasMoved) { isLongPress = true; self.showEditCustomItemPopup(idx); } }, 500);
+        });
+        row.addEventListener("pointermove", function(e) {
+          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) { hasMoved = true; clearTimeout(pressTimer); }
+        });
+        row.addEventListener("pointerup", function(e) {
+          clearTimeout(pressTimer);
+          if (e.target === del || del.contains(e.target) || e.target === edit || edit.contains(e.target)) return;
+          if (isLongPress || hasMoved) return;
+          var now = Date.now();
+          var threshold = self.plugin.getDoubleTapThreshold();
+          if (lastTapAt && now - lastTapAt <= threshold) {
+            lastTapAt = 0;
+            self.showQuickCustomScorePopup(idx);
+            return;
+          }
+          lastTapAt = now;
+        });
+        row.addEventListener("pointercancel", function() { clearTimeout(pressTimer); hasMoved = true; lastTapAt = 0; });
+        row.addEventListener("contextmenu", function(e) { e.preventDefault(); });
       })(i);
     }
   }
@@ -1083,7 +1283,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     var self = this;
     var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
     var popup = document.createElement("div"); popup.className = "kid-score-value-popup kid-score-custom-form";
-    popup.innerHTML = '<div class="value-popup-header">\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879</div>';
+    popup.innerHTML = '<div class="value-popup-header">\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879</div><div class="value-popup-hint">\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0</div>';
     var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
     var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
     var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = "\u2B50"; emojiInput.maxLength = 2;
@@ -1105,21 +1305,110 @@ var DailyScoringModal = class extends import_obsidian.Modal {
     pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
     pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp);
     pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
+    var noteRow = document.createElement("div"); noteRow.className = "custom-form-row";
+    var noteLabel = document.createElement("span"); noteLabel.className = "custom-form-label"; noteLabel.textContent = "\u5907\u6CE8";
+    var noteInput = document.createElement("input"); noteInput.type = "text"; noteInput.className = "custom-form-name-input"; noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D..."; noteInput.autocomplete = "off";
+    noteRow.appendChild(noteLabel); noteRow.appendChild(noteInput); popup.appendChild(noteRow);
     var acts = document.createElement("div"); acts.className = "value-popup-actions";
     var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
     var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u6DFB\u52A0";
-    ok.onclick = function() { var n = nameInput.value.trim(); if (!n) { nameInput.classList.add("is-error"); return; } self.customItems.push({ id: "custom_" + Date.now(), emoji: emojiInput.value.trim() || "\u2B50", name: n, points: parseInt(pi.value) || 0 }); self.renderCustomItems(); self.updateTotalDisplay(); overlay.remove(); };
+    ok.onclick = function() { var n = nameInput.value.trim(); if (!n) { nameInput.classList.add("is-error"); return; } self.customItems.push({ id: "custom_" + Date.now(), emoji: emojiInput.value.trim() || "\u2B50", name: n, points: parseInt(pi.value) || 0, note: noteInput.value.trim() }); self.renderCustomItems(); self.updateTotalDisplay(); overlay.remove(); };
     acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
     popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
     overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
     getOverlayMount(self.containerEl).appendChild(overlay);
+    setupMobileKeyboard(overlay, popup);
     setTimeout(function() { nameInput.focus(); }, 100);
+  }
+
+  showEditCustomItemPopup(idx) {
+    var self = this;
+    var ci = self.customItems[idx];
+    if (!ci) return;
+    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
+    var popup = document.createElement("div"); popup.className = "kid-score-value-popup kid-score-custom-form";
+    popup.innerHTML = '<div class="value-popup-header">\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879</div>';
+    var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
+    var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
+    var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = ci.emoji; emojiInput.maxLength = 2;
+    var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\uD83D\uDD0D"; emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
+    emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn); popup.appendChild(emojiRow);
+    var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
+    var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u4E8B\u9879";
+    var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.value = ci.name; nameInput.autocomplete = "off";
+    nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
+    var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
+    var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u5206\u503C";
+    var pc = document.createElement("div"); pc.className = "value-popup-controls";
+    var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
+    var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = String(ci.points);
+    var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
+    pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
+    pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
+    pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp);
+    pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
+    var noteRow2 = document.createElement("div"); noteRow2.className = "custom-form-row";
+    var noteLabel2 = document.createElement("span"); noteLabel2.className = "custom-form-label"; noteLabel2.textContent = "\u5907\u6CE8";
+    var noteInput2 = document.createElement("input"); noteInput2.type = "text"; noteInput2.className = "custom-form-name-input"; noteInput2.value = ci.note || ""; noteInput2.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D..."; noteInput2.autocomplete = "off";
+    noteRow2.appendChild(noteLabel2); noteRow2.appendChild(noteInput2); popup.appendChild(noteRow2);
+    var acts = document.createElement("div"); acts.className = "value-popup-actions";
+    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
+    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u4FDD\u5B58";
+    ok.onclick = function() {
+      var n = nameInput.value.trim();
+      if (!n) { nameInput.classList.add("is-error"); return; }
+      self.customItems[idx].emoji = emojiInput.value.trim() || "\u2B50";
+      self.customItems[idx].name = n;
+      self.customItems[idx].points = parseInt(pi.value) || 0;
+      self.customItems[idx].note = noteInput2.value.trim();
+      self.renderCustomItems();
+      self.updateTotalDisplay();
+      overlay.remove();
+    };
+    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
+    popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
+    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    getOverlayMount(self.containerEl).appendChild(overlay);
+    setupMobileKeyboard(overlay, popup);
+    setTimeout(function() { nameInput.focus(); nameInput.select(); }, 100);
+  }
+
+  showQuickCustomScorePopup(idx) {
+    var self = this;
+    var ci = self.customItems[idx];
+    if (!ci) return;
+    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
+    var popup = document.createElement("div"); popup.className = "kid-score-value-popup";
+    popup.innerHTML = '<div class="value-popup-header">' + ci.emoji + " " + ci.name + '</div>' + (ci.note ? '<div class="value-popup-note">' + ci.note + '</div>' : '') + '<div class="value-popup-hint">\u5FEB\u901F\u4FEE\u6539\u5206\u503C</div>';
+    var controls = document.createElement("div"); controls.className = "value-popup-controls";
+    var minus = document.createElement("button"); minus.className = "value-popup-adjust"; minus.textContent = "\u2212";
+    var input = document.createElement("input"); input.type = "number"; input.className = "value-popup-input"; input.value = String(ci.points || 0);
+    var plus = document.createElement("button"); plus.className = "value-popup-adjust"; plus.textContent = "+";
+    minus.onclick = function() { input.value = String(parseInt(input.value || "0") - 1); };
+    plus.onclick = function() { input.value = String(parseInt(input.value || "0") + 1); };
+    controls.appendChild(minus); controls.appendChild(input); controls.appendChild(plus); popup.appendChild(controls);
+    var acts = document.createElement("div"); acts.className = "value-popup-actions";
+    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
+    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u4FDD\u5B58";
+    ok.onclick = function() {
+      self.customItems[idx].points = parseInt(input.value) || 0;
+      self.renderCustomItems();
+      self.updateTotalDisplay();
+      overlay.remove();
+    };
+    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
+    popup.addEventListener("mousedown", function(e) { e.stopPropagation(); });
+    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    getOverlayMount(self.containerEl).appendChild(overlay);
+    setupMobileKeyboard(overlay, popup);
+    setTimeout(function() { input.focus(); input.select(); }, 60);
   }
 
   updateTotalDisplay() {
     if (!this.totalDisplay) return;
     var total = 0;
-    for (var item of this.plugin.settings.items) { total += (this.scores[item.id] || 0); }
+    for (var item of this.plugin.currentUser.items) { total += (this.scores[item.id] || 0); }
     for (var ci of this.customItems) { total += ci.points; }
     this.totalDisplay.textContent = "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206";
   }
@@ -1136,7 +1425,7 @@ var StatsModal = class extends import_obsidian.Modal {
   onOpen() {
     return __async(this, null, function* () {
       var contentEl = this.contentEl; contentEl.empty(); contentEl.addClass("kid-score-stats-modal");
-      contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.settings.childName + " \u7684\u6253\u5206\u7EDF\u8BA1" });
+      contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
       var allScores = yield this.plugin.getAllScores();
       if (allScores.length === 0) { contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" }); return; }
       var grandTotal = allScores.reduce(function(s, r) { return s + r.total; }, 0);
@@ -1197,10 +1486,10 @@ var StatsModal = class extends import_obsidian.Modal {
         mkCard("\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
         mkCard("\u6700\u9AD8\u5355\u65E5", "+" + max);
         mkCard("\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
-        if (self.plugin.settings.items.length > 0) {
+        if (self.plugin.currentUser.items.length > 0) {
           statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
           var itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-          for (var item of self.plugin.settings.items) {
+          for (var item of self.plugin.currentUser.items) {
             var count = filtered.filter(function(s) { return s.scores[item.id] !== undefined && s.scores[item.id] > 0; }).length;
             var rate = Math.round(count / filtered.length * 100);
             var row = itemList.createDiv({ cls: "completion-row" });
@@ -1254,10 +1543,88 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     containerEl.addClass("kid-score-settings");
     containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
 
-    new import_obsidian.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u8BB0\u5F55\u6253\u5206\u7684\u5C0F\u670B\u53CB\u540D\u5B57")
-      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.settings.childName).onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.childName = v; yield self.plugin.saveSettings(); }); }); });
+    /* ── User management ── */
+    containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u4E0B\u65B9\u6240\u6709\u8BBE\u7F6E\u5747\u4E3A\u5F53\u524D\u7528\u6237\u3002" });
+    var userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+    var renderUserMgr = function() {
+      userMgrWrap.empty();
+      self.plugin.settings.users.forEach(function(u) {
+        var uBtn = userMgrWrap.createEl("button", {
+          cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+          text: u.name
+        });
+        uBtn.onclick = function() {
+          return __async(self, null, function* () {
+            self.plugin.settings.currentUserId = u.id;
+            yield self.plugin.saveSettings();
+            self.display();
+          });
+        };
+      });
+      var addUBtn = userMgrWrap.createEl("button", { cls: "kid-score-user-add-btn", text: "\uFF0B \u6DFB\u52A0\u7528\u6237" });
+      addUBtn.onclick = function() {
+        return __async(self, null, function* () {
+          var nu = makeDefaultUser();
+          nu.name = "\u65B0\u7528\u6237";
+          self.plugin.settings.users.push(nu);
+          self.plugin.settings.currentUserId = nu.id;
+          yield self.plugin.saveSettings();
+          self.display();
+        });
+      };
+    };
+    renderUserMgr();
+    if (self.plugin.settings.users.length > 1) {
+      new import_obsidian.Setting(containerEl)
+        .setName("\u5220\u9664\u5F53\u524D\u7528\u6237")
+        .setDesc(self.plugin.currentUser.name + " \u7684\u8BBE\u7F6E\u5C06\u88AB\u5220\u9664\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD")
+        .addButton(function(btn) {
+          btn.setButtonText("\u{1F5D1} \u5220\u9664").setWarning().onClick(function() {
+            return __async(self, null, function* () {
+              var users = self.plugin.settings.users;
+              var idx = users.findIndex(function(u) { return u.id === self.plugin.settings.currentUserId; });
+              if (idx !== -1 && users.length > 1) {
+                users.splice(idx, 1);
+                self.plugin.settings.currentUserId = users[Math.max(0, idx - 1)].id;
+                yield self.plugin.saveSettings();
+                self.display();
+              }
+            });
+          });
+        });
+    }
+
+    new import_obsidian.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57")
+      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.currentUser.name).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.name = v.trim() || "\u5C0F\u670B\u53CB"; yield self.plugin.saveSettings(); renderUserMgr(); }); }); });
     new import_obsidian.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939")
-      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0/\u6BCF\u65E5\u6253\u5206").setValue(self.plugin.settings.savePath).onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.savePath = v; yield self.plugin.saveSettings(); }); }); });
+      .addText(function(t) { return t.setPlaceholder("Little Milestones/Daily Records").setValue(self.plugin.currentUser.savePath).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.savePath = v.trim() || "Little Milestones/Daily Records"; yield self.plugin.saveSettings(); }); }); });
+
+    containerEl.createEl("h3", { text: "\u{1F3AF} \u53CC\u51FB\u9608\u503C\u8BBE\u7F6E" });
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u5355\u4F4D\u4E3A\u6BEB\u79D2(ms)\u3002\u5EFA\u8BAE\u8303\u56F4 120-600\u3002\u63D2\u4EF6\u4F1A\u6309\u5F53\u524D\u8BBE\u5907\u7CFB\u7EDF\u81EA\u52A8\u9009\u7528\u5BF9\u5E94\u9608\u503C\u3002" });
+    var dt = self.plugin.settings.doubleTapThresholds || DEFAULT_SETTINGS.doubleTapThresholds;
+    var addThresholdInput = function(key, label, desc, fallback) {
+      new import_obsidian.Setting(containerEl)
+        .setName(label)
+        .setDesc(desc)
+        .addText(function(t) {
+          t.setPlaceholder(String(fallback));
+          t.setValue(String(dt[key]));
+          t.onChange(function(v) {
+            return __async(self, null, function* () {
+              var next = self.plugin.sanitizeDoubleTapThreshold(v, fallback);
+              self.plugin.settings.doubleTapThresholds[key] = next;
+              yield self.plugin.saveSettings();
+            });
+          });
+          return t;
+        });
+    };
+    addThresholdInput("windows", "Windows \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 220", DEFAULT_SETTINGS.doubleTapThresholds.windows);
+    addThresholdInput("mac", "macOS \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 220", DEFAULT_SETTINGS.doubleTapThresholds.mac);
+    addThresholdInput("android", "Android \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 280", DEFAULT_SETTINGS.doubleTapThresholds.android);
+    addThresholdInput("ios", "iOS \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 280", DEFAULT_SETTINGS.doubleTapThresholds.ios);
+    addThresholdInput("fallback", "\u5176\u4ED6\u8BBE\u5907\u515C\u5E95\u9608\u503C", "\u65E0\u6CD5\u8BC6\u522B\u7CFB\u7EDF\u65F6\u4F7F\u7528", DEFAULT_SETTINGS.doubleTapThresholds.fallback);
 
     // ── Category management ──
     containerEl.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
@@ -1298,8 +1665,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       var targetIdx = getCatDragRowIndex(clientY);
       var fromIdx = catDrag.dragIdx;
       if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.settings.categories.length) {
-        var arr = self.plugin.settings.categories;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.categories.length) {
+        var arr = self.plugin.currentUser.categories;
         var moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
         __async(self, null, function* () { yield self.plugin.saveSettings(); renderCategories(); renderItems(); })();
@@ -1318,7 +1685,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     var renderCategories = function() {
       catWrap.empty();
       catDrag.rows = [];
-      var cats = self.plugin.settings.categories || [];
+      var cats = self.plugin.currentUser.categories || [];
       for (var ci = 0; ci < cats.length; ci++) {
         (function(idx) {
           var row = catWrap.createDiv({ cls: "kid-score-cat-row" });
@@ -1356,11 +1723,11 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           input.value = cats[idx];
           input.onchange = function() {
             return __async(self, null, function* () {
-              var oldName = self.plugin.settings.categories[idx];
+              var oldName = self.plugin.currentUser.categories[idx];
               var newName = input.value.trim();
               if (!newName) return;
-              self.plugin.settings.categories[idx] = newName;
-              for (var it of self.plugin.settings.items) { if (it.category === oldName) it.category = newName; }
+              self.plugin.currentUser.categories[idx] = newName;
+              for (var it of self.plugin.currentUser.items) { if (it.category === oldName) it.category = newName; }
               yield self.plugin.saveSettings();
               renderItems();
             });
@@ -1370,10 +1737,10 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           var delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
           delBtn.onclick = function() {
             return __async(self, null, function* () {
-              var removedCat = self.plugin.settings.categories[idx];
-              self.plugin.settings.categories.splice(idx, 1);
-              var fallback = self.plugin.settings.categories[0] || "\u5176\u4ED6";
-              for (var it of self.plugin.settings.items) { if (it.category === removedCat) it.category = fallback; }
+              var removedCat = self.plugin.currentUser.categories[idx];
+              self.plugin.currentUser.categories.splice(idx, 1);
+              var fallback = self.plugin.currentUser.categories[0] || "\u5176\u4ED6";
+              for (var it of self.plugin.currentUser.items) { if (it.category === removedCat) it.category = fallback; }
               yield self.plugin.saveSettings(); renderCategories(); renderItems();
             });
           };
@@ -1387,7 +1754,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     new import_obsidian.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(function(btn) {
       return btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(function() {
         return __async(self, null, function* () {
-          self.plugin.settings.categories.push("\u65B0\u5206\u7C7B");
+          self.plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
           yield self.plugin.saveSettings(); renderCategories(); renderItems();
         });
       });
@@ -1444,8 +1811,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       var targetIdx = getDragRowIndex(clientY);
       var fromIdx = dragState.dragIdx;
       if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.settings.items.length) {
-        var arr = self.plugin.settings.items;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.items.length) {
+        var arr = self.plugin.currentUser.items;
         var moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
         __async(self, null, function* () { yield self.plugin.saveSettings(); renderItems(); })();
@@ -1464,7 +1831,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
     var renderItems = function() {
       itemsWrap.empty();
       dragState.rows = [];
-      if (self.plugin.settings.items.length === 0) {
+      if (self.plugin.currentUser.items.length === 0) {
         itemsWrap.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01" });
         return;
       }
@@ -1473,9 +1840,9 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach(function(h) { headerRow.createSpan({ text: h, cls: "col-header" }); });
 
       var lastCat = null;
-      for (var i = 0; i < self.plugin.settings.items.length; i++) {
+      for (var i = 0; i < self.plugin.currentUser.items.length; i++) {
         (function(idx) {
-          var item = self.plugin.settings.items[idx];
+          var item = self.plugin.currentUser.items[idx];
           var thisCat = item.category || "\u5176\u4ED6";
           if (thisCat !== lastCat) {
             lastCat = thisCat;
@@ -1523,7 +1890,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           emojiBtn.onclick = function() {
             showEmojiPicker(function(em) {
               return __async(self, null, function* () {
-                self.plugin.settings.items[idx].emoji = em;
+                self.plugin.currentUser.items[idx].emoji = em;
                 yield self.plugin.saveSettings();
                 emojiBtn.textContent = em;
               });
@@ -1533,25 +1900,25 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           // Name
           var nameInput = row.createEl("input", { cls: "settings-name-input" });
           nameInput.type = "text"; nameInput.value = item.name;
-          nameInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].name = nameInput.value; yield self.plugin.saveSettings(); }); };
+          nameInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].name = nameInput.value; yield self.plugin.saveSettings(); }); };
 
           // Category dropdown
           var catSelect = row.createEl("select", { cls: "settings-cat-select" });
-          var cats = self.plugin.settings.categories || [];
+          var cats = self.plugin.currentUser.categories || [];
           for (var c of cats) {
             var opt = catSelect.createEl("option", { text: c, value: c });
             if (item.category === c) opt.selected = true;
           }
-          catSelect.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].category = catSelect.value; var cats = self.plugin.settings.categories || []; self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; }); yield self.plugin.saveSettings(); renderItems(); }); };
+          catSelect.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].category = catSelect.value; var cats = self.plugin.currentUser.categories || []; self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; }); yield self.plugin.saveSettings(); renderItems(); }); };
 
           // Points
           var pointsInput = row.createEl("input", { cls: "settings-points-input" });
           pointsInput.type = "number"; pointsInput.value = String(item.points);
-          pointsInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].points = parseInt(pointsInput.value) || 0; yield self.plugin.saveSettings(); }); };
+          pointsInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].points = parseInt(pointsInput.value) || 0; yield self.plugin.saveSettings(); }); };
 
           // Delete
           var del = row.createEl("button", { text: "\u{1F5D1}", cls: "settings-delete-btn" });
-          del.onclick = function() { return __async(self, null, function* () { self.plugin.settings.items.splice(idx, 1); yield self.plugin.saveSettings(); renderItems(); }); };
+          del.onclick = function() { return __async(self, null, function* () { self.plugin.currentUser.items.splice(idx, 1); yield self.plugin.saveSettings(); renderItems(); }); };
 
           // Note (below the main row)
           var noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
@@ -1559,7 +1926,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
           noteInput.type = "text";
           noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09";
           noteInput.value = item.note || "";
-          noteInput.onchange = function() { return __async(self, null, function* () { self.plugin.settings.items[idx].note = noteInput.value; yield self.plugin.saveSettings(); }); };
+          noteInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].note = noteInput.value; yield self.plugin.saveSettings(); }); };
 
           dragState.rows.push(wrap);
         })(i);
@@ -1576,9 +1943,9 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
         (function(c) {
           addBtn.onclick = function() {
             return __async(self, null, function* () {
-              self.plugin.settings.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: c, note: "" });
-              var cats2 = self.plugin.settings.categories || [];
-              self.plugin.settings.items.sort(function(a, b) { var ai = cats2.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats2.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+              self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: c, note: "" });
+              var cats2 = self.plugin.currentUser.categories || [];
+              self.plugin.currentUser.items.sort(function(a, b) { var ai = cats2.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats2.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
               yield self.plugin.saveSettings();
               renderItems();
             });
@@ -1594,10 +1961,10 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .addButton(function(btn) {
         return btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(function() {
           return __async(self, null, function* () {
-            var defaultCat = self.plugin.settings.categories[0] || "\u52A0\u5206\u9879";
-            self.plugin.settings.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: defaultCat, note: "" });
-            var cats = self.plugin.settings.categories || [];
-            self.plugin.settings.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
+            var defaultCat = self.plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
+            self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: defaultCat, note: "" });
+            var cats = self.plugin.currentUser.categories || [];
+            self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
             yield self.plugin.saveSettings(); renderItems();
           });
         });
@@ -1605,8 +1972,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .addButton(function(btn) {
         return btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(function() {
           return __async(self, null, function* () {
-            var cats = self.plugin.settings.categories || [];
-            self.plugin.settings.items.sort(function(a, b) {
+            var cats = self.plugin.currentUser.categories || [];
+            self.plugin.currentUser.items.sort(function(a, b) {
               var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999;
               var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999;
               return ai - bi;
@@ -1617,42 +1984,169 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
         });
       });
 
-    // ── Diary template ──
-    containerEl.createEl("h3", { text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u6BCF\u65E5\u65E5\u8BB0\u7684\u9ED8\u8BA4\u6A21\u677F\uFF0C\u652F\u6301 Markdown" });
-
-    var tmplIsPreview = false;
-    var tmplSetting = new import_obsidian.Setting(containerEl).setName("\u65E5\u8BB0\u6A21\u677F\u5185\u5BB9");
-    var tmplTextArea;
-    tmplSetting.addTextArea(function(t) {
-      tmplTextArea = t;
-      t.setValue(self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate);
-      t.inputEl.rows = 8; t.inputEl.style.width = "100%"; t.inputEl.style.fontFamily = "monospace";
-      t.onChange(function(v) { return __async(self, null, function* () { self.plugin.settings.diaryTemplate = v; yield self.plugin.saveSettings(); }); });
-      return t;
-    });
-    var tmplPreviewWrap = containerEl.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
-    tmplPreviewWrap.style.display = "none";
-    var tmplPreviewBtn = containerEl.createEl("button", { cls: "diary-tool-btn", text: "MD\u6A21\u5F0F" });
-    tmplPreviewBtn.onclick = function() {
-      tmplIsPreview = !tmplIsPreview;
-      if (tmplIsPreview) {
-        tmplTextArea.inputEl.rows = 4;
-        tmplPreviewWrap.style.display = "";
-        tmplPreviewWrap.empty();
-        import_obsidian.MarkdownRenderer.render(self.app, self.plugin.settings.diaryTemplate || DEFAULT_SETTINGS.diaryTemplate, tmplPreviewWrap, "", self);
-        tmplTextArea.inputEl.oninput = function() {
-          tmplPreviewWrap.empty();
-          import_obsidian.MarkdownRenderer.render(self.app, tmplTextArea.inputEl.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", tmplPreviewWrap, "", self);
-        };
-        tmplPreviewBtn.textContent = "\u9884\u89C8\u6A21\u5F0F";
+    // ── Scoring rules (same card style as scoring page) ──
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u8FD9\u91CC\u7684\u89C4\u5219\u4E0E\u300C\u6253\u5206\u9875\u300D\u5B8C\u5168\u540C\u6B65\uFF0C\u4FEE\u6539\u4EFB\u610F\u4E00\u5904\u90FD\u4F1A\u751F\u6548\u3002" });
+    var settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+    var settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
+    var settingsRulesToggle = settingsRulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
+    settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+    var settingsRulesEditBtn = settingsRulesHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
+    var settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
+    var settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
+    var settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+    var settingsRulesTextarea = settingsRulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+    settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
+    settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+    var settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
+    var settingsRulesSaveBtn = settingsRulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
+    var settingsRulesCancelBtn = settingsRulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
+    var renderSettingsRules = function() {
+      settingsRulesView.empty();
+      var text = self.plugin.currentUser.scoringRules || "";
+      if (text.trim()) {
+        import_obsidian.MarkdownRenderer.render(self.app, text, settingsRulesView, "", self);
       } else {
-        tmplTextArea.inputEl.rows = 8;
-        tmplPreviewWrap.style.display = "none";
-        tmplTextArea.inputEl.oninput = null;
-        tmplPreviewBtn.textContent = "MD\u6A21\u5F0F";
+        settingsRulesView.createEl("p", { cls: "kid-score-rules-empty", text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219" });
       }
     };
+    renderSettingsRules();
+    var settingsRulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
+    if (!settingsRulesOpen) { settingsRulesBody.addClass("is-hidden"); } else { settingsRulesToggle.textContent = "\u25BC"; }
+    settingsRulesHeader.addEventListener("click", function(e) {
+      if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
+      settingsRulesOpen = !settingsRulesOpen;
+      settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
+      settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
+    });
+    var settingsRulesIsEditing = false;
+    settingsRulesEditBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      settingsRulesIsEditing = !settingsRulesIsEditing;
+      if (settingsRulesIsEditing) {
+        settingsRulesOpen = true;
+        settingsRulesToggle.textContent = "\u25BC";
+        settingsRulesBody.removeClass("is-hidden");
+        settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+        settingsRulesView.addClass("is-hidden");
+        settingsRulesEdit.removeClass("is-hidden");
+        settingsRulesTextarea.focus();
+      } else {
+        settingsRulesView.removeClass("is-hidden");
+        settingsRulesEdit.addClass("is-hidden");
+      }
+    });
+    settingsRulesSaveBtn.addEventListener("click", function() {
+      return __async(self, null, function* () {
+        self.plugin.currentUser.scoringRules = settingsRulesTextarea.value;
+        yield self.plugin.saveSettings();
+        renderSettingsRules();
+        settingsRulesIsEditing = false;
+        settingsRulesView.removeClass("is-hidden");
+        settingsRulesEdit.addClass("is-hidden");
+        new import_obsidian.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+      });
+    });
+    settingsRulesCancelBtn.addEventListener("click", function() {
+      settingsRulesIsEditing = false;
+      settingsRulesView.removeClass("is-hidden");
+      settingsRulesEdit.addClass("is-hidden");
+    });
+
+    // ── Diary template (same card style as scoring rules) ──
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u6BCF\u65E5\u65E5\u8BB0\u7684\u9ED8\u8BA4\u6A21\u677F\u3002\u652F\u6301 Markdown\uFF0C\u4E0E\u6253\u5206\u9875\u76F4\u63A5\u540C\u6B65\u3002" });
+    var tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+    var tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
+    var tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
+    tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
+    var tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
+    var tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
+    var tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
+    var tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+    var tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+    tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+    tmplTextarea.style.minHeight = "220px";
+    var tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
+    tmplPreviewWrap.style.display = "none";
+    var tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
+    var tmplPreviewBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "MD\u9884\u89C8" });
+    var tmplSaveBtn = tmplActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u6A21\u677F" });
+    var tmplCancelBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
+    var renderTemplateView = function() {
+      tmplView.empty();
+      var text = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+      import_obsidian.MarkdownRenderer.render(self.app, text, tmplView, "", self);
+    };
+    renderTemplateView();
+    var tmplOpen = true;
+    tmplToggle.textContent = "\u25BC";
+    var tmplIsEditing = false;
+    var tmplIsPreview = false;
+    var refreshTemplatePreview = function() {
+      tmplPreviewWrap.empty();
+      import_obsidian.MarkdownRenderer.render(self.app, tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", tmplPreviewWrap, "", self);
+    };
+    tmplHeader.addEventListener("click", function(e) {
+      if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
+      tmplOpen = !tmplOpen;
+      tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
+      tmplBody.toggleClass("is-hidden", !tmplOpen);
+    });
+    tmplEditBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      tmplIsEditing = !tmplIsEditing;
+      if (tmplIsEditing) {
+        tmplOpen = true;
+        tmplToggle.textContent = "\u25BC";
+        tmplBody.removeClass("is-hidden");
+        tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+        tmplView.addClass("is-hidden");
+        tmplEdit.removeClass("is-hidden");
+        tmplIsPreview = false;
+        tmplPreviewWrap.style.display = "none";
+        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+        tmplTextarea.focus();
+      } else {
+        tmplView.removeClass("is-hidden");
+        tmplEdit.addClass("is-hidden");
+      }
+    });
+    tmplPreviewBtn.addEventListener("click", function() {
+      tmplIsPreview = !tmplIsPreview;
+      if (tmplIsPreview) {
+        refreshTemplatePreview();
+        tmplPreviewWrap.style.display = "";
+        tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
+      } else {
+        tmplPreviewWrap.style.display = "none";
+        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+      }
+    });
+    tmplTextarea.addEventListener("input", function() {
+      if (!tmplIsPreview) return;
+      refreshTemplatePreview();
+    });
+    tmplSaveBtn.addEventListener("click", function() {
+      return __async(self, null, function* () {
+        self.plugin.currentUser.diaryTemplate = tmplTextarea.value;
+        yield self.plugin.saveSettings();
+        renderTemplateView();
+        tmplIsEditing = false;
+        tmplIsPreview = false;
+        tmplPreviewWrap.style.display = "none";
+        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+        tmplView.removeClass("is-hidden");
+        tmplEdit.addClass("is-hidden");
+        new import_obsidian.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
+      });
+    });
+    tmplCancelBtn.addEventListener("click", function() {
+      tmplIsEditing = false;
+      tmplIsPreview = false;
+      tmplPreviewWrap.style.display = "none";
+      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+      tmplView.removeClass("is-hidden");
+      tmplEdit.addClass("is-hidden");
+    });
 
     // ── Export / Import ──
     containerEl.createEl("h3", { text: "\uD83D\uDCE6 \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
@@ -1661,7 +2155,7 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
       .setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6")
       .addButton(function(btn) {
         btn.setButtonText("\uD83D\uDCE4 \u5BFC\u51FA").onClick(function() {
-          var data = { categories: self.plugin.settings.categories, items: self.plugin.settings.items };
+          var data = { categories: self.plugin.currentUser.categories, items: self.plugin.currentUser.items };
           var json = JSON.stringify(data, null, 2);
           var blob = new Blob([json], { type: "application/json" });
           var url = URL.createObjectURL(blob);
@@ -1684,8 +2178,8 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
               try {
                 var text = yield file.text();
                 var data = JSON.parse(text);
-                if (Array.isArray(data.items)) self.plugin.settings.items = data.items;
-                if (Array.isArray(data.categories)) self.plugin.settings.categories = data.categories;
+                if (Array.isArray(data.items)) self.plugin.currentUser.items = data.items;
+                if (Array.isArray(data.categories)) self.plugin.currentUser.categories = data.categories;
                 yield self.plugin.saveSettings();
                 self.display();
                 new import_obsidian.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");

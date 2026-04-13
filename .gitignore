@@ -1,2 +1,5 @@
 # Personal data — do not commit
 data.json
+
+# Dependencies
+node_modules/
