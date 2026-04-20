@@ -18,6 +18,11 @@ Every time Codex enters this repository, do these steps first:
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
 - Review, validation, and documentation may run in parallel if they are read-only or have a separate `write-scope`.
 
+## Shared Page Names
+- `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
+- `打分页`: the main scoring page opened by clicking the star icon in Obsidian's left sidebar.
+- `得分页`: the generated Markdown result document page.
+
 ## Required Handoff Updates
 After Codex finishes a turn:
 - Update `.agents/STATE.md`

@@ -15,6 +15,11 @@ This file is the short operational version of the collaboration protocol. Give i
 - If you need the lock, update `LOCK.md` first.
 - Declare a precise `write-scope`. Do not use vague scopes if a smaller one is enough.
 
+## Shared Page Names
+- `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
+- `打分页`: the main scoring page opened by clicking the star icon in Obsidian's left sidebar.
+- `得分页`: the generated Markdown result document page.
+
 ## Write-Scope Rules
 - Same-file write access must be exclusive.
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
