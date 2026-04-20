@@ -36,6 +36,10 @@ After Codex finishes a turn:
 - Do not hand-edit `styles.css` unless the build chain is broken and the reason is recorded.
 - `main.js` may still be a transitional working source in this repo; if Codex edits it, record why in the task card and log.
 - Treat Vault sync as a separate explicit step.
+- Only the primary workspace may sync files into the Obsidian Vault plugin directory.
+- Do not sync directly from a worktree to the Vault.
+- If work happened in a worktree, sync it back to the primary workspace first, then sync to the Vault from the primary workspace.
+- Before Vault sync, verify that `manifest.json`, `main.js`, and `styles.css` match the current primary workspace version.
 
 ## Commit Prefix
 - Use `[codex]` in commit messages for Codex-authored commits.

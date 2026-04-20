@@ -29,6 +29,7 @@ This file is the short operational version of the collaboration protocol. Give i
 - Treat the primary workspace `.agents/` directory as canonical.
 - If you work in a sub-worktree such as `.claude/worktrees/...`, sync task state, review output, and log summary back to the primary workspace before handoff.
 - If the active task is happening in a sub-worktree, record that path in the primary workspace `STATE.md`.
+- If you changed code in a sub-worktree, sync it back to the primary workspace before anyone treats it as the latest shared implementation.
 
 ## Required Updates After Work
 - Update `.agents/STATE.md`.
@@ -46,6 +47,10 @@ This file is the short operational version of the collaboration protocol. Give i
 ## Vault Sync Rule
 - Syncing to the Obsidian Vault is a separate step.
 - Do not assume implementation automatically includes sync.
+- Only the primary workspace may sync files into the Obsidian Vault plugin directory.
+- Do not sync directly from a worktree to the Vault.
+- If work happened in a worktree, sync back to the primary workspace first, then sync from the primary workspace to the Vault.
+- Before syncing, verify that `manifest.json`, `main.js`, and `styles.css` are the current primary workspace versions.
 - Record `sync-to-vault: pending | done | n/a` in the task card.
 - When syncing, record which files were synced.
 
@@ -83,6 +88,8 @@ Rules:
 - Acquire `LOCK.md` before writing
 - Update `STATE.md`, `LOCK.md`, task card, and `log.md` after work
 - Treat Vault sync as a separate explicit step
+- Only the primary workspace may sync to the Vault
+- Do not sync directly from a worktree to the Vault
 - Prefer source files over generated artifacts
 - If you must hand-edit `main.js` or generated output, record why
 - Sync task state back to the primary workspace `.agents/` before handoff if you worked inside a git worktree
@@ -105,6 +112,8 @@ Rules:
 - Update `STATE.md`, `LOCK.md`, task card, and `log.md` after work
 - Record review findings in `.agents/reviews/`
 - Treat Vault sync as a separate explicit step
+- Only the primary workspace may sync to the Vault
+- Do not sync directly from a worktree to the Vault
 - Prefer source files over generated artifacts
 - If you must hand-edit `main.js` or generated output, record why
 - Sync task state back to the primary workspace `.agents/` before handoff if you worked inside a git worktree
