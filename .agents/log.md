@@ -1,0 +1,4 @@
+- 2026-04-20 12:00 [codex] initialized .agents collaboration scaffold with README, STATE, LOCK, task/review templates
+- 2026-04-20 12:10 [codex] opened task 2026-04-20-build-pipeline-recovery and handed off to claude-code
+- 2026-04-20 12:20 [codex] discovered Claude worktree state under .claude/worktrees/sleepy-engelbart-925e6b and synced shared .agents status back to primary workspace
+- 2026-04-20 12:25 [codex] moved build-pipeline-recovery to next-task queue to avoid conflicting with active mobile-ux handoff
