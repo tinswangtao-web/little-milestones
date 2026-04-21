@@ -88,6 +88,13 @@ Working rule for this repo:
 - Do not hand-edit generated/runtime artifacts like `styles.css` unless necessary.
 - Only hand-edit `main.js` when it is the effective source of truth or when the build pipeline is broken.
 - If artifact files are hand-edited, record why in the task card and log.
+- If `styles/**` changes, rebuild `styles.css` before sync or commit.
+- Style changes are not complete until both the source style file and generated `styles.css` are updated together.
+
+## Mobile Style Rule
+- For iPhone/mobile layout tuning, prefer `styles/07-mobile.css` first.
+- Only edit other style files for mobile behavior when the base component styles truly belong there.
+- If mobile styles are split across files, record which files were touched in the task card or log.
 
 ## Vault Sync Rule
 Syncing to the Obsidian Vault is a separate step, not implied by implementation.
@@ -97,15 +104,22 @@ Additional guardrails for this repo:
 - A worktree must never sync directly to the Vault.
 - If work happens inside a worktree, sync code and `.agents/` state back to the primary workspace first, then sync to the Vault from the primary workspace.
 - Before every Vault sync, verify that `manifest.json`, `main.js`, and `styles.css` match the current primary workspace version.
+- After every Vault sync, verify that the Vault copies of `manifest.json`, `main.js`, and `styles.css` match the primary workspace version using `diff`, hashes, or another explicit comparison.
 
 Track it explicitly in the task card:
 - `sync-to-vault: pending`
 - `sync-to-vault: done`
+- `sync-to-vault: n/a`
 
 When sync happens, record:
 - which files were synced
 - who synced them
 - when sync happened
+
+## Git Safety Rule
+- Do not run `git add`, `git status`, and `git commit` as parallel steps.
+- Stage first, then confirm staged state with `git status --short`, then commit.
+- If a commit changes generated files, make sure the corresponding source files are staged in the same commit.
 
 ## Commit Message Convention
 Use a visible agent prefix:

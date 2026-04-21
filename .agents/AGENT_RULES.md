@@ -43,6 +43,13 @@ This file is the short operational version of the collaboration protocol. Give i
 - Do not hand-edit `styles.css` unless the build chain is broken and you record why.
 - `main.js` may still need edits in this repository state, but treat that as an exception or transitional state whenever possible.
 - If runtime or generated files are hand-edited, record the reason in the task card and log.
+- If you changed `styles/**`, rebuild and stage `styles.css` in the same round.
+- Do not treat a style task as complete if only the source CSS changed but generated `styles.css` did not.
+
+## Mobile Style Rule
+- For iPhone/mobile layout fixes, check `styles/07-mobile.css` first.
+- Only spread a mobile fix into other style files when the component's base style genuinely belongs there.
+- If multiple style files are touched for one mobile fix, mention them in the task card or log.
 
 ## Vault Sync Rule
 - Syncing to the Obsidian Vault is a separate step.
@@ -51,8 +58,17 @@ This file is the short operational version of the collaboration protocol. Give i
 - Do not sync directly from a worktree to the Vault.
 - If work happened in a worktree, sync back to the primary workspace first, then sync from the primary workspace to the Vault.
 - Before syncing, verify that `manifest.json`, `main.js`, and `styles.css` are the current primary workspace versions.
+- After syncing, verify that the Vault copies of `manifest.json`, `main.js`, and `styles.css` match the primary workspace copies.
 - Record `sync-to-vault: pending | done | n/a` in the task card.
 - When syncing, record which files were synced.
+
+## Git Sequence Rule
+- Do not run `git add`, `git status`, and `git commit` in parallel.
+- Run them in this order:
+  1. `git add`
+  2. `git status --short`
+  3. `git commit`
+- If generated files are committed, include the matching source files in the same commit.
 
 ## Commit Rule
 - Use agent prefixes:
