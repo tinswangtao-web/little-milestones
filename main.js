@@ -22,7 +22,7 @@ __export(main_exports, {
   default: () => KidScorePlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian19 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 
 // src/data/emoji-data.ts
 var EMOJI_DATA = {
@@ -4113,7 +4113,7 @@ var DailyScoringModal = class extends BaseMobileModal {
 };
 
 // src/settings/settings-tab.ts
-var import_obsidian17 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 
 // src/settings/category-settings.ts
 var import_obsidian9 = require("obsidian");
@@ -4319,11 +4319,135 @@ function renderCategorySettings({
   );
 }
 
-// src/settings/content-sections.ts
-var import_obsidian11 = require("obsidian");
+// src/settings/diary-template-settings-section.ts
+var import_obsidian10 = require("obsidian");
+function renderDiaryTemplateSettingsSection({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const toggle = header.createEl("span", {
+    cls: "kid-score-rules-toggle",
+    text: "\u25BC"
+  });
+  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
+  header.createSpan({
+    cls: "kid-score-rules-desc",
+    text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875"
+  });
+  const editBtn = header.createEl("button", {
+    cls: "kid-score-rules-edit-btn",
+    text: "\u270F\uFE0F"
+  });
+  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  const view = body.createDiv({ cls: "kid-score-rules-view" });
+  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+  bindSettingsInput(textarea);
+  textarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+  textarea.style.minHeight = "220px";
+  const previewWrap = edit.createDiv({
+    cls: "diary-preview-wrap diary-preview-settings"
+  });
+  previewWrap.style.display = "none";
+  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const previewBtn = actions.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "MD\u9884\u89C8"
+  });
+  const saveBtn = actions.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\u4FDD\u5B58\u6A21\u677F"
+  });
+  const cancelBtn = actions.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u53D6\u6D88"
+  });
+  const renderView = () => {
+    view.empty();
+    const text = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+    import_obsidian10.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
+  };
+  renderView();
+  let open = true;
+  let isEditing = false;
+  let isPreview = false;
+  const refreshPreview = () => {
+    previewWrap.empty();
+    import_obsidian10.MarkdownRenderer.render(
+      plugin.app,
+      textarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
+      previewWrap,
+      "",
+      plugin
+    );
+  };
+  header.addEventListener("click", (e) => {
+    if (e.target === editBtn || editBtn.contains(e.target)) return;
+    open = !open;
+    toggle.textContent = open ? "\u25BC" : "\u25B6";
+    body.toggleClass("is-hidden", !open);
+  });
+  editBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isEditing = !isEditing;
+    if (isEditing) {
+      open = true;
+      toggle.textContent = "\u25BC";
+      body.removeClass("is-hidden");
+      textarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+      view.addClass("is-hidden");
+      edit.removeClass("is-hidden");
+      isPreview = false;
+      previewWrap.style.display = "none";
+      previewBtn.textContent = "MD\u9884\u89C8";
+      textarea.focus();
+    } else {
+      view.removeClass("is-hidden");
+      edit.addClass("is-hidden");
+    }
+  });
+  previewBtn.addEventListener("click", () => {
+    isPreview = !isPreview;
+    if (isPreview) {
+      refreshPreview();
+      previewWrap.style.display = "";
+      previewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
+    } else {
+      previewWrap.style.display = "none";
+      previewBtn.textContent = "MD\u9884\u89C8";
+    }
+  });
+  textarea.addEventListener("input", () => {
+    if (!isPreview) return;
+    refreshPreview();
+  });
+  saveBtn.addEventListener("click", async () => {
+    plugin.currentUser.diaryTemplate = textarea.value;
+    await plugin.saveSettings();
+    renderView();
+    isEditing = false;
+    isPreview = false;
+    previewWrap.style.display = "none";
+    previewBtn.textContent = "MD\u9884\u89C8";
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+    new import_obsidian10.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
+  });
+  cancelBtn.addEventListener("click", () => {
+    isEditing = false;
+    isPreview = false;
+    previewWrap.style.display = "none";
+    previewBtn.textContent = "MD\u9884\u89C8";
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+  });
+}
 
 // src/settings/diary-module-settings.ts
-var import_obsidian10 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 function renderDiaryModuleSettingsSection({
   plugin,
   containerEl,
@@ -4428,7 +4552,7 @@ function renderDiaryModuleSettingsSection({
       plugin.currentUser.diaryModules = makeDefaultDiaryModules();
       await plugin.saveSettings();
       render();
-      new import_obsidian10.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
+      new import_obsidian11.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
     };
   };
   render();
@@ -4439,205 +4563,119 @@ function renderDiaryModuleSettingsSection({
   });
 }
 
+// src/settings/rules-settings-section.ts
+var import_obsidian12 = require("obsidian");
+function renderRulesSettingsSection({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const toggle = header.createEl("span", {
+    cls: "kid-score-rules-toggle",
+    text: "\u25B6"
+  });
+  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  header.createSpan({
+    cls: "kid-score-rules-desc",
+    text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875"
+  });
+  const editBtn = header.createEl("button", {
+    cls: "kid-score-rules-edit-btn",
+    text: "\u270F\uFE0F"
+  });
+  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  const view = body.createDiv({ cls: "kid-score-rules-view" });
+  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const textarea = edit.createEl("textarea", {
+    cls: "kid-score-rules-textarea"
+  });
+  textarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
+  bindSettingsInput(textarea);
+  textarea.value = plugin.currentUser.scoringRules || "";
+  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const saveBtn = actions.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\u4FDD\u5B58\u89C4\u5219"
+  });
+  const cancelBtn = actions.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u53D6\u6D88"
+  });
+  const renderView = () => {
+    view.empty();
+    const text = plugin.currentUser.scoringRules || "";
+    if (text.trim()) {
+      import_obsidian12.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
+    } else {
+      view.createEl("p", {
+        cls: "kid-score-rules-empty",
+        text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
+      });
+    }
+  };
+  renderView();
+  let open = !!(plugin.currentUser.scoringRules && plugin.currentUser.scoringRules.trim());
+  if (!open) {
+    body.addClass("is-hidden");
+  } else {
+    toggle.textContent = "\u25BC";
+  }
+  header.addEventListener("click", (e) => {
+    if (e.target === editBtn || editBtn.contains(e.target)) return;
+    open = !open;
+    toggle.textContent = open ? "\u25BC" : "\u25B6";
+    body.toggleClass("is-hidden", !open);
+  });
+  let isEditing = false;
+  editBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isEditing = !isEditing;
+    if (isEditing) {
+      open = true;
+      toggle.textContent = "\u25BC";
+      body.removeClass("is-hidden");
+      textarea.value = plugin.currentUser.scoringRules || "";
+      view.addClass("is-hidden");
+      edit.removeClass("is-hidden");
+      textarea.focus();
+    } else {
+      view.removeClass("is-hidden");
+      edit.addClass("is-hidden");
+    }
+  });
+  saveBtn.addEventListener("click", async () => {
+    plugin.currentUser.scoringRules = textarea.value;
+    await plugin.saveSettings();
+    renderView();
+    isEditing = false;
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+    new import_obsidian12.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+  });
+  cancelBtn.addEventListener("click", () => {
+    isEditing = false;
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+  });
+}
+
 // src/settings/content-sections.ts
 function renderContentSettingsSections({
   plugin,
   containerEl,
   bindSettingsInput
 }) {
-  const settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-  const settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
-  const settingsRulesToggle = settingsRulesHeader.createEl("span", {
-    cls: "kid-score-rules-toggle",
-    text: "\u25B6"
+  renderRulesSettingsSection({
+    plugin,
+    containerEl,
+    bindSettingsInput
   });
-  settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-  settingsRulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
-  const settingsRulesEditBtn = settingsRulesHeader.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
-    text: "\u270F\uFE0F"
-  });
-  const settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
-  const settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
-  const settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-  const settingsRulesTextarea = settingsRulesEdit.createEl("textarea", {
-    cls: "kid-score-rules-textarea"
-  });
-  settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
-  bindSettingsInput(settingsRulesTextarea);
-  settingsRulesTextarea.value = plugin.currentUser.scoringRules || "";
-  const settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
-  const settingsRulesSaveBtn = settingsRulesActRow.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
-    text: "\u4FDD\u5B58\u89C4\u5219"
-  });
-  const settingsRulesCancelBtn = settingsRulesActRow.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
-    text: "\u53D6\u6D88"
-  });
-  const renderSettingsRules = () => {
-    settingsRulesView.empty();
-    const text = plugin.currentUser.scoringRules || "";
-    if (text.trim()) {
-      import_obsidian11.MarkdownRenderer.render(plugin.app, text, settingsRulesView, "", plugin);
-    } else {
-      settingsRulesView.createEl("p", {
-        cls: "kid-score-rules-empty",
-        text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
-      });
-    }
-  };
-  renderSettingsRules();
-  let settingsRulesOpen = !!(plugin.currentUser.scoringRules && plugin.currentUser.scoringRules.trim());
-  if (!settingsRulesOpen) {
-    settingsRulesBody.addClass("is-hidden");
-  } else {
-    settingsRulesToggle.textContent = "\u25BC";
-  }
-  settingsRulesHeader.addEventListener("click", (e) => {
-    if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
-    settingsRulesOpen = !settingsRulesOpen;
-    settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
-    settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
-  });
-  let settingsRulesIsEditing = false;
-  settingsRulesEditBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    settingsRulesIsEditing = !settingsRulesIsEditing;
-    if (settingsRulesIsEditing) {
-      settingsRulesOpen = true;
-      settingsRulesToggle.textContent = "\u25BC";
-      settingsRulesBody.removeClass("is-hidden");
-      settingsRulesTextarea.value = plugin.currentUser.scoringRules || "";
-      settingsRulesView.addClass("is-hidden");
-      settingsRulesEdit.removeClass("is-hidden");
-      settingsRulesTextarea.focus();
-    } else {
-      settingsRulesView.removeClass("is-hidden");
-      settingsRulesEdit.addClass("is-hidden");
-    }
-  });
-  settingsRulesSaveBtn.addEventListener("click", async () => {
-    plugin.currentUser.scoringRules = settingsRulesTextarea.value;
-    await plugin.saveSettings();
-    renderSettingsRules();
-    settingsRulesIsEditing = false;
-    settingsRulesView.removeClass("is-hidden");
-    settingsRulesEdit.addClass("is-hidden");
-    new import_obsidian11.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
-  });
-  settingsRulesCancelBtn.addEventListener("click", () => {
-    settingsRulesIsEditing = false;
-    settingsRulesView.removeClass("is-hidden");
-    settingsRulesEdit.addClass("is-hidden");
-  });
-  const tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-  const tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
-  const tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-  tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
-  tmplHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
-  const tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-  const tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
-  const tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
-  const tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-  const tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-  bindSettingsInput(tmplTextarea);
-  tmplTextarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-  tmplTextarea.style.minHeight = "220px";
-  const tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
-  tmplPreviewWrap.style.display = "none";
-  const tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
-  const tmplPreviewBtn = tmplActRow.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
-    text: "MD\u9884\u89C8"
-  });
-  const tmplSaveBtn = tmplActRow.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
-    text: "\u4FDD\u5B58\u6A21\u677F"
-  });
-  const tmplCancelBtn = tmplActRow.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
-    text: "\u53D6\u6D88"
-  });
-  const renderTemplateView = () => {
-    tmplView.empty();
-    const text = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-    import_obsidian11.MarkdownRenderer.render(plugin.app, text, tmplView, "", plugin);
-  };
-  renderTemplateView();
-  let tmplOpen = true;
-  tmplToggle.textContent = "\u25BC";
-  let tmplIsEditing = false;
-  let tmplIsPreview = false;
-  const refreshTemplatePreview = () => {
-    tmplPreviewWrap.empty();
-    import_obsidian11.MarkdownRenderer.render(
-      plugin.app,
-      tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
-      tmplPreviewWrap,
-      "",
-      plugin
-    );
-  };
-  tmplHeader.addEventListener("click", (e) => {
-    if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
-    tmplOpen = !tmplOpen;
-    tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
-    tmplBody.toggleClass("is-hidden", !tmplOpen);
-  });
-  tmplEditBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    tmplIsEditing = !tmplIsEditing;
-    if (tmplIsEditing) {
-      tmplOpen = true;
-      tmplToggle.textContent = "\u25BC";
-      tmplBody.removeClass("is-hidden");
-      tmplTextarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      tmplView.addClass("is-hidden");
-      tmplEdit.removeClass("is-hidden");
-      tmplIsPreview = false;
-      tmplPreviewWrap.style.display = "none";
-      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-      tmplTextarea.focus();
-    } else {
-      tmplView.removeClass("is-hidden");
-      tmplEdit.addClass("is-hidden");
-    }
-  });
-  tmplPreviewBtn.addEventListener("click", () => {
-    tmplIsPreview = !tmplIsPreview;
-    if (tmplIsPreview) {
-      refreshTemplatePreview();
-      tmplPreviewWrap.style.display = "";
-      tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
-    } else {
-      tmplPreviewWrap.style.display = "none";
-      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-    }
-  });
-  tmplTextarea.addEventListener("input", () => {
-    if (!tmplIsPreview) return;
-    refreshTemplatePreview();
-  });
-  tmplSaveBtn.addEventListener("click", async () => {
-    plugin.currentUser.diaryTemplate = tmplTextarea.value;
-    await plugin.saveSettings();
-    renderTemplateView();
-    tmplIsEditing = false;
-    tmplIsPreview = false;
-    tmplPreviewWrap.style.display = "none";
-    tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-    tmplView.removeClass("is-hidden");
-    tmplEdit.addClass("is-hidden");
-    new import_obsidian11.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
-  });
-  tmplCancelBtn.addEventListener("click", () => {
-    tmplIsEditing = false;
-    tmplIsPreview = false;
-    tmplPreviewWrap.style.display = "none";
-    tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-    tmplView.removeClass("is-hidden");
-    tmplEdit.addClass("is-hidden");
+  renderDiaryTemplateSettingsSection({
+    plugin,
+    containerEl,
+    bindSettingsInput
   });
   renderDiaryModuleSettingsSection({
     plugin,
@@ -4647,7 +4685,7 @@ function renderContentSettingsSections({
 }
 
 // src/settings/goal-settings-section.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 function renderGoalSettingsSection({
   plugin,
   containerEl,
@@ -4678,21 +4716,21 @@ function renderGoalSettingsSection({
       if (Number.isFinite(value) && value > 0) {
         plugin.currentUser.goals[goalField.key] = value;
         await plugin.saveSettings();
-        new import_obsidian12.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
+        new import_obsidian13.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
       }
     };
   }
 }
 
 // src/settings/import-export-settings.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 function renderImportExportSettings({
   plugin,
   containerEl,
   refresh
 }) {
   containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
-  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+  new import_obsidian14.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
     btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
       const data = { categories: plugin.currentUser.categories, items: plugin.currentUser.items };
       const json = JSON.stringify(data, null, 2);
@@ -4705,7 +4743,7 @@ function renderImportExportSettings({
       URL.revokeObjectURL(url);
     });
   });
-  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+  new import_obsidian14.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
     btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
       const fileInput = document.createElement("input");
       fileInput.type = "file";
@@ -4720,9 +4758,9 @@ function renderImportExportSettings({
           if (Array.isArray(data.categories)) plugin.currentUser.categories = data.categories;
           await plugin.saveSettings();
           refresh();
-          new import_obsidian13.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
+          new import_obsidian14.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
         } catch (e) {
-          new import_obsidian13.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
+          new import_obsidian14.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
         }
       };
       fileInput.click();
@@ -4731,7 +4769,7 @@ function renderImportExportSettings({
 }
 
 // src/settings/item-settings.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 
 // src/settings/item-sorting.ts
 function sortItemsByCategories(items, categories) {
@@ -4745,7 +4783,7 @@ function sortItemsByCategories(items, categories) {
 }
 
 // src/settings/item-settings-list.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 function renderItemSettingsList({
   plugin,
   itemsWrap,
@@ -4953,7 +4991,7 @@ function renderItemSettingsList({
           await plugin.saveSettings();
           renderItems();
         } catch (error) {
-          new import_obsidian14.Notice(
+          new import_obsidian15.Notice(
             "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
           );
         }
@@ -5004,7 +5042,7 @@ function renderItemSettingsList({
           setPendingScrollItemId(newItemId);
           renderItems();
         } catch (error) {
-          new import_obsidian14.Notice(
+          new import_obsidian15.Notice(
             "\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
           );
         }
@@ -5052,7 +5090,7 @@ function renderItemSettings({
     }
   });
   renderItems();
-  new import_obsidian15.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+  new import_obsidian16.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
     (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
       const defaultCat = plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
       const newItemId = "item_" + Date.now();
@@ -5074,13 +5112,13 @@ function renderItemSettings({
       sortItemsByCategories(plugin.currentUser.items, plugin.currentUser.categories || []);
       await plugin.saveSettings();
       renderItems();
-      new import_obsidian15.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
+      new import_obsidian16.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
     })
   );
 }
 
 // src/settings/user-settings-section.ts
-var import_obsidian16 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 function renderUserSettingsSection({
   app,
   plugin,
@@ -5095,7 +5133,7 @@ function renderUserSettingsSection({
   });
   const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
   const showUserDeleteConfirm = (user) => {
-    const deleteModal = new class extends import_obsidian16.Modal {
+    const deleteModal = new class extends import_obsidian17.Modal {
       onOpen() {
         this.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
         this.modalEl.addClass("kid-score-edit-modal");
@@ -5146,7 +5184,7 @@ function renderUserSettingsSection({
               refresh();
             }
           } catch (error) {
-            new import_obsidian16.Notice(
+            new import_obsidian17.Notice(
               "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
             );
           }
@@ -5194,14 +5232,14 @@ function renderUserSettingsSection({
         await plugin.saveSettings();
         refresh();
       } catch (error) {
-        new import_obsidian16.Notice(
+        new import_obsidian17.Notice(
           "\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
         );
       }
     };
   };
   renderUserMgr();
-  new import_obsidian16.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+  new import_obsidian17.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
     (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
       const newName = value.trim() || "\u5C0F\u670B\u53CB";
       const oldName = plugin.currentUser.name;
@@ -5212,17 +5250,17 @@ function renderUserSettingsSection({
         plugin.currentUser.name = newName;
         await plugin.saveSettings();
         renderUserMgr();
-        new import_obsidian16.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
+        new import_obsidian17.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
       } catch (error) {
         console.error("[Little Milestones] renameUserInFiles error", error);
-        new import_obsidian16.Notice(
+        new import_obsidian17.Notice(
           "\u274C " + (error instanceof Error ? error.message : String(error))
         );
       }
     })
   );
   bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
-  new import_obsidian16.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+  new import_obsidian17.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
     (text) => text.setPlaceholder("Little Milestones/Daily Records").setValue(plugin.currentUser.savePath).onChange(async (value) => {
       const newPath = value.trim() || "Little Milestones/Daily Records";
       const oldPath = plugin.currentUser.savePath;
@@ -5236,10 +5274,10 @@ function renderUserSettingsSection({
         await plugin.migrateSavePath(oldPath, newPath);
         plugin.currentUser.savePath = newPath;
         await plugin.saveSettings();
-        new import_obsidian16.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
+        new import_obsidian17.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
       } catch (error) {
         console.error("[Little Milestones] migrateSavePath error", error);
-        new import_obsidian16.Notice(
+        new import_obsidian17.Notice(
           "\u274C " + (error instanceof Error ? error.message : String(error))
         );
       }
@@ -5249,7 +5287,7 @@ function renderUserSettingsSection({
 }
 
 // src/settings/settings-tab.ts
-var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
+var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -5420,7 +5458,7 @@ function ensureUserDefaults(user) {
 }
 
 // src/storage/day-data-store.ts
-var import_obsidian18 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 
 // src/composers/day-data-composer.ts
 var DayDataComposer = class {
@@ -5649,7 +5687,7 @@ var DayDataStore = class {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
-    if (!(file instanceof import_obsidian18.TFile)) return null;
+    if (!(file instanceof import_obsidian19.TFile)) return null;
     const content = await this.plugin.app.vault.read(file);
     const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fmMatch) return null;
@@ -5720,32 +5758,32 @@ var DayDataStore = class {
         diaryContent
       );
       const fileContent = builder.build(report);
-      const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+      const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
       if (!this.plugin.app.vault.getAbstractFileByPath(dirPath)) {
         await this.plugin.app.vault.createFolder(dirPath);
       }
       const filePath = this.plugin.filePath(dateStr);
       const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
-      if (existing instanceof import_obsidian18.TFile) {
+      if (existing instanceof import_obsidian19.TFile) {
         await this.plugin.app.vault.modify(existing, fileContent);
       } else {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
-      new import_obsidian18.Notice(
+      new import_obsidian19.Notice(
         "\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal
       );
     } catch (error) {
       console.error("[Little Milestones] saveDayData failed", error);
-      new import_obsidian18.Notice(
+      new import_obsidian19.Notice(
         "\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
       );
       throw error;
     }
   }
   async renameUserInFiles(oldName, newName) {
-    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -5779,8 +5817,8 @@ var DayDataStore = class {
     }
   }
   async migrateSavePath(oldPath, newPath) {
-    const oldDir = (0, import_obsidian18.normalizePath)(oldPath);
-    const newDir = (0, import_obsidian18.normalizePath)(newPath);
+    const oldDir = (0, import_obsidian19.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian19.normalizePath)(newPath);
     if (oldDir === newDir) return;
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
@@ -5792,9 +5830,9 @@ var DayDataStore = class {
     let errorCount = 0;
     for (const file of files) {
       try {
-        const newFilePath = (0, import_obsidian18.normalizePath)(newDir + "/" + file.name);
+        const newFilePath = (0, import_obsidian19.normalizePath)(newDir + "/" + file.name);
         const existing = this.plugin.app.vault.getAbstractFileByPath(newFilePath);
-        if (existing instanceof import_obsidian18.TFile) {
+        if (existing instanceof import_obsidian19.TFile) {
           const oldContent = await this.plugin.app.vault.read(file);
           await this.plugin.app.vault.modify(existing, oldContent);
           await this.plugin.app.vault.delete(file, true);
@@ -5817,7 +5855,7 @@ var DayDataStore = class {
     }
   }
   async getAllScores() {
-    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -5834,7 +5872,7 @@ var DayDataStore = class {
 };
 
 // src/main.ts
-var KidScorePlugin = class extends import_obsidian19.Plugin {
+var KidScorePlugin = class extends import_obsidian20.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -5893,7 +5931,7 @@ var KidScorePlugin = class extends import_obsidian19.Plugin {
     return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
   }
   filePath(dateStr) {
-    return (0, import_obsidian19.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian20.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
   async readDayData(dateStr) {
     return this.dayDataStore.readDayData(dateStr);
