@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Acquire this lock before editing files in your declared write-scope.
+- `notes`: Review completed. Lock released by kimi-code.
