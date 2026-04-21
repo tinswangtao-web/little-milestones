@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Role redefined per user request: codex writes, kimi reviews. Lock free until next task begins.
+- `notes`: Lock released after codex completed the latest mobile UX follow-up in the primary workspace and re-synced Vault.

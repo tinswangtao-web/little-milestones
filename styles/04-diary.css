@@ -72,6 +72,10 @@
   margin-bottom: 12px;
 }
 
+.diary-freewrite-toolbar {
+  margin: 4px 0 10px;
+}
+
 .diary-tool-btn {
   display: inline-flex;
   align-items: center;
@@ -116,6 +120,22 @@
 .diary-module-title {
   margin: 0 0 6px;
   font-size: 1em;
+}
+
+.diary-freewrite-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.diary-freewrite-header .diary-module-title {
+  margin-bottom: 0;
+}
+
+.diary-inline-preview-btn {
+  flex-shrink: 0;
 }
 
 .diary-module-hint {

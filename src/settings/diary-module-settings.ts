@@ -42,8 +42,16 @@ export function renderDiaryModuleSettingsSection({
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
       const row = list.createDiv({ cls: "diary-module-settings-row" });
+      const main = row.createDiv({ cls: "diary-module-settings-main" });
+      const meta = row.createDiv({ cls: "diary-module-settings-meta" });
+      const actions = row.createDiv({ cls: "diary-module-settings-actions" });
 
-      const labelInput = row.createEl("input", {
+      const labelField = main.createDiv({ cls: "diary-module-settings-field" });
+      labelField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "模块名称",
+      });
+      const labelInput = labelField.createEl("input", {
         cls: "diary-module-settings-input",
         type: "text",
       });
@@ -57,7 +65,14 @@ export function renderDiaryModuleSettingsSection({
         render();
       };
 
-      const placeholderInput = row.createEl("input", {
+      const placeholderField = main.createDiv({
+        cls: "diary-module-settings-field is-wide",
+      });
+      placeholderField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "提示文案",
+      });
+      const placeholderInput = placeholderField.createEl("input", {
         cls: "diary-module-settings-input is-wide",
         type: "text",
       });
@@ -69,7 +84,12 @@ export function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
       };
 
-      const kindSelect = row.createEl("select", {
+      const kindField = meta.createDiv({ cls: "diary-module-settings-field" });
+      kindField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "记录形式",
+      });
+      const kindSelect = kindField.createEl("select", {
         cls: "diary-module-settings-select",
       });
       [
@@ -87,7 +107,7 @@ export function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
       };
 
-      const delBtn = row.createEl("button", {
+      const delBtn = actions.createEl("button", {
         cls: "settings-delete-btn",
         text: "🗑",
       });

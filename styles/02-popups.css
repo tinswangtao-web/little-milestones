@@ -269,6 +269,16 @@
   display: flex;
   gap: 10px;
   justify-content: stretch;
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 4px);
+  padding-top: 10px;
+  padding-bottom: 2px;
+  background: linear-gradient(
+    to top,
+    var(--background-primary) 72%,
+    rgba(0, 0, 0, 0)
+  );
+  z-index: 2;
 }
 .kid-score-edit-modal .value-popup-cancel,
 .kid-score-edit-modal .value-popup-confirm {
@@ -380,7 +390,9 @@ textarea.custom-form-name-input {
 }
 
 .kid-score-edit-modal textarea.custom-form-name-input {
-  /* Auto-growing textarea: no max-height so content is fully visible */
+  max-height: min(38vh, 260px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 

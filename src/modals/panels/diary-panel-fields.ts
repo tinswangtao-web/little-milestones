@@ -133,8 +133,11 @@ export function createDiaryQuickGroup({
     const text = textInput.value.trim();
     if (!customEmoji && !text) return;
     const body = [customEmoji, text].filter(Boolean).join(" ").trim();
-    valueInput.value = body;
-    diaryModules[moduleDef.id] = body;
+    const existing = valueInput.value.trim();
+    const nextValue =
+      !existing ? body : existing.includes(body) ? existing : existing + " / " + body;
+    valueInput.value = nextValue;
+    diaryModules[moduleDef.id] = nextValue;
     updateDiaryModules(diaryModules);
     syncAndRefresh();
     textInput.value = "";

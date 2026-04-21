@@ -623,6 +623,16 @@ button,
   display: flex;
   gap: 10px;
   justify-content: stretch;
+  position: sticky;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 4px);
+  padding-top: 10px;
+  padding-bottom: 2px;
+  background: linear-gradient(
+    to top,
+    var(--background-primary) 72%,
+    rgba(0, 0, 0, 0)
+  );
+  z-index: 2;
 }
 .kid-score-edit-modal .value-popup-cancel,
 .kid-score-edit-modal .value-popup-confirm {
@@ -734,7 +744,9 @@ textarea.custom-form-name-input {
 }
 
 .kid-score-edit-modal textarea.custom-form-name-input {
-  /* Auto-growing textarea: no max-height so content is fully visible */
+  max-height: min(38vh, 260px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 
@@ -1083,6 +1095,10 @@ textarea.custom-form-name-input {
   margin-bottom: 12px;
 }
 
+.diary-freewrite-toolbar {
+  margin: 4px 0 10px;
+}
+
 .diary-tool-btn {
   display: inline-flex;
   align-items: center;
@@ -1127,6 +1143,22 @@ textarea.custom-form-name-input {
 .diary-module-title {
   margin: 0 0 6px;
   font-size: 1em;
+}
+
+.diary-freewrite-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.diary-freewrite-header .diary-module-title {
+  margin-bottom: 0;
+}
+
+.diary-inline-preview-btn {
+  flex-shrink: 0;
 }
 
 .diary-module-hint {
@@ -2440,6 +2472,71 @@ textarea.custom-form-name-input {
   cursor: not-allowed;
 }
 
+.diary-module-settings-list {
+  display: grid;
+  gap: 12px;
+}
+
+.diary-module-settings-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px 44px;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--background-secondary) 84%, transparent);
+}
+
+.diary-module-settings-main {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+}
+
+.diary-module-settings-meta,
+.diary-module-settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diary-module-settings-actions {
+  align-items: flex-end;
+}
+
+.diary-module-settings-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.diary-module-settings-field-label {
+  font-size: 0.76em;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.diary-module-settings-input,
+.diary-module-settings-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  box-sizing: border-box;
+}
+
+.diary-module-settings-input.is-wide {
+  min-width: 0;
+}
+
 /* ─── 移动端适配 ─────────────────────────────────────────────────────────────── */
 
 @media (max-width: 480px) {
@@ -3284,6 +3381,30 @@ textarea.custom-form-name-input {
   .settings-note-input {
     min-height: 64px;
     font-size: 0.86em;
+  }
+
+  .diary-module-settings-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .diary-module-settings-main {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-module-settings-meta,
+  .diary-module-settings-actions {
+    width: 100%;
+  }
+
+  .diary-module-settings-actions {
+    align-items: stretch;
+  }
+
+  .diary-module-settings-select,
+  .diary-module-settings-actions .settings-delete-btn {
+    min-height: 40px;
   }
 
   /* Stats cards mobile */

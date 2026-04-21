@@ -13,6 +13,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   let stableViewportHeight = window.visualViewport
     ? window.visualViewport.height
     : window.innerHeight;
+  let isManualAdjusting = false;
 
   mEl.style.display = "flex";
   mEl.style.flexDirection = "column";
@@ -51,6 +52,12 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     }
   };
 
+  const readManualOffset = () =>
+    parseInt(mEl.dataset.manualModalOffset || "0", 10) || 0;
+
+  const readKeyboardOffset = () =>
+    parseInt(mEl.style.getPropertyValue("--keyboard-modal-offset") || "0", 10) || 0;
+
   const getKeyboardHeight = () => {
     if (!window.visualViewport) return 0;
     const vv = window.visualViewport;
@@ -70,12 +77,20 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
       return;
     }
-    if (keyboardH > 80) {
-      const lift = Math.min(180, Math.max(72, Math.round(keyboardH * 0.32)));
-      mEl.style.setProperty("--keyboard-modal-offset", -lift + "px");
-    } else {
+    if (keyboardH <= 80) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
+      return;
     }
+
+    if (isManualAdjusting) return;
+
+    const desiredBottom = (window.visualViewport?.offsetTop || 0) +
+      (window.visualViewport?.height || window.innerHeight) -
+      8;
+    const currentRect = mEl.getBoundingClientRect();
+    const currentKeyboardOffset = readKeyboardOffset();
+    const nextKeyboardOffset = currentKeyboardOffset + (desiredBottom - currentRect.bottom);
+    mEl.style.setProperty("--keyboard-modal-offset", Math.round(nextKeyboardOffset) + "px");
   };
 
   const applyLayout = () => {
@@ -95,13 +110,13 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
-        mEl.style.maxHeight = Math.max(120, vvH - 24) + "px";
+        mEl.style.maxHeight = Math.max(220, vvH - 12) + "px";
         if (platformIsIOS && isEditModal) {
           mEl.style.height = Math.max(220, vvH - 12) + "px";
         }
-        const extraBottom = isEditModal ? 176 : 72;
-        contentEl.style.paddingBottom = Math.round(keyboardH + extraBottom) + "px";
-        contentEl.style.scrollPaddingBottom = Math.round(keyboardH + extraBottom) + "px";
+        const extraBottom = isEditModal ? 28 : 18;
+        contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
+        contentEl.style.scrollPaddingBottom = Math.round(extraBottom + 12) + "px";
       } else {
         mEl.style.alignSelf = "";
         mEl.style.marginTop = "";
@@ -120,10 +135,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     const focused = document.activeElement as HTMLElement | null;
     if (focused && contentEl.contains(focused)) {
       setTimeout(() => {
-        ensureTargetVisible(
-          focused,
-          focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104
-        );
+        ensureTargetVisible(focused, focused.tagName === "TEXTAREA" ? 98 : isEditModal ? 76 : 56);
       }, platformIsIOS ? 120 : 60);
     }
   };
@@ -136,14 +148,14 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     const delay = platformIsIOS ? 120 : 80;
     setTimeout(() => {
       applyLayout();
-      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
     }, delay);
     // Fallback 2: longer retry for iOS where visualViewport resize may not
     // fire reliably (observed on iOS 26.4.1).
     if (platformIsIOS) {
       setTimeout(() => {
         applyLayout();
-        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
       }, 380);
     }
   };
@@ -162,8 +174,16 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     window.visualViewport.addEventListener("resize", onVVChange);
     window.visualViewport.addEventListener("scroll", onVVChange);
   }
+  const onManualDragStart = () => {
+    isManualAdjusting = true;
+  };
+  const onManualDragEnd = () => {
+    isManualAdjusting = false;
+  };
   window.addEventListener("resize", onWinResize);
   mEl.addEventListener("focusin", onFocusIn);
+  mEl.addEventListener("kid-score:manual-drag-start", onManualDragStart as EventListener);
+  mEl.addEventListener("kid-score:manual-drag-end", onManualDragEnd as EventListener);
   applyLayout();
 
   return () => {
@@ -173,6 +193,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     }
     window.removeEventListener("resize", onWinResize);
     mEl.removeEventListener("focusin", onFocusIn);
+    mEl.removeEventListener("kid-score:manual-drag-start", onManualDragStart as EventListener);
+    mEl.removeEventListener("kid-score:manual-drag-end", onManualDragEnd as EventListener);
     cEl.style.position = "";
     cEl.style.top = "";
     cEl.style.left = "";
@@ -187,6 +209,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     mEl.style.transform = "";
     mEl.style.removeProperty("--keyboard-modal-offset");
     mEl.style.removeProperty("--manual-modal-offset");
+    delete mEl.dataset.manualModalOffset;
     mEl.style.transition = "";
     mEl.style.alignSelf = "";
     mEl.style.marginTop = "";

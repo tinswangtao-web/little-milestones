@@ -1,5 +1,4 @@
 import type KidScorePlugin from "../main";
-import { renderDiaryTemplateSettingsSection } from "./diary-template-settings-section";
 import { renderDiaryModuleSettingsSection } from "./diary-module-settings";
 import { renderRulesSettingsSection } from "./rules-settings-section";
 
@@ -15,12 +14,6 @@ export function renderContentSettingsSections({
   bindSettingsInput,
 }: RenderContentSettingsSectionsOptions) {
   renderRulesSettingsSection({
-    plugin,
-    containerEl,
-    bindSettingsInput,
-  });
-
-  renderDiaryTemplateSettingsSection({
     plugin,
     containerEl,
     bindSettingsInput,

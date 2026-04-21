@@ -844,6 +844,30 @@
     font-size: 0.86em;
   }
 
+  .diary-module-settings-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .diary-module-settings-main {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-module-settings-meta,
+  .diary-module-settings-actions {
+    width: 100%;
+  }
+
+  .diary-module-settings-actions {
+    align-items: stretch;
+  }
+
+  .diary-module-settings-select,
+  .diary-module-settings-actions .settings-delete-btn {
+    min-height: 40px;
+  }
+
   /* Stats cards mobile */
   .summary-card {
     padding: 12px 8px;

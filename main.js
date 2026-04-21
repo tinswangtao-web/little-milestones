@@ -22,7 +22,7 @@ __export(main_exports, {
   default: () => KidScorePlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian20 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 
 // src/data/emoji-data.ts
 var EMOJI_DATA = {
@@ -1192,6 +1192,7 @@ function setupModalKeyboard(modal) {
   const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
   let stableViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  let isManualAdjusting = false;
   mEl.style.display = "flex";
   mEl.style.flexDirection = "column";
   mEl.style.overflow = "hidden";
@@ -1225,6 +1226,8 @@ function setupModalKeyboard(modal) {
       });
     }
   };
+  const readManualOffset = () => parseInt(mEl.dataset.manualModalOffset || "0", 10) || 0;
+  const readKeyboardOffset = () => parseInt(mEl.style.getPropertyValue("--keyboard-modal-offset") || "0", 10) || 0;
   const getKeyboardHeight = () => {
     if (!window.visualViewport) return 0;
     const vv = window.visualViewport;
@@ -1239,16 +1242,21 @@ function setupModalKeyboard(modal) {
     return raw;
   };
   const updateModalLift = (keyboardH) => {
+    var _a, _b;
     if (!(platformIsIOS && isEditModal)) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
       return;
     }
-    if (keyboardH > 80) {
-      const lift = Math.min(180, Math.max(72, Math.round(keyboardH * 0.32)));
-      mEl.style.setProperty("--keyboard-modal-offset", -lift + "px");
-    } else {
+    if (keyboardH <= 80) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
+      return;
     }
+    if (isManualAdjusting) return;
+    const desiredBottom = (((_a = window.visualViewport) == null ? void 0 : _a.offsetTop) || 0) + (((_b = window.visualViewport) == null ? void 0 : _b.height) || window.innerHeight) - 8;
+    const currentRect = mEl.getBoundingClientRect();
+    const currentKeyboardOffset = readKeyboardOffset();
+    const nextKeyboardOffset = currentKeyboardOffset + (desiredBottom - currentRect.bottom);
+    mEl.style.setProperty("--keyboard-modal-offset", Math.round(nextKeyboardOffset) + "px");
   };
   const applyLayout = () => {
     const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
@@ -1266,13 +1274,13 @@ function setupModalKeyboard(modal) {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
-        mEl.style.maxHeight = Math.max(120, vvH - 24) + "px";
+        mEl.style.maxHeight = Math.max(220, vvH - 12) + "px";
         if (platformIsIOS && isEditModal) {
           mEl.style.height = Math.max(220, vvH - 12) + "px";
         }
-        const extraBottom = isEditModal ? 176 : 72;
-        contentEl.style.paddingBottom = Math.round(keyboardH + extraBottom) + "px";
-        contentEl.style.scrollPaddingBottom = Math.round(keyboardH + extraBottom) + "px";
+        const extraBottom = isEditModal ? 28 : 18;
+        contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
+        contentEl.style.scrollPaddingBottom = Math.round(extraBottom + 12) + "px";
       } else {
         mEl.style.alignSelf = "";
         mEl.style.marginTop = "";
@@ -1290,10 +1298,7 @@ function setupModalKeyboard(modal) {
     const focused = document.activeElement;
     if (focused && contentEl.contains(focused)) {
       setTimeout(() => {
-        ensureTargetVisible(
-          focused,
-          focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104
-        );
+        ensureTargetVisible(focused, focused.tagName === "TEXTAREA" ? 98 : isEditModal ? 76 : 56);
       }, platformIsIOS ? 120 : 60);
     }
   };
@@ -1303,12 +1308,12 @@ function setupModalKeyboard(modal) {
     const delay = platformIsIOS ? 120 : 80;
     setTimeout(() => {
       applyLayout();
-      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
     }, delay);
     if (platformIsIOS) {
       setTimeout(() => {
         applyLayout();
-        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
       }, 380);
     }
   };
@@ -1322,8 +1327,16 @@ function setupModalKeyboard(modal) {
     window.visualViewport.addEventListener("resize", onVVChange);
     window.visualViewport.addEventListener("scroll", onVVChange);
   }
+  const onManualDragStart = () => {
+    isManualAdjusting = true;
+  };
+  const onManualDragEnd = () => {
+    isManualAdjusting = false;
+  };
   window.addEventListener("resize", onWinResize);
   mEl.addEventListener("focusin", onFocusIn);
+  mEl.addEventListener("kid-score:manual-drag-start", onManualDragStart);
+  mEl.addEventListener("kid-score:manual-drag-end", onManualDragEnd);
   applyLayout();
   return () => {
     if (window.visualViewport) {
@@ -1332,6 +1345,8 @@ function setupModalKeyboard(modal) {
     }
     window.removeEventListener("resize", onWinResize);
     mEl.removeEventListener("focusin", onFocusIn);
+    mEl.removeEventListener("kid-score:manual-drag-start", onManualDragStart);
+    mEl.removeEventListener("kid-score:manual-drag-end", onManualDragEnd);
     cEl.style.position = "";
     cEl.style.top = "";
     cEl.style.left = "";
@@ -1346,6 +1361,7 @@ function setupModalKeyboard(modal) {
     mEl.style.transform = "";
     mEl.style.removeProperty("--keyboard-modal-offset");
     mEl.style.removeProperty("--manual-modal-offset");
+    delete mEl.dataset.manualModalOffset;
     mEl.style.transition = "";
     mEl.style.alignSelf = "";
     mEl.style.marginTop = "";
@@ -1374,7 +1390,8 @@ function attachModalDragGesture(modal) {
   let startY = 0;
   let startOffset = 0;
   let dragging = false;
-  let lastDeltaY = 0;
+  let minOffset = Number.NEGATIVE_INFINITY;
+  let maxOffset = Number.POSITIVE_INFINITY;
   const isInteractiveTarget = (target) => {
     return !!(target && target.closest && target.closest(
       "input, textarea, select, button, .clickable-icon, .modal-close-button"
@@ -1382,31 +1399,25 @@ function attachModalDragGesture(modal) {
   };
   const readOffset = () => parseInt(modalEl.dataset.manualModalOffset || "0", 10) || 0;
   const writeOffset = (next) => {
-    const clamped = Math.max(-180, Math.min(140, next));
+    const clamped = Math.max(minOffset, Math.min(maxOffset, next));
     modalEl.dataset.manualModalOffset = String(clamped);
     modalEl.style.setProperty("--manual-modal-offset", clamped + "px");
   };
-  const snapOffset = (current, deltaY) => {
-    const snapPoints = [-144, -72, 0, 72];
-    const biased = current + Math.max(-18, Math.min(18, deltaY * 0.18));
-    let best = snapPoints[0];
-    let bestDist = Math.abs(biased - best);
-    for (let i = 1; i < snapPoints.length; i++) {
-      const point = snapPoints[i];
-      const dist = Math.abs(biased - point);
-      if (dist < bestDist) {
-        best = point;
-        bestDist = dist;
-      }
+  const updateBounds = () => {
+    var _a, _b;
+    const currentOffset = readOffset();
+    const rect = modalEl.getBoundingClientRect();
+    const viewportTop = ((_a = window.visualViewport) == null ? void 0 : _a.offsetTop) || 0;
+    const viewportBottom = viewportTop + (((_b = window.visualViewport) == null ? void 0 : _b.height) || window.innerHeight);
+    const baseTop = rect.top - currentOffset;
+    const baseBottom = rect.bottom - currentOffset;
+    minOffset = viewportTop + 8 - baseTop;
+    maxOffset = viewportBottom - 8 - baseBottom;
+    if (minOffset > maxOffset) {
+      const middle = (minOffset + maxOffset) / 2;
+      minOffset = middle;
+      maxOffset = middle;
     }
-    return best;
-  };
-  const applyDamping = (delta) => {
-    const sign = delta < 0 ? -1 : 1;
-    const abs = Math.abs(delta);
-    if (abs <= 48) return delta * 0.9;
-    if (abs <= 120) return sign * (43 + (abs - 48) * 0.55);
-    return sign * (82.6 + (abs - 120) * 0.28);
   };
   const onTouchStart = (e) => {
     if (!e.touches || e.touches.length !== 1) return;
@@ -1414,25 +1425,23 @@ function attachModalDragGesture(modal) {
     const touch = e.touches[0];
     startY = touch.clientY;
     startOffset = readOffset();
-    lastDeltaY = 0;
+    updateBounds();
     dragging = true;
     modalEl.classList.add("is-dragging-position");
+    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-start"));
   };
   const onTouchMove = (e) => {
     if (!dragging || !e.touches || e.touches.length !== 1) return;
     const touch = e.touches[0];
     const deltaY = touch.clientY - startY;
-    lastDeltaY = deltaY;
-    writeOffset(startOffset + applyDamping(deltaY));
+    writeOffset(startOffset + deltaY);
     e.preventDefault();
   };
   const onTouchEnd = () => {
     if (!dragging) return;
     dragging = false;
     modalEl.classList.remove("is-dragging-position");
-    modalEl.classList.add("is-settling-position");
-    writeOffset(snapOffset(readOffset(), lastDeltaY));
-    setTimeout(() => modalEl.classList.remove("is-settling-position"), 220);
+    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-end"));
   };
   modalEl.addEventListener("touchstart", onTouchStart, { passive: true });
   modalEl.addEventListener("touchmove", onTouchMove, { passive: false });
@@ -2334,8 +2343,10 @@ function createDiaryQuickGroup({
     const text = textInput.value.trim();
     if (!customEmoji && !text) return;
     const body = [customEmoji, text].filter(Boolean).join(" ").trim();
-    valueInput.value = body;
-    diaryModules[moduleDef.id] = body;
+    const existing = valueInput.value.trim();
+    const nextValue = !existing ? body : existing.includes(body) ? existing : existing + " / " + body;
+    valueInput.value = nextValue;
+    diaryModules[moduleDef.id] = nextValue;
     updateDiaryModules(diaryModules);
     syncAndRefresh();
     textInput.value = "";
@@ -2403,6 +2414,7 @@ function buildDiaryPanel(options) {
   let diaryTextarea = null;
   let textareaWrap = null;
   let charCount = null;
+  let inlinePreviewBtn = null;
   const updateCharCount = () => {
     if (charCount) charCount.textContent = (currentDiaryContent || "").length + " \u5B57";
   };
@@ -2420,8 +2432,9 @@ function buildDiaryPanel(options) {
       target.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
     });
   };
-  const toolbar = panel.createDiv({ cls: "diary-toolbar" });
+  let toolbar = null;
   const createToolButton = (text, onClick, extraCls = "") => {
+    if (!toolbar) return null;
     const btn = toolbar.createEl("button", {
       cls: "diary-tool-btn" + (extraCls ? " " + extraCls : ""),
       text
@@ -2429,23 +2442,6 @@ function buildDiaryPanel(options) {
     btn.onclick = onClick;
     return btn;
   };
-  [
-    { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
-    { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
-    { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
-  ].forEach((asset) => {
-    createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
-  });
-  createToolButton("B \u52A0\u7C97", () => wrapDiarySelection("**", "**", "\u91CD\u70B9\u5185\u5BB9"), "is-format");
-  createToolButton("I \u659C\u4F53", () => wrapDiarySelection("*", "*", "\u60F3\u6CD5"), "is-format");
-  createToolButton("H \u6807\u9898", () => insertDiaryText("\n### \u5C0F\u6807\u9898\n"), "is-format");
-  createToolButton("\u2022 \u5217\u8868", () => insertDiaryText("\n- "), "is-format");
-  createToolButton("\u275D \u5F15\u7528", () => insertDiaryText("\n> "), "is-format");
-  createToolButton(
-    "\u2194\uFE0E \u5C45\u4E2D",
-    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "\u5199\u5728\u4E2D\u95F4\u7684\u8BDD"),
-    "is-format"
-  );
   const togglePreview = () => {
     isPreview = !isPreview;
     if (isPreview) {
@@ -2525,11 +2521,35 @@ function buildDiaryPanel(options) {
     panel
   });
   textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
-  textareaWrap.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+  const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
+  freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+  inlinePreviewBtn = freewriteHeader.createEl("button", {
+    cls: "diary-tool-btn diary-inline-preview-btn",
+    text: "\u67E5\u770B\u9884\u89C8"
+  });
+  inlinePreviewBtn.onclick = () => togglePreview();
   textareaWrap.createEl("p", {
     cls: "diary-module-hint",
     text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
   });
+  toolbar = textareaWrap.createDiv({ cls: "diary-toolbar diary-freewrite-toolbar" });
+  [
+    { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
+    { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
+    { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
+  ].forEach((asset) => {
+    createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
+  });
+  createToolButton("B \u52A0\u7C97", () => wrapDiarySelection("**", "**", "\u91CD\u70B9\u5185\u5BB9"), "is-format");
+  createToolButton("I \u659C\u4F53", () => wrapDiarySelection("*", "*", "\u60F3\u6CD5"), "is-format");
+  createToolButton("H \u6807\u9898", () => insertDiaryText("\n### \u5C0F\u6807\u9898\n"), "is-format");
+  createToolButton("\u2022 \u5217\u8868", () => insertDiaryText("\n- "), "is-format");
+  createToolButton("\u275D \u5F15\u7528", () => insertDiaryText("\n> "), "is-format");
+  createToolButton(
+    "\u2194\uFE0E \u5C45\u4E2D",
+    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "\u5199\u5728\u4E2D\u95F4\u7684\u8BDD"),
+    "is-format"
+  );
   diaryTextarea = textareaWrap.createEl("textarea", {
     cls: "diary-textarea",
     placeholder: "\u4F8B\u5982\uFF1A\u4ECA\u5929\u653E\u5B66\u540E\uFF0C\u6211\u548C\u5988\u5988\u4E00\u8D77\u53BB\u4E86\u516C\u56ED..."
@@ -2560,8 +2580,12 @@ function buildDiaryPanel(options) {
     togglePreview,
     bindActionButtons: ({ previewBtn, saveBtn, statsBtn, actions }) => {
       previewButtonBinder = (active) => {
-        previewBtn.textContent = active ? "\u8FD4\u56DE\u7F16\u8F91" : "\u67E5\u770B\u9884\u89C8";
-        previewBtn.classList.toggle("is-active", active);
+        previewBtn.style.display = "none";
+        previewBtn.classList.remove("is-active");
+        if (inlinePreviewBtn) {
+          inlinePreviewBtn.textContent = active ? "\u8FD4\u56DE\u7F16\u8F91" : "\u67E5\u770B\u9884\u89C8";
+          inlinePreviewBtn.classList.toggle("is-active", active);
+        }
         saveBtn.textContent = active ? "\u{1F4BE} \u786E\u8BA4\u4FDD\u5B58" : "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55";
         saveBtn.classList.toggle("is-preview-ready", active);
         if (statsBtn) statsBtn.classList.toggle("is-muted-during-preview", active);
@@ -4173,7 +4197,7 @@ var DailyScoringModal = class extends BaseMobileModal {
 };
 
 // src/settings/settings-tab.ts
-var import_obsidian18 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 
 // src/settings/category-settings.ts
 var import_obsidian9 = require("obsidian");
@@ -4379,135 +4403,8 @@ function renderCategorySettings({
   );
 }
 
-// src/settings/diary-template-settings-section.ts
-var import_obsidian10 = require("obsidian");
-function renderDiaryTemplateSettingsSection({
-  plugin,
-  containerEl,
-  bindSettingsInput
-}) {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
-  const toggle = header.createEl("span", {
-    cls: "kid-score-rules-toggle",
-    text: "\u25BC"
-  });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
-  header.createSpan({
-    cls: "kid-score-rules-desc",
-    text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875"
-  });
-  const editBtn = header.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
-    text: "\u270F\uFE0F"
-  });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
-  const view = body.createDiv({ cls: "kid-score-rules-view" });
-  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-  const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-  bindSettingsInput(textarea);
-  textarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-  textarea.style.minHeight = "220px";
-  const previewWrap = edit.createDiv({
-    cls: "diary-preview-wrap diary-preview-settings"
-  });
-  previewWrap.style.display = "none";
-  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
-  const previewBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
-    text: "MD\u9884\u89C8"
-  });
-  const saveBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
-    text: "\u4FDD\u5B58\u6A21\u677F"
-  });
-  const cancelBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
-    text: "\u53D6\u6D88"
-  });
-  const renderView = () => {
-    view.empty();
-    const text = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-    import_obsidian10.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
-  };
-  renderView();
-  let open = true;
-  let isEditing = false;
-  let isPreview = false;
-  const refreshPreview = () => {
-    previewWrap.empty();
-    import_obsidian10.MarkdownRenderer.render(
-      plugin.app,
-      textarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
-      previewWrap,
-      "",
-      plugin
-    );
-  };
-  header.addEventListener("click", (e) => {
-    if (e.target === editBtn || editBtn.contains(e.target)) return;
-    open = !open;
-    toggle.textContent = open ? "\u25BC" : "\u25B6";
-    body.toggleClass("is-hidden", !open);
-  });
-  editBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    isEditing = !isEditing;
-    if (isEditing) {
-      open = true;
-      toggle.textContent = "\u25BC";
-      body.removeClass("is-hidden");
-      textarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      view.addClass("is-hidden");
-      edit.removeClass("is-hidden");
-      isPreview = false;
-      previewWrap.style.display = "none";
-      previewBtn.textContent = "MD\u9884\u89C8";
-      textarea.focus();
-    } else {
-      view.removeClass("is-hidden");
-      edit.addClass("is-hidden");
-    }
-  });
-  previewBtn.addEventListener("click", () => {
-    isPreview = !isPreview;
-    if (isPreview) {
-      refreshPreview();
-      previewWrap.style.display = "";
-      previewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
-    } else {
-      previewWrap.style.display = "none";
-      previewBtn.textContent = "MD\u9884\u89C8";
-    }
-  });
-  textarea.addEventListener("input", () => {
-    if (!isPreview) return;
-    refreshPreview();
-  });
-  saveBtn.addEventListener("click", async () => {
-    plugin.currentUser.diaryTemplate = textarea.value;
-    await plugin.saveSettings();
-    renderView();
-    isEditing = false;
-    isPreview = false;
-    previewWrap.style.display = "none";
-    previewBtn.textContent = "MD\u9884\u89C8";
-    view.removeClass("is-hidden");
-    edit.addClass("is-hidden");
-    new import_obsidian10.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
-  });
-  cancelBtn.addEventListener("click", () => {
-    isEditing = false;
-    isPreview = false;
-    previewWrap.style.display = "none";
-    previewBtn.textContent = "MD\u9884\u89C8";
-    view.removeClass("is-hidden");
-    edit.addClass("is-hidden");
-  });
-}
-
 // src/settings/diary-module-settings.ts
-var import_obsidian11 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 function renderDiaryModuleSettingsSection({
   plugin,
   containerEl,
@@ -4539,7 +4436,15 @@ function renderDiaryModuleSettingsSection({
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
       const row = list.createDiv({ cls: "diary-module-settings-row" });
-      const labelInput = row.createEl("input", {
+      const main = row.createDiv({ cls: "diary-module-settings-main" });
+      const meta = row.createDiv({ cls: "diary-module-settings-meta" });
+      const actions2 = row.createDiv({ cls: "diary-module-settings-actions" });
+      const labelField = main.createDiv({ cls: "diary-module-settings-field" });
+      labelField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "\u6A21\u5757\u540D\u79F0"
+      });
+      const labelInput = labelField.createEl("input", {
         cls: "diary-module-settings-input",
         type: "text"
       });
@@ -4551,7 +4456,14 @@ function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
         render();
       };
-      const placeholderInput = row.createEl("input", {
+      const placeholderField = main.createDiv({
+        cls: "diary-module-settings-field is-wide"
+      });
+      placeholderField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "\u63D0\u793A\u6587\u6848"
+      });
+      const placeholderInput = placeholderField.createEl("input", {
         cls: "diary-module-settings-input is-wide",
         type: "text"
       });
@@ -4562,7 +4474,12 @@ function renderDiaryModuleSettingsSection({
         plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
         await plugin.saveSettings();
       };
-      const kindSelect = row.createEl("select", {
+      const kindField = meta.createDiv({ cls: "diary-module-settings-field" });
+      kindField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "\u8BB0\u5F55\u5F62\u5F0F"
+      });
+      const kindSelect = kindField.createEl("select", {
         cls: "diary-module-settings-select"
       });
       [
@@ -4579,7 +4496,7 @@ function renderDiaryModuleSettingsSection({
         plugin.currentUser.diaryModules[idx].kind = kindSelect.value;
         await plugin.saveSettings();
       };
-      const delBtn = row.createEl("button", {
+      const delBtn = actions2.createEl("button", {
         cls: "settings-delete-btn",
         text: "\u{1F5D1}"
       });
@@ -4612,7 +4529,7 @@ function renderDiaryModuleSettingsSection({
       plugin.currentUser.diaryModules = makeDefaultDiaryModules();
       await plugin.saveSettings();
       render();
-      new import_obsidian11.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
+      new import_obsidian10.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
     };
   };
   render();
@@ -4624,7 +4541,7 @@ function renderDiaryModuleSettingsSection({
 }
 
 // src/settings/rules-settings-section.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 function renderRulesSettingsSection({
   plugin,
   containerEl,
@@ -4667,7 +4584,7 @@ function renderRulesSettingsSection({
     view.empty();
     const text = plugin.currentUser.scoringRules || "";
     if (text.trim()) {
-      import_obsidian12.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
+      import_obsidian11.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
     } else {
       view.createEl("p", {
         cls: "kid-score-rules-empty",
@@ -4712,7 +4629,7 @@ function renderRulesSettingsSection({
     isEditing = false;
     view.removeClass("is-hidden");
     edit.addClass("is-hidden");
-    new import_obsidian12.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+    new import_obsidian11.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
   });
   cancelBtn.addEventListener("click", () => {
     isEditing = false;
@@ -4732,11 +4649,6 @@ function renderContentSettingsSections({
     containerEl,
     bindSettingsInput
   });
-  renderDiaryTemplateSettingsSection({
-    plugin,
-    containerEl,
-    bindSettingsInput
-  });
   renderDiaryModuleSettingsSection({
     plugin,
     containerEl,
@@ -4745,7 +4657,7 @@ function renderContentSettingsSections({
 }
 
 // src/settings/goal-settings-section.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 function renderGoalSettingsSection({
   plugin,
   containerEl,
@@ -4776,21 +4688,21 @@ function renderGoalSettingsSection({
       if (Number.isFinite(value) && value > 0) {
         plugin.currentUser.goals[goalField.key] = value;
         await plugin.saveSettings();
-        new import_obsidian13.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
+        new import_obsidian12.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
       }
     };
   }
 }
 
 // src/settings/import-export-settings.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 function renderImportExportSettings({
   plugin,
   containerEl,
   refresh
 }) {
   containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
-  new import_obsidian14.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
     btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
       const data = { categories: plugin.currentUser.categories, items: plugin.currentUser.items };
       const json = JSON.stringify(data, null, 2);
@@ -4803,7 +4715,7 @@ function renderImportExportSettings({
       URL.revokeObjectURL(url);
     });
   });
-  new import_obsidian14.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
     btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
       const fileInput = document.createElement("input");
       fileInput.type = "file";
@@ -4818,9 +4730,9 @@ function renderImportExportSettings({
           if (Array.isArray(data.categories)) plugin.currentUser.categories = data.categories;
           await plugin.saveSettings();
           refresh();
-          new import_obsidian14.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
+          new import_obsidian13.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
         } catch (e) {
-          new import_obsidian14.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
+          new import_obsidian13.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
         }
       };
       fileInput.click();
@@ -4829,7 +4741,7 @@ function renderImportExportSettings({
 }
 
 // src/settings/item-settings.ts
-var import_obsidian16 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 
 // src/settings/item-sorting.ts
 function sortItemsByCategories(items, categories) {
@@ -4843,7 +4755,7 @@ function sortItemsByCategories(items, categories) {
 }
 
 // src/settings/item-settings-list.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 function renderItemSettingsList({
   plugin,
   itemsWrap,
@@ -4851,6 +4763,7 @@ function renderItemSettingsList({
   pendingScrollItemId,
   setPendingScrollItemId
 }) {
+  const getScrollContainer = () => itemsWrap.closest(".vertical-tab-content") || itemsWrap.closest(".modal-content") || itemsWrap.parentElement;
   const dragState = {
     dragging: false,
     dragIdx: -1,
@@ -4955,6 +4868,9 @@ function renderItemSettingsList({
     document.addEventListener("pointercancel", pointerCancelHandler);
   };
   const renderItems = () => {
+    var _a;
+    const scroller = getScrollContainer();
+    const preservedScrollTop = pendingScrollItemId ? null : (_a = scroller == null ? void 0 : scroller.scrollTop) != null ? _a : null;
     itemsWrap.empty();
     dragState.rows = [];
     if (plugin.currentUser.items.length === 0) {
@@ -5051,7 +4967,7 @@ function renderItemSettingsList({
           await plugin.saveSettings();
           renderItems();
         } catch (error) {
-          new import_obsidian15.Notice(
+          new import_obsidian14.Notice(
             "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
           );
         }
@@ -5077,8 +4993,8 @@ function renderItemSettingsList({
       itemsWrap.querySelectorAll(".settings-cat-group-header")
     );
     groupHeaders.forEach((header, hi) => {
-      var _a;
-      const category = ((_a = header.querySelector("span")) == null ? void 0 : _a.textContent) || "";
+      var _a2;
+      const category = ((_a2 = header.querySelector("span")) == null ? void 0 : _a2.textContent) || "";
       const nextSibling = groupHeaders[hi + 1] || null;
       const addBtn = document.createElement("button");
       addBtn.className = "settings-cat-add-btn";
@@ -5102,7 +5018,7 @@ function renderItemSettingsList({
           setPendingScrollItemId(newItemId);
           renderItems();
         } catch (error) {
-          new import_obsidian15.Notice(
+          new import_obsidian14.Notice(
             "\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
           );
         }
@@ -5117,9 +5033,9 @@ function renderItemSettingsList({
         );
         if (newItemEl) {
           newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
-          const scroller = itemsWrap.closest(".vertical-tab-content") || itemsWrap.closest(".modal-content") || itemsWrap.closest(".setting-item") || itemsWrap.parentElement;
-          if (scroller && scroller !== itemsWrap) {
-            const scrollerEl = scroller;
+          const scrollContainer = getScrollContainer();
+          if (scrollContainer && scrollContainer !== itemsWrap) {
+            const scrollerEl = scrollContainer;
             const itemTop = newItemEl.offsetTop - (itemsWrap.offsetTop - scrollerEl.offsetTop);
             const desiredScroll = Math.max(
               0,
@@ -5138,6 +5054,10 @@ function renderItemSettingsList({
           }
         }
         setPendingScrollItemId(null);
+      });
+    } else if (scroller && preservedScrollTop !== null) {
+      requestAnimationFrame(() => {
+        scroller.scrollTop = preservedScrollTop;
       });
     }
   };
@@ -5167,7 +5087,7 @@ function renderItemSettings({
     }
   });
   renderItems();
-  new import_obsidian16.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+  new import_obsidian15.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
     (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
       const defaultCat = plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
       const newItemId = "item_" + Date.now();
@@ -5189,13 +5109,13 @@ function renderItemSettings({
       sortItemsByCategories(plugin.currentUser.items, plugin.currentUser.categories || []);
       await plugin.saveSettings();
       renderItems();
-      new import_obsidian16.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
+      new import_obsidian15.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
     })
   );
 }
 
 // src/settings/user-settings-section.ts
-var import_obsidian17 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 function renderUserSettingsSection({
   app,
   plugin,
@@ -5210,7 +5130,7 @@ function renderUserSettingsSection({
   });
   const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
   const showUserDeleteConfirm = (user) => {
-    const deleteModal = new class extends import_obsidian17.Modal {
+    const deleteModal = new class extends import_obsidian16.Modal {
       onOpen() {
         this.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
         this.modalEl.addClass("kid-score-edit-modal");
@@ -5261,7 +5181,7 @@ function renderUserSettingsSection({
               refresh();
             }
           } catch (error) {
-            new import_obsidian17.Notice(
+            new import_obsidian16.Notice(
               "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
             );
           }
@@ -5309,14 +5229,14 @@ function renderUserSettingsSection({
         await plugin.saveSettings();
         refresh();
       } catch (error) {
-        new import_obsidian17.Notice(
+        new import_obsidian16.Notice(
           "\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
         );
       }
     };
   };
   renderUserMgr();
-  new import_obsidian17.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+  new import_obsidian16.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
     (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
       const newName = value.trim() || "\u5C0F\u670B\u53CB";
       const oldName = plugin.currentUser.name;
@@ -5327,17 +5247,17 @@ function renderUserSettingsSection({
         plugin.currentUser.name = newName;
         await plugin.saveSettings();
         renderUserMgr();
-        new import_obsidian17.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
+        new import_obsidian16.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
       } catch (error) {
         console.error("[Little Milestones] renameUserInFiles error", error);
-        new import_obsidian17.Notice(
+        new import_obsidian16.Notice(
           "\u274C " + (error instanceof Error ? error.message : String(error))
         );
       }
     })
   );
   bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
-  new import_obsidian17.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+  new import_obsidian16.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
     (text) => text.setPlaceholder("Little Milestones/Daily Records").setValue(plugin.currentUser.savePath).onChange(async (value) => {
       const newPath = value.trim() || "Little Milestones/Daily Records";
       const oldPath = plugin.currentUser.savePath;
@@ -5351,10 +5271,10 @@ function renderUserSettingsSection({
         await plugin.migrateSavePath(oldPath, newPath);
         plugin.currentUser.savePath = newPath;
         await plugin.saveSettings();
-        new import_obsidian17.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
+        new import_obsidian16.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
       } catch (error) {
         console.error("[Little Milestones] migrateSavePath error", error);
-        new import_obsidian17.Notice(
+        new import_obsidian16.Notice(
           "\u274C " + (error instanceof Error ? error.message : String(error))
         );
       }
@@ -5364,7 +5284,7 @@ function renderUserSettingsSection({
 }
 
 // src/settings/settings-tab.ts
-var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
+var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.touchGuardCleanup = null;
@@ -5611,7 +5531,7 @@ function ensureUserDefaults(user) {
 }
 
 // src/storage/day-data-store.ts
-var import_obsidian19 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 
 // src/composers/day-data-composer.ts
 var DayDataComposer = class {
@@ -5840,7 +5760,7 @@ var DayDataStore = class {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
-    if (!(file instanceof import_obsidian19.TFile)) return null;
+    if (!(file instanceof import_obsidian18.TFile)) return null;
     const content = await this.plugin.app.vault.read(file);
     const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
     if (!fmMatch) return null;
@@ -5911,32 +5831,32 @@ var DayDataStore = class {
         diaryContent
       );
       const fileContent = builder.build(report);
-      const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
+      const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
       if (!this.plugin.app.vault.getAbstractFileByPath(dirPath)) {
         await this.plugin.app.vault.createFolder(dirPath);
       }
       const filePath = this.plugin.filePath(dateStr);
       const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
-      if (existing instanceof import_obsidian19.TFile) {
+      if (existing instanceof import_obsidian18.TFile) {
         await this.plugin.app.vault.modify(existing, fileContent);
       } else {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
-      new import_obsidian19.Notice(
+      new import_obsidian18.Notice(
         "\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal
       );
     } catch (error) {
       console.error("[Little Milestones] saveDayData failed", error);
-      new import_obsidian19.Notice(
+      new import_obsidian18.Notice(
         "\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
       );
       throw error;
     }
   }
   async renameUserInFiles(oldName, newName) {
-    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -5970,8 +5890,8 @@ var DayDataStore = class {
     }
   }
   async migrateSavePath(oldPath, newPath) {
-    const oldDir = (0, import_obsidian19.normalizePath)(oldPath);
-    const newDir = (0, import_obsidian19.normalizePath)(newPath);
+    const oldDir = (0, import_obsidian18.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian18.normalizePath)(newPath);
     if (oldDir === newDir) return;
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
@@ -5983,9 +5903,9 @@ var DayDataStore = class {
     let errorCount = 0;
     for (const file of files) {
       try {
-        const newFilePath = (0, import_obsidian19.normalizePath)(newDir + "/" + file.name);
+        const newFilePath = (0, import_obsidian18.normalizePath)(newDir + "/" + file.name);
         const existing = this.plugin.app.vault.getAbstractFileByPath(newFilePath);
-        if (existing instanceof import_obsidian19.TFile) {
+        if (existing instanceof import_obsidian18.TFile) {
           const oldContent = await this.plugin.app.vault.read(file);
           await this.plugin.app.vault.modify(existing, oldContent);
           await this.plugin.app.vault.delete(file, true);
@@ -6008,7 +5928,7 @@ var DayDataStore = class {
     }
   }
   async getAllScores() {
-    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -6025,7 +5945,7 @@ var DayDataStore = class {
 };
 
 // src/main.ts
-var KidScorePlugin = class extends import_obsidian20.Plugin {
+var KidScorePlugin = class extends import_obsidian19.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -6079,7 +5999,7 @@ var KidScorePlugin = class extends import_obsidian20.Plugin {
     return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
   }
   filePath(dateStr) {
-    return (0, import_obsidian20.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian19.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
   async readDayData(dateStr) {
     return this.dayDataStore.readDayData(dateStr);

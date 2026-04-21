@@ -18,6 +18,11 @@ export function renderItemSettingsList({
   pendingScrollItemId,
   setPendingScrollItemId,
 }: RenderItemSettingsListOptions): void {
+  const getScrollContainer = () =>
+    (itemsWrap.closest(".vertical-tab-content") ||
+      itemsWrap.closest(".modal-content") ||
+      itemsWrap.parentElement) as HTMLElement | null;
+
   const dragState = {
     dragging: false,
     dragIdx: -1,
@@ -141,6 +146,9 @@ export function renderItemSettingsList({
   };
 
   const renderItems = () => {
+    const scroller = getScrollContainer();
+    const preservedScrollTop = pendingScrollItemId ? null : scroller?.scrollTop ?? null;
+
     itemsWrap.empty();
     dragState.rows = [];
 
@@ -322,13 +330,9 @@ export function renderItemSettingsList({
 
           // Fallback: if Obsidian's settings page uses a separate scroll
           // container (common on mobile), also scroll that container.
-          const scroller =
-            itemsWrap.closest(".vertical-tab-content") ||
-            itemsWrap.closest(".modal-content") ||
-            itemsWrap.closest(".setting-item") ||
-            itemsWrap.parentElement;
-          if (scroller && scroller !== itemsWrap) {
-            const scrollerEl = scroller as HTMLElement;
+          const scrollContainer = getScrollContainer();
+          if (scrollContainer && scrollContainer !== itemsWrap) {
+            const scrollerEl = scrollContainer as HTMLElement;
             const itemTop =
               newItemEl.offsetTop -
               (itemsWrap.offsetTop - scrollerEl.offsetTop);
@@ -352,6 +356,10 @@ export function renderItemSettingsList({
           }
         }
         setPendingScrollItemId(null);
+      });
+    } else if (scroller && preservedScrollTop !== null) {
+      requestAnimationFrame(() => {
+        scroller.scrollTop = preservedScrollTop;
       });
     }
   };
