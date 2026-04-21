@@ -1,0 +1,719 @@
+/* ─── Settings ───────────────────────────────────────────────────────────────── */
+
+.kid-score-settings {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+.kid-score-settings,
+.kid-score-settings * {
+  box-sizing: border-box;
+}
+
+.kid-score-settings .setting-item-control,
+.kid-score-settings-items,
+.kid-score-cat-list {
+  overflow-x: clip;
+}
+
+.kid-score-settings h3 {
+  margin: 20px 0 8px;
+}
+
+.settings-item-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 72px 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.header-row {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding-bottom: 4px;
+}
+
+/* Emoji picker */
+.settings-emoji-wrap { position: relative; }
+
+.settings-emoji-btn {
+  width: 44px;
+  height: 36px;
+  font-size: 1.3em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+  padding: 0;
+  text-align: center;
+}
+.settings-emoji-btn:hover { background: var(--background-modifier-hover); }
+
+.kid-score-emoji-picker {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  z-index: 9999;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  width: 240px;
+  max-height: 260px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.emoji-option {
+  font-size: 1.3em;
+  padding: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: center;
+  transition: background 0.1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.emoji-option:hover { background: var(--background-modifier-hover); }
+.emoji-option:active { background: var(--background-modifier-hover); -webkit-transform: scale(0.9); transform: scale(0.9); }
+
+.emoji-custom-row {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+.emoji-custom-row input {
+  width: 100%;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  box-sizing: border-box;
+  font-size: 0.9em;
+}
+
+/* ── Unified style for ALL item-row inputs (name, points, category, note) ── */
+.settings-name-input,
+.settings-points-input,
+.settings-cat-select,
+.settings-note-input {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.85em;
+  width: 100%;
+  box-sizing: border-box;
+  /* Remove native browser/iOS pill shape */
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+  outline: none;
+}
+/* Restore the dropdown arrow on <select> */
+.settings-cat-select {
+  -webkit-appearance: auto;
+  appearance: auto;
+  padding: 0 4px;
+  cursor: pointer;
+}
+/* Focus ring shared */
+.settings-name-input:focus,
+.settings-points-input:focus,
+.settings-cat-select:focus,
+.settings-note-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+/* Score column: center the number */
+.settings-points-input { text-align: center; }
+
+.settings-delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+
+.settings-delete-btn:hover {
+  opacity: 1;
+  background: var(--background-modifier-error);
+}
+
+/* ─── User Switcher ─────────────────────────────────────────────────────────── */
+
+.kid-score-user-switcher {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.kid-score-user-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  height: auto !important;
+  min-height: 32px !important;
+  padding: 6px 14px !important;
+  border-radius: 20px;
+  border: 1.5px solid var(--interactive-accent);
+  background: transparent;
+  color: var(--interactive-accent);
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+.kid-score-user-btn:hover {
+  background: var(--background-modifier-hover);
+}
+.kid-score-user-btn.is-active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+/* Settings page user list */
+.kid-score-settings-users {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+}
+
+.kid-score-user-add-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px dashed var(--interactive-accent);
+  background: transparent;
+  color: var(--interactive-accent);
+  font-size: 0.9em;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+.kid-score-user-add-btn:hover {
+  opacity: 1;
+}
+
+/* ─── Goals settings ─────────────────────────────────────────────────────────── */
+
+.kid-score-goals-section {
+  margin: 16px 0;
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 10px;
+}
+
+.kid-score-goals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.kid-score-goal-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kid-score-goal-cell label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+}
+
+.kid-score-goal-input {
+  padding: 6px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.95em;
+  text-align: center;
+}
+
+/* ─── Category Management (Settings) ──────────────────────────────────────── */
+
+.kid-score-cat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.kid-score-cat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+}
+
+.kid-score-cat-row .settings-name-input {
+  flex: 1;
+}
+
+/* ─── Category Divider ─────────────────────────────────────────────────────── */
+
+.kid-score-divider {
+  border: none;
+  border-top: 1px solid var(--background-modifier-border);
+  margin: 16px 0 4px;
+}
+
+/* ─── Settings Item Row v2 (6 columns: drag, emoji, name, category, points, delete) */
+
+.settings-item-row-v2 {
+  display: grid;
+  grid-template-columns: 28px 48px 1fr 90px 60px 36px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.settings-item-row-v2.header-row {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  font-weight: 600;
+  padding-bottom: 4px;
+}
+
+.settings-drag-handle {
+  font-size: 1.1em;
+  color: var(--text-faint);
+  cursor: grab;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.settings-drag-handle:hover {
+  color: var(--interactive-accent);
+}
+.settings-drag-handle:active {
+  cursor: grabbing;
+}
+
+.settings-drag-ghost {
+  padding: 6px 8px !important;
+}
+
+/* .settings-cat-select base style is now in the unified block above */
+
+.settings-move-wrap {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-move-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  font-size: 0.75em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+}
+.settings-move-btn:hover:not(:disabled) {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+
+/* ─── Settings Category Group Header ───────────────────────────────────────── */
+
+.settings-cat-group-header {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 4px;
+  padding: 4px 10px;
+  background: var(--background-secondary);
+  border-left: 3px solid var(--interactive-accent);
+  border-radius: 0 4px 4px 0;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.settings-cat-group-header:first-of-type {
+  margin-top: 8px;
+}
+
+.settings-cat-add-btn {
+  display: block;
+  width: 100%;
+  margin: 4px 0 12px;
+  padding: 6px 12px;
+  border: 1.5px dashed var(--interactive-accent);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--interactive-accent);
+  font-size: 0.82em;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.settings-cat-add-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+/* ─── Settings Item Wrap (row + note grouped for drag) ─────────────────────── */
+
+.settings-item-wrap {
+  margin-bottom: 2px;
+  max-width: 100%;
+}
+
+.settings-item-wrap.is-new-item {
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb, 99, 102, 241), 0.22);
+  transition: box-shadow 0.2s ease;
+}
+
+/* ─── Settings Note Row (below each item) ──────────────────────────────────── */
+
+.settings-item-note-row {
+  padding: 0 0 6px 36px;
+  margin-bottom: 4px;
+  border-bottom: 1px dashed var(--background-modifier-border);
+}
+
+/* Note input: inherits unified style; use muted color to signal it's optional */
+.settings-note-input {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  min-height: 32px;
+  height: auto;
+  padding: 6px 8px;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+  font-family: inherit;
+}
+.settings-note-input::placeholder {
+  color: var(--text-faint);
+}
+.settings-note-input:focus {
+}
+
+/* ─── 打分规则区块 ───────────────────────────────────────────────────────────── */
+
+.kid-score-rules-section {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.kid-score-rules-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: var(--background-secondary);
+  user-select: none;
+  transition: background 0.15s;
+}
+.kid-score-rules-header:hover {
+  background: var(--background-modifier-hover);
+}
+
+.kid-score-rules-toggle {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  width: 12px;
+  flex-shrink: 0;
+}
+
+.kid-score-rules-title {
+  flex: 0 1 auto;
+  font-size: 0.9em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.kid-score-rules-desc {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  margin-left: auto;
+  padding-right: 4px;
+  white-space: normal;
+  text-align: right;
+  flex-shrink: 1;
+}
+
+.kid-score-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.kid-score-section-header h3 {
+  margin: 0;
+}
+.kid-score-section-header .kid-score-section-desc {
+  font-size: 0.78em;
+  color: var(--text-muted);
+}
+  color: var(--text-normal);
+}
+
+.kid-score-rules-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.kid-score-rules-edit-btn:hover {
+  opacity: 1;
+  background: var(--background-modifier-hover);
+}
+
+.kid-score-rules-body {
+  padding: 12px 14px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+.kid-score-rules-body.is-hidden {
+  display: none;
+}
+
+.kid-score-rules-view {
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: var(--text-normal);
+}
+.kid-score-rules-view.is-hidden {
+  display: none;
+}
+.kid-score-rules-view p,
+.kid-score-rules-view ul,
+.kid-score-rules-view ol {
+  margin: 4px 0;
+}
+.kid-score-rules-view h1,
+.kid-score-rules-view h2,
+.kid-score-rules-view h3 {
+  font-size: 0.95em;
+  margin: 8px 0 4px;
+}
+
+.kid-score-rules-empty {
+  color: var(--text-muted);
+  font-size: 0.88em;
+  text-align: center;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.kid-score-rules-edit.is-hidden {
+  display: none;
+}
+
+.kid-score-rules-textarea {
+  width: 100%;
+  min-height: 120px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.88em;
+  line-height: 1.6;
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: var(--font-text);
+}
+.kid-score-rules-textarea:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.kid-score-rules-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.kid-score-rules-save-btn {
+  font-size: 0.88em;
+  padding: 6px 14px;
+}
+
+.kid-score-rules-cancel-btn {
+  background: none;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.88em;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.15s;
+}
+.kid-score-rules-cancel-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+/* ─── Config Import / Export ────────────────────────────────────────────────── */
+
+.kid-score-import-popup {
+  width: min(480px, 94vw);
+  max-height: 80vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Tab bar */
+.kid-score-import-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1.5px solid var(--background-modifier-border);
+  margin-bottom: 12px;
+}
+.kid-score-import-tab {
+  flex: 1;
+  padding: 8px 6px;
+  background: none;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer;
+  font-size: 0.88em;
+  color: var(--text-muted);
+  margin-bottom: -1.5px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.kid-score-import-tab.is-active {
+  color: var(--interactive-accent);
+  border-bottom-color: var(--interactive-accent);
+  font-weight: 600;
+}
+
+/* Panel visibility */
+.kid-score-import-panel.is-hidden { display: none; }
+
+/* File list */
+.kid-score-import-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+.kid-score-import-file-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.kid-score-import-file-row:hover { background: var(--background-modifier-hover); }
+.kid-score-import-file-row input[type="radio"] { accent-color: var(--interactive-accent); flex-shrink: 0; }
+.kid-score-import-file-meta {
+  font-size: 0.72em;
+  color: var(--text-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+/* Paste textarea */
+.kid-score-import-textarea {
+  width: 100%;
+  height: 120px;
+  font-family: var(--font-monospace);
+  font-size: 0.8em;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 8px;
+  resize: vertical;
+  box-sizing: border-box;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+.kid-score-import-textarea:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+/* Preview / field selector */
+.kid-score-import-preview {
+  background: var(--background-secondary);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border: 1px solid var(--background-modifier-border);
+}
+.kid-score-import-fields {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.kid-score-import-check-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88em;
+  padding: 3px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.kid-score-import-check-row input[type="checkbox"] { accent-color: var(--interactive-accent); }
+
+/* Disabled confirm button */
+.value-popup-confirm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

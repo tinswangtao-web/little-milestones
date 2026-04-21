@@ -1,14 +1,17 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(gh repo:*)",
-      "Bash(gh api:*)",
-      "Bash(gh pr:*)",
-      "Bash(powershell -Command ':*)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:api.github.com)",
-      "WebFetch(domain:github.com)",
-      "Bash(dir /s /b .claude)"
-    ]
-  }
+﻿{
+    "hooks":  {
+                  "PostToolUse":  [
+                                      {
+                                          "matcher":  "Edit|Write",
+                                          "hooks":  [
+                                                        {
+                                                            "type":  "command",
+                                                            "command":  "powershell -NonInteractive -File \"C:\\Users\\FinalHome\\Documents\\Cursor\\obsidianplugins\\obsidian-little-milestones\\sync-to-vault.ps1\"",
+                                                            "statusMessage":  "Syncing to Obsidian vault...",
+                                                            "async":  true
+                                                        }
+                                                    ]
+                                      }
+                                  ]
+              }
 }

@@ -1,0 +1,116 @@
+export interface ScoreItem {
+  id: string;
+  name: string;
+  emoji: string;
+  points: number;
+  category: string;
+  note?: string;
+}
+
+export interface CustomScoreItem {
+  id: string;
+  name: string;
+  emoji: string;
+  points: number;
+  note?: string;
+}
+
+export interface UserGoals {
+  daily: number;
+  weekly: number;
+  monthly: number;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  savePath: string;
+  items: ScoreItem[];
+  categories: string[];
+  scoringRules: string;
+  diaryTemplate: string;
+  goals: UserGoals;
+}
+
+export interface DayData {
+  date: string;
+  child: string;
+  total: number;
+  scores: Record<string, number>;
+  customItems: CustomScoreItem[];
+  diaryContent?: string;
+}
+
+export interface DoubleTapThresholds {
+  windows: number;
+  mac: number;
+  android: number;
+  ios: number;
+  fallback: number;
+}
+
+export interface PluginSettings {
+  users: User[];
+  currentUserId: string;
+  doubleTapThresholds: DoubleTapThresholds;
+}
+
+export type MobilePlatform = "desktop" | "android" | "ios" | "mobile-other";
+
+export interface DiaryTemplate {
+  name: string;
+  content: string;
+}
+
+export interface DiaryTemplates {
+  default: DiaryTemplate;
+  simple: DiaryTemplate;
+  detailed: DiaryTemplate;
+  creative: DiaryTemplate;
+}
+
+export type StatsPeriod = "week" | "month" | "all";
+
+// ─── Report Types ───────────────────────────────────────────────────────────
+
+export interface DayReport {
+  dateStr: string;
+  childName: string;
+  scores: Record<string, number>;
+  customItems: CustomScoreItem[];
+  diaryContent: string;
+
+  total: number;
+  earnedCount: number;
+  missedCount: number;
+  positiveCount: number;
+  negativeCount: number;
+  customTotal: number;
+  totalItems: number;
+  completionRate: number;
+  grandTotal: number;
+  grandDays: number;
+  grandAvg: number;
+  streak: number;
+
+  hasYesterday: boolean;
+  yesterdayData: DayData | null;
+
+  tags: {
+    weather?: string;
+    mood?: string;
+    homeCook?: string;
+    exercise?: string;
+    sleep?: string;
+    hasDiary: boolean;
+  };
+
+  diet: {
+    breakfast?: string;
+    lunch?: string;
+    dinner?: string;
+  };
+
+  items: ScoreItem[];
+  categories: string[];
+}

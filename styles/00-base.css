@@ -1,0 +1,30 @@
+/* ─── Global touch / tap reset ──────────────────────────────────────────────── */
+
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes kid-score-popup-in {
+  from { -webkit-transform: scale(0.92); transform: scale(0.92); opacity: 0; }
+  to { -webkit-transform: scale(1); transform: scale(1); opacity: 1; }
+}
+@-webkit-keyframes kid-score-popup-in {
+  from { -webkit-transform: scale(0.92); opacity: 0; }
+  to { -webkit-transform: scale(1); opacity: 1; }
+}
+@keyframes kid-score-shake {
+  0%, 100% { -webkit-transform: translateX(0); transform: translateX(0); }
+  25% { -webkit-transform: translateX(-4px); transform: translateX(-4px); }
+  75% { -webkit-transform: translateX(4px); transform: translateX(4px); }
+}
+@-webkit-keyframes kid-score-shake {
+  0%, 100% { -webkit-transform: translateX(0); }
+  25% { -webkit-transform: translateX(-4px); }
+  75% { -webkit-transform: translateX(4px); }
+}

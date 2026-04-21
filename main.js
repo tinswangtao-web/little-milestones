@@ -15,28 +15,127 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try { step(generator.next(value)); } catch (e) { reject(e); }
-    };
-    var rejected = (value) => {
-      try { step(generator.throw(value)); } catch (e) { reject(e); }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 
-// main.ts
+// src/main.ts
 var main_exports = {};
-__export(main_exports, { default: () => KidScorePlugin });
+__export(main_exports, {
+  default: () => KidScorePlugin
+});
 module.exports = __toCommonJS(main_exports);
-var import_obsidian = require("obsidian");
+var import_obsidian6 = require("obsidian");
 
-var DEFAULT_DIARY_TEMPLATE = "### \u5929\u6C14\u4E0E\u5FC3\u60C5\n\u5929\u6C14\uFF1A\n\u5FC3\u60C5\uFF1A\n\n### \u4ECA\u65E5\u6D3B\u52A8\n\u5730\u70B9\uFF1A\n\u6D3B\u52A8\uFF1A\n\n### \u996E\u98DF\u8BB0\u5F55\n\u65E9\u9910\uFF1A\n\u5348\u9910\uFF1A\n\u665A\u9910\uFF1A\n\u96F6\u98DF/\u6C34\u679C\uFF1A\n\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426\n\u83DC\u5355\uFF1A\n\u8BC4\u4EF7\uFF1A\n\n### \u8FD0\u52A8\u4E0E\u5065\u5EB7\n\u8FD0\u52A8\u9879\u76EE\uFF1A\n\u8FD0\u52A8\u65F6\u957F\uFF1A\n\u7761\u7720\u60C5\u51B5\uFF1A\n\n### \u5B66\u4E60\u4E0E\u6210\u957F\n\n\n### \u5176\u4ED6\u8BB0\u5F55\n\n";
+// src/constants.ts
+var DEFAULT_DIARY_TEMPLATE = `### \u5929\u6C14\u4E0E\u5FC3\u60C5
+\u5929\u6C14\uFF1A
+\u5FC3\u60C5\uFF1A
+
+### \u4ECA\u65E5\u6D3B\u52A8
+\u5730\u70B9\uFF1A
+\u6D3B\u52A8\uFF1A
+
+### \u996E\u98DF\u8BB0\u5F55
+\u65E9\u9910\uFF1A
+\u5348\u9910\uFF1A
+\u665A\u9910\uFF1A
+\u96F6\u98DF/\u6C34\u679C\uFF1A
+\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426
+\u83DC\u5355\uFF1A
+\u8BC4\u4EF7\uFF1A
+
+### \u8FD0\u52A8\u4E0E\u5065\u5EB7
+\u8FD0\u52A8\u9879\u76EE\uFF1A
+\u8FD0\u52A8\u65F6\u957F\uFF1A
+\u7761\u7720\u60C5\u51B5\uFF1A
+
+### \u5B66\u4E60\u4E0E\u6210\u957F
+
+
+### \u5176\u4ED6\u8BB0\u5F55
+
+`;
+var DIARY_TEMPLATES = {
+  default: {
+    name: "\u9ED8\u8BA4\u6A21\u677F",
+    content: DEFAULT_DIARY_TEMPLATE
+  },
+  simple: {
+    name: "\u7B80\u6D01\u6A21\u677F",
+    content: `### \u4ECA\u5929\u7684\u611F\u53D7
+
+### \u4E00\u5929\u7684\u603B\u7ED3
+
+### \u6700\u4F7F\u6211\u4E50\u513F\u7684\u4E8B
+
+### \u6700\u4F60\u89C9\u5F97\u9700\u8981\u6301\u7EED\u52A0\u6C61\u7684\u4E8B
+`
+  },
+  detailed: {
+    name: "\u8BE6\u7EC6\u6A21\u677F",
+    content: `# \u4ECA\u65E5\u8BB0\u5F55
+
+## \u5929\u6C14\u4E0E\u5FC3\u60C5
+- \u5929\u6C14\uFF1A
+- \u5FC3\u60C5\uFF1A
+- \u7279\u6B8A\u611F\u53D7\uFF1A
+
+## \u65E5\u5E38\u751F\u6D3B
+- \u65E9\u9910\uFF1A
+- \u5348\u9910\uFF1A
+- \u665A\u9910\uFF1A
+- \u96F6\u98DF\u548C\u6C34\u679C\uFF1A
+
+## \u6D3B\u52A8\u4E0E\u5065\u5EB7
+- \u6B63\u5E38\u8FD0\u52A8\uFF1A
+- \u7761\u7720\u60C5\u51B5\uFF1A
+- \u5065\u5EB7\u611F\u53D7\uFF1A
+
+## \u5B66\u4E60\u4E0E\u6210\u957F
+- \u5B66\u4E60\u5185\u5BB9\uFF1A
+- \u5B66\u4E60\u611F\u53D7\uFF1A
+- \u6210\u957F\u7684\u70B9\uFF1A
+
+## \u5176\u4ED6\u8BB0\u5F55
+- \u7279\u6B8A\u4E8B\u4EF6\uFF1A
+- \u611F\u6069\u8BB0\u5F55\uFF1A
+- \u672A\u6765\u8BA1\u5212\uFF1A
+`
+  },
+  creative: {
+    name: "\u521B\u610F\u6A21\u677F",
+    content: `\u{1F3A8} \u4ECA\u5929\u7684\u6545\u4E8B
+
+\u{1F4DD} \u6211\u7684\u611F\u53D7
+
+\u{1F31F} \u6700\u6F6E\u5149\u7684\u70B9
+
+\u{1F308} \u672A\u6765\u7684\u5E0C\u671B
+
+\u{1F4A1} \u4E00\u70B9\u611F\u6069
+`
+  }
+};
+function makeDefaultDiaryModules() {
+  return [
+    { id: "weather", label: "\u4ECA\u5929\u5929\u6C14", placeholder: "\u9009\u4E00\u4E2A\u5929\u6C14\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199", kind: "quick" },
+    { id: "mood", label: "\u4ECA\u5929\u5FC3\u60C5", placeholder: "\u9009\u4E00\u4E2A\u5FC3\u60C5\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199", kind: "quick" },
+    { id: "todayThing", label: "\u4ECA\u5929\u6211\u505A\u4E86...", placeholder: "\u4F8B\u5982\uFF1A\u6211\u4E0A\u4E86\u6570\u5B66\u8BFE\uFF0C\u8FD8\u753B\u4E86\u753B", kind: "multi" },
+    { id: "learnedThing", label: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86...", placeholder: "\u4F8B\u5982\uFF1A\u6211\u5B66\u4F1A\u4E86\u5199\u201C\u6625\u201D\u5B57", kind: "multi" },
+    { id: "happyThing", label: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F...", placeholder: "\u4F8B\u5982\uFF1A\u4E0B\u8BFE\u540E\u6211\u548C\u540C\u5B66\u4E00\u8D77\u73A9", kind: "multi" },
+    { id: "wantToSay", label: "\u6211\u8FD8\u60F3\u8BF4...", placeholder: "\u53EF\u4EE5\u5199\u60F3\u5BF9\u7238\u7238\u5988\u5988\u6216\u81EA\u5DF1\u8BF4\u7684\u8BDD", kind: "multi" }
+  ];
+}
 function makeDefaultUser() {
-  return { id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), name: "\u5C0F\u670B\u53CB", savePath: "Little Milestones/Daily Records", items: [], categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"], scoringRules: "", diaryTemplate: DEFAULT_DIARY_TEMPLATE };
+  return {
+    id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+    name: "\u5C0F\u670B\u53CB",
+    savePath: "Little Milestones/Daily Records",
+    items: [],
+    categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
+    scoringRules: "",
+    diaryTemplate: DEFAULT_DIARY_TEMPLATE,
+    diaryModules: makeDefaultDiaryModules(),
+    goals: { daily: 10, weekly: 70, monthly: 300 }
+  };
 }
 var DEFAULT_SETTINGS = {
   users: [],
@@ -49,995 +148,3498 @@ var DEFAULT_SETTINGS = {
     fallback: 260
   }
 };
-
 var DIARY_MARKER = "<!-- DIARY_START -->";
-
-/* ── Comprehensive emoji data (iOS-like categories) ── */
 var EMOJI_DATA = {
-  "\u{1F600} \u7B11\u8138": ["😀","😃","😄","😁","😆","😅","🤣","😂","🙂","🙃","😉","😊","😇","🥰","😍","🤩","😘","😗","😚","😙","🥲","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","🫡","🤐","🤨","😐","😑","😶","🫥","😏","😒","🙄","😬","🤥","😌","😔","😪","🤤","😴","😷","🤒","🤕","🤢","🤮","🥵","🥶","🥴","😵","🤯","🤠","🥳","🥸","😎","🤓","🧐","😕","🫤","😟","🙁","😮","😯","😲","😳","🥺","🥹","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👹","👺","👻","👽","👾","🤖"],
-  "\u{1F44B} \u624B\u52BF": ["👋","🤚","🖐️","✋","🖖","🫱","🫲","🫳","🫴","👌","🤌","🤏","✌️","🤞","🫰","🤟","🤘","🤙","👈","👉","👆","🖕","👇","☝️","🫵","👍","👎","✊","👊","🤛","🤜","👏","🙌","🫶","👐","🤲","🤝","🙏","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🧠","🫀","🫁","🦷","🦴","👀","👁️","👅","👄"],
-  "\u2B50 \u661F\u53F7": ["⭐","🌟","✨","💫","🔥","💥","💢","💦","💨","🕳️","💣","💬","💭","💤","🎯","🏆","🏅","🥇","🥈","🥉","⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱","🪀","🏓","🏸","🥊","🥋","⛳","⛸️","🎣","🤿","🎿","🛷","🥌","🎪","🎭","🎨","🎬","🎤","🎧","🎼","🎹","🥁","🪘","🎷","🎺","🪗","🎸","🪕","🎻"],
-  "\u{1F466} \u4EBA\u7269": ["👶","🧒","👦","👧","🧑","👱","👨","🧔","👩","🧓","👴","👵","🙍","🙎","🙅","🙆","💁","🙋","🧏","🙇","🤦","🤷","👮","🕵️","💂","🥷","👷","🫅","🤴","👸","👳","👲","🧕","🤵","👰","🤰","🤱","👼","🎅","🤶","🦸","🦹","🧙","🧚","🧛","🧜","🧝","🧞","🧟","🧌","💆","💇","🚶","🧍","🧎","🏃","💃","🕺","👯","🧖","🧗","🤸","⛹️","🏋️","🚴","🚵","🤼","🤽","🤾","🤺","🏇","⛷️","🏂","🏌️","🏄","🚣","🏊","🤹","🧘"],
-  "\u{1F34E} \u98DF\u7269": ["🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🫑","🌽","🥕","🫒","🧄","🧅","🥔","🍠","🫘","🥐","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🌭","🍔","🍟","🍕","🫓","🥪","🥙","🧆","🌮","🌯","🫔","🥗","🥘","🫕","🥫","🍝","🍜","🍲","🍛","🍣","🍱","🥟","🦪","🍤","🍙","🍚","🍘","🍥","🥠","🥮","🍢","🍡","🍧","🍨","🍦","🥧","🧁","🍰","🎂","🍮","🍭","🍬","🍫","🍿","🍩","🍪","🌰","🥜","🍯","🥛","🍼","🫖","☕","🍵","🧃","🥤","🧋","🍶","🍺","🍻","🥂","🍷","🥃","🍸","🍹","🧉","🍾","🫗","🧊"],
-  "\u{1F3E0} \u5730\u70B9": ["🏠","🏡","🏘️","🏚️","🏗️","🏢","🏬","🏣","🏤","🏥","🏦","🏨","🏪","🏫","🏩","💒","🏛️","⛪","🕌","🕍","🛕","🕋","⛩️","🛤️","🛣️","🗾","🎑","🏞️","🌅","🌄","🌠","🎇","🎆","🌇","🌆","🏙️","🌃","🌌","🌉","🌁"],
-  "\u{1F331} \u81EA\u7136": ["🌱","🪴","🌲","🌳","🌴","🌵","🌿","☘️","🍀","🍁","🍂","🍃","🪹","🪺","🍄","🌾","💐","🌷","🌹","🥀","🌺","🌸","🌼","🌻","🌞","🌝","🌛","🌜","🌚","🌕","🌖","🌗","🌘","🌑","🌒","🌓","🌔","🌙","🌎","🌍","🌏","🪐","💫","⭐","🌟","✨","⚡","☄️","💥","🔥","🌪️","🌈","☀️","🌤️","⛅","🌥️","☁️","🌦️","🌧️","⛈️","🌩️","🌨️","❄️","☃️","⛄","🌬️","💨","💧","💦","🫧","☔","☂️","🌊","🌫️"],
-  "\u{1F4DA} \u7269\u54C1": ["📚","📖","📕","📗","📘","📙","📓","📒","📃","📜","📄","📰","🗞️","📑","🔖","🏷️","💰","🪙","💴","💵","💶","💷","💸","💳","🧾","💹","✉️","📧","📨","📩","📤","📥","📦","📫","📪","📬","📭","📮","🗳️","✏️","✒️","🖋️","🖊️","🖌️","🖍️","📝","💼","📁","📂","🗂️","📅","📆","🗒️","🗓️","📇","📈","📉","📊","📋","📌","📍","📎","🖇️","📏","📐","✂️","🗃️","🗄️","🗑️","🔒","🔓","🔏","🔐","🔑","🗝️","🔨","🪓","⛏️","⚒️","🛠️","🗡️","⚔️","🔫","🪃","🏹","🛡️","🪚","🔧","🪛","🔩","⚙️","🗜️","⚖️","🦯","🔗","⛓️","🪝","🧰","🧲","🪜","💡","🔦","🕯️","🪔","🧯","🛢️","💸","🔮","🧿","🪬","🧸","🪆","🖼️","🛍️","📿","💎","🔇","🔈","🔉","🔊","📢","📣","📯","🔔","🔕","🎵","🎶","🎙️","🎚️","🎛️","📻","📱","📲","☎️","📞","📟","📠","🔋","🔌","💻","🖥️","🖨️","⌨️","🖱️","🖲️","💽","💾","💿","📀","🧮","🎥","🎞️","📽️","🎬","📺","📷","📸","📹","🔍","🔎","🕯️","💡","🔦","🏮","🪔"],
-  "\u{1F698} \u4EA4\u901A": ["🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍️","🛺","🚔","🚍","🚘","🚖","🛞","🚡","🚠","🚟","🚃","🚋","🚞","🚝","🚄","🚅","🚈","🚂","🚆","🚇","🚊","🚉","✈️","🛫","🛬","🛩️","💺","🛰️","🚀","🛸","🚁","🛶","⛵","🚤","🛥️","🛳️","⛴️","🚢","⚓","🪝","⛽","🚧","🚦","🚥","🛑","🚏"],
-  "\u2764\uFE0F \u5FC3": ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🕎","☯️","☦️","🛐","⛎","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","🆔","⚛️","🉑","☢️","☣️","📴","📳","🈶","🈚","🈸","🈺","🈷️","✴️","🆚","💮","🉐","㊙️","㊗️","🈴","🈵","🈹","🈲","🅰️","🅱️","🆎","🆑","🅾️","🆘","❌","⭕","🛑","⛔","📛","🚫","💯","💢","♨️","🚷","🚯","🚳","🚱","🔞","📵","🚭","❗","❕","❓","❔","‼️","⁉️","🔅","🔆","〽️","⚠️","🚸","🔱","⚜️","🔰","♻️","✅","🈯","💹","❇️","✳️","❎","🌐","💠","Ⓜ️","🌀","💤","🏧","🚾","♿","🅿️","🛗","🈳","🈂️","🛂","🛃","🛄","🛅","🚹","🚺","🚼","⚧️","🚻","🚮","🎦","📶","🈁","🔣","ℹ️","🔤","🔡","🔠","🆖","🆗","🆙","🆒","🆕","🆓","0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟","🔢","#️⃣","*️⃣","⏏️","▶️","⏸️","⏯️","⏹️","⏺️","⏭️","⏮️","⏩","⏪","⏫","⏬","◀️","🔼","🔽","➡️","⬅️","⬆️","⬇️","↗️","↘️","↙️","↖️","↕️","↔️","↩️","↪️","⤴️","⤵️","🔀","🔁","🔂","🔄","🔃","🎵","🎶","➕","➖","➗","✖️","🟰","♾️","💲","💱","™️","©️","®️","👁️‍🗨️","🔚","🔙","🔛","🔜","🔝"]
+  "\u{1F600} \u7B11\u8138": ["\u{1F600}", "\u{1F603}", "\u{1F604}", "\u{1F601}", "\u{1F606}", "\u{1F605}", "\u{1F923}", "\u{1F602}", "\u{1F642}", "\u{1F643}", "\u{1F609}", "\u{1F60A}", "\u{1F607}", "\u{1F970}", "\u{1F60D}", "\u{1F929}", "\u{1F618}", "\u{1F617}", "\u{1F61A}", "\u{1F619}", "\u{1F972}", "\u{1F60B}", "\u{1F61B}", "\u{1F61C}", "\u{1F92A}", "\u{1F61D}", "\u{1F911}", "\u{1F917}", "\u{1F92D}", "\u{1F92B}", "\u{1F914}", "\u{1FAE1}", "\u{1F910}", "\u{1F928}", "\u{1F610}", "\u{1F611}", "\u{1F636}", "\u{1FAE5}", "\u{1F60F}", "\u{1F612}", "\u{1F644}", "\u{1F62C}", "\u{1F925}", "\u{1F60C}", "\u{1F614}", "\u{1F62A}", "\u{1F924}", "\u{1F634}", "\u{1F637}", "\u{1F912}", "\u{1F915}", "\u{1F922}", "\u{1F92E}", "\u{1F975}", "\u{1F976}", "\u{1F974}", "\u{1F635}", "\u{1F92F}", "\u{1F920}", "\u{1F973}", "\u{1F978}", "\u{1F60E}", "\u{1F913}", "\u{1F9D0}", "\u{1F615}", "\u{1FAE4}", "\u{1F61F}", "\u{1F641}", "\u{1F62E}", "\u{1F62F}", "\u{1F632}", "\u{1F633}", "\u{1F97A}", "\u{1F979}", "\u{1F627}", "\u{1F628}", "\u{1F630}", "\u{1F625}", "\u{1F622}", "\u{1F62D}", "\u{1F631}", "\u{1F616}", "\u{1F623}", "\u{1F61E}", "\u{1F613}", "\u{1F629}", "\u{1F62B}", "\u{1F971}", "\u{1F624}", "\u{1F621}", "\u{1F620}", "\u{1F92C}", "\u{1F608}", "\u{1F47F}", "\u{1F480}", "\u2620\uFE0F", "\u{1F4A9}", "\u{1F921}", "\u{1F479}", "\u{1F47A}", "\u{1F47B}", "\u{1F47D}", "\u{1F47E}", "\u{1F916}"],
+  "\u{1F44B} \u624B\u52BF": ["\u{1F44B}", "\u{1F91A}", "\u{1F590}\uFE0F", "\u270B", "\u{1F596}", "\u{1FAF1}", "\u{1FAF2}", "\u{1FAF3}", "\u{1FAF4}", "\u{1F44C}", "\u{1F90C}", "\u{1F90F}", "\u270C\uFE0F", "\u{1F91E}", "\u{1FAF0}", "\u{1F91F}", "\u{1F918}", "\u{1F919}", "\u{1F448}", "\u{1F449}", "\u{1F446}", "\u{1F595}", "\u{1F447}", "\u261D\uFE0F", "\u{1FAF5}", "\u{1F44D}", "\u{1F44E}", "\u270A", "\u{1F44A}", "\u{1F91B}", "\u{1F91C}", "\u{1F44F}", "\u{1F64C}", "\u{1FAF6}", "\u{1F450}", "\u{1F932}", "\u{1F91D}", "\u{1F64F}", "\u{1F4AA}", "\u{1F9BE}", "\u{1F9BF}", "\u{1F9B5}", "\u{1F9B6}", "\u{1F442}", "\u{1F9BB}", "\u{1F443}", "\u{1F9E0}", "\u{1FAC0}", "\u{1FAC1}", "\u{1F9B7}", "\u{1F9B4}", "\u{1F440}", "\u{1F441}\uFE0F", "\u{1F445}", "\u{1F444}"],
+  "\u2B50 \u661F\u53F7": ["\u2B50", "\u{1F31F}", "\u2728", "\u{1F4AB}", "\u{1F525}", "\u{1F4A5}", "\u{1F4A2}", "\u{1F4A6}", "\u{1F4A8}", "\u{1F573}\uFE0F", "\u{1F4A3}", "\u{1F4AC}", "\u{1F4AD}", "\u{1F4A4}", "\u{1F3AF}", "\u{1F3C6}", "\u{1F3C5}", "\u{1F947}", "\u{1F948}", "\u{1F949}", "\u26BD", "\u{1F3C0}", "\u{1F3C8}", "\u26BE", "\u{1F3BE}", "\u{1F3D0}", "\u{1F3C9}", "\u{1F3B1}", "\u{1F3B0}", "\u{1F3D3}", "\u{1F3F8}", "\u{1F94A}", "\u{1F94B}", "\u26F3", "\u26F8\uFE0F", "\u{1F3A3}", "\u{1F93F}", "\u{1F3BF}", "\u{1F6F7}", "\u{1F94C}", "\u{1F3AA}", "\u{1F3AD}", "\u{1F3A8}", "\u{1F3AC}", "\u{1F3A4}", "\u{1F3A7}", "\u{1F3BC}", "\u{1F3B9}", "\u{1F941}", "\u{1FA98}", "\u{1F3B7}", "\u{1F3BA}", "\u{1FA97}", "\u{1F3B8}", "\u{1FA95}", "\u{1F3BB}"],
+  "\u{1F466} \u4EBA\u7269": ["\u{1F476}", "\u{1F9D2}", "\u{1F466}", "\u{1F467}", "\u{1F9D1}", "\u{1F471}", "\u{1F468}", "\u{1F9D4}", "\u{1F469}", "\u{1F9D3}", "\u{1F474}", "\u{1F475}", "\u{1F64D}", "\u{1F64E}", "\u{1F645}", "\u{1F646}", "\u{1F481}", "\u{1F64B}", "\u{1F647}", "\u{1F926}", "\u{1F937}", "\u{1F482}", "\u{1F575}\uFE0F", "\u{1F486}", "\u{1F487}", "\u{1F6B6}", "\u{1F9CD}", "\u{1F9CE}", "\u{1F3C3}", "\u{1F483}", "\u{1F57A}", "\u{1F46F}", "\u{1F9D6}", "\u{1F9D7}", "\u{1F93A}", "\u{1F3C7}", "\u26F7\uFE0F", "\u{1F3C2}", "\u{1F3CC}\uFE0F", "\u{1F3C4}", "\u{1F6A3}", "\u{1F3CA}", "\u{1F93D}", "\u{1F9D8}", "\u{1F6C0}", "\u{1F6CC}"],
+  "\u{1F34E} \u98DF\u7269": ["\u{1F34E}", "\u{1F350}", "\u{1F34A}", "\u{1F34B}", "\u{1F34C}", "\u{1F349}", "\u{1F347}", "\u{1F353}", "\u{1FAD0}", "\u{1F348}", "\u{1F352}", "\u{1F351}", "\u{1F96D}", "\u{1F34D}", "\u{1F965}", "\u{1F95D}", "\u{1F345}", "\u{1F346}", "\u{1F951}", "\u{1F966}", "\u{1F96C}", "\u{1F952}", "\u{1F336}\uFE0F", "\u{1FAD1}", "\u{1F33D}", "\u{1F955}", "\u{1FAD2}", "\u{1F9C4}", "\u{1F9C5}", "\u{1F954}", "\u{1F360}", "\u{1FAD8}", "\u{1F950}", "\u{1F35E}", "\u{1F956}", "\u{1F968}", "\u{1F9C0}", "\u{1F95A}", "\u{1F373}", "\u{1F9C8}", "\u{1F95E}", "\u{1F9C7}", "\u{1F953}", "\u{1F969}", "\u{1F357}", "\u{1F356}", "\u{1F32D}", "\u{1F354}", "\u{1F35F}", "\u{1F355}", "\u{1FAD3}", "\u{1F96A}", "\u{1F959}", "\u{1F9C6}", "\u{1F32E}", "\u{1F32F}", "\u{1FAD4}", "\u{1F957}", "\u{1F958}", "\u{1FAD5}", "\u{1F96B}", "\u{1F35D}", "\u{1F35C}", "\u{1F372}", "\u{1F35B}", "\u{1F363}", "\u{1F371}", "\u{1F95F}", "\u{1F9AA}", "\u{1F364}", "\u{1F359}", "\u{1F35A}", "\u{1F358}", "\u{1F365}", "\u{1F960}", "\u{1F362}", "\u{1F361}", "\u{1F367}", "\u{1F368}", "\u{1F366}", "\u{1F967}", "\u{1F9C1}", "\u{1F370}", "\u{1F382}", "\u{1F36E}", "\u{1F36D}", "\u{1F36C}", "\u{1F36B}", "\u{1F37F}", "\u{1F369}", "\u{1F36A}", "\u{1F330}", "\u{1F95C}", "\u{1F36F}", "\u{1F95B}", "\u{1F37C}", "\u{1FAD6}", "\u2615", "\u{1F375}", "\u{1F9C3}", "\u{1F964}", "\u{1F9CB}", "\u{1F376}", "\u{1F37A}", "\u{1F37B}", "\u{1F942}", "\u{1F377}", "\u{1F378}", "\u{1F379}", "\u{1F9C9}", "\u{1F37E}", "\u{1F9CA}", "\u{1F944}", "\u{1F52A}", "\u{1F3FA}"],
+  "\u{1F3E0} \u5730\u70B9": ["\u{1F3E0}", "\u{1F3E1}", "\u{1F3D8}\uFE0F", "\u{1F3DA}\uFE0F", "\u{1F3D7}\uFE0F", "\u{1F3E2}", "\u{1F3EC}", "\u{1F3E3}", "\u{1F3E4}", "\u{1F3E5}", "\u{1F3E6}", "\u{1F3E8}", "\u{1F3EA}", "\u{1F3EB}", "\u{1F3E9}", "\u{1F492}", "\u{1F3DB}\uFE0F", "\u26EA", "\u{1F54C}", "\u{1F54D}", "\u{1F6D5}", "\u{1F54B}", "\u26E9\uFE0F", "\u{1F6E4}\uFE0F", "\u{1F6E3}\uFE0F", "\u{1F5FE}", "\u{1F391}", "\u{1F3DE}\uFE0F", "\u{1F305}", "\u{1F304}", "\u{1F320}", "\u{1F387}", "\u{1F386}", "\u{1F307}", "\u{1F306}", "\u{1F3D9}\uFE0F", "\u{1F303}", "\u{1F30C}", "\u{1F309}", "\u{1F301}"],
+  "\u{1F331} \u81EA\u7136": ["\u{1F331}", "\u{1FAB4}", "\u{1F332}", "\u{1F333}", "\u{1F334}", "\u{1F335}", "\u{1F33F}", "\u2618\uFE0F", "\u{1F340}", "\u{1F341}", "\u{1F342}", "\u{1F343}", "\u{1FAB9}", "\u{1FABA}", "\u{1F344}", "\u{1F33E}", "\u{1F490}", "\u{1F337}", "\u{1F339}", "\u{1F940}", "\u{1F33A}", "\u{1F338}", "\u{1F33C}", "\u{1F33B}", "\u{1F31E}", "\u{1F31D}", "\u{1F31B}", "\u{1F31C}", "\u{1F31A}", "\u{1F315}", "\u{1F316}", "\u{1F317}", "\u{1F318}", "\u{1F311}", "\u{1F312}", "\u{1F313}", "\u{1F314}", "\u{1F319}", "\u{1F30E}", "\u{1F30D}", "\u{1F30F}", "\u{1FA90}", "\u{1F4AB}", "\u2B50", "\u{1F31F}", "\u2728", "\u26A1", "\u2604\uFE0F", "\u{1F4A5}", "\u{1F525}", "\u{1F32A}\uFE0F", "\u{1F308}", "\u2600\uFE0F", "\u{1F324}\uFE0F", "\u26C5", "\u{1F325}\uFE0F", "\u2601\uFE0F", "\u{1F326}\uFE0F", "\u{1F327}\uFE0F", "\u26C8\uFE0F", "\u{1F329}\uFE0F", "\u{1F328}\uFE0F", "\u2744\uFE0F", "\u2603\uFE0F", "\u26C4", "\u{1F32C}\uFE0F", "\u{1F4A8}", "\u{1F4A7}", "\u{1F4A6}", "\u{1FAE7}", "\u2614", "\u2602\uFE0F", "\u{1F30A}", "\u{1F32B}\uFE0F"],
+  "\u{1F4DA} \u7269\u54C1": ["\u{1F4DA}", "\u{1F4D6}", "\u{1F4D5}", "\u{1F4D7}", "\u{1F4D8}", "\u{1F4D9}", "\u{1F4D3}", "\u{1F4D2}", "\u{1F4C3}", "\u{1F4DC}", "\u{1F4C4}", "\u{1F4F0}", "\u{1F5DE}\uFE0F", "\u{1F4D1}", "\u{1F516}", "\u{1F3F7}\uFE0F", "\u{1F4B0}", "\u{1FA99}", "\u{1F4B4}", "\u{1F4B5}", "\u{1F4B6}", "\u{1F4B7}", "\u{1F4B8}", "\u{1F4B3}", "\u{1F9FE}", "\u{1F4B9}", "\u2709\uFE0F", "\u{1F4E7}", "\u{1F4E8}", "\u{1F4E9}", "\u{1F4E4}", "\u{1F4E5}", "\u{1F4E6}", "\u{1F4EB}", "\u{1F4EA}", "\u{1F4EC}", "\u{1F4ED}", "\u{1F4EE}", "\u{1F5F3}\uFE0F", "\u270F\uFE0F", "\u2712\uFE0F", "\u{1F58B}\uFE0F", "\u{1F58A}\uFE0F", "\u{1F58C}\uFE0F", "\u{1F58D}\uFE0F", "\u{1F4DD}", "\u{1F4BC}", "\u{1F4C1}", "\u{1F4C2}", "\u{1F5C2}\uFE0F", "\u{1F4C5}", "\u{1F4C6}", "\u{1F5D2}\uFE0F", "\u{1F5D3}\uFE0F", "\u{1F4C7}", "\u{1F4C8}", "\u{1F4C9}", "\u{1F4CA}", "\u{1F4CB}", "\u{1F4CC}", "\u{1F4CD}", "\u{1F4CE}", "\u{1F587}\uFE0F", "\u{1F4CF}", "\u{1F4D0}", "\u2702\uFE0F", "\u{1F5C3}\uFE0F", "\u{1F5C4}\uFE0F", "\u{1F5D1}\uFE0F", "\u{1F512}", "\u{1F513}", "\u{1F50F}", "\u{1F510}", "\u{1F511}", "\u{1F5DD}\uFE0F", "\u{1F528}", "\u{1FA93}", "\u26CF\uFE0F", "\u2692\uFE0F", "\u{1F6E0}\uFE0F", "\u{1F5E1}\uFE0F", "\u2694\uFE0F", "\u{1F52B}", "\u{1FA83}", "\u{1F3F9}", "\u{1F6E1}\uFE0F", "\u{1FA9A}", "\u{1F527}", "\u{1FA9B}", "\u{1F529}", "\u2699\uFE0F", "\u{1F5DC}\uFE0F", "\u2696\uFE0F", "\u{1F9AF}", "\u{1F517}", "\u26D3\uFE0F", "\u{1FA9D}", "\u{1F527}", "\u{1F9F0}", "\u{1F9F2}", "\u{1FA9C}", "\u2697\uFE0F", "\u{1F9EA}", "\u{1F9EB}", "\u{1F9EC}", "\u{1F52C}", "\u{1F52D}", "\u{1F4E1}", "\u{1F489}", "\u{1FA78}", "\u{1F48A}", "\u{1FA79}", "\u{1FA7C}", "\u{1FA7A}", "\u{1F321}\uFE0F", "\u{1F6BD}", "\u{1F6B0}", "\u{1F6BF}", "\u{1F6C1}", "\u{1F6C0}", "\u{1F9F4}", "\u{1F9F7}", "\u{1F9F9}", "\u{1F9FA}", "\u{1F9FB}", "\u{1F9FC}", "\u{1F9FD}", "\u{1F9EF}", "\u{1F6D2}", "\u{1F6AC}", "\u26B0\uFE0F", "\u{1FAA6}", "\u26B1\uFE0F", "\u{1F5FF}", "\u{1FAA7}", "\u{1F3E7}", "\u{1F6AE}", "\u{1F6B0}", "\u267F", "\u{1F6B9}", "\u{1F6BA}", "\u{1F6BB}", "\u{1F6BC}", "\u{1F6BE}", "\u{1F6C2}", "\u{1F6C3}", "\u{1F6C4}", "\u{1F6C5}", "\u26A0\uFE0F", "\u{1F6B8}", "\u26D4", "\u{1F6AB}", "\u{1F6B3}", "\u{1F6AD}", "\u{1F6AF}", "\u{1F6B1}", "\u{1F6B7}", "\u{1F4F5}", "\u{1F51E}", "\u2622\uFE0F", "\u2623\uFE0F", "\u2B06\uFE0F", "\u2197\uFE0F", "\u27A1\uFE0F", "\u2198\uFE0F", "\u2B07\uFE0F", "\u2199\uFE0F", "\u2B05\uFE0F", "\u2196\uFE0F", "\u2195\uFE0F", "\u2194\uFE0F", "\u21A9\uFE0F", "\u21AA\uFE0F", "\u2934\uFE0F", "\u2935\uFE0F", "\u{1F503}", "\u{1F504}", "\u{1F519}", "\u{1F51A}", "\u{1F51B}", "\u{1F51C}", "\u{1F51D}", "\u{1F6D0}", "\u269B\uFE0F", "\u{1F549}\uFE0F", "\u2721\uFE0F", "\u2638\uFE0F", "\u262F\uFE0F", "\u271D\uFE0F", "\u2626\uFE0F", "\u262A\uFE0F", "\u262E\uFE0F", "\u{1F54E}", "\u{1F52F}", "\u2648", "\u2649", "\u264A", "\u264B", "\u264C", "\u264D", "\u264E", "\u264F", "\u2650", "\u2651", "\u2652", "\u2653", "\u26CE", "\u{1F500}", "\u{1F501}", "\u{1F502}", "\u25B6\uFE0F", "\u23E9", "\u23ED\uFE0F", "\u23EF\uFE0F", "\u25C0\uFE0F", "\u23EA", "\u23EE\uFE0F", "\u{1F53C}", "\u23EB", "\u{1F53D}", "\u23EC", "\u23F8\uFE0F", "\u23F9\uFE0F", "\u23FA\uFE0F", "\u23CF\uFE0F", "\u{1F3A6}", "\u{1F505}", "\u{1F506}", "\u{1F4F6}", "\u{1F4F3}", "\u{1F4F4}", "\u2640\uFE0F", "\u2642\uFE0F", "\u26A7\uFE0F", "\u2716\uFE0F", "\u2795", "\u2796", "\u2797", "\u267E\uFE0F", "\u203C\uFE0F", "\u2049\uFE0F", "\u2753", "\u2754", "\u2755", "\u2757", "\u3030\uFE0F", "\u{1F4B1}", "\u{1F4B2}", "\u2695\uFE0F", "\u267B\uFE0F", "\u269C\uFE0F", "\u{1F531}", "\u{1F4DB}", "\u{1F530}", "\u2B55", "\u2705", "\u2611\uFE0F", "\u2714\uFE0F", "\u274C", "\u274E", "\u27B0", "\u27BF", "\u303D\uFE0F", "\u2733\uFE0F", "\u2734\uFE0F", "\u2747\uFE0F", "\xA9\uFE0F", "\xAE\uFE0F", "\u2122\uFE0F"],
+  "\u{1F697} \u4EA4\u901A": ["\u{1F697}", "\u{1F695}", "\u{1F699}", "\u{1F68C}", "\u{1F68E}", "\u{1F3CE}\uFE0F", "\u{1F693}", "\u{1F691}", "\u{1F692}", "\u{1F690}", "\u{1F6FB}", "\u{1F69A}", "\u{1F69B}", "\u{1F69C}", "\u{1F9AF}", "\u{1F9BD}", "\u{1F9BC}", "\u{1F6F4}", "\u{1F6B2}", "\u{1F6F5}", "\u{1F3CD}\uFE0F", "\u{1F6FA}", "\u{1F694}", "\u{1F68D}", "\u{1F698}", "\u{1F696}", "\u{1F6A1}", "\u{1F6A0}", "\u{1F69F}", "\u{1F683}", "\u{1F68B}", "\u{1F69E}", "\u{1F69D}", "\u{1F684}", "\u{1F685}", "\u{1F688}", "\u{1F682}", "\u{1F686}", "\u{1F687}", "\u{1F68A}", "\u{1F689}", "\u2708\uFE0F", "\u{1F6EB}", "\u{1F6EC}", "\u{1F6E9}\uFE0F", "\u{1F4BA}", "\u{1F6F0}\uFE0F", "\u{1F680}", "\u{1F6F8}", "\u{1F681}", "\u{1F6F6}", "\u26F5", "\u{1F6A4}", "\u{1F6E5}\uFE0F", "\u{1F6A2}", "\u2693", "\u{1FA9D}", "\u26FD", "\u{1F6A7}", "\u{1F6A6}", "\u{1F6A5}", "\u{1F68F}", "\u{1F5FA}\uFE0F", "\u{1F6D1}", "\u{1F6AD}", "\u{1F6B0}", "\u267F", "\u{1F6B9}", "\u{1F6BA}", "\u{1F6BB}", "\u{1F6BC}", "\u{1F6BE}", "\u{1F6C2}", "\u{1F6C3}", "\u{1F6C4}", "\u{1F6C5}", "\u26A0\uFE0F"]
 };
-
-/* ── Emoji search index (Chinese + English keywords) ── */
 var EMOJI_SEARCH = {
-  "😀":"笑 开心 高兴 快乐 smile happy grin","😃":"笑 开心 高兴 smile happy","😄":"笑 开心 大笑 smile grin laugh","😁":"笑 嘿嘿 露齿 grin beam","😆":"笑 哈哈 大笑 laugh squint","😅":"笑 尴尬 汗 sweat smile awkward","🤣":"笑 大笑 笑哭 哈哈 rofl laugh cry","😂":"笑 笑哭 眼泪 joy laugh cry tear","🙂":"微笑 笑 smile slight","🙃":"倒脸 颠倒 upside down","😉":"眨眼 暗示 wink","😊":"害羞 微笑 腼腆 blush smile shy","😇":"天使 善良 angel halo","🥰":"喜欢 爱心 爱 love heart face","😍":"爱心 喜欢 爱 心眼 heart eyes love","🤩":"星星 崇拜 追星 star struck wow","😘":"亲亲 飞吻 吻 kiss blow","😗":"亲亲 嘟嘴 kiss","😚":"亲亲 害羞 kiss shy blush","😙":"亲亲 口哨 kiss whistle","🥲":"感动 笑中带泪 微笑 smile tear","😋":"好吃 美味 馋 yummy delicious tongue","😛":"吐舌 调皮 tongue playful","😜":"调皮 搞怪 吐舌 wink tongue crazy","🤪":"疯狂 搞怪 zany crazy wild","😝":"吐舌 鬼脸 tongue squint","🤑":"发财 钱 财迷 money rich dollar","🤗":"拥抱 抱抱 hug warm","🤭":"偷笑 捂嘴 giggle cover","🤫":"嘘 安静 秘密 shush quiet secret","🤔":"思考 想 疑问 think wonder hmm","🤐":"闭嘴 沉默 zip mouth silent","🤨":"怀疑 质疑 raised eyebrow skeptic","😐":"冷漠 无语 neutral blank","😑":"无语 无聊 expressionless","😶":"沉默 无语 mute no mouth","😏":"坏笑 得意 smirk sly","😒":"不屑 嫌弃 unamused bored","🙄":"翻白眼 无语 eye roll whatever","😬":"尴尬 龇牙 grimace awkward","😌":"放松 舒适 满足 relieved calm peaceful","😔":"失落 难过 沮丧 sad pensive down","😪":"困 瞌睡 睡觉 sleepy tired","🤤":"流口水 馋 drool hungry","😴":"睡觉 困 睡眠 晚安 sleep zzz night","😷":"口罩 生病 感冒 mask sick cold","🤒":"发烧 生病 温度计 fever sick thermometer","🤕":"受伤 头痛 绷带 hurt injury bandage","🤢":"恶心 想吐 nauseous sick green","🤮":"吐 恶心 呕吐 vomit throw up sick","🥵":"热 出汗 发热 hot heat sweat","🥶":"冷 冻 寒冷 cold freeze frozen","🥴":"晕 醉 woozy dizzy drunk","😵":"晕 头晕 眩晕 dizzy daze","🤯":"爆炸 震惊 炸裂 mind blown explode shock","🤠":"牛仔 帅 cowboy","🥳":"庆祝 派对 生日 聚会 party celebrate birthday","😎":"酷 墨镜 帅 cool sunglasses","🤓":"书呆子 眼镜 学霸 nerd glasses geek","🧐":"审视 单片眼镜 monocle inspect","😕":"困惑 不解 confused","😟":"担心 忧虑 worried concern","🙁":"难过 不开心 sad frown","😮":"惊讶 吃惊 surprise open mouth","😯":"惊讶 吃惊 hushed surprise","😲":"震惊 大惊 astonished shock","😳":"脸红 害羞 尴尬 flushed blush embarrass","🥺":"可怜 求求 撒娇 pleading puppy eyes","🥹":"感动 忍住 holding tears touched","😨":"害怕 恐惧 fearful scared afraid","😰":"焦虑 紧张 冷汗 anxious nervous sweat","😥":"失望 释然 disappointed relieved","😢":"哭 难过 伤心 cry sad tear","😭":"大哭 伤心 痛哭 sob cry loud","😱":"尖叫 恐惧 吓 scream fear horror","😖":"痛苦 难受 confounded pain","😣":"忍耐 坚持 persevere endure","😞":"失望 沮丧 disappointed sad","😓":"汗 无奈 sweat downcast","😩":"疲惫 累 崩溃 weary exhausted tired","😫":"累 疲惫 tired exhausted","🥱":"打哈欠 困 无聊 yawn sleepy bored","😤":"生气 愤怒 哼 angry huff steam","😡":"愤怒 生气 rage angry red","😠":"生气 不满 angry mad","🤬":"骂人 脏话 愤怒 swear curse angry","😈":"恶魔 坏 调皮 devil evil imp","👿":"恶魔 生气 devil angry imp","💀":"骷髅 死 吓 skull dead","☠️":"骷髅 危险 死亡 skull crossbones danger","💩":"便便 屎 poop poo shit","🤡":"小丑 clown","👹":"妖怪 鬼 ogre monster","👺":"天狗 鬼 goblin tengu","👻":"鬼 幽灵 万圣节 ghost halloween boo","👽":"外星人 alien ufo","👾":"怪物 游戏 monster alien game","🤖":"机器人 robot bot",
-  "👋":"挥手 你好 再见 拜拜 wave hello hi bye","🤚":"手 停 举手 hand stop raise","🖐️":"手 五 张开 hand five open","✋":"手 停 高五 hand stop high five","🖖":"手 vulcan spock","👌":"好的 OK 可以 没问题 ok okay perfect","🤏":"一点点 少量 pinch small little","✌️":"胜利 耶 剪刀 victory peace yeah","🤞":"祈祷 好运 cross finger luck hope","🤟":"爱你 摇滚 love you rock","🤘":"摇滚 rock metal horn","🤙":"打电话 联系 call phone shaka","👈":"左 指 left point","👉":"右 指 right point","👆":"上 指 up point","👇":"下 指 down point","☝️":"上 指 第一 point up first","👍":"好 赞 棒 厉害 点赞 like good thumb up great nice","👎":"差 不好 踩 dislike bad thumb down","✊":"加油 拳头 坚持 fist power fight","👊":"拳头 打 加油 punch fist bump","👏":"鼓掌 掌声 拍手 棒 clap applause bravo","🙌":"庆祝 万岁 欢呼 raise hand hooray celebrate","🫶":"比心 爱心 心 heart hands love","👐":"张开 拥抱 open hand hug","🤝":"握手 合作 协议 handshake deal agree","🙏":"祈祷 感谢 拜托 谢谢 请 pray thank please hope","💪":"肌肉 力量 加油 健身 强 muscle strong power flex gym","👀":"看 眼睛 注意 eyes look see watch","👅":"舌头 吐舌 tongue lick","👄":"嘴 嘴唇 亲 mouth lips kiss",
-  "⭐":"星 星星 star","🌟":"星 闪亮 发光 star glow shine","✨":"闪 闪亮 闪耀 亮晶晶 sparkle shine glitter","💫":"头晕 星星 dizzy star","🔥":"火 热门 厉害 牛 fire hot lit flame","💥":"爆炸 碰撞 boom crash explosion","💢":"生气 愤怒 anger symbol","💦":"汗 水 sweat drop water splash","💨":"风 快 跑 wind dash fast","💣":"炸弹 bomb","💬":"对话 说话 聊天 speech chat talk bubble","💭":"思考 想法 thought think bubble","💤":"睡觉 困 zzz sleep","🎯":"目标 靶子 命中 target bullseye goal","🏆":"奖杯 冠军 第一 胜利 trophy champion winner cup","🏅":"奖牌 勋章 medal award","🥇":"金牌 第一 冠军 gold first winner","🥈":"银牌 第二 silver second","🥉":"铜牌 第三 bronze third","⚽":"足球 球 soccer football","🏀":"篮球 球 basketball","🏈":"橄榄球 football american","⚾":"棒球 baseball","🎾":"网球 tennis","🏐":"排球 volleyball","🎱":"台球 桌球 billiards pool","🏓":"乒乓球 球 ping pong table tennis","🏸":"羽毛球 球 badminton","🥊":"拳击 打拳 boxing glove","🥋":"武术 跆拳道 空手道 martial arts karate","🎪":"马戏团 演出 circus tent","🎭":"戏剧 表演 面具 theater drama mask","🎨":"画 绘画 美术 艺术 art paint palette draw","🎬":"电影 拍摄 movie film clapper","🎤":"麦克风 唱歌 KTV microphone sing karaoke","🎧":"耳机 听歌 音乐 headphone music listen","🎼":"音乐 乐谱 music score note","🎹":"钢琴 弹琴 piano keyboard","🥁":"鼓 打鼓 drum","🎷":"萨克斯 音乐 saxophone","🎺":"喇叭 号 trumpet horn","🎸":"吉他 音乐 guitar","🎻":"小提琴 音乐 violin",
-  "👶":"宝宝 婴儿 小孩 baby infant","🧒":"小孩 儿童 孩子 child kid","👦":"男孩 男生 boy","👧":"女孩 女生 girl","🧑":"人 成人 person adult","👨":"男人 爸爸 父亲 man father dad","👩":"女人 妈妈 母亲 woman mother mom","🧓":"老人 elder old","👴":"爷爷 老爷爷 grandpa old man","👵":"奶奶 老奶奶 grandma old woman","👮":"警察 police cop officer","🕵️":"侦探 detective spy","💂":"卫兵 guard","🥷":"忍者 ninja","👷":"工人 建筑 worker construction builder","🤴":"王子 prince","👸":"公主 princess","👳":"头巾 turban","🤵":"新郎 西装 groom suit tuxedo","👰":"新娘 婚礼 bride wedding","🤰":"孕妇 怀孕 pregnant","🤱":"哺乳 妈妈 喂奶 breastfeed nursing mother","👼":"天使 宝宝 angel baby cherub","🎅":"圣诞老人 圣诞 santa christmas","🦸":"超人 英雄 superhero hero","🦹":"反派 villain","🧙":"魔法师 巫师 wizard mage magic","🧚":"精灵 仙女 fairy","💆":"按摩 放松 massage relax spa","💇":"理发 剪发 haircut barber","🚶":"走路 步行 散步 walk pedestrian","🏃":"跑步 运动 跑 run jog exercise","💃":"跳舞 舞蹈 dance salsa","🕺":"跳舞 舞蹈 dance disco","🧖":"桑拿 温泉 sauna spa steam","🧗":"攀岩 爬 climb rock","🤸":"翻跟头 体操 cartwheel gymnastics","🏋️":"举重 健身 weightlift gym fitness","🚴":"骑车 自行车 骑行 bike cycle bicycle","🤼":"摔跤 wrestle","🤽":"水球 water polo","🤾":"手球 handball","🏄":"冲浪 滑浪 surf wave","🏊":"游泳 swim pool","🧘":"瑜伽 冥想 打坐 yoga meditate zen",
-  "🍎":"苹果 水果 apple fruit","🍐":"梨 水果 pear fruit","🍊":"橘子 橙子 水果 orange tangerine fruit","🍋":"柠檬 水果 lemon fruit","🍌":"香蕉 水果 banana fruit","🍉":"西瓜 水果 watermelon fruit","🍇":"葡萄 水果 grape fruit","🍓":"草莓 水果 strawberry fruit","🫐":"蓝莓 水果 blueberry fruit","🍒":"樱桃 水果 cherry fruit","🍑":"桃子 水果 peach fruit","🥭":"芒果 水果 mango fruit","🍍":"菠萝 水果 pineapple fruit","🥥":"椰子 水果 coconut fruit","🥝":"猕猴桃 水果 kiwi fruit","🍅":"番茄 西红柿 蔬菜 tomato vegetable","🍆":"茄子 蔬菜 eggplant aubergine","🥑":"牛油果 蔬菜 avocado","🥦":"西兰花 蔬菜 broccoli vegetable","🥒":"黄瓜 蔬菜 cucumber vegetable","🌶️":"辣椒 辣 pepper hot chili spicy","🌽":"玉米 corn","🥕":"胡萝卜 萝卜 蔬菜 carrot vegetable","🧄":"大蒜 蒜 garlic","🧅":"洋葱 onion","🥔":"土豆 马铃薯 potato","🍠":"红薯 地瓜 sweet potato","🍞":"面包 bread","🧀":"奶酪 芝士 cheese","🥚":"鸡蛋 蛋 egg","🍳":"煎蛋 做饭 煮 cooking egg fry","🥞":"煎饼 薄饼 pancake","🥓":"培根 肉 bacon meat","🥩":"牛排 肉 steak meat beef","🍗":"鸡腿 肉 chicken leg drumstick","🍖":"排骨 肉 meat bone rib","🌭":"热狗 hotdog","🍔":"汉堡 快餐 burger hamburger fast food","🍟":"薯条 快餐 fries fast food","🍕":"披萨 快餐 pizza","🥪":"三明治 sandwich","🥙":"卷饼 pita wrap","🌮":"墨西哥 卷 taco","🥗":"沙拉 蔬菜 salad","🍝":"意面 面条 pasta spaghetti noodle","🍜":"面条 拉面 汤面 noodle ramen soup","🍲":"火锅 炖菜 汤 hotpot stew soup","🍛":"咖喱 饭 curry rice","🍣":"寿司 日料 sushi japanese","🍱":"便当 盒饭 饭盒 bento lunch box","🥟":"饺子 馄饨 dumpling","🍤":"虾 炸虾 shrimp prawn","🍙":"饭团 米饭 rice ball onigiri","🍚":"米饭 饭 rice bowl","🍘":"米饼 仙贝 rice cracker","🍢":"关东煮 串 oden skewer","🍡":"团子 丸子 dango","🍧":"刨冰 冰沙 shaved ice","🍨":"冰淇淋 雪糕 ice cream","🍦":"甜筒 冰淇淋 ice cream cone","🥧":"派 馅饼 pie","🧁":"杯子蛋糕 蛋糕 cupcake","🍰":"蛋糕 甜点 cake dessert","🎂":"生日蛋糕 生日 birthday cake","🍮":"布丁 果冻 pudding custard","🍭":"棒棒糖 糖 lollipop candy","🍬":"糖果 糖 candy sweet","🍫":"巧克力 chocolate","🍿":"爆米花 popcorn","🍩":"甜甜圈 donut doughnut","🍪":"饼干 曲奇 cookie","🥜":"花生 坚果 peanut nut","🍯":"蜂蜜 honey","🥛":"牛奶 奶 milk","🍼":"奶瓶 婴儿 baby bottle","🫖":"茶壶 茶 teapot","☕":"咖啡 热饮 coffee cafe hot drink","🍵":"茶 抹茶 绿茶 tea matcha green","🧃":"果汁 juice box","🥤":"奶茶 饮料 drink cup straw","🧋":"珍珠奶茶 奶茶 波霸 bubble tea boba milk tea","🍺":"啤酒 干杯 beer","🍻":"干杯 啤酒 碰杯 cheers beer clink","🥂":"香槟 庆祝 干杯 champagne cheers toast","🍷":"红酒 葡萄酒 wine red","🍸":"鸡尾酒 cocktail martini","🍹":"饮料 热带 tropical drink","🧊":"冰 冰块 ice cube",
-  "🏠":"家 房子 房屋 home house","🏡":"别墅 花园 house garden","🏢":"办公楼 公司 上班 office building work","🏥":"医院 看病 hospital","🏦":"银行 bank","🏨":"酒店 宾馆 住 hotel","🏪":"便利店 商店 store shop convenience","🏫":"学校 上学 school","💒":"婚礼 教堂 wedding chapel","🏛️":"博物馆 museum","⛪":"教堂 church","⛩️":"神社 日本 shrine japan","🌅":"日出 早晨 sunrise morning","🌄":"日出 山 sunrise mountain","🌇":"日落 黄昏 sunset evening","🌆":"城市 黄昏 city dusk sunset","🏙️":"城市 高楼 city skyline","🌃":"夜晚 城市 星空 night city star","🌉":"夜景 桥 bridge night",
-  "🌱":"发芽 生长 种子 seed sprout grow plant","🪴":"盆栽 植物 potted plant","🌲":"树 松树 tree pine evergreen","🌳":"树 大树 tree deciduous","🌴":"棕榈树 椰子树 热带 palm tree tropical","🌵":"仙人掌 沙漠 cactus desert","🌿":"草 叶子 植物 herb leaf plant green","🍀":"四叶草 幸运 clover lucky four leaf","🍁":"枫叶 秋天 maple leaf autumn fall","🍂":"落叶 秋天 fallen leaf autumn","🍃":"叶子 风 leaf wind","🍄":"蘑菇 mushroom","🌾":"稻谷 麦子 rice wheat grain","💐":"花束 鲜花 送花 bouquet flower","🌷":"郁金香 花 tulip flower","🌹":"玫瑰 花 爱情 rose flower love","🥀":"枯萎 凋谢 wilted flower","🌺":"花 芙蓉 hibiscus flower","🌸":"樱花 花 cherry blossom sakura flower","🌼":"花 向日葵 blossom flower","🌻":"向日葵 太阳花 sunflower","🌞":"太阳 晴天 sun sunny","🌙":"月亮 晚上 夜晚 moon crescent night","🌈":"彩虹 rainbow","☀️":"太阳 晴天 天气 sun sunny weather","⛅":"多云 天气 cloud sun weather partly","☁️":"云 阴天 天气 cloud weather cloudy","🌧️":"下雨 雨天 天气 rain weather","⛈️":"雷雨 暴风雨 天气 thunder storm weather","❄️":"雪花 下雪 冬天 冷 snow snowflake cold winter","☃️":"雪人 冬天 snowman winter","⛄":"雪人 冬天 snowman winter","🌊":"浪 海浪 海 大海 wave ocean sea water","☔":"雨伞 下雨 umbrella rain",
-  "📚":"书 书籍 学习 读书 阅读 book study read learn","📖":"书 读书 阅读 book read open","📕":"书 红 book red","📗":"书 绿 book green","📘":"书 蓝 book blue","📝":"笔记 写 记录 备忘 memo note write","💰":"钱 金钱 金币 money bag gold coin","💵":"钱 美元 钞票 money dollar bill cash","💸":"花钱 钱飞了 money fly spend","💳":"信用卡 银行卡 刷卡 credit card bank","✏️":"铅笔 写 画 pencil write draw","✒️":"钢笔 写 pen ink write","📅":"日历 日期 计划 calendar date plan schedule","📆":"日历 日期 calendar date","📈":"上涨 增长 进步 chart up grow increase","📉":"下降 下跌 chart down decrease","📊":"图表 统计 数据 chart bar graph data","📋":"剪贴板 清单 列表 clipboard list checklist","📌":"图钉 标记 pin pushpin mark","📎":"回形针 paperclip clip","✂️":"剪刀 剪 scissors cut","🔑":"钥匙 关键 key","🔨":"锤子 工具 hammer tool","🔧":"扳手 工具 修理 wrench tool fix repair","⚙️":"齿轮 设置 gear settings config","💡":"灯泡 想法 主意 bulb idea light","🔦":"手电筒 照明 flashlight torch","🧸":"玩具熊 泰迪熊 毛绒 teddy bear toy plush","💎":"钻石 宝石 diamond gem jewel","🔔":"铃铛 通知 提醒 bell ring notification alert","🔕":"静音 关闭通知 mute bell silent","🎵":"音乐 音符 music note","🎶":"音乐 音符 歌曲 music note song","📱":"手机 电话 phone mobile cell","💻":"电脑 笔记本 计算机 computer laptop","🖥️":"电脑 显示器 台式 desktop computer monitor","📺":"电视 电视机 tv television","📷":"相机 拍照 照相 camera photo","📸":"拍照 闪光 camera flash photo","📹":"摄像 录像 video camera record","🔍":"搜索 放大镜 查找 search magnify find look","🔎":"搜索 放大镜 search magnify",
-  "🚗":"汽车 车 开车 小轿车 car automobile drive","🚕":"出租车 的士 打车 taxi cab","🚙":"SUV 越野车 车 suv car truck","🚌":"公交车 巴士 bus","🏎️":"赛车 跑车 race car racing formula","🚓":"警车 police car","🚑":"救护车 ambulance","🚒":"消防车 fire truck engine","🚐":"面包车 van minibus","🚚":"货车 卡车 truck delivery","🚛":"大卡车 货车 truck lorry","🚜":"拖拉机 tractor farm","🚲":"自行车 单车 骑车 bicycle bike cycle","🛵":"摩托车 电动车 scooter motor","🏍️":"摩托 机车 motorcycle","🚄":"高铁 火车 动车 train high speed bullet","🚅":"高铁 新干线 bullet train","🚂":"火车 蒸汽 train steam locomotive","🚇":"地铁 metro subway underground","✈️":"飞机 飞 旅行 airplane plane flight travel","🚀":"火箭 发射 快 rocket launch fast space","🛸":"飞碟 UFO flying saucer","🚁":"直升机 helicopter","⛵":"帆船 航海 sailboat sailing","🚤":"快艇 船 speedboat boat","🚢":"轮船 大船 ship cruise","⚓":"锚 停泊 anchor dock",
-  "❤️":"心 爱心 爱 红心 喜欢 heart love red like","🧡":"心 爱心 橙 heart orange","💛":"心 爱心 黄 heart yellow","💚":"心 爱心 绿 heart green","💙":"心 爱心 蓝 heart blue","💜":"心 爱心 紫 heart purple","🖤":"心 爱心 黑 heart black","🤍":"心 爱心 白 heart white","💔":"心碎 伤心 分手 broken heart","💕":"心 爱 双心 two heart love","💖":"心 闪亮 sparkling heart","💗":"心 跳动 成长 growing heart","💘":"心 丘比特 爱情 cupid heart love arrow","💝":"心 礼物 heart ribbon gift","💯":"满分 一百 完美 hundred perfect score","❌":"错 叉 不 取消 cross wrong no cancel","⭕":"对 圈 是 circle","✅":"完成 对 通过 正确 好 check done yes correct complete","❗":"注意 重要 感叹号 exclamation important","❓":"问号 疑问 什么 question mark what","⚠️":"警告 注意 小心 warning caution alert","🚫":"禁止 不允许 prohibited forbidden no","♻️":"回收 环保 recycle green"
+  "\u{1F600}": "\u7B11 \u5F00\u5FC3 \u9AD8\u5174 \u5FEB\u4E50 smile happy grin",
+  "\u{1F603}": "\u7B11 \u5F00\u5FC3 \u9AD8\u5174 smile happy",
+  "\u{1F604}": "\u7B11 \u5F00\u5FC3 \u5927\u7B11 smile grin laugh",
+  "\u{1F601}": "\u7B11 \u563F\u563F \u9732\u9F7F grin beam",
+  "\u{1F606}": "\u7B11 \u54C8\u54C8 \u5927\u7B11 laugh squint",
+  "\u{1F605}": "\u7B11 \u5C34\u5C2C \u6C57 sweat smile awkward",
+  "\u{1F923}": "\u7B11 \u5927\u7B11 \u7B11\u54ED \u54C8\u54C8 rofl laugh cry",
+  "\u{1F602}": "\u7B11 \u7B11\u54ED \u773C\u6CEA joy laugh cry tear",
+  "\u{1F642}": "\u5FAE\u7B11 \u7B11 smile slight",
+  "\u{1F643}": "\u5012\u8138 \u98A0\u5012 upside down",
+  "\u{1F609}": "\u7728\u773C \u6697\u793A wink",
+  "\u{1F60A}": "\u5BB3\u7F9E \u5FAE\u7B11 \u817C\u8146 blush smile shy",
+  "\u{1F607}": "\u5929\u4F7F \u5584\u826F angel halo",
+  "\u{1F970}": "\u559C\u6B22 \u7231\u5FC3 \u7231 love heart face",
+  "\u{1F60D}": "\u7231\u5FC3 \u559C\u6B22 \u7231 \u5FC3\u773C heart eyes love",
+  "\u{1F929}": "\u661F\u661F \u5D07\u62DC \u8FFD\u661F star struck wow",
+  "\u{1F618}": "\u4EB2\u4EB2 \u98DE\u543B \u543B kiss blow",
+  "\u{1F617}": "\u4EB2\u4EB2 \u561F\u5634 kiss",
+  "\u{1F61A}": "\u4EB2\u4EB2 \u5BB3\u7F9E kiss shy blush",
+  "\u{1F619}": "\u4EB2\u4EB2 \u53E3\u54E8 kiss whistle",
+  "\u{1F972}": "\u611F\u52A8 \u7B11\u4E2D\u5E26\u6CEA \u5FAE\u7B11 smile tear",
+  "\u{1F60B}": "\u597D\u5403 \u7F8E\u5473 \u998B yummy delicious tongue",
+  "\u{1F61B}": "\u5410\u820C \u8C03\u76AE tongue playful",
+  "\u{1F61C}": "\u8C03\u76AE \u641E\u602A \u5410\u820C wink tongue crazy",
+  "\u{1F92A}": "\u75AF\u72C2 \u641E\u602A zany crazy wild",
+  "\u{1F61D}": "\u5410\u820C \u9B3C\u8138 tongue squint",
+  "\u{1F911}": "\u53D1\u8D22 \u94B1 \u8D22\u8FF7 money rich dollar",
+  "\u{1F917}": "\u62E5\u62B1 \u62B1\u62B1 hug warm",
+  "\u{1F92D}": "\u5077\u7B11 \u6342\u5634 giggle cover",
+  "\u{1F92B}": "\u5618 \u5B89\u9759 \u79D8\u5BC6 shush quiet secret",
+  "\u{1F914}": "\u601D\u8003 \u60F3 \u7591\u95EE think wonder hmm",
+  "\u{1FAE1}": "\u656C\u793C \u5C0A\u91CD salute respect",
+  "\u{1F910}": "\u95ED\u5634 \u6C89\u9ED8 zip mouth silent",
+  "\u{1F928}": "\u6000\u7591 \u8D28\u7591 raised eyebrow skeptic",
+  "\u{1F610}": "\u51B7\u6F20 \u65E0\u8BED neutral blank",
+  "\u{1F611}": "\u65E0\u8BED \u65E0\u804A expressionless",
+  "\u{1F636}": "\u6C89\u9ED8 \u65E0\u8BED mute no mouth",
+  "\u{1FAE5}": "\u865A\u7EBF\u8138 \u9690\u5F62 dotted line face invisible",
+  "\u{1F60F}": "\u574F\u7B11 \u5F97\u610F smirk sly",
+  "\u{1F612}": "\u4E0D\u5C51 \u5ACC\u5F03 unamused bored",
+  "\u{1F644}": "\u767D\u773C \u65E0\u8BED eye roll whatever",
+  "\u{1F62C}": "\u5C34\u5C2C \u9F87\u7259 grimace awkward",
+  "\u{1F925}": "\u8BF4\u8C0E \u9A97\u5B50 lying liar",
+  "\u{1F60C}": "\u653E\u677E \u8212\u9002 \u6EE1\u8DB3 relieved calm peaceful",
+  "\u{1F614}": "\u5931\u843D \u96BE\u8FC7 \u6CAE\u4E27 sad pensive down",
+  "\u{1F62A}": "\u56F0 \u778C\u7761 \u7761\u89C9 sleepy tired",
+  "\u{1F924}": "\u6D41\u53E3\u6C34 \u998B drool hungry",
+  "\u{1F634}": "\u7761\u89C9 \u56F0 \u7761\u7720 \u665A\u5B89 sleep zzz night",
+  "\u{1F637}": "\u53E3\u7F69 \u751F\u75C5 \u611F\u5192 mask sick cold",
+  "\u{1F912}": "\u53D1\u70E7 \u751F\u75C5 \u6E29\u5EA6\u8BA1 fever sick thermometer",
+  "\u{1F915}": "\u53D7\u4F24 \u5934\u75DB \u7EF7\u5E26 hurt injury bandage",
+  "\u{1F922}": "\u6076\u5FC3 \u60F3\u5410 nauseous sick green",
+  "\u{1F92E}": "\u5410 \u6076\u5FC3 \u5455\u5410 vomit throw up sick",
+  "\u{1F975}": "\u70ED \u51FA\u6C57 \u53D1\u70ED hot heat sweat",
+  "\u{1F976}": "\u51B7 \u51BB \u5BD2\u51B7 cold freeze frozen",
+  "\u{1F974}": "\u6655 \u9189 woozy dizzy drunk",
+  "\u{1F635}": "\u6655 \u5934\u6655 \u7729\u6655 dizzy daze",
+  "\u{1F92F}": "\u7206\u70B8 \u9707\u60CA \u70B8\u88C2 mind blown explode shock",
+  "\u{1F920}": "\u725B\u4ED4 \u5E05 cowboy",
+  "\u{1F973}": "\u5E86\u795D \u6D3E\u5BF9 \u751F\u65E5 \u805A\u4F1A party celebrate birthday",
+  "\u{1F978}": "\u4F2A\u88C5 \u5047\u80E1\u5B50 disguised face",
+  "\u{1F60E}": "\u9177 \u58A8\u955C \u5E05 cool sunglasses",
+  "\u{1F913}": "\u4E66\u5446\u5B50 \u773C\u955C \u5B66\u9738 nerd glasses geek",
+  "\u{1F9D0}": "\u5BA1\u89C6 \u5355\u7247\u773C\u955C monocle inspect",
+  "\u{1F615}": "\u56F0\u60D1 \u4E0D\u89E3 confused",
+  "\u{1FAE4}": "\u90C1\u95F7 \u76B1\u7709 diagonal mouth meh",
+  "\u{1F61F}": "\u62C5\u5FC3 \u5FE7\u8651 worried concern",
+  "\u{1F641}": "\u96BE\u8FC7 \u4E0D\u5F00\u5FC3 sad frown",
+  "\u{1F62E}": "\u60CA\u8BB6 \u5403\u60CA surprise open mouth",
+  "\u{1F62F}": "\u60CA\u8BB6 \u5403\u60CA hushed surprise",
+  "\u{1F632}": "\u9707\u60CA \u5927\u60CA astonished shock",
+  "\u{1F633}": "\u8138\u7EA2 \u5BB3\u7F9E \u5C34\u5C2C flushed blush embarrass",
+  "\u{1F97A}": "\u53EF\u601C \u6C42\u6C42 \u6492\u5A07 pleading puppy eyes",
+  "\u{1F979}": "\u611F\u52A8 \u5FCD\u4F4F holding tears touched",
+  "\u{1F627}": "\u75DB\u82E6 \u7126\u8651 anguished",
+  "\u{1F628}": "\u5BB3\u6015 \u6050\u60E7 fearful scared afraid",
+  "\u{1F630}": "\u7126\u8651 \u7D27\u5F20 \u51B7\u6C57 anxious nervous sweat",
+  "\u{1F625}": "\u5931\u671B \u91CA\u7136 disappointed relieved",
+  "\u{1F622}": "\u54ED \u96BE\u8FC7 \u4F24\u5FC3 cry sad tear",
+  "\u{1F62D}": "\u5927\u54ED \u4F24\u5FC3 \u75DB\u54ED sob cry loud",
+  "\u{1F631}": "\u5C16\u53EB \u6050\u60E7 \u5413 scream fear horror",
+  "\u{1F616}": "\u75DB\u82E6 \u96BE\u53D7 confounded pain",
+  "\u{1F623}": "\u5FCD\u8010 \u575A\u6301 persevere endure",
+  "\u{1F61E}": "\u5931\u671B \u6CAE\u4E27 disappointed sad",
+  "\u{1F613}": "\u6C57 \u65E0\u5948 sweat downcast",
+  "\u{1F629}": "\u75B2\u5026 \u7D2F \u5D29\u6E83 weary exhausted tired",
+  "\u{1F62B}": "\u7D2F \u75B2\u5026 tired exhausted",
+  "\u{1F971}": "\u6253\u54C8\u6B20 \u56F0 \u65E0\u804A yawn sleepy bored",
+  "\u{1F624}": "\u751F\u6C14 \u6124\u6012 \u54FC angry huff steam",
+  "\u{1F621}": "\u6124\u6012 \u751F\u6C14 rage angry red",
+  "\u{1F620}": "\u751F\u6C14 \u4E0D\u6EE1 angry mad",
+  "\u{1F92C}": "\u9A82\u4EBA \u810F\u8BDD \u6124\u6012 swear curse angry",
+  "\u{1F608}": "\u6076\u9B54 \u574F \u8C03\u76AE devil evil imp",
+  "\u{1F47F}": "\u6076\u9B54 \u751F\u6C14 devil angry imp",
+  "\u{1F480}": "\u9AB7\u9AC5 \u6B7B \u5413 skull dead",
+  "\u2620\uFE0F": "\u9AB7\u9AC5 \u5371\u9669 \u6B7B\u4EA1 skull crossbones danger",
+  "\u{1F4A9}": "\u4FBF\u4FBF \u5C4E poop poo shit",
+  "\u{1F921}": "\u5C0F\u4E11 clown",
+  "\u{1F479}": "\u5996\u602A \u9B3C ogre monster",
+  "\u{1F47A}": "\u5929\u72D7 \u9B3C goblin tengu",
+  "\u{1F47B}": "\u9B3C \u5E7D\u7075 \u4E07\u5723\u8282 ghost halloween boo",
+  "\u{1F47D}": "\u5916\u661F\u4EBA alien ufo",
+  "\u{1F47E}": "\u602A\u7269 \u6E38\u620F monster alien game",
+  "\u{1F916}": "\u673A\u5668\u4EBA robot bot",
+  "\u{1F44B}": "\u6325\u624B \u4F60\u597D \u518D\u89C1 \u62DC\u62DC wave hello hi bye",
+  "\u{1F91A}": "\u624B \u505C \u4E3E\u624B hand stop raise",
+  "\u{1F590}\uFE0F": "\u624B \u4E94 \u5F20\u5F00 hand five open",
+  "\u270B": "\u624B \u505C \u9AD8\u4E3E hand stop high five",
+  "\u{1F596}": "\u624B vulcan spock",
+  "\u{1FAF1}": "\u5411\u53F3\u7684\u624B rightward hand",
+  "\u{1FAF2}": "\u5411\u5DE6\u7684\u624B leftward hand",
+  "\u{1FAF3}": "\u638C\u5FC3\u5411\u4E0B\u7684\u624B palm down hand",
+  "\u{1FAF4}": "\u638C\u5FC3\u5411\u4E0A\u7684\u624B palm up hand",
+  "\u{1F44C}": "\u597D\u7684 OK \u53EF\u4EE5 \u6CA1\u95EE\u9898 ok okay perfect",
+  "\u{1F90C}": "\u634F\u624B\u6307 pinched fingers",
+  "\u{1F90F}": "\u4E00\u70B9\u70B9 \u5C11\u91CF pinch small little",
+  "\u270C\uFE0F": "\u80DC\u5229 \u8036 \u526A\u5200 victory peace yeah",
+  "\u{1F91E}": "\u7948\u7977 \u597D\u8FD0 cross finger luck hope",
+  "\u{1FAF0}": "\u6BD4\u5FC3 \u7231\u5FC3 \u5FC3 heart hands love",
+  "\u{1F91F}": "\u7231\u4F60 \u6447\u6EDA love you rock",
+  "\u{1F918}": "\u6447\u6EDA rock metal horn",
+  "\u{1F919}": "\u6253\u7535\u8BDD \u8054\u7CFB call phone shaka",
+  "\u{1F448}": "\u5DE6 \u6307 left point",
+  "\u{1F449}": "\u53F3 \u6307 right point",
+  "\u{1F446}": "\u4E0A \u6307 up point",
+  "\u{1F595}": "\u7AD6\u4E2D\u6307 \u5192\u72AF middle finger",
+  "\u{1F447}": "\u4E0B \u6307 down point",
+  "\u261D\uFE0F": "\u4E0A \u6307 \u7B2C\u4E00 point up first",
+  "\u{1FAF5}": "\u6307\u5411\u89C2\u770B\u8005 index pointing at viewer",
+  "\u{1F44D}": "\u597D \u8D5E \u68D2 \u5389\u5BB3 \u70B9\u8D5E like good thumb up great nice",
+  "\u{1F44E}": "\u5DEE \u4E0D\u597D \u8E29 dislike bad thumb down",
+  "\u270A": "\u52A0\u6CB9 \u62F3\u5934 \u575A\u6301 fist power fight",
+  "\u{1F44A}": "\u62F3\u5934 \u6253 \u52A0\u6CB9 punch fist bump",
+  "\u{1F91B}": "\u5DE6\u62F3 left-facing fist",
+  "\u{1F91C}": "\u53F3\u62F3 right-facing fist",
+  "\u{1F44F}": "\u9F13\u638C \u638C\u58F0 \u62CD\u624B \u68D2 clap applause bravo",
+  "\u{1F64C}": "\u5E86\u795D \u4E07\u5C81 \u6B22\u547C raise hand hooray celebrate",
+  "\u{1FAF6}": "\u6BD4\u5FC3 \u7231\u5FC3 \u5FC3 heart hands love",
+  "\u{1F450}": "\u5F20\u5F00 \u62E5\u62B1 open hand hug",
+  "\u{1F932}": "\u638C\u5FC3\u5411\u4E0A\u5E76\u62E2 palms up together",
+  "\u{1F91D}": "\u63E1\u624B \u5408\u4F5C \u534F\u8BAE handshake deal agree",
+  "\u{1F64F}": "\u7948\u7977 \u611F\u8C22 \u62DC\u6258 \u8C22\u8C22 \u8BF7 pray thank please hope",
+  "\u{1F4AA}": "\u808C\u8089 \u529B\u91CF \u52A0\u6CB9 \u5065\u8EAB \u5F3A muscle strong power flex gym",
+  "\u{1F9BE}": "\u673A\u68B0\u624B\u81C2 mechanical arm",
+  "\u{1F9BF}": "\u673A\u68B0\u817F mechanical leg",
+  "\u{1F9B5}": "\u817F leg",
+  "\u{1F9B6}": "\u811A foot",
+  "\u{1F442}": "\u8033\u6735 ear",
+  "\u{1F9BB}": "\u6234\u52A9\u542C\u5668 ear with hearing aid",
+  "\u{1F443}": "\u9F3B\u5B50 nose",
+  "\u{1F9E0}": "\u5927\u8111 brain",
+  "\u{1FAC0}": "\u5FC3\u810F anatomical heart",
+  "\u{1FAC1}": "\u80BA lungs",
+  "\u{1F9B7}": "\u7259\u9F7F tooth",
+  "\u{1F9B4}": "\u9AA8\u5934 bone",
+  "\u{1F440}": "\u770B \u773C\u775B \u6CE8\u610F eyes look see watch",
+  "\u{1F441}\uFE0F": "\u773C\u775B eye",
+  "\u{1F445}": "\u820C\u5934 \u5410\u820C tongue lick",
+  "\u{1F444}": "\u5634 \u5634\u5507 \u4EB2 mouth lips kiss",
+  "\u{1F9D1}\u200D\u{1F37C}": "\u54FA\u4E73\u7684\u4EBA person feeding baby",
+  "\u{1F47C}": "\u5929\u4F7F\u5B9D\u5B9D baby angel",
+  "\u{1F385}": "\u5723\u8BDE\u8001\u4EBA santa christmas",
+  "\u{1F936}": "\u5723\u8BDE\u5976\u5976 mrs claus",
+  "\u{1F9B8}": "\u8D85\u7EA7\u82F1\u96C4 superhero",
+  "\u{1F9B9}": "\u8D85\u7EA7\u53CD\u6D3E supervillain",
+  "\u{1F9D9}": "\u9B54\u6CD5\u5E08 wizard",
+  "\u{1F9DA}": "\u7CBE\u7075 fairy",
+  "\u{1F9DB}": "\u5438\u8840\u9B3C vampire",
+  "\u{1F9DC}": "\u7F8E\u4EBA\u9C7C merperson",
+  "\u{1F9DD}": "\u5C0F\u7CBE\u7075 elf",
+  "\u{1F9DE}": "\u795E\u706F\u7CBE\u7075 genie",
+  "\u{1F9DF}": "\u50F5\u5C38 zombie",
+  "\u{1F9CC}": "\u5DE8\u9B54 troll",
+  "\u{1F486}": "\u6309\u6469 \u653E\u677E massage relax spa",
+  "\u{1F487}": "\u7406\u53D1 \u526A\u53D1 haircut barber",
+  "\u{1F6B6}": "\u8D70\u8DEF \u6B65\u884C \u6563\u6B65 walk pedestrian",
+  "\u{1F9CD}": "\u7AD9\u7ACB\u7684\u4EBA person standing",
+  "\u{1F9CE}": "\u8DEA\u7740\u7684\u4EBA person kneeling",
+  "\u{1F3C3}": "\u8DD1\u6B65 \u8FD0\u52A8 \u8DD1 run jog exercise",
+  "\u{1F483}": "\u8DF3\u821E \u821E\u8E48 dance salsa",
+  "\u{1F57A}": "\u8DF3\u821E \u821E\u8E48 dance disco",
+  "\u{1F574}\uFE0F": "\u7A7F\u897F\u88C5\u60AC\u6D6E\u7684\u4EBA person in suit levitating",
+  "\u{1F46F}": "\u6234\u5154\u8033\u7684\u4EBA people with bunny ears",
+  "\u{1F9D6}": "\u84B8\u6851\u62FF\u7684\u4EBA person in steamy room",
+  "\u{1F9D7}": "\u6500\u5CA9\u7684\u4EBA person climbing",
+  "\u{1F93A}": "\u51FB\u5251 fencer",
+  "\u{1F3C7}": "\u8D5B\u9A6C horse racing",
+  "\u26F7\uFE0F": "\u6ED1\u96EA skier",
+  "\u{1F3C2}": "\u5355\u677F\u6ED1\u96EA snowboarder",
+  "\u{1F3CC}\uFE0F": "\u6253\u9AD8\u5C14\u592B\u7403\u7684\u4EBA person golfing",
+  "\u{1F3C4}": "\u51B2\u6D6A \u6ED1\u6D6A surf wave",
+  "\u{1F6A3}": "\u5212\u8239 person rowing boat",
+  "\u{1F3CA}": "\u6E38\u6CF3 swim pool",
+  "\u26F9\uFE0F": "\u6253\u7BEE\u7403\u7684\u4EBA person bouncing ball",
+  "\u{1F3CB}\uFE0F": "\u4E3E\u91CD \u5065\u8EAB weightlift gym fitness",
+  "\u{1F6B4}": "\u9A91\u8F66 \u81EA\u884C\u8F66 \u9A91\u884C bike cycle bicycle",
+  "\u{1F6B5}": "\u9A91\u5C71\u5730\u8F66\u7684\u4EBA person mountain biking",
+  "\u{1F938}": "\u7FFB\u8DDF\u5934 \u4F53\u64CD cartwheel gymnastics",
+  "\u{1F93C}": "\u6454\u8DE4 wrestle",
+  "\u{1F93D}": "\u6C34\u7403 water polo",
+  "\u{1F93E}": "\u624B\u7403 handball",
+  "\u{1F933}": "\u81EA\u62CD selfie",
+  "\u{1F485}": "\u7F8E\u7532 \u6D82\u6307\u7532\u6CB9 nail polish",
+  "\u{1F934}": "\u738B\u5B50 prince",
+  "\u{1F478}": "\u516C\u4E3B princess",
+  "\u{1F473}": "\u5934\u5DFE turban",
+  "\u{1F472}": "\u6234\u74DC\u76AE\u5E3D\u7684\u4EBA person with skullcap",
+  "\u{1F9D5}": "\u6234\u5934\u5DFE\u7684\u5973\u4EBA woman with headscarf",
+  "\u{1F935}": "\u65B0\u90CE \u897F\u88C5 groom suit tuxedo",
+  "\u{1F470}": "\u65B0\u5A18 \u5A5A\u793C bride wedding",
+  "\u{1F930}": "\u5B55\u5987 \u6000\u5B55 pregnant",
+  "\u{1F931}": "\u54FA\u4E73 \u5988\u5988 \u5582\u5976 breastfeed nursing mother",
+  "\u{1F46E}": "\u8B66\u5BDF police cop officer",
+  "\u{1F575}\uFE0F": "\u4FA6\u63A2 detective spy",
+  "\u{1F482}": "\u536B\u5175 guard",
+  "\u{1F977}": "\u5FCD\u8005 ninja",
+  "\u{1F477}": "\u5DE5\u4EBA \u5EFA\u7B51 worker construction builder",
+  "\u{1FAC5}": "\u6234\u7687\u51A0\u7684\u4EBA person with crown",
+  "\u2B50": "\u661F \u661F\u661F star",
+  "\u{1F31F}": "\u661F \u95EA\u4EAE \u53D1\u5149 star glow shine",
+  "\u2728": "\u95EA \u95EA\u4EAE \u95EA\u8000 \u4EAE\u6676\u6676 sparkle shine glitter",
+  "\u{1F4AB}": "\u5934\u6655 \u661F\u661F dizzy star",
+  "\u{1F525}": "\u706B \u70ED\u95E8 \u5389\u5BB3 \u725B fire hot lit flame",
+  "\u{1F4A5}": "\u7206\u70B8 \u78B0\u649E boom crash explosion",
+  "\u{1F4A2}": "\u751F\u6C14 \u6124\u6012 anger symbol",
+  "\u{1F4A6}": "\u6C57 \u6C34 sweat drop water splash",
+  "\u{1F4A8}": "\u98CE \u5FEB \u8DD1 wind dash fast",
+  "\u{1F573}\uFE0F": "\u6D1E hole",
+  "\u{1F4A3}": "\u70B8\u5F39 bomb",
+  "\u{1F4AC}": "\u5BF9\u8BDD \u8BF4\u8BDD \u804A\u5929 speech chat talk bubble",
+  "\u{1F4AD}": "\u601D\u8003 \u60F3\u6CD5 thought think bubble",
+  "\u{1F4A4}": "\u7761\u89C9 \u56F0 zzz sleep",
+  "\u{1F3AF}": "\u76EE\u6807 \u9776\u5B50 \u547D\u4E2D target bullseye goal",
+  "\u{1F3C6}": "\u5956\u676F \u51A0\u519B \u7B2C\u4E00 \u80DC\u5229 trophy champion winner cup",
+  "\u{1F3C5}": "\u5956\u724C \u52CB\u7AE0 medal award",
+  "\u{1F947}": "\u91D1\u724C \u7B2C\u4E00 \u51A0\u519B gold first winner",
+  "\u{1F948}": "\u94F6\u724C \u7B2C\u4E8C silver second",
+  "\u{1F949}": "\u94DC\u724C \u7B2C\u4E09 bronze third",
+  "\u26BD": "\u8DB3\u7403 \u7403 soccer football",
+  "\u{1F3C0}": "\u7BEE\u7403 \u7403 basketball",
+  "\u{1F3C8}": "\u6A44\u6984\u7403 football american",
+  "\u26BE": "\u68D2\u7403 baseball",
+  "\u{1F3BE}": "\u7F51\u7403 tennis",
+  "\u{1F3D0}": "\u6392\u7403 volleyball",
+  "\u{1F3C9}": "\u6A44\u6984\u7403 rugby",
+  "\u{1F3B1}": "\u53F0\u7403 \u684C\u7403 billiards pool",
+  "\u{1F3B0}": "\u8001\u864E\u673A slot machine",
+  "\u{1F3D3}": "\u4E52\u4E53\u7403 \u7403 ping pong table tennis",
+  "\u{1F3F8}": "\u7FBD\u6BDB\u7403 \u7403 badminton",
+  "\u{1F94A}": "\u62F3\u51FB \u6253\u62F3 boxing glove",
+  "\u{1F94B}": "\u6B66\u672F \u8DC6\u62F3\u9053 \u7A7A\u624B\u9053 martial arts karate",
+  "\u{1F6F7}": "\u96EA\u6A47 sled",
+  "\u{1F94C}": "\u51B0\u58F6 curling stone",
+  "\u26F3": "\u9AD8\u5C14\u592B\u7403 golf",
+  "\u26F8\uFE0F": "\u6ED1\u51B0 ice skate",
+  "\u{1F3A3}": "\u9493\u9C7C fishing pole",
+  "\u{1F93F}": "\u6F5C\u6C34\u955C diving mask",
+  "\u{1F3BD}": "\u8FD0\u52A8\u80CC\u5FC3 running shirt",
+  "\u{1F3BF}": "\u6ED1\u96EA skis",
+  "\u{1F6FC}": "\u8F6E\u6ED1\u978B roller skate",
+  "\u{1F3AA}": "\u9A6C\u620F\u56E2 \u6F14\u51FA circus tent",
+  "\u{1F3AD}": "\u620F\u5267 \u8868\u6F14 \u9762\u5177 theater drama mask",
+  "\u{1F3A8}": "\u753B \u7ED8\u753B \u7F8E\u672F \u827A\u672F art paint palette draw",
+  "\u{1F3AC}": "\u7535\u5F71 \u62CD\u6444 movie film clapper",
+  "\u{1F3A4}": "\u9EA6\u514B\u98CE \u5531\u6B4C KTV microphone sing karaoke",
+  "\u{1F3A7}": "\u8033\u673A \u542C\u6B4C \u97F3\u4E50 headphone music listen",
+  "\u{1F3BC}": "\u97F3\u4E50 \u4E50\u8C31 music score note",
+  "\u{1F3B9}": "\u94A2\u7434 \u5F39\u7434 piano keyboard",
+  "\u{1F941}": "\u9F13 \u6253\u9F13 drum",
+  "\u{1FA98}": "\u957F\u9F13 long drum",
+  "\u{1F3B7}": "\u8428\u514B\u65AF \u97F3\u4E50 saxophone",
+  "\u{1F3BA}": "\u5587\u53ED \u53F7 trumpet horn",
+  "\u{1FA97}": "\u624B\u98CE\u7434 accordion",
+  "\u{1F3B8}": "\u5409\u4ED6 \u97F3\u4E50 guitar",
+  "\u{1FA95}": "\u73ED\u5353\u7434 banjo",
+  "\u{1F3BB}": "\u5C0F\u63D0\u7434 \u97F3\u4E50 violin",
+  "\u{1F396}\uFE0F": "\u519B\u529F\u7AE0 military medal",
+  "\u{1F3F5}\uFE0F": "\u82B1\u73AF rosette",
+  "\u{1F397}\uFE0F": "\u63D0\u793A\u4E1D\u5E26 reminder ribbon",
+  "\u{1F3AB}": "\u7968 ticket",
+  "\u{1F39F}\uFE0F": "\u5165\u573A\u5238 admission tickets",
+  "\u{1F3AE}": "\u6E38\u620F \u624B\u67C4 video game",
+  "\u{1F579}\uFE0F": "\u64CD\u7EB5\u6746 joystick",
+  "\u{1F3B2}": "\u9AB0\u5B50 game die",
+  "\u{1F9E9}": "\u62FC\u56FE puzzle piece",
+  "\u{1F9F8}": "\u6CF0\u8FEA\u718A teddy bear",
+  "\u{1FA85}": "\u5F69\u7F50 pi\xF1ata",
+  "\u{1FAA9}": "\u8FEA\u65AF\u79D1\u7403 mirror ball",
+  "\u{1FA86}": "\u5957\u5A03 nesting dolls",
+  "\u2660\uFE0F": "\u9ED1\u6843 spade suit",
+  "\u2665\uFE0F": "\u7EA2\u6843 heart suit",
+  "\u2666\uFE0F": "\u65B9\u7247 diamond suit",
+  "\u2663\uFE0F": "\u6885\u82B1 club suit",
+  "\u265F\uFE0F": "\u56FD\u9645\u8C61\u68CB\u68CB\u5B50 chess pawn",
+  "\u{1F0CF}": "\u738B\u724C joker",
+  "\u{1F004}": "\u9EBB\u5C06\u7EA2\u4E2D mahjong red dragon",
+  "\u{1F3B4}": "\u82B1\u672D\u7EB8\u724C flower playing cards",
+  "\u{1F5BC}\uFE0F": "\u5E26\u6846\u7684\u753B framed picture",
+  "\u{1F9F5}": "\u7EBF thread",
+  "\u{1FAA1}": "\u7F1D\u8863\u9488 sewing needle",
+  "\u{1F9F6}": "\u6BDB\u7EBF yarn",
+  "\u{1F453}": "\u773C\u955C glasses",
+  "\u{1F576}\uFE0F": "\u58A8\u955C sunglasses",
+  "\u{1F97D}": "\u62A4\u76EE\u955C goggles",
+  "\u{1F97C}": "\u767D\u5927\u8902 lab coat",
+  "\u{1F9BA}": "\u5B89\u5168\u80CC\u5FC3 safety vest",
+  "\u{1F454}": "\u9886\u5E26 necktie",
+  "\u{1F455}": "T\u6064 t-shirt",
+  "\u{1F456}": "\u725B\u4ED4\u88E4 jeans",
+  "\u{1F9E3}": "\u56F4\u5DFE scarf",
+  "\u{1F9E4}": "\u624B\u5957 gloves",
+  "\u{1F9E5}": "\u5916\u5957 coat",
+  "\u{1F9E6}": "\u889C\u5B50 socks",
+  "\u{1F457}": "\u8FDE\u8863\u88D9 dress",
+  "\u{1F458}": "\u548C\u670D kimono",
+  "\u{1F97B}": "\u7EB1\u4E3D sari",
+  "\u{1FA71}": "\u8FDE\u4F53\u6CF3\u8863 one-piece swimsuit",
+  "\u{1FA72}": "\u6CF3\u88E4 briefs",
+  "\u{1FA73}": "\u77ED\u88E4 shorts",
+  "\u{1F459}": "\u6BD4\u57FA\u5C3C bikini",
+  "\u{1F45A}": "\u5973\u88C5 woman's clothes",
+  "\u{1F45B}": "\u94B1\u5305 purse",
+  "\u{1F45C}": "\u624B\u63D0\u5305 handbag",
+  "\u{1F45D}": "\u624B\u5305 clutch bag",
+  "\u{1F6CD}\uFE0F": "\u8D2D\u7269\u888B shopping bags",
+  "\u{1F392}": "\u4E66\u5305 \u80CC\u5305 backpack",
+  "\u{1FA74}": "\u4EBA\u5B57\u62D6 thong sandal",
+  "\u{1F45E}": "\u7537\u978B man's shoe",
+  "\u{1F45F}": "\u8FD0\u52A8\u978B running shoe",
+  "\u{1F97E}": "\u767B\u5C71\u9774 hiking boot",
+  "\u{1F97F}": "\u5E73\u5E95\u978B flat shoe",
+  "\u{1F460}": "\u9AD8\u8DDF\u978B high-heeled shoe",
+  "\u{1F461}": "\u5973\u5F0F\u51C9\u978B woman's sandal",
+  "\u{1FA70}": "\u82AD\u857E\u821E\u978B ballet shoes",
+  "\u{1F462}": "\u5973\u9774 woman's boot",
+  "\u{1F451}": "\u7687\u51A0 crown",
+  "\u{1F452}": "\u5973\u5E3D woman's hat",
+  "\u{1F3A9}": "\u793C\u5E3D top hat",
+  "\u{1F393}": "\u6BD5\u4E1A\u5E3D graduation cap",
+  "\u{1F9E2}": "\u9E2D\u820C\u5E3D billed cap",
+  "\u{1FA96}": "\u519B\u7528\u5934\u76D4 military helmet",
+  "\u26D1\uFE0F": "\u767D\u5341\u5B57\u5934\u76D4 rescue worker's helmet",
+  "\u{1F4FF}": "\u5FF5\u73E0 prayer beads",
+  "\u{1F484}": "\u53E3\u7EA2 lipstick",
+  "\u{1F48D}": "\u6212\u6307 ring",
+  "\u{1F48E}": "\u5B9D\u77F3 gem stone",
+  "\u{1F507}": "\u9759\u97F3 speaker muted",
+  "\u{1F508}": "\u5C0F\u58F0 speaker low volume",
+  "\u{1F509}": "\u4E2D\u58F0 speaker medium volume",
+  "\u{1F50A}": "\u5927\u58F0 speaker high volume",
+  "\u{1F4E2}": "\u6269\u97F3\u5668 loudspeaker",
+  "\u{1F4E3}": "\u5587\u53ED megaphone",
+  "\u{1F4EF}": "\u90AE\u653F\u53F7\u89D2 postal horn",
+  "\u{1F514}": "\u94C3\u94DB bell",
+  "\u{1F515}": "\u7981\u6B62\u94C3\u94DB bell with slash",
+  "\u{1F3B5}": "\u97F3\u7B26 musical note",
+  "\u{1F3B6}": "\u97F3\u7B26 musical notes",
+  "\u{1F399}\uFE0F": "\u5F55\u97F3\u5BA4\u9EA6\u514B\u98CE studio microphone",
+  "\u{1F39A}\uFE0F": "\u8C03\u97F3\u53F0 level slider",
+  "\u{1F39B}\uFE0F": "\u63A7\u5236\u65CB\u94AE control knobs",
+  "\u{1F4FB}": "\u6536\u97F3\u673A radio",
+  "\u{1F4F1}": "\u624B\u673A mobile phone",
+  "\u{1F4F2}": "\u5E26\u7BAD\u5934\u7684\u624B\u673A mobile phone with arrow",
+  "\u260E\uFE0F": "\u7535\u8BDD telephone",
+  "\u{1F4DE}": "\u7535\u8BDD\u542C\u7B52 telephone receiver",
+  "\u{1F4DF}": "\u5BFB\u547C\u673A pager",
+  "\u{1F4E0}": "\u4F20\u771F\u673A fax machine",
+  "\u{1F50B}": "\u7535\u6C60 battery",
+  "\u{1F50C}": "\u63D2\u5934 electric plug",
+  "\u{1F4BB}": "\u7B14\u8BB0\u672C\u7535\u8111 laptop",
+  "\u{1F5A5}\uFE0F": "\u53F0\u5F0F\u7535\u8111 desktop computer",
+  "\u{1F5A8}\uFE0F": "\u6253\u5370\u673A printer",
+  "\u2328\uFE0F": "\u952E\u76D8 keyboard",
+  "\u{1F5B1}\uFE0F": "\u9F20\u6807 computer mouse",
+  "\u{1F5B2}\uFE0F": "\u8F68\u8FF9\u7403 trackball",
+  "\u{1F4BD}": "\u8FF7\u4F60\u789F minidisc",
+  "\u{1F4BE}": "\u8F6F\u76D8 floppy disk",
+  "\u{1F4BF}": "\u5149\u76D8 optical disk",
+  "\u{1F4C0}": "DVD dvd",
+  "\u{1F9EE}": "\u7B97\u76D8 abacus",
+  "\u{1F3A5}": "\u7535\u5F71\u6444\u50CF\u673A movie camera",
+  "\u{1F39E}\uFE0F": "\u7535\u5F71\u80F6\u7247 film frames",
+  "\u{1F4FD}\uFE0F": "\u7535\u5F71\u653E\u6620\u673A film projector",
+  "\u{1F4FA}": "\u7535\u89C6\u673A television",
+  "\u{1F4F7}": "\u76F8\u673A camera",
+  "\u{1F4F8}": "\u95EA\u5149\u706F\u76F8\u673A camera with flash",
+  "\u{1F4F9}": "\u6444\u50CF\u673A video camera",
+  "\u{1F4FC}": "\u5F55\u50CF\u5E26 videocassette",
+  "\u{1F50D}": "\u5411\u5DE6\u7684\u653E\u5927\u955C magnifying glass tilted left",
+  "\u{1F50E}": "\u5411\u53F3\u7684\u653E\u5927\u955C magnifying glass tilted right",
+  "\u{1F56F}\uFE0F": "\u8721\u70DB candle",
+  "\u{1F4A1}": "\u706F\u6CE1 \u60F3\u6CD5 light bulb idea",
+  "\u{1F526}": "\u624B\u7535\u7B52 flashlight",
+  "\u{1F3EE}": "\u7EA2\u706F\u7B3C red paper lantern",
+  "\u{1FA94}": "\u6CB9\u706F diya lamp",
+  "\u{1F4D4}": "\u5E26\u88C5\u9970\u5C01\u9762\u7684\u7B14\u8BB0\u672C notebook with decorative cover",
+  "\u{1F4D5}": "\u5408\u4E0A\u7684\u7EA2\u4E66 closed book",
+  "\u{1F4D6}": "\u6253\u5F00\u7684\u4E66 open book",
+  "\u{1F4D7}": "\u7EFF\u4E66 green book",
+  "\u{1F4D8}": "\u84DD\u4E66 blue book",
+  "\u{1F4D9}": "\u6A59\u4E66 orange book",
+  "\u{1F4DA}": "\u4E66 \u4E66\u7C4D books",
+  "\u{1F4D3}": "\u7B14\u8BB0\u672C notebook",
+  "\u{1F4D2}": "\u8D26\u672C ledger",
+  "\u{1F4C3}": "\u5E26\u5377\u8FB9\u7684\u9875\u9762 page with curl",
+  "\u{1F4DC}": "\u5377\u8F74 scroll",
+  "\u{1F4C4}": "\u6587\u4EF6 page facing up",
+  "\u{1F4F0}": "\u62A5\u7EB8 newspaper",
+  "\u{1F5DE}\uFE0F": "\u5377\u8D77\u6765\u7684\u62A5\u7EB8 rolled-up newspaper",
+  "\u{1F4D1}": "\u4E66\u7B7E\u6807\u7B7E bookmark tabs",
+  "\u{1F516}": "\u4E66\u7B7E bookmark",
+  "\u{1F3F7}\uFE0F": "\u6807\u7B7E label",
+  "\u{1F4B0}": "\u94B1\u888B money bag",
+  "\u{1FA99}": "\u786C\u5E01 coin",
+  "\u{1F4B4}": "\u65E5\u5143 yen banknote",
+  "\u{1F4B5}": "\u7F8E\u5143 dollar banknote",
+  "\u{1F4B6}": "\u6B27\u5143 euro banknote",
+  "\u{1F4B7}": "\u82F1\u9551 pound banknote",
+  "\u{1F4B8}": "\u957F\u7FC5\u8180\u7684\u94B1 money with wings",
+  "\u{1F4B3}": "\u4FE1\u7528\u5361 credit card",
+  "\u{1F9FE}": "\u6536\u636E receipt",
+  "\u{1F4B9}": "\u56FE\u8868\u4E0A\u6DA8 chart increasing with yen",
+  "\u2709\uFE0F": "\u4FE1\u5C01 envelope",
+  "\u{1F4E7}": "\u7535\u5B50\u90AE\u4EF6 e-mail",
+  "\u{1F4E8}": " incoming envelope",
+  "\u{1F4E9}": "\u5E26\u7BAD\u5934\u7684\u4FE1\u5C01 envelope with arrow",
+  "\u{1F4E4}": "\u53D1\u4EF6\u7BB1 outbox tray",
+  "\u{1F4E5}": "\u6536\u4EF6\u7BB1 inbox tray",
+  "\u{1F4E6}": "\u5305\u88F9 package",
+  "\u{1F4EB}": "\u6709\u5F85\u53D6\u90AE\u4EF6\u7684\u90AE\u7BB1 closed mailbox with raised flag",
+  "\u{1F4EA}": "\u65E0\u5F85\u53D6\u90AE\u4EF6\u7684\u90AE\u7BB1 closed mailbox with lowered flag",
+  "\u{1F4EC}": "\u6709\u5F85\u53D6\u90AE\u4EF6\u7684\u5F00\u90AE\u7BB1 open mailbox with raised flag",
+  "\u{1F4ED}": "\u65E0\u5F85\u53D6\u90AE\u4EF6\u7684\u5F00\u90AE\u7BB1 open mailbox with lowered flag",
+  "\u{1F4EE}": "\u90AE\u7B52 postbox",
+  "\u{1F5F3}\uFE0F": "\u5E26\u9009\u7968\u7684\u6295\u7968\u7BB1 ballot box with ballot",
+  "\u270F\uFE0F": "\u94C5\u7B14 pencil",
+  "\u2712\uFE0F": "\u94A2\u7B14 black nib",
+  "\u{1F58B}\uFE0F": "\u94A2\u7B14 fountain pen",
+  "\u{1F58A}\uFE0F": "\u5706\u73E0\u7B14 pen",
+  "\u{1F58C}\uFE0F": "\u753B\u7B14 paintbrush",
+  "\u{1F58D}\uFE0F": "\u8721\u7B14 crayon",
+  "\u{1F4DD}": "\u5907\u5FD8\u5F55 memo",
+  "\u{1F4BC}": "\u516C\u6587\u5305 briefcase",
+  "\u{1F4C1}": "\u6587\u4EF6\u5939 file folder",
+  "\u{1F4C2}": "\u6253\u5F00\u7684\u6587\u4EF6\u5939 open file folder",
+  "\u{1F5C2}\uFE0F": "\u5361\u7247\u7D22\u5F15 card index dividers",
+  "\u{1F4C5}": "\u65E5\u5386 calendar",
+  "\u{1F4C6}": "\u6495\u9875\u65E5\u5386 tear-off calendar",
+  "\u{1F5D2}\uFE0F": "\u87BA\u65CB\u8BB0\u4E8B\u672C spiral notepad",
+  "\u{1F5D3}\uFE0F": "\u87BA\u65CB\u65E5\u5386 spiral calendar",
+  "\u{1F4C7}": "\u5361\u7247\u7D22\u5F15 card index",
+  "\u{1F4C8}": "\u4E0A\u6DA8\u7684\u56FE\u8868 chart increasing",
+  "\u{1F4C9}": "\u4E0B\u964D\u7684\u56FE\u8868 chart decreasing",
+  "\u{1F4CA}": "\u67F1\u72B6\u56FE bar chart",
+  "\u{1F4CB}": "\u526A\u8D34\u677F clipboard",
+  "\u{1F4CC}": "\u56FE\u9489 pushpin",
+  "\u{1F4CD}": "\u5706\u56FE\u9489 round pushpin",
+  "\u{1F4CE}": "\u56DE\u5F62\u9488 paperclip",
+  "\u{1F587}\uFE0F": "\u76F8\u8FDE\u7684\u56DE\u5F62\u9488 linked paperclips",
+  "\u{1F4CF}": "\u76F4\u5C3A straight ruler",
+  "\u{1F4D0}": "\u4E09\u89D2\u5C3A triangular ruler",
+  "\u2702\uFE0F": "\u526A\u5200 scissors",
+  "\u{1F5C3}\uFE0F": "\u5361\u7247\u6587\u4EF6\u76D2 card file box",
+  "\u{1F5C4}\uFE0F": "\u6587\u4EF6\u67DC file cabinet",
+  "\u{1F5D1}\uFE0F": "\u5E9F\u7EB8\u7BD3 wastebasket",
+  "\u{1F512}": "\u9501 locked",
+  "\u{1F513}": "\u6253\u5F00\u7684\u9501 unlocked",
+  "\u{1F50F}": "\u5E26\u94A2\u7B14\u7684\u9501 locked with pen",
+  "\u{1F510}": "\u5E26\u94A5\u5319\u7684\u9501 locked with key",
+  "\u{1F511}": "\u94A5\u5319 key",
+  "\u{1F5DD}\uFE0F": "\u65E7\u94A5\u5319 old key",
+  "\u{1F528}": "\u9524\u5B50 hammer",
+  "\u{1FA93}": "\u65A7\u5934 axe",
+  "\u26CF\uFE0F": "\u9550 pick",
+  "\u2692\uFE0F": "\u9524\u5B50\u548C\u9550 hammer and pick",
+  "\u{1F6E0}\uFE0F": "\u9524\u5B50\u548C\u6273\u624B hammer and wrench",
+  "\u{1F5E1}\uFE0F": "\u5315\u9996 dagger",
+  "\u2694\uFE0F": "\u4EA4\u53C9\u7684\u5251 crossed swords",
+  "\u{1F52B}": "\u6C34\u67AA pistol",
+  "\u{1FA83}": "\u56DE\u65CB\u9556 boomerang",
+  "\u{1F3F9}": "\u5F13\u548C\u7BAD bow and arrow",
+  "\u{1F6E1}\uFE0F": "\u76FE\u724C shield",
+  "\u{1FA9A}": "\u6728\u5DE5\u952F carpentry saw",
+  "\u{1F527}": "\u6273\u624B wrench",
+  "\u{1FA9B}": "\u87BA\u4E1D\u5200 screwdriver",
+  "\u{1F529}": "\u87BA\u6BCD\u548C\u87BA\u6813 nut and bolt",
+  "\u2699\uFE0F": "\u9F7F\u8F6E gear",
+  "\u{1F5DC}\uFE0F": "\u5939\u94B3 clamp",
+  "\u2696\uFE0F": "\u5929\u5E73 balance scale",
+  "\u{1F9AF}": "\u767D\u624B\u6756 white cane",
+  "\u{1F517}": "\u94FE\u63A5 link",
+  "\u26D3\uFE0F": "\u94FE\u6761 chains",
+  "\u{1FA9D}": "\u94A9\u5B50 hook",
+  "\u{1F9F0}": "\u5DE5\u5177\u7BB1 toolbox",
+  "\u{1F9F2}": "\u78C1\u94C1 magnet",
+  "\u{1FA9C}": "\u68AF\u5B50 ladder",
+  "\u2697\uFE0F": "\u84B8\u998F\u5668 alembic",
+  "\u{1F9EA}": "\u8BD5\u7BA1 test tube",
+  "\u{1F9EB}": "\u57F9\u517B\u76BF petri dish",
+  "\u{1F9EC}": "DNA dna",
+  "\u{1F52C}": "\u663E\u5FAE\u955C microscope",
+  "\u{1F52D}": "\u671B\u8FDC\u955C telescope",
+  "\u{1F4E1}": "\u536B\u661F\u5929\u7EBF satellite antenna",
+  "\u{1F489}": "\u6CE8\u5C04\u5668 syringe",
+  "\u{1FA78}": "\u8840\u6EF4 drop of blood",
+  "\u{1F48A}": "\u836F\u4E38 pill",
+  "\u{1FA79}": "\u521B\u53EF\u8D34 adhesive bandage",
+  "\u{1FA7C}": "\u62D0\u6756 crutch",
+  "\u{1FA7A}": "\u542C\u8BCA\u5668 stethoscope",
+  "\u{1F321}\uFE0F": "\u6E29\u5EA6\u8BA1 thermometer",
+  "\u{1F6AA}": "\u95E8 door",
+  "\u{1F6D7}": "\u7535\u68AF elevator",
+  "\u{1FA9E}": "\u955C\u5B50 mirror",
+  "\u{1FA9F}": "\u7A97\u6237 window",
+  "\u{1F6CF}\uFE0F": "\u5E8A bed",
+  "\u{1F6CB}\uFE0F": "\u6C99\u53D1\u548C\u706F couch and lamp",
+  "\u{1FA91}": "\u6905\u5B50 chair",
+  "\u{1F6BD}": "\u5395\u6240 toilet",
+  "\u{1FAA0}": "\u76AE\u640B\u5B50 plunger",
+  "\u{1F6BF}": "\u6DCB\u6D74 shower",
+  "\u{1F6C1}": "\u6D74\u7F38 bathtub",
+  "\u{1FAA4}": "\u6355\u9F20\u5668 mouse trap",
+  "\u{1FA92}": "\u5243\u987B\u5200 razor",
+  "\u{1F9F4}": "\u4E73\u6DB2\u74F6 lotion bottle",
+  "\u{1F9F7}": "\u5B89\u5168\u522B\u9488 safety pin",
+  "\u{1F9F9}": "\u626B\u5E1A broom",
+  "\u{1F9FA}": "\u7BEE\u5B50 basket",
+  "\u{1F9FB}": "\u5377\u7EB8 roll of paper",
+  "\u{1F9FC}": "\u80A5\u7682 soap",
+  "\u{1F9FD}": "\u6D77\u7EF5 sponge",
+  "\u{1F9EF}": "\u706D\u706B\u5668 fire extinguisher",
+  "\u{1F6D2}": "\u8D2D\u7269\u8F66 shopping cart",
+  "\u{1F6AC}": "\u9999\u70DF cigarette",
+  "\u26B0\uFE0F": "\u68FA\u6750 coffin",
+  "\u{1FAA6}": "\u5893\u7891 headstone",
+  "\u26B1\uFE0F": "\u9AA8\u7070\u74EE funeral urn",
+  "\u{1F5FF}": "\u6469\u827E\u77F3\u50CF moai",
+  "\u{1FAA7}": "\u6807\u8BED\u724C placard",
+  "\u{1F697}": "\u8F66 \u6C7D\u8F66 car",
+  "\u{1F695}": "\u51FA\u79DF\u8F66 taxi",
+  "\u{1F699}": "SUV \u8D8A\u91CE\u8F66 sport utility vehicle",
+  "\u{1F68C}": "\u516C\u4EA4\u8F66 bus",
+  "\u{1F68E}": "\u65E0\u8F68\u7535\u8F66 trolleybus",
+  "\u{1F3CE}\uFE0F": "\u8D5B\u8F66 racing car",
+  "\u{1F693}": "\u8B66\u8F66 police car",
+  "\u{1F691}": "\u6551\u62A4\u8F66 ambulance",
+  "\u{1F692}": "\u6D88\u9632\u8F66 fire engine",
+  "\u{1F690}": "\u9762\u5305\u8F66 minibus",
+  "\u{1F6FB}": "\u76AE\u5361\u8F66 pickup truck",
+  "\u{1F69A}": "\u8D27\u8F66 delivery truck",
+  "\u{1F69B}": " articulated lorry",
+  "\u{1F69C}": "\u62D6\u62C9\u673A tractor",
+  "\u{1F3CD}\uFE0F": "\u6469\u6258\u8F66 motorcycle",
+  "\u{1F6F5}": "\u7535\u52A8\u8F66 motor scooter",
+  "\u{1F9BD}": "\u624B\u52A8\u8F6E\u6905 manual wheelchair",
+  "\u{1F9BC}": "\u7535\u52A8\u8F6E\u6905 motorized wheelchair",
+  "\u{1F6FA}": "\u81EA\u52A8\u4EBA\u529B\u8F66 auto rickshaw",
+  "\u{1F6B2}": "\u81EA\u884C\u8F66 bicycle",
+  "\u{1F6F4}": "\u6ED1\u677F\u8F66 kick scooter",
+  "\u{1F6F9}": "\u6ED1\u677F skateboard",
+  "\u{1F68F}": "\u516C\u4EA4\u8F66\u7AD9 bus stop",
+  "\u{1F6E3}\uFE0F": "\u9AD8\u901F\u516C\u8DEF motorway",
+  "\u{1F6E4}\uFE0F": "\u94C1\u8F68 railway track",
+  "\u{1F6E2}\uFE0F": "\u6CB9\u6876 oil drum",
+  "\u26FD": "\u52A0\u6CB9\u7AD9 fuel pump",
+  "\u{1F6DE}": "\u8F66\u8F6E wheel",
+  "\u{1F6A8}": "\u8B66\u8F66\u65CB\u8F6C\u706F police car light",
+  "\u{1F6A5}": "\u6A2A\u5411\u7EA2\u7EFF\u706F horizontal traffic light",
+  "\u{1F6A6}": "\u7EB5\u5411\u7EA2\u7EFF\u706F vertical traffic light",
+  "\u{1F6D1}": "\u505C\u8F66\u6807\u5FD7 stop sign",
+  "\u{1F6A7}": "\u65BD\u5DE5 construction",
+  "\u2693": "\u951A anchor",
+  "\u{1F6DF}": "\u6551\u751F\u5708 ring buoy",
+  "\u26F5": "\u5E06\u8239 sailboat",
+  "\u{1F6F6}": "\u72EC\u6728\u821F canoe",
+  "\u{1F6A4}": "\u5FEB\u8247 speedboat",
+  "\u{1F6F3}\uFE0F": "\u5BA2\u8239 passenger ship",
+  "\u26F4\uFE0F": "\u6E21\u8F6E ferry",
+  "\u{1F6E5}\uFE0F": "\u6C7D\u8247 motor boat",
+  "\u{1F6A2}": "\u8F6E\u8239 ship",
+  "\u2708\uFE0F": "\u98DE\u673A airplane",
+  "\u{1F6E9}\uFE0F": "\u5C0F\u578B\u98DE\u673A small airplane",
+  "\u{1F6EB}": "\u98DE\u673A\u8D77\u98DE airplane departure",
+  "\u{1F6EC}": "\u98DE\u673A\u964D\u843D airplane arriving",
+  "\u{1FA82}": "\u964D\u843D\u4F1E parachute",
+  "\u{1F4BA}": "\u5EA7\u4F4D seat",
+  "\u{1F681}": "\u76F4\u5347\u673A helicopter",
+  "\u{1F69F}": "\u60AC\u6302\u5F0F\u94C1\u8DEF suspension railway",
+  "\u{1F6A0}": "\u7F06\u8F66 mountain cableway",
+  "\u{1F6A1}": "\u7A7A\u4E2D\u7F06\u8F66 aerial tramway",
+  "\u{1F6F0}\uFE0F": "\u536B\u661F satellite",
+  "\u{1F680}": "\u706B\u7BAD rocket",
+  "\u{1F6F8}": "\u98DE\u789F flying saucer",
+  "\u{1F320}": "\u6D41\u661F shooting star",
+  "\u{1F30C}": "\u94F6\u6CB3 milky way",
+  "\u26F1\uFE0F": "\u6C99\u6EE9\u4F1E umbrella on ground",
+  "\u{1F386}": "\u70DF\u82B1 fireworks",
+  "\u{1F387}": "\u7130\u706B sparkler",
+  "\u{1F391}": "\u8D4F\u6708 moon viewing ceremony",
+  "\u{1F3D9}\uFE0F": "\u57CE\u5E02\u591C\u666F cityscape",
+  "\u{1F305}": "\u65E5\u51FA sunrise",
+  "\u{1F304}": "\u5C71\u8FB9\u65E5\u51FA sunrise over mountains",
+  "\u{1F307}": "\u65E5\u843D sunset",
+  "\u{1F306}": "\u57CE\u5E02\u9EC4\u660F cityscape at dusk",
+  "\u{1F303}": "\u591C\u665A with stars",
+  "\u{1F309}": "\u591C\u666F\u6865 bridge at night",
+  "\u{1F301}": "\u6709\u96FE foggy",
+  "\u231A": "\u624B\u8868 watch",
+  "\u23F0": "\u95F9\u949F alarm clock",
+  "\u23F1\uFE0F": "\u79D2\u8868 stopwatch",
+  "\u23F2\uFE0F": "\u8BA1\u65F6\u5668 timer clock",
+  "\u{1F570}\uFE0F": "\u5EA7\u949F mantelpiece clock",
+  "\u{1F55B}": "\u5341\u4E8C\u70B9 twelve o'clock",
+  "\u{1F567}": "\u5341\u4E8C\u70B9\u534A twelve-thirty",
+  "\u{1F55C}": "\u4E00\u70B9 half past one",
+  "\u{1F550}": "\u4E00\u70B9 one o'clock",
+  "\u{1F34E}": "\u82F9\u679C \u6C34\u679C apple fruit",
+  "\u{1F350}": "\u68A8 \u6C34\u679C pear fruit",
+  "\u{1F34A}": "\u6A58\u5B50 \u6A59\u5B50 \u6C34\u679C orange tangerine fruit",
+  "\u{1F34B}": "\u67E0\u6AAC \u6C34\u679C lemon fruit",
+  "\u{1F34C}": "\u9999\u8549 \u6C34\u679C banana fruit",
+  "\u{1F349}": "\u897F\u74DC \u6C34\u679C watermelon fruit",
+  "\u{1F347}": "\u8461\u8404 \u6C34\u679C grape fruit",
+  "\u{1F353}": "\u8349\u8393 \u6C34\u679C strawberry fruit",
+  "\u{1FAD0}": "\u84DD\u8393 \u6C34\u679C blueberry fruit",
+  "\u{1F348}": "\u751C\u74DC \u6C34\u679C melon fruit",
+  "\u{1F352}": "\u6A31\u6843 \u6C34\u679C cherry fruit",
+  "\u{1F351}": "\u6843\u5B50 \u6C34\u679C peach fruit",
+  "\u{1F96D}": "\u8292\u679C \u6C34\u679C mango fruit",
+  "\u{1F34D}": "\u83E0\u841D \u6C34\u679C pineapple fruit",
+  "\u{1F965}": "\u6930\u5B50 \u6C34\u679C coconut fruit",
+  "\u{1F95D}": "\u7315\u7334\u6843 \u6C34\u679C kiwi fruit",
+  "\u{1F345}": "\u756A\u8304 \u897F\u7EA2\u67FF \u852C\u83DC tomato vegetable",
+  "\u{1F346}": "\u8304\u5B50 \u852C\u83DC eggplant aubergine",
+  "\u{1F951}": "\u725B\u6CB9\u679C \u852C\u83DC avocado",
+  "\u{1F966}": "\u897F\u5170\u82B1 \u852C\u83DC broccoli vegetable",
+  "\u{1F96C}": "\u7EFF\u53F6\u852C\u83DC leafy green",
+  "\u{1F952}": "\u9EC4\u74DC \u852C\u83DC cucumber vegetable",
+  "\u{1F336}\uFE0F": "\u8FA3\u6912 \u8FA3 pepper hot chili spicy",
+  "\u{1FAD1}": "\u751C\u6912 bell pepper",
+  "\u{1F33D}": "\u7389\u7C73 corn",
+  "\u{1F955}": "\u80E1\u841D\u535C \u841D\u535C \u852C\u83DC carrot vegetable",
+  "\u{1FAD2}": "\u6A44\u6984 olive",
+  "\u{1F9C4}": "\u5927\u849C \u849C garlic",
+  "\u{1F9C5}": "\u6D0B\u8471 onion",
+  "\u{1F954}": "\u571F\u8C46 \u9A6C\u94C3\u85AF potato",
+  "\u{1F360}": "\u7EA2\u85AF \u5730\u74DC sweet potato",
+  "\u{1FAD8}": "\u8C46\u5B50 beans",
+  "\u{1F950}": "\u725B\u89D2\u9762\u5305 croissant",
+  "\u{1F35E}": "\u9762\u5305 bread",
+  "\u{1F956}": "\u6CD5\u68CD baguette bread",
+  "\u{1F968}": "\u6912\u76D0\u5377\u997C pretzel",
+  "\u{1F96F}": "\u767E\u5409\u997C bagel",
+  "\u{1F95E}": "\u714E\u997C \u8584\u997C pancake",
+  "\u{1F9C7}": "\u534E\u592B\u997C waffle",
+  "\u{1F9C0}": "\u5976\u916A \u829D\u58EB cheese",
+  "\u{1F356}": "\u6392\u9AA8\u4E0A\u7684\u8089 meat on bone",
+  "\u{1F357}": "\u9E21\u817F \u8089 chicken leg drumstick",
+  "\u{1F969}": "\u725B\u6392 \u8089 steak meat beef",
+  "\u{1F953}": "\u57F9\u6839 \u8089 bacon meat",
+  "\u{1F354}": "\u6C49\u5821 \u5FEB\u9910 burger hamburger fast food",
+  "\u{1F35F}": "\u85AF\u6761 \u5FEB\u9910 fries fast food",
+  "\u{1F355}": "\u62AB\u8428 \u5FEB\u9910 pizza",
+  "\u{1F32D}": "\u70ED\u72D7 hotdog",
+  "\u{1F96A}": "\u4E09\u660E\u6CBB sandwich",
+  "\u{1F32E}": "\u58A8\u897F\u54E5 \u5377 taco",
+  "\u{1F32F}": "\u5377\u997C burrito",
+  "\u{1FAD4}": "\u7389\u7C73\u7C89\u84B8\u8089 tamale",
+  "\u{1F959}": "\u76AE\u5854\u997C stuffed flatbread",
+  "\u{1F9C6}": "\u70B8\u8C46\u4E38\u5B50 falafel",
+  "\u{1F95A}": "\u9E21\u86CB \u86CB egg",
+  "\u{1F373}": "\u714E\u86CB \u505A\u996D \u716E cooking egg fry",
+  "\u{1F958}": " shallow pan of food",
+  "\u{1F372}": "\u4E00\u9505\u98DF\u7269 pot of food",
+  "\u{1FAD5}": "\u5976\u916A\u706B\u9505 fondue",
+  "\u{1F963}": "\u7897\u52FA bowl with spoon",
+  "\u{1F957}": "\u6C99\u62C9 \u852C\u83DC salad",
+  "\u{1F37F}": "\u7206\u7C73\u82B1 popcorn",
+  "\u{1F9C8}": "\u9EC4\u6CB9 butter",
+  "\u{1F9C2}": "\u76D0 salt",
+  "\u{1F96B}": "\u7F50\u5934\u98DF\u54C1 canned food",
+  "\u{1F371}": "\u4FBF\u5F53 \u76D2\u996D \u996D\u76D2 bento lunch box",
+  "\u{1F358}": "\u7C73\u997C rice cracker",
+  "\u{1F359}": "\u996D\u56E2 \u7C73\u996D rice ball onigiri",
+  "\u{1F35A}": "\u7C73\u996D \u996D rice bowl",
+  "\u{1F35B}": "\u5496\u55B1\u996D curry rice",
+  "\u{1F35C}": "\u9762\u6761 \u62C9\u9762 \u6C64\u9762 noodle ramen soup",
+  "\u{1F35D}": "\u610F\u9762 \u9762\u6761 pasta spaghetti noodle",
+  "\u{1F362}": "\u5173\u4E1C\u716E \u4E32 oden skewer",
+  "\u{1F363}": "\u5BFF\u53F8 \u65E5\u6599 sushi japanese",
+  "\u{1F364}": "\u5929\u5987\u7F57 fried shrimp",
+  "\u{1F365}": "\u9C7C\u677F fish cake with swirl",
+  "\u{1F96E}": "\u6708\u997C moon cake",
+  "\u{1F361}": "\u56E2\u5B50 \u4E38\u5B50 dango",
+  "\u{1F95F}": "\u997A\u5B50 \u9984\u9968 dumpling",
+  "\u{1F960}": "\u5E78\u8FD0\u997C\u5E72 fortune cookie",
+  "\u{1F961}": "\u5916\u5356\u76D2 takeout box",
+  "\u{1F980}": "\u87F9 crab",
+  "\u{1F99E}": "\u9F99\u867E lobster",
+  "\u{1F990}": "\u867E \u70B8\u867E shrimp prawn",
+  "\u{1F991}": "\u4E4C\u8D3C squid",
+  "\u{1F9AA}": "\u7261\u86CE oyster",
+  "\u{1F366}": "\u751C\u7B52 \u51B0\u6DC7\u6DCB ice cream cone",
+  "\u{1F367}": "\u5228\u51B0 shaved ice",
+  "\u{1F368}": "\u51B0\u6DC7\u6DCB ice cream",
+  "\u{1F369}": "\u751C\u751C\u5708 donut doughnut",
+  "\u{1F36A}": "\u997C\u5E72 \u66F2\u5947 cookie",
+  "\u{1F382}": "\u751F\u65E5\u86CB\u7CD5 \u751F\u65E5 birthday cake",
+  "\u{1F370}": "\u86CB\u7CD5 \u751C\u70B9 cake dessert",
+  "\u{1F9C1}": "\u676F\u5B50\u86CB\u7CD5 cupcake",
+  "\u{1F967}": "\u6D3E \u9985\u997C pie",
+  "\u{1F36B}": "\u5DE7\u514B\u529B chocolate",
+  "\u{1F36C}": "\u7CD6\u679C candy sweet",
+  "\u{1F36D}": "\u68D2\u68D2\u7CD6 lollipop candy",
+  "\u{1F36E}": "\u5E03\u4E01 custard pudding",
+  "\u{1F36F}": "\u8702\u871C honey pot",
+  "\u{1F37C}": "\u5976\u74F6 \u5A74\u513F baby bottle",
+  "\u{1F95B}": "\u725B\u5976 \u5976 milk",
+  "\u2615": "\u5496\u5561 \u70ED\u996E coffee cafe hot drink",
+  "\u{1FAD6}": "\u8336\u58F6 tea pot",
+  "\u{1F375}": "\u8336 \u62B9\u8336 \u7EFF\u8336 tea matcha green",
+  "\u{1F9C3}": "\u679C\u6C41\u76D2 beverage box",
+  "\u{1F964}": "\u5976\u8336 \u996E\u6599 drink cup straw",
+  "\u{1F9CB}": "\u73CD\u73E0\u5976\u8336 \u5976\u8336 \u6CE2\u9738 bubble tea boba milk tea",
+  "\u{1F376}": "\u6E05\u9152 sake",
+  "\u{1F37A}": "\u5564\u9152 \u5E72\u676F beer",
+  "\u{1F37B}": "\u5E72\u676F \u5564\u9152 \u78B0\u676F cheers beer clink",
+  "\u{1F942}": "\u9999\u69DF \u5E86\u795D \u5E72\u676F champagne cheers toast",
+  "\u{1F377}": "\u7EA2\u9152 \u8461\u8404\u9152 wine red",
+  "\u{1F943}": "\u5A01\u58EB\u5FCC\u9152\u676F tumbler glass",
+  "\u{1F378}": "\u9E21\u5C3E\u9152 cocktail martini",
+  "\u{1F379}": "\u996E\u6599 \u70ED\u5E26 tropical drink",
+  "\u{1F37E}": "\u9999\u69DF\u74F6 bottle with popping cork",
+  "\u{1F9CA}": "\u51B0 \u51B0\u5757 ice cube",
+  "\u{1F944}": "\u52FA\u5B50 spoon",
+  "\u{1F52A}": "\u5200 kitchen knife",
+  "\u{1F3FA}": "\u53CC\u8033\u74F6 amphora",
+  "\u{1F30D}": "\u5730\u7403 \u6B27\u6D32\u975E\u6D32 earth globe europe-africa",
+  "\u{1F30E}": "\u5730\u7403 \u7F8E\u6D32 earth globe americas",
+  "\u{1F30F}": "\u5730\u7403 \u4E9A\u6D32\u6FB3\u6D32 earth globe asia-australia",
+  "\u{1F310}": "\u5E26\u5B50\u5348\u7EBF\u7684\u5730\u7403 globe with meridians",
+  "\u{1F5FA}\uFE0F": "\u4E16\u754C\u5730\u56FE world map",
+  "\u{1F5FE}": "\u65E5\u672C\u5730\u56FE map of japan",
+  "\u{1F9ED}": "\u6307\u5357\u9488 compass",
+  "\u{1F3D4}\uFE0F": "\u96EA\u5C71 mountain snow capped",
+  "\u26F0\uFE0F": "\u5C71 mountain",
+  "\u{1F30B}": "\u706B\u5C71 volcano",
+  "\u{1F5FB}": "\u5BCC\u58EB\u5C71 mount fuji",
+  "\u{1F3D5}\uFE0F": "\u9732\u8425 camping",
+  "\u{1F3D6}\uFE0F": "\u6C99\u6EE9\u4F1E \u6D77\u6EE9 beach with umbrella",
+  "\u{1F3DC}\uFE0F": "\u6C99\u6F20 desert",
+  "\u{1F3DD}\uFE0F": "\u8352\u5C9B desert island",
+  "\u{1F3DE}\uFE0F": "\u56FD\u5BB6\u516C\u56ED national park",
+  "\u{1F3DF}\uFE0F": "\u4F53\u80B2\u9986 stadium",
+  "\u{1F3DB}\uFE0F": "\u53E4\u5178\u5EFA\u7B51 classical building",
+  "\u{1F3D7}\uFE0F": "\u5EFA\u7B51\u5DE5\u5730 building construction",
+  "\u{1F9F1}": "\u7816 brick",
+  "\u{1FAA8}": "\u5CA9\u77F3 rock",
+  "\u{1FAB5}": "\u6728\u5934 wood",
+  "\u{1F6D6}": "\u5C0F\u5C4B hut",
+  "\u{1F3D8}\uFE0F": "\u623F\u5C4B\u5EFA\u7B51\u7FA4 houses",
+  "\u{1F3DA}\uFE0F": "\u5E9F\u5F03\u7684\u623F\u5C4B derelict house",
+  "\u{1F3E0}": "\u5BB6 \u623F\u5B50 \u623F\u5C4B home house",
+  "\u{1F3E1}": "\u522B\u5885 \u82B1\u56ED house garden",
+  "\u{1F3E2}": "\u529E\u516C\u697C \u516C\u53F8 \u4E0A\u73ED office building work",
+  "\u{1F3E3}": "\u65E5\u672C\u90AE\u5C40 japanese post office",
+  "\u{1F3E4}": "\u90AE\u5C40 post office",
+  "\u{1F3E5}": "\u533B\u9662 \u770B\u75C5 hospital",
+  "\u{1F3E6}": "\u94F6\u884C bank",
+  "\u{1F3E8}": "\u9152\u5E97 \u5BBE\u9986 \u4F4F hotel",
+  "\u{1F3E9}": "\u7231\u60C5\u65C5\u9986 love hotel",
+  "\u{1F492}": "\u5A5A\u793C\u6559\u5802 wedding",
+  "\u{1F3EC}": "\u767E\u8D27\u5546\u5E97 department store",
+  "\u{1F3ED}": "\u5DE5\u5382 factory",
+  "\u{1F3EF}": "\u65E5\u672C\u57CE\u5821 japanese castle",
+  "\u{1F3F0}": "\u6B27\u6D32\u57CE\u5821 european castle",
+  "\u{1F488}": "\u7406\u53D1\u5E97 barber pole",
+  "\u{1F682}": "\u84B8\u6C7D\u706B\u8F66 locomotive",
+  "\u{1F683}": "\u6709\u8F68\u7535\u8F66 railway car",
+  "\u{1F684}": "\u9AD8\u94C1 \u5B50\u5F39\u5934\u5217\u8F66 high-speed train",
+  "\u{1F685}": "\u5B50\u5F39\u5934\u5217\u8F66 bullet train",
+  "\u{1F686}": "\u706B\u8F66 train",
+  "\u{1F687}": "\u5730\u94C1 subway",
+  "\u{1F688}": "\u8F7B\u8F68 light rail",
+  "\u{1F689}": "\u8F66\u7AD9 station",
+  "\u{1F68A}": "\u6709\u8F68\u7535\u8F66 tram",
+  "\u{1F69D}": "\u5355\u8F68 monorail",
+  "\u{1F69E}": "\u5C71\u533A\u94C1\u8DEF mountain railway",
+  "\u{1F68B}": "\u6709\u8F68\u7535\u8F66 tram car",
+  "\u{1F68D}": "\u8FCE\u9762\u800C\u6765\u7684\u516C\u4EA4\u8F66 oncoming bus",
+  "\u{1F694}": "\u8FCE\u9762\u800C\u6765\u7684\u8B66\u8F66 oncoming police car",
+  "\u{1F696}": "\u8FCE\u9762\u800C\u6765\u7684\u51FA\u79DF\u8F66 oncoming taxi",
+  "\u{1F698}": "\u8FCE\u9762\u800C\u6765\u7684\u6C7D\u8F66 oncoming automobile",
+  "\u{1F6CE}\uFE0F": "\u670D\u52A1\u94C3 bellhop bell",
+  "\u{1F9F3}": "\u884C\u674E luggage",
+  "\u{1F311}": "\u65B0\u6708 new moon",
+  "\u{1F312}": "\u5A25\u7709\u6708 waxing crescent moon",
+  "\u{1F313}": "\u4E0A\u5F26\u6708 first quarter moon",
+  "\u{1F314}": "\u76C8\u51F8\u6708 waxing gibbous moon",
+  "\u{1F315}": "\u6EE1\u6708 full moon",
+  "\u{1F316}": "\u4E8F\u51F8\u6708 waning gibbous moon",
+  "\u{1F317}": "\u4E0B\u5F26\u6708 last quarter moon",
+  "\u{1F318}": "\u6B8B\u6708 waning crescent moon",
+  "\u{1F319}": "\u5F2F\u6708 crescent moon",
+  "\u{1F31A}": "\u65B0\u6708\u8138 new moon face",
+  "\u{1F31B}": "\u4E0A\u5F26\u6708\u8138 first quarter moon face",
+  "\u{1F31C}": "\u4E0B\u5F26\u6708\u8138 last quarter moon face",
+  "\u2600\uFE0F": "\u592A\u9633 \u6674\u5929 sun",
+  "\u{1F31D}": "\u6EE1\u6708\u8138 full moon face",
+  "\u{1F31E}": "\u592A\u9633\u8138 sun with face",
+  "\u{1FA90}": "\u884C\u661F ringed planet",
+  "\u2601\uFE0F": "\u4E91 cloud",
+  "\u26C5": "\u591A\u4E91 partly sunny",
+  "\u26C8\uFE0F": "\u96F7\u96E8 cloud with lightning and rain",
+  "\u{1F324}\uFE0F": "\u6674\u95F4\u591A\u4E91 sun behind small cloud",
+  "\u{1F325}\uFE0F": "\u591A\u4E91 sun behind large cloud",
+  "\u{1F326}\uFE0F": "\u6674\u8F6C\u96E8 sun behind rain cloud",
+  "\u{1F327}\uFE0F": "\u96E8 cloud with rain",
+  "\u{1F328}\uFE0F": "\u4E0B\u96EA cloud with snow",
+  "\u{1F329}\uFE0F": "\u6253\u96F7 cloud with lightning",
+  "\u{1F32A}\uFE0F": "\u9F99\u5377\u98CE tornado",
+  "\u{1F32B}\uFE0F": "\u6709\u96FE fog",
+  "\u{1F32C}\uFE0F": "\u522E\u98CE wind face",
+  "\u{1F300}": "\u53F0\u98CE cyclone",
+  "\u{1F308}": "\u5F69\u8679 rainbow",
+  "\u{1F302}": "\u6536\u8D77\u7684\u4F1E closed umbrella",
+  "\u2602\uFE0F": "\u96E8\u4F1E umbrella",
+  "\u2614": "\u96E8\u4F1E\u5E26\u96E8\u6EF4 umbrella with rain drops",
+  "\u26A1": "\u95EA\u7535 high voltage",
+  "\u2744\uFE0F": "\u96EA\u82B1 snowflake",
+  "\u2603\uFE0F": "\u96EA\u4EBA snowman",
+  "\u26C4": "\u96EA\u4EBA \u6CA1\u6709\u96EA snowman without snow",
+  "\u2604\uFE0F": "\u5F57\u661F comet",
+  "\u{1F4A7}": "\u6C34\u6EF4 droplet",
+  "\u{1F30A}": "\u6D77\u6D6A water wave",
+  "\u{1F384}": "\u5723\u8BDE\u6811 christmas tree",
+  "\u{1F38B}": "\u4E03\u5915\u6811 tanabata tree",
+  "\u{1F38D}": "\u95E8\u677E pine decoration",
+  "\u{1F34F}": "\u9752\u82F9\u679C green apple",
+  "\u{1F344}": "\u8611\u83C7 mushroom",
+  "\u{1F95C}": "\u82B1\u751F peanuts",
+  "\u{1F330}": "\u6817\u5B50 chestnut",
+  "\u{1FAD3}": "\u6241\u9762\u5305 flatbread",
+  "\u{1F9C9}": "\u9A6C\u9EDB\u8336 mate drink",
+  "\u{1F962}": "\u7B77\u5B50 chopsticks",
+  "\u{1F37D}\uFE0F": "\u9910\u5177\u53C9\u5200\u76D8 fork and knife with plate",
+  "\u{1F374}": "\u5200\u53C9 fork and knife",
+  "\u{1F5FC}": "\u4E1C\u4EAC\u5854 tokyo tower",
+  "\u{1F5FD}": "\u81EA\u7531\u5973\u795E\u50CF statue of liberty",
+  "\u26EA": "\u6559\u5802 church",
+  "\u{1F54C}": "\u6E05\u771F\u5BFA mosque",
+  "\u{1F6D5}": "\u5370\u5EA6\u795E\u5E99 hindu temple",
+  "\u{1F54D}": "\u72B9\u592A\u6559\u5802 synagogue",
+  "\u26E9\uFE0F": "\u795E\u793E shinto shrine",
+  "\u{1F54B}": "\u514B\u5C14\u767D kaaba",
+  "\u26F2": "\u55B7\u6CC9 fountain",
+  "\u26FA": "\u5E10\u7BF7 tent",
+  "\u2668\uFE0F": "\u6E29\u6CC9 hot springs",
+  "\u{1F3A0}": "\u65CB\u8F6C\u6728\u9A6C carousel horse",
+  "\u{1F3A1}": "\u6469\u5929\u8F6E ferris wheel",
+  "\u{1F3A2}": "\u8FC7\u5C71\u8F66 roller coaster",
+  "\u{1F383}": "\u5357\u74DC\u706F jack-o-lantern",
+  "\u{1F9E8}": "\u97AD\u70AE firecracker",
+  "\u{1F388}": "\u6C14\u7403 balloon",
+  "\u{1F389}": "\u62C9\u70AE \u5E86\u795D party popper",
+  "\u{1F38A}": "\u5F69\u7403 confetti ball",
+  "\u{1F38E}": "\u65E5\u672C dolls",
+  "\u{1F38F}": "\u9CA4\u9C7C\u65D7 carp streamer",
+  "\u{1F390}": "\u98CE\u94C3 wind chime",
+  "\u{1F9E7}": "\u7EA2\u5305 red envelope",
+  "\u{1F380}": "\u8774\u8776\u7ED3 ribbon",
+  "\u{1F381}": "\u793C\u7269 wrapped gift",
+  "\u{1F94E}": "\u5792\u7403 softball",
+  "\u{1F94F}": "\u98DE\u76D8 flying disc",
+  "\u{1F3B3}": "\u4FDD\u9F84\u7403 bowling",
+  "\u{1F3CF}": "\u677F\u7403 cricket game",
+  "\u{1F3D1}": "\u66F2\u68CD\u7403 field hockey",
+  "\u{1F3D2}": "\u51B0\u7403 ice hockey",
+  "\u{1F94D}": "\u957F\u66F2\u68CD\u7403 lacrosse",
+  "\u{1F945}": "\u7403\u95E8 goal net",
+  "\u{1FA80}": "\u60A0\u60A0\u7403 yo-yo",
+  "\u{1FA81}": "\u98CE\u7B5D kite",
+  "\u{1F52E}": "\u6C34\u6676\u7403 crystal ball",
+  "\u{1FA84}": "\u9B54\u68D2 magic wand",
+  "\u{1F9FF}": "\u7EB3\u624E\u5C14\u62A4\u8EAB\u7B26 nazar amulet",
+  "\u{1FAAB}": "\u4F4E\u7535\u91CF\u7535\u6C60 low battery",
+  "\u{1F3E7}": "ATM atm sign",
+  "\u{1F6AE}": "\u5012\u5783\u573E litter in bin sign",
+  "\u{1F6B0}": "\u996E\u7528\u6C34 potable water",
+  "\u267F": "\u8F6E\u6905\u6807\u8BC6 wheelchair symbol",
+  "\u{1F6B9}": "\u7537\u5395 men's room",
+  "\u{1F6BA}": "\u5973\u5395 women's room",
+  "\u{1F6BB}": "\u6D17\u624B\u95F4 restroom",
+  "\u{1F6BC}": "\u5A74\u513F\u7B26\u53F7 baby symbol",
+  "\u{1F6BE}": "\u5395\u6240 water closet",
+  "\u{1F6C2}": "\u62A4\u7167\u68C0\u67E5 passport control",
+  "\u{1F6C3}": "\u6D77\u5173 customs",
+  "\u{1F6C4}": "\u884C\u674E\u9886\u53D6 baggage claim",
+  "\u{1F6C5}": "\u884C\u674E\u5BC4\u5B58 left luggage",
+  "\u26A0\uFE0F": "\u8B66\u544A warning",
+  "\u{1F6B8}": "\u513F\u7AE5\u8FC7\u8857 children crossing",
+  "\u26D4": "\u7981\u6B62\u8FDB\u5165 no entry",
+  "\u{1F6AB}": "\u7981\u6B62 prohibited",
+  "\u{1F6B3}": "\u7981\u6B62\u81EA\u884C\u8F66 no bicycles",
+  "\u{1F6AD}": "\u7981\u6B62\u5438\u70DF no smoking",
+  "\u{1F6AF}": "\u7981\u6B62\u4E71\u6254\u5783\u573E no littering",
+  "\u{1F6B1}": "\u975E\u996E\u7528\u6C34 non-potable water",
+  "\u{1F6B7}": "\u7981\u6B62\u884C\u4EBA no pedestrians",
+  "\u{1F4F5}": "\u7981\u6B62\u4F7F\u7528\u624B\u673A no mobile phones",
+  "\u{1F51E}": "\u672A\u6210\u5E74\u4EBA\u4E0D\u5B9C no one under eighteen",
+  "\u2622\uFE0F": "\u8F90\u5C04 radioactive",
+  "\u2623\uFE0F": "\u751F\u7269\u5371\u5BB3 biohazard",
+  "\u2B06\uFE0F": "\u5411\u4E0A\u7BAD\u5934 up arrow",
+  "\u2197\uFE0F": "\u53F3\u4E0A\u7BAD\u5934 up-right arrow",
+  "\u27A1\uFE0F": "\u5411\u53F3\u7BAD\u5934 right arrow",
+  "\u2198\uFE0F": "\u53F3\u4E0B\u7BAD\u5934 down-right arrow",
+  "\u2B07\uFE0F": "\u5411\u4E0B\u7BAD\u5934 down arrow",
+  "\u2199\uFE0F": "\u5DE6\u4E0B\u7BAD\u5934 down-left arrow",
+  "\u2B05\uFE0F": "\u5411\u5DE6\u7BAD\u5934 left arrow",
+  "\u2196\uFE0F": "\u5DE6\u4E0A\u7BAD\u5934 up-left arrow",
+  "\u2195\uFE0F": "\u4E0A\u4E0B\u7BAD\u5934 up-down arrow",
+  "\u2194\uFE0F": "\u5DE6\u53F3\u7BAD\u5934 left-right arrow",
+  "\u21A9\uFE0F": "\u53F3\u5F2F\u7BAD\u5934 right arrow curving left",
+  "\u21AA\uFE0F": "\u5DE6\u5F2F\u7BAD\u5934 left arrow curving right",
+  "\u2934\uFE0F": "\u53F3\u4E0A\u5F2F\u7BAD\u5934 right arrow curving up",
+  "\u2935\uFE0F": "\u53F3\u4E0B\u5F2F\u7BAD\u5934 right arrow curving down",
+  "\u{1F503}": "\u987A\u65F6\u9488\u5782\u76F4\u7BAD\u5934 clockwise vertical arrows",
+  "\u{1F504}": "\u9006\u65F6\u9488\u7BAD\u5934\u6309\u94AE counterclockwise arrows button",
+  "\u{1F519}": "\u8FD4\u56DE back arrow",
+  "\u{1F51A}": "\u7ED3\u675F end arrow",
+  "\u{1F51B}": "\u5F00\u901A! on! arrow",
+  "\u{1F51C}": "\u9A6C\u4E0A soon arrow",
+  "\u{1F51D}": "\u7F6E\u9876 top arrow",
+  "\u{1F6D0}": "\u793C\u62DC\u573A\u6240 place of worship",
+  "\u269B\uFE0F": "\u539F\u5B50\u7B26\u53F7 atom symbol",
+  "\u{1F549}\uFE0F": "\u5965\u59C6 om",
+  "\u2721\uFE0F": "\u5927\u536B\u4E4B\u661F star of david",
+  "\u2638\uFE0F": "\u6CD5\u8F6E wheel of dharma",
+  "\u262F\uFE0F": "\u9634\u9633 yin yang",
+  "\u271D\uFE0F": "\u62C9\u4E01\u5341\u5B57\u67B6 latin cross",
+  "\u2626\uFE0F": "\u4E1C\u6B63\u6559\u5341\u5B57\u67B6 orthodox cross",
+  "\u262A\uFE0F": "\u661F\u6708 star and crescent",
+  "\u262E\uFE0F": "\u548C\u5E73 symbol peace",
+  "\u{1F54E}": "\u70DB\u53F0 menorah",
+  "\u{1F52F}": "\u516D\u89D2\u661F dotted six-pointed star",
+  "\u2648": "\u767D\u7F8A\u5EA7 aries",
+  "\u2649": "\u91D1\u725B\u5EA7 taurus",
+  "\u264A": "\u53CC\u5B50\u5EA7 gemini",
+  "\u264B": "\u5DE8\u87F9\u5EA7 cancer",
+  "\u264C": "\u72EE\u5B50\u5EA7 leo",
+  "\u264D": "\u5BA4\u5973\u5EA7 virgo",
+  "\u264E": "\u5929\u79E4\u5EA7 libra",
+  "\u264F": "\u5929\u874E\u5EA7 scorpio",
+  "\u2650": "\u5C04\u624B\u5EA7 sagittarius",
+  "\u2651": "\u6469\u7FAF\u5EA7 capricorn",
+  "\u2652": "\u6C34\u74F6\u5EA7 aquarius",
+  "\u2653": "\u53CC\u9C7C\u5EA7 pisces",
+  "\u26CE": "\u86C7\u592B\u5EA7 ophiuchus",
+  "\u{1F500}": "\u968F\u673A\u64AD\u653E\u66F2\u76EE shuffle tracks button",
+  "\u{1F501}": "\u91CD\u590D\u64AD\u653E repeat button",
+  "\u{1F502}": "\u91CD\u590D\u5355\u66F2 repeat single button",
+  "\u25B6\uFE0F": "\u64AD\u653E play button",
+  "\u23E9": "\u5FEB\u8FDB fast-forward button",
+  "\u23ED\uFE0F": "\u4E0B\u4E00\u66F2 next track button",
+  "\u23EF\uFE0F": "\u64AD\u653E\u6216\u6682\u505C play or pause button",
+  "\u25C0\uFE0F": "\u540E\u9000 reverse button",
+  "\u23EA": "\u5FEB\u9000 fast reverse button",
+  "\u23EE\uFE0F": "\u4E0A\u4E00\u66F2 last track button",
+  "\u{1F53C}": "\u5411\u4E0A\u4E09\u89D2\u5F62 upwards button",
+  "\u23EB": "\u5FEB\u901F\u4E0A\u5347 fast up button",
+  "\u{1F53D}": "\u5411\u4E0B\u4E09\u89D2\u5F62 downwards button",
+  "\u23EC": "\u5FEB\u901F\u4E0B\u964D fast down button",
+  "\u23F8\uFE0F": "\u6682\u505C pause button",
+  "\u23F9\uFE0F": "\u505C\u6B62 stop button",
+  "\u23FA\uFE0F": "\u5F55\u5236 record button",
+  "\u23CF\uFE0F": "\u5F39\u51FA eject button",
+  "\u{1F3A6}": "\u7535\u5F71\u9662 cinema",
+  "\u{1F505}": "\u4F4E\u4EAE\u5EA6 dim button",
+  "\u{1F506}": "\u9AD8\u4EAE\u5EA6 bright button",
+  "\u{1F4F6}": "\u4FE1\u53F7 antenna bars",
+  "\u{1F4F3}": "\u632F\u52A8\u6A21\u5F0F vibration mode",
+  "\u{1F4F4}": "\u5173\u95ED\u624B\u673A mobile phone off",
+  "\u2640\uFE0F": "\u5973\u6027\u7B26\u53F7 female sign",
+  "\u2642\uFE0F": "\u7537\u6027\u7B26\u53F7 male sign",
+  "\u26A7\uFE0F": "\u8DE8\u6027\u522B\u7B26\u53F7 transgender symbol",
+  "\u2716\uFE0F": "\u4E58\u53F7 multiply",
+  "\u2795": "\u52A0\u53F7 plus",
+  "\u2796": "\u51CF\u53F7 minus",
+  "\u2797": "\u9664\u53F7 divide",
+  "\u267E\uFE0F": "\u65E0\u9650 infinity",
+  "\u203C\uFE0F": "\u53CC\u611F\u53F9\u53F7 double exclamation mark",
+  "\u2049\uFE0F": "\u611F\u53F9\u95EE\u53F7 exclamation question mark",
+  "\u2753": "\u7EA2\u8272\u95EE\u53F7 red question mark",
+  "\u2754": "\u767D\u8272\u95EE\u53F7 white question mark",
+  "\u2755": "\u767D\u8272\u611F\u53F9\u53F7 white exclamation mark",
+  "\u2757": "\u7EA2\u8272\u611F\u53F9\u53F7 red exclamation mark",
+  "\u3030\uFE0F": "\u6CE2\u6D6A\u7EBF wavy dash",
+  "\u{1F4B1}": "\u8D27\u5E01\u5151\u6362 currency exchange",
+  "\u{1F4B2}": " heavy dollar sign",
+  "\u2695\uFE0F": "\u533B\u7597\u7B26\u53F7 medical symbol",
+  "\u267B\uFE0F": "\u56DE\u6536 recycling symbol",
+  "\u269C\uFE0F": "\u767E\u5408\u82B1\u9970 fleur-de-lis",
+  "\u{1F530}": "\u65E5\u672C\u521D\u5B66\u8005\u7B26\u53F7 japanese symbol for beginner",
+  "\u2B55": "\u7C97\u7A7A\u5FC3\u5706\u5708 heavy large circle",
+  "\u2705": "\u767D\u8272\u52FE\u52FE check mark button",
+  "\u2611\uFE0F": "\u5E26\u52FE\u7684\u65B9\u6846 check box with check",
+  "\u2714\uFE0F": "\u7C97\u52FE check mark",
+  "\u274C": "\u53C9\u53F7 cross mark",
+  "\u274E": "\u53C9\u53F7\u6309\u94AE cross mark button",
+  "\u27B0": "\u5377\u66F2\u73AF curly loop",
+  "\u27BF": "\u53CC\u5377\u66F2\u73AF double curly loop",
+  "\u303D\uFE0F": "\u90E8\u5206\u4EA4\u66FF\u6807\u8BB0 part alternation mark",
+  "\u2733\uFE0F": "\u516B\u89D2\u661F eight-spoked asterisk",
+  "\u2734\uFE0F": "\u516B\u89D2\u661F\u53F7 eight-pointed star",
+  "\u2747\uFE0F": "\u95EA\u4EAE sparkle",
+  "\xA9\uFE0F": "\u7248\u6743 copyright",
+  "\xAE\uFE0F": "\u6CE8\u518C\u5546\u6807 registered",
+  "\u2122\uFE0F": "\u5546\u6807 trade mark"
 };
 
-function formatDate(offset) {
-  if (offset === void 0) offset = 0;
-  var d = new Date();
-  d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
-}
+// src/composers/day-data-composer.ts
+var DayDataComposer = class {
+  constructor(plugin) {
+    this.plugin = plugin;
+  }
+  async compose(dateStr, scores, customItems, diaryContent) {
+    const items = this.plugin.currentUser.items;
+    const childName = this.plugin.currentUser.name;
+    const d = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() - 1);
+    const yesterdayStr = d.toISOString().slice(0, 10);
+    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
+    let total = 0;
+    let earnedCount = 0;
+    let missedCount = 0;
+    let positiveCount = 0;
+    let negativeCount = 0;
+    for (const item of items) {
+      const val = scores[item.id] || 0;
+      total += val;
+      const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+      if (isDeduct) {
+        if (val !== 0) {
+          earnedCount++;
+          negativeCount++;
+        } else {
+          missedCount++;
+        }
+      } else {
+        if (val > 0) {
+          earnedCount++;
+          positiveCount++;
+        } else {
+          missedCount++;
+        }
+      }
+    }
+    let customTotal = 0;
+    for (const ci of customItems) {
+      customTotal += ci.points;
+    }
+    total += customTotal;
+    const allScores = await this.plugin.getAllScores();
+    let cumulativeTotal = 0;
+    let cumulativeDays = 0;
+    for (const s of allScores) {
+      if (s.date !== dateStr) {
+        cumulativeTotal += s.total;
+        cumulativeDays++;
+      }
+    }
+    const grandTotal = cumulativeTotal + total;
+    const grandDays = cumulativeDays + 1;
+    const grandAvg = grandDays > 0 ? Math.round(grandTotal / grandDays * 10) / 10 : 0;
+    let streak = 0;
+    const sortedScores = [...allScores].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    for (const s of sortedScores) {
+      if (s.total > 0) streak++;
+      else break;
+    }
+    if (total > 0) streak++;
+    const diaryText = diaryContent || "";
+    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const diaryModules = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const weatherLabel = ((diaryModules.find((m) => m.id === "weather") || {}).label || "\u5929\u6C14").trim();
+    const moodLabel = ((diaryModules.find((m) => m.id === "mood") || {}).label || "\u5FC3\u60C5").trim();
+    const weatherMatch = diaryText.match(new RegExp(escapeRegex(weatherLabel) + "：\\s*(.+)"));
+    const moodMatch = diaryText.match(new RegExp(escapeRegex(moodLabel) + "：\\s*(.+)"));
+    const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
+    const lunchMatch = diaryText.match(/午餐：\s*(.+)/);
+    const dinnerMatch = diaryText.match(/晚餐：\s*(.+)/);
+    const homeCookMatch = diaryText.match(/在家做饭：\s*(.+)/);
+    const exerciseMatch = diaryText.match(/运动项目：\s*(.+)/);
+    const sleepMatch = diaryText.match(/睡眠情况：\s*(.+)/);
+    return {
+      dateStr,
+      childName,
+      scores,
+      customItems,
+      diaryContent,
+      total,
+      earnedCount,
+      missedCount,
+      positiveCount,
+      negativeCount,
+      customTotal,
+      totalItems: items.length,
+      completionRate: items.length > 0 ? Math.round(earnedCount / items.length * 100) : 0,
+      grandTotal,
+      grandDays,
+      grandAvg,
+      streak,
+      hasYesterday: !!yesterdayData,
+      yesterdayData,
+      tags: {
+        weather: weatherMatch ? weatherMatch[1].trim() : void 0,
+        mood: moodMatch ? moodMatch[1].trim() : void 0,
+        homeCook: homeCookMatch ? homeCookMatch[1].trim() : void 0,
+        exercise: exerciseMatch ? exerciseMatch[1].trim() : void 0,
+        sleep: sleepMatch ? sleepMatch[1].trim() : void 0,
+        hasDiary: diaryText.trim().length > 0
+      },
+      diet: {
+        breakfast: breakfastMatch ? breakfastMatch[1].trim() : void 0,
+        lunch: lunchMatch ? lunchMatch[1].trim() : void 0,
+        dinner: dinnerMatch ? dinnerMatch[1].trim() : void 0
+      },
+      items,
+      categories: this.plugin.currentUser.categories || []
+    };
+  }
+};
+
+// src/utils/yaml.ts
 function toYamlInline(value) {
-  var safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   return '"' + safe + '"';
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Shared Emoji Picker
-   ═══════════════════════════════════════════════════════════════════════════ */
-function getOverlayMount(containerEl) {
-  // Mobile: mount to body so position:fixed works against the viewport.
-  // Desktop: mount inside containerEl to avoid Obsidian's modal focus trap.
-  return document.body.classList.contains("is-mobile") ? document.body : (containerEl || document.body);
-}
-/* ── Mobile keyboard handler: keeps popup above virtual keyboard ── */
-function setupMobileKeyboard(overlay, popup) {
-  if (!window.visualViewport) return;
-  var active = true;
-  var handler = function() {
-    if (!active || !document.contains(overlay)) { active = false; window.visualViewport.removeEventListener("resize", handler); return; }
-    var vv = window.visualViewport;
-    var bottom = window.innerHeight - (vv.offsetTop + vv.height);
-    overlay.style.bottom = Math.max(bottom, 0) + "px";
+// src/renderers/report-builder.ts
+var MarkdownReportBuilder = class {
+  build(report) {
+    const {
+      dateStr,
+      childName,
+      scores,
+      customItems,
+      diaryContent,
+      total,
+      earnedCount,
+      missedCount,
+      positiveCount,
+      negativeCount,
+      customTotal,
+      totalItems,
+      completionRate,
+      grandTotal,
+      grandDays,
+      grandAvg,
+      streak,
+      hasYesterday,
+      yesterdayData,
+      tags,
+      diet,
+      items,
+      categories
+    } = report;
+    const scoresYaml = items.map((item) => "  " + item.id + ": " + (scores[item.id] || 0)).join("\n");
+    let customYaml = "";
+    if (customItems.length > 0) {
+      customYaml = "\ncustomItems:\n" + customItems.map((ci) => "  - " + toYamlInline(ci.emoji + "|" + ci.name + "|" + ci.points)).join("\n");
+    }
+    let scoreDetailYaml = "\nscoreDetail:\n" + items.map((item) => {
+      const v = scores[item.id] || 0;
+      return "  " + toYamlInline(item.name) + ": " + v;
+    }).join("\n");
+    if (customItems.length > 0) {
+      for (const ci of customItems) {
+        scoreDetailYaml += "\n  " + toYamlInline("\u4E34\u65F6-" + ci.name) + ": " + ci.points;
+      }
+    }
+    const summaryYaml = "\nsummary:\n  earned: " + earnedCount + "\n  missed: " + missedCount + "\n  positiveCount: " + positiveCount + "\n  negativeCount: " + negativeCount + "\n  customCount: " + customItems.length + "\n  customTotal: " + customTotal + "\n  cumulativeTotal: " + grandTotal + "\n  cumulativeDays: " + grandDays + "\n  cumulativeAvg: " + grandAvg + "\n  streak: " + streak;
+    let tagsYaml = "\ntags:";
+    if (tags.weather) tagsYaml += "\n  weather: " + toYamlInline(tags.weather);
+    if (tags.mood) tagsYaml += "\n  mood: " + toYamlInline(tags.mood);
+    if (tags.homeCook) tagsYaml += "\n  homeCook: " + toYamlInline(tags.homeCook);
+    if (tags.exercise) tagsYaml += "\n  exercise: " + toYamlInline(tags.exercise);
+    if (tags.sleep) tagsYaml += "\n  sleep: " + toYamlInline(tags.sleep);
+    tagsYaml += "\n  hasDiary: " + tags.hasDiary;
+    let dietYaml = "";
+    if (diet.breakfast || diet.lunch || diet.dinner) {
+      dietYaml = "\ndiet:";
+      if (diet.breakfast) dietYaml += "\n  breakfast: " + toYamlInline(diet.breakfast);
+      if (diet.lunch) dietYaml += "\n  lunch: " + toYamlInline(diet.lunch);
+      if (diet.dinner) dietYaml += "\n  dinner: " + toYamlInline(diet.dinner);
+    }
+    const totalSign = total >= 0 ? "+" : "";
+    const grandSign = grandTotal >= 0 ? "+" : "";
+    const renderProgressBar = (pct) => {
+      const filled = Math.round(pct / 5);
+      const empty = 20 - filled;
+      return "`" + "\u2588".repeat(filled) + "\u2591".repeat(empty) + " " + pct + "%`";
+    };
+    const renderScoreCell = (actual, isDeduct) => {
+      const sign = actual >= 0 ? "+" : "";
+      const color = isDeduct ? "#dc2626" : "#16a34a";
+      return '<span style="color:' + color + ';font-weight:600">' + sign + actual + "</span>";
+    };
+    let summaryCallout = "> [!summary] \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n> - \u{1F3C6} \u4ECA\u65E5\u603B\u5206\uFF1A**" + totalSign + total + " \u5206**\n";
+    if (hasYesterday && yesterdayData) {
+      const yTotalSign = yesterdayData.total >= 0 ? "+" : "";
+      summaryCallout += "> - \u{1F4C5} \u6628\u65E5\u603B\u5206\uFF1A" + yTotalSign + yesterdayData.total + " \u5206\n";
+    }
+    summaryCallout += "> - \u2705 \u5B8C\u6210\u9879\u76EE\uFF1A**" + earnedCount + "/" + totalItems + " (" + completionRate + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + streak + " \u5929\n";
+    const dailyGoal = 10;
+    const goalPct = Math.min(100, Math.round(earnedCount / dailyGoal * 100));
+    const goalCallout = "> [!tip] \u{1F3AF} \u4ECA\u65E5\u76EE\u6807\n> \u5B8C\u6210\u9879\u76EE **" + earnedCount + "/" + dailyGoal + "** \xB7 " + renderProgressBar(goalPct) + "\n";
+    const renderCategoryTable = (list) => {
+      let rows = "";
+      for (const item of list) {
+        const actual = scores[item.id] || 0;
+        const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+        const status = isDeductItem ? actual !== 0 ? "\u2B55" : "\u{1F535}" : actual > 0 ? "\u2705" : "\u274C";
+        const dSign = item.points >= 0 ? "+" : "";
+        const cn = actual !== 0 && actual !== item.points ? " \u{1F4DD}" : "";
+        rows += "| " + item.emoji + " " + item.name + " | " + dSign + item.points + " | " + renderScoreCell(actual, isDeductItem) + cn + " | " + status + " |\n";
+        if (hasYesterday && yesterdayData) {
+          const yVal = yesterdayData.scores[item.id] || 0;
+          const ySign = yVal >= 0 ? "+" : "";
+          const yIcon = yVal > 0 ? "\u2705" : yVal < 0 ? "\u274C" : "\u2014";
+          rows += "> [!quote]- \u6628\u65E5\uFF1A" + item.name + " " + ySign + yVal + " \u5206 " + yIcon + "\n";
+        }
+      }
+      return rows;
+    };
+    let tableContent = "";
+    for (const cat of categories) {
+      const catItems = items.filter((it) => it.category === cat);
+      if (catItems.length > 0) {
+        tableContent += "\n### " + cat + "\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryTable(catItems) + "\n";
+      }
+    }
+    const uncatItems = items.filter(
+      (it) => !it.category || categories.indexOf(it.category) === -1
+    );
+    if (uncatItems.length > 0) {
+      tableContent += "\n### \u5176\u4ED6\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryTable(uncatItems) + "\n";
+    }
+    let customCallout = "";
+    if (customItems.length > 0) {
+      const hasCustomNotes = customItems.some((ci) => ci.note && ci.note.trim());
+      customCallout = "\n> [!info] \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF08" + customItems.length + " \u9879\uFF0C" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206\uFF09\n";
+      if (hasCustomNotes) {
+        customCallout += "> | \u4E8B\u9879 | \u5F97\u5206 | \u5907\u6CE8 |\n> |:---|---:|:---|\n";
+        for (const ci of customItems) {
+          customCallout += "> | " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " | " + (ci.note || "") + " |\n";
+        }
+      } else {
+        customCallout += "> | \u4E8B\u9879 | \u5F97\u5206 |\n> |:---|---:|\n";
+        for (const ci of customItems) {
+          customCallout += "> | " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " |\n";
+        }
+      }
+      customCallout += "\n";
+    }
+    const fileContent = "---\ndate: " + dateStr + "\nchild: " + childName + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n" + summaryCallout + "\n" + goalCallout + "\n---\n" + tableContent + customCallout + "---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || "") + "\n";
+    return fileContent;
+  }
+};
+
+// src/modals/daily-scoring-modal.ts
+var import_obsidian4 = require("obsidian");
+
+// src/ui/base-mobile-modal.ts
+var import_obsidian = require("obsidian");
+
+// src/utils/mobile.ts
+function setupModalKeyboard(modal) {
+  const cEl = modal.containerEl;
+  const mEl = modal.modalEl;
+  const contentEl = modal.contentEl;
+  const ua = (navigator.userAgent || "").toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isAndroid = /android/.test(ua);
+  const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  let stableViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  mEl.style.display = "flex";
+  mEl.style.flexDirection = "column";
+  mEl.style.overflow = "hidden";
+  contentEl.style.flex = "1 1 auto";
+  contentEl.style.minHeight = "0";
+  contentEl.style.overflowY = "auto";
+  contentEl.style.position = "relative";
+  contentEl.style.width = "100%";
+  contentEl.style["overscrollBehavior"] = "contain";
+  contentEl.style["touchAction"] = "pan-y";
+  contentEl.style["webkitOverflowScrolling"] = "touch";
+  const ensureTargetVisible = (target, extraBottom = 96) => {
+    if (!target || !contentEl.contains(target)) return;
+    const contentRect = contentEl.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const currentTop = targetRect.top - contentRect.top + contentEl.scrollTop;
+    const currentBottom = currentTop + targetRect.height;
+    const safeTop = contentEl.scrollTop + 12;
+    const safeBottom = contentEl.scrollTop + contentEl.clientHeight - extraBottom;
+    if (currentBottom > safeBottom) {
+      contentEl.scrollTo({
+        top: Math.max(0, currentBottom - contentEl.clientHeight + extraBottom),
+        behavior: "smooth"
+      });
+      return;
+    }
+    if (currentTop < safeTop) {
+      contentEl.scrollTo({
+        top: Math.max(0, currentTop - 16),
+        behavior: "smooth"
+      });
+    }
   };
-  window.visualViewport.addEventListener("resize", handler);
-  popup.addEventListener("focusin", function(e) {
-    var tgt = e.target;
-    if (!tgt || !tgt.tagName || tgt.tagName === "BUTTON") return;
-    setTimeout(function() {
-      if (active && tgt.scrollIntoView) tgt.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }, 350);
+  const getKeyboardHeight = () => {
+    if (!window.visualViewport) return 0;
+    const vv = window.visualViewport;
+    const raw = Math.max(0, stableViewportHeight - vv.height - Math.max(0, vv.offsetTop || 0));
+    if (raw < 70) {
+      stableViewportHeight = Math.max(stableViewportHeight, vv.height);
+      return 0;
+    }
+    return raw;
+  };
+  const updateModalLift = (keyboardH) => {
+    if (!(isIOS && isEditModal)) {
+      mEl.style.setProperty("--keyboard-modal-offset", "0px");
+      return;
+    }
+    if (keyboardH > 80) {
+      const lift = Math.min(180, Math.max(72, Math.round(keyboardH * 0.32)));
+      mEl.style.setProperty("--keyboard-modal-offset", -lift + "px");
+    } else {
+      mEl.style.setProperty("--keyboard-modal-offset", "0px");
+    }
+  };
+  const applyLayout = () => {
+    const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const vvTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+    cEl.style.position = "fixed";
+    cEl.style.top = vvTop + "px";
+    cEl.style.left = "0";
+    cEl.style.right = "0";
+    cEl.style.bottom = "auto";
+    cEl.style.height = vvH + "px";
+    if ((isIOS || isAndroid) && window.visualViewport) {
+      const keyboardH = getKeyboardHeight();
+      updateModalLift(keyboardH);
+      if (keyboardH > 80) {
+        mEl.style.alignSelf = "flex-start";
+        mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
+        mEl.style.marginBottom = "auto";
+        mEl.style.maxHeight = Math.max(120, vvH - 24) + "px";
+        if (isIOS && isEditModal) {
+          mEl.style.height = Math.max(220, vvH - 12) + "px";
+        }
+        const extraBottom = isEditModal ? 176 : 72;
+        contentEl.style.paddingBottom = Math.round(keyboardH + extraBottom) + "px";
+        contentEl.style.scrollPaddingBottom = Math.round(keyboardH + extraBottom) + "px";
+      } else {
+        mEl.style.alignSelf = "";
+        mEl.style.marginTop = "";
+        mEl.style.marginBottom = "";
+        mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+        mEl.style.height = "";
+        contentEl.style.paddingBottom = "";
+        contentEl.style.scrollPaddingBottom = "";
+      }
+    } else {
+      mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+      mEl.style.height = "";
+      updateModalLift(0);
+    }
+    const focused = document.activeElement;
+    if (focused && contentEl.contains(focused)) {
+      setTimeout(() => {
+        ensureTargetVisible(focused, focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104);
+      }, isIOS ? 180 : 60);
+    }
+  };
+  const onFocusIn = (e) => {
+    const target = e.target;
+    if (!target || !contentEl.contains(target)) return;
+    const delays = isIOS ? [120, 380, 760] : [80, 220, 420];
+    delays.forEach((delay) => {
+      setTimeout(() => {
+        applyLayout();
+        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+      }, delay);
+    });
+    if ((isIOS || isAndroid) && target.tagName === "TEXTAREA") {
+      setTimeout(() => {
+        if (contentEl.scrollHeight > contentEl.clientHeight) {
+          const targetRect = target.getBoundingClientRect();
+          const contentRect = contentEl.getBoundingClientRect();
+          const targetBottom = targetRect.bottom - contentRect.top + contentEl.scrollTop;
+          const containerBottom = contentEl.scrollTop + contentEl.clientHeight;
+          if (targetBottom > containerBottom - 56) {
+            contentEl.scrollTop = targetBottom - contentEl.clientHeight + 128;
+          }
+        }
+      }, isEditModal ? 950 : 850);
+      setTimeout(() => {
+        ensureTargetVisible(target, 208);
+      }, isEditModal ? 1150 : 980);
+    }
+  };
+  const onVVChange = () => {
+    setTimeout(applyLayout, 80);
+  };
+  const onWinResize = () => {
+    setTimeout(applyLayout, 80);
+  };
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onVVChange);
+    window.visualViewport.addEventListener("scroll", onVVChange);
+  }
+  window.addEventListener("resize", onWinResize);
+  mEl.addEventListener("focusin", onFocusIn);
+  applyLayout();
+  return function cleanup() {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onVVChange);
+      window.visualViewport.removeEventListener("scroll", onVVChange);
+    }
+    window.removeEventListener("resize", onWinResize);
+    mEl.removeEventListener("focusin", onFocusIn);
+    cEl.style.position = "";
+    cEl.style.top = "";
+    cEl.style.left = "";
+    cEl.style.right = "";
+    cEl.style.bottom = "";
+    cEl.style.height = "";
+    mEl.style.maxHeight = "";
+    mEl.style.height = "";
+    mEl.style.display = "";
+    mEl.style.flexDirection = "";
+    mEl.style.overflow = "";
+    mEl.style.transform = "";
+    mEl.style.removeProperty("--keyboard-modal-offset");
+    mEl.style.removeProperty("--manual-modal-offset");
+    mEl.style.transition = "";
+    mEl.style.alignSelf = "";
+    mEl.style.marginTop = "";
+    mEl.style.marginBottom = "";
+    contentEl.style.flex = "";
+    contentEl.style.minHeight = "";
+    contentEl.style.overflowY = "";
+    contentEl.style.position = "";
+    contentEl.style.width = "";
+    contentEl.style.paddingBottom = "";
+    contentEl.style.scrollPaddingBottom = "";
+    contentEl.style["overscrollBehavior"] = "";
+    contentEl.style["touchAction"] = "";
+    contentEl.style["webkitOverflowScrolling"] = "";
+  };
+}
+
+// src/ui/base-mobile-modal.ts
+var BaseMobileModal = class extends import_obsidian.Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.mobilePlatform = "desktop";
+    this._kbCleanup = null;
+    this._dragCleanup = null;
+    this.enableKeyboardAdjustment = true;
+    this.plugin = plugin;
+  }
+  onOpen() {
+    this.mobilePlatform = this.detectMobilePlatform();
+    this.modalEl.toggleClass("is-mobile-ios", this.mobilePlatform === "ios");
+    this.modalEl.toggleClass(
+      "is-mobile-android",
+      this.mobilePlatform === "android"
+    );
+    this.titleEl.addClass("kid-score-modal-title");
+    if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
+      this._kbCleanup = setupModalKeyboard(this);
+    }
+    if (this.mobilePlatform !== "desktop") {
+      this._dragCleanup = attachModalDragGesture(this);
+    }
+  }
+  onClose() {
+    if (this._kbCleanup) {
+      this._kbCleanup();
+      this._kbCleanup = null;
+    }
+    if (this._dragCleanup) {
+      this._dragCleanup();
+      this._dragCleanup = null;
+    }
+    this.contentEl.empty();
+  }
+  detectMobilePlatform() {
+    const ua = (navigator.userAgent || "").toLowerCase();
+    if (/android/.test(ua)) return "android";
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
+  }
+  getLongPressDuration() {
+    if (this.mobilePlatform === "ios") return 560;
+    if (this.mobilePlatform === "android") return 460;
+    return 500;
+  }
+  triggerHaptic(type) {
+    if (this.mobilePlatform !== "android") return;
+    if (!navigator.vibrate) return;
+    navigator.vibrate(type === "longpress" ? 12 : 8);
+  }
+};
+
+// src/utils/date.ts
+function formatDate(offset = 0) {
+  const d = /* @__PURE__ */ new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+// src/utils/dom.ts
+function getOverlayMount(containerEl) {
+  return document.body.classList.contains("is-mobile") ? document.body : containerEl || document.body;
+}
+function bindModalInputFocus(input, options = {}) {
+  if (!input) return;
+  const inp = input;
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isIOS = /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const {
+    manualTouchFocus = true,
+    scrollOnIOSFocus = true
+  } = options;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchMoved = false;
+  if (inp.tagName === "INPUT" && inp.type === "number") {
+    inp.setAttribute("inputmode", "numeric");
+  }
+  input.setAttribute("tabindex", "0");
+  input.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+  });
+  if (isTouch) {
+    input.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch ? touch.clientX : 0;
+      touchStartY = touch ? touch.clientY : 0;
+      touchMoved = false;
+      e.stopPropagation();
+    }, { passive: true });
+    input.addEventListener("touchmove", (e) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
+        touchMoved = true;
+      }
+    }, { passive: true });
+    input.addEventListener("touchend", (e) => {
+      e.stopPropagation();
+      if (!manualTouchFocus || touchMoved) return;
+      inp.focus();
+    });
+  }
+  const setIOSKeyboardFocusState = (on) => {
+    if (!isIOS) return;
+    const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
+    const scroller = input.closest(".modal-content");
+    if (!modal || !scroller) return;
+    modal.classList.toggle("has-ios-keyboard-focus", on);
+    if (on) {
+      const target = input;
+      const forceScroll = () => {
+        const scrollerRect = scroller.getBoundingClientRect();
+        const inputRect = target.getBoundingClientRect();
+        const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
+        const desiredTop = Math.max(0, inputTop - Math.max(16, scroller.clientHeight * 0.1));
+        scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
+      };
+      setTimeout(forceScroll, 80);
+      setTimeout(forceScroll, 260);
+      setTimeout(forceScroll, 520);
+      setTimeout(forceScroll, 860);
+    }
+  };
+  input.addEventListener("focus", () => {
+    if (!scrollOnIOSFocus) return;
+    if (!isIOS) return;
+    setIOSKeyboardFocusState(true);
+    const scrollWithinModal = () => {
+      const scroller = input.closest(".modal-content");
+      if (!scroller) {
+        if (input.scrollIntoView) input.scrollIntoView({ block: "center", behavior: "smooth" });
+        return;
+      }
+      const scrollerRect = scroller.getBoundingClientRect();
+      const inputRect = input.getBoundingClientRect();
+      const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
+      const desiredTop = Math.max(0, inputTop - Math.max(18, scroller.clientHeight * 0.12));
+      scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
+    };
+    const doScroll = (delay) => {
+      setTimeout(() => {
+        scrollWithinModal();
+      }, delay);
+    };
+    doScroll(400);
+    doScroll(650);
+  });
+  input.addEventListener("blur", () => {
+    if (!isIOS) return;
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (active && active.closest && active.closest(".kid-score-edit-modal, .kid-score-import-modal") === input.closest(".kid-score-edit-modal, .kid-score-import-modal")) {
+        return;
+      }
+      setIOSKeyboardFocusState(false);
+    }, 180);
   });
 }
+function attachModalDragGesture(modal) {
+  if (!modal) return null;
+  const modalEl = modal.modalEl;
+  if (!modalEl) return null;
+  let startY = 0;
+  let startOffset = 0;
+  let dragging = false;
+  let lastDeltaY = 0;
+  const isInteractiveTarget = (target) => {
+    return !!(target && target.closest && target.closest("input, textarea, select, button, .clickable-icon, .modal-close-button"));
+  };
+  const readOffset = () => parseInt(modalEl.dataset.manualModalOffset || "0", 10) || 0;
+  const writeOffset = (next) => {
+    const clamped = Math.max(-180, Math.min(140, next));
+    modalEl.dataset.manualModalOffset = String(clamped);
+    modalEl.style.setProperty("--manual-modal-offset", clamped + "px");
+  };
+  const snapOffset = (current, deltaY) => {
+    const snapPoints = [-144, -72, 0, 72];
+    const biased = current + Math.max(-18, Math.min(18, deltaY * 0.18));
+    let best = snapPoints[0];
+    let bestDist = Math.abs(biased - best);
+    for (let i = 1; i < snapPoints.length; i++) {
+      const point = snapPoints[i];
+      const dist = Math.abs(biased - point);
+      if (dist < bestDist) {
+        best = point;
+        bestDist = dist;
+      }
+    }
+    return best;
+  };
+  const applyDamping = (delta) => {
+    const sign = delta < 0 ? -1 : 1;
+    const abs = Math.abs(delta);
+    if (abs <= 48) return delta * 0.9;
+    if (abs <= 120) return sign * (43 + (abs - 48) * 0.55);
+    return sign * (82.6 + (abs - 120) * 0.28);
+  };
+  const onTouchStart = (e) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    if (isInteractiveTarget(e.target)) return;
+    const touch = e.touches[0];
+    startY = touch.clientY;
+    startOffset = readOffset();
+    lastDeltaY = 0;
+    dragging = true;
+    modalEl.classList.add("is-dragging-position");
+  };
+  const onTouchMove = (e) => {
+    if (!dragging || !e.touches || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    const deltaY = touch.clientY - startY;
+    lastDeltaY = deltaY;
+    writeOffset(startOffset + applyDamping(deltaY));
+    e.preventDefault();
+  };
+  const onTouchEnd = () => {
+    if (!dragging) return;
+    dragging = false;
+    modalEl.classList.remove("is-dragging-position");
+    modalEl.classList.add("is-settling-position");
+    writeOffset(snapOffset(readOffset(), lastDeltaY));
+    setTimeout(() => modalEl.classList.remove("is-settling-position"), 220);
+  };
+  modalEl.addEventListener("touchstart", onTouchStart, { passive: true });
+  modalEl.addEventListener("touchmove", onTouchMove, { passive: false });
+  modalEl.addEventListener("touchend", onTouchEnd, { passive: true });
+  modalEl.addEventListener("touchcancel", onTouchEnd, { passive: true });
+  return () => {
+    modalEl.removeEventListener("touchstart", onTouchStart);
+    modalEl.removeEventListener("touchmove", onTouchMove);
+    modalEl.removeEventListener("touchend", onTouchEnd);
+    modalEl.removeEventListener("touchcancel", onTouchEnd);
+    modalEl.classList.remove("is-dragging-position");
+  };
+}
+
+// src/modals/stats-modal.ts
+var StatsModal = class extends BaseMobileModal {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
+  async onOpen() {
+    super.onOpen();
+    const contentEl = this.contentEl;
+    contentEl.empty();
+    contentEl.addClass("kid-score-modal", "kid-score-stats-modal");
+    contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
+    const allScores = await this.plugin.getAllScores();
+    if (allScores.length === 0) {
+      contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" });
+      return;
+    }
+    const grandTotal = allScores.reduce((s, r) => s + r.total, 0);
+    const grandDays = allScores.length;
+    const grandAvg = Math.round(grandTotal / grandDays);
+    const gtSign = grandTotal >= 0 ? "+" : "";
+    const gaSign = grandAvg >= 0 ? "+" : "";
+    const grandBanner = contentEl.createDiv({ cls: "kid-score-grand-banner" });
+    const gl = grandBanner.createDiv({ cls: "grand-left" });
+    gl.createDiv({ cls: "grand-total-value", text: gtSign + grandTotal });
+    gl.createDiv({ cls: "grand-total-label", text: "\u5386\u53F2\u7D2F\u8BA1\u603B\u5206" });
+    const gr = grandBanner.createDiv({ cls: "grand-right" });
+    gr.createDiv({ text: "\u{1F4C5} \u8BB0\u5F55 " + grandDays + " \u5929", cls: "grand-stat" });
+    gr.createDiv({ text: "\u{1F4C8} \u65E5\u5747 " + gaSign + grandAvg + " \u5206", cls: "grand-stat" });
+    gr.createDiv({ text: "\u{1F5D3}\uFE0F \u8D77\u59CB " + allScores[0].date, cls: "grand-stat" });
+    const tabs = contentEl.createDiv({ cls: "kid-score-tabs" });
+    const statsBody = contentEl.createDiv({ cls: "kid-score-stats-body" });
+    const periods = [
+      { label: "\u672C\u5468", key: "week" },
+      { label: "\u672C\u6708", key: "month" },
+      { label: "\u5168\u90E8", key: "all" }
+    ];
+    let activePeriod = "week";
+    const self = this;
+    const filterScores = (period, scores) => {
+      const today = /* @__PURE__ */ new Date();
+      if (period === "week") {
+        const ws = new Date(today);
+        ws.setDate(today.getDate() - today.getDay() + 1);
+        return scores.filter((s) => s.date >= ws.toISOString().slice(0, 10));
+      } else if (period === "month") {
+        const ms = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-01";
+        return scores.filter((s) => s.date >= ms);
+      }
+      return scores;
+    };
+    const drawBarChart = (canvas, data) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx || !data.length) return;
+      const W = canvas.width, H = canvas.height;
+      const pad = { top: 24, bottom: 32, left: 8, right: 8 };
+      const chartH = H - pad.top - pad.bottom;
+      const midY = pad.top + chartH * 0.6;
+      const maxAbs = Math.max(...data.map((s) => Math.abs(s.total)).concat([1]));
+      const barW = Math.max(Math.floor((W - pad.left - pad.right) / data.length) - 4, 6);
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#f5f5f5";
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = "#aaa";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, midY);
+      ctx.lineTo(W - pad.right, midY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      data.forEach((score, i) => {
+        const x = pad.left + i * (barW + 4);
+        const pixPer = chartH * 0.55 / maxAbs;
+        const barH = Math.abs(score.total) * pixPer;
+        const isPos = score.total >= 0;
+        ctx.fillStyle = isPos ? "#4ade80" : "#f87171";
+        ctx.fillRect(x, isPos ? midY - barH : midY, barW, barH);
+        ctx.fillStyle = "#333";
+        ctx.font = "bold " + Math.min(11, barW) + "px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(String(score.total), x + barW / 2, isPos ? midY - barH - 4 : midY + barH + 12);
+        ctx.font = "9px sans-serif";
+        ctx.fillStyle = "#999";
+        ctx.fillText(score.date.slice(5), x + barW / 2, H - 4);
+      });
+    };
+    const renderStats = (period) => {
+      statsBody.empty();
+      const filtered = filterScores(period, allScores);
+      if (!filtered.length) {
+        statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "kid-score-empty" });
+        return;
+      }
+      const total = filtered.reduce((s, r) => s + r.total, 0);
+      const avg = Math.round(total / filtered.length * 10) / 10;
+      const max = Math.max(...filtered.map((s) => s.total));
+      let streak = 0;
+      const sortedScores = filtered.sort((a, b) => +new Date(b.date) - +new Date(a.date));
+      for (const s of sortedScores) {
+        if (s.total > 0) streak++;
+        else break;
+      }
+      const positiveDays = filtered.filter((s) => s.total > 0).length;
+      const negativeDays = filtered.filter((s) => s.total < 0).length;
+      const neutralDays = filtered.filter((s) => s.total === 0).length;
+      const calcCompleted = (day) => {
+        let completed = (day.customItems || []).length;
+        for (const item of self.plugin.currentUser.items) {
+          const val = day.scores[item.id] || 0;
+          const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+          if (isDeduct ? val !== 0 : val > 0) completed++;
+        }
+        return completed;
+      };
+      const cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
+      const mkCard = (l, v, a) => {
+        const c = cards.createDiv({ cls: "summary-card " + (a ? "accent" : "") });
+        c.createDiv({ cls: "card-val", text: v });
+        c.createDiv({ cls: "card-lbl", text: l });
+      };
+      mkCard("\u7D2F\u8BA1\u603B\u5206", (total >= 0 ? "+" : "") + total, true);
+      mkCard("\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
+      mkCard("\u6700\u9AD8\u5355\u65E5", "+" + max);
+      mkCard("\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
+      mkCard("\u8FDE\u7EED\u6253\u5206", streak + " \u5929");
+      mkCard("\u6B63\u9762\u5929\u6570", positiveDays + " \u5929");
+      mkCard("\u8D1F\u9762\u5929\u6570", negativeDays + " \u5929");
+      const goals = self.plugin.currentUser.goals || { daily: 10, weekly: 70, monthly: 300 };
+      let goalLabel = "";
+      let goalTarget = 0;
+      let goalCompleted = 0;
+      if (period === "week") {
+        goalLabel = "\u672C\u5468\u76EE\u6807";
+        goalTarget = goals.weekly;
+        goalCompleted = filtered.reduce((s, d) => s + calcCompleted(d), 0);
+      } else if (period === "month") {
+        goalLabel = "\u672C\u6708\u76EE\u6807";
+        goalTarget = goals.monthly;
+        goalCompleted = filtered.reduce((s, d) => s + calcCompleted(d), 0);
+      }
+      if (goalTarget > 0) {
+        const goalPct = Math.min(100, Math.round(goalCompleted / goalTarget * 100));
+        const goalCard = cards.createDiv({ cls: "summary-card goal-card" });
+        goalCard.createDiv({ cls: "card-val", text: goalCompleted + "/" + goalTarget });
+        goalCard.createDiv({ cls: "card-lbl", text: goalLabel });
+        const gBarWrap = goalCard.createDiv({ cls: "summary-goal-bar-wrap" });
+        const gBar = gBarWrap.createDiv({ cls: "summary-goal-bar" });
+        gBar.style.width = goalPct + "%";
+        if (goalPct >= 100) gBar.addClass("is-complete");
+      }
+      if (self.plugin.currentUser.items.length > 0) {
+        const categories = self.plugin.currentUser.categories || [];
+        const categoryStats = {};
+        categories.forEach((cat) => {
+          categoryStats[cat] = { total: 0, completed: 0 };
+        });
+        const isItemDone = (item, val) => {
+          const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+          return isDeduct ? val !== 0 : val > 0;
+        };
+        for (const item of self.plugin.currentUser.items) {
+          const cat = item.category || "\u5176\u4ED6";
+          if (!categoryStats[cat]) {
+            categoryStats[cat] = { total: 0, completed: 0 };
+          }
+          categoryStats[cat].total++;
+          const count = filtered.filter((s) => s.scores[item.id] !== void 0 && isItemDone(item, s.scores[item.id])).length;
+          categoryStats[cat].completed += count;
+        }
+        statsBody.createEl("h3", { text: "\u6807\u9898\u5206\u7C7B\u5B8C\u6210\u7387", cls: "stats-section-title" });
+        const categoryList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+        Object.entries(categoryStats).forEach(([cat, stats]) => {
+          const rate = Math.round(stats.completed / (stats.total * filtered.length) * 100);
+          const row2 = categoryList.createDiv({ cls: "completion-row" });
+          row2.createSpan({ cls: "completion-emoji", text: "\u{1F4CB}" });
+          row2.createSpan({ cls: "completion-name", text: cat });
+          const bw2 = row2.createDiv({ cls: "completion-bar-wrap" });
+          const bar2 = bw2.createDiv({ cls: "completion-bar pos" });
+          bar2.style.width = rate + "%";
+          row2.createSpan({ cls: "completion-rate", text: rate + "%" });
+        });
+        statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
+        const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+        const drawSparkline = (canvas2, data, isDeduct) => {
+          const ctx = canvas2.getContext("2d");
+          if (!ctx || data.length === 0) return;
+          const W = canvas2.width;
+          const H = canvas2.height;
+          ctx.clearRect(0, 0, W, H);
+          const pad = 4;
+          const maxAbs = Math.max(...data.map((v) => Math.abs(v)), 1);
+          const step = data.length > 1 ? (W - pad * 2) / (data.length - 1) : 0;
+          const baselineY = H / 2;
+          ctx.strokeStyle = isDeduct ? "#f87171" : "#4ade80";
+          ctx.lineWidth = 2;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.beginPath();
+          data.forEach((v, i) => {
+            const x = pad + i * step;
+            const y = baselineY - v / maxAbs * (baselineY - pad);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+          ctx.fillStyle = isDeduct ? "#f87171" : "#4ade80";
+          data.forEach((v, i) => {
+            const x = pad + i * step;
+            const y = baselineY - v / maxAbs * (baselineY - pad);
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        };
+        for (const item of self.plugin.currentUser.items) {
+          const itemHistory = filtered.slice().sort((a, b) => a.date.localeCompare(b.date)).map((s) => s.scores[item.id] || 0);
+          const count = filtered.filter((s) => s.scores[item.id] !== void 0 && isItemDone(item, s.scores[item.id])).length;
+          const rate = Math.round(count / filtered.length * 100);
+          const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
+          const row = rowWrap.createDiv({ cls: "completion-row" });
+          row.createSpan({ cls: "completion-emoji", text: item.emoji });
+          row.createSpan({ cls: "completion-name", text: item.name });
+          const bw = row.createDiv({ cls: "completion-bar-wrap" });
+          const bar = bw.createDiv({ cls: "completion-bar " + (item.points >= 0 ? "pos" : "neg") });
+          bar.style.width = rate + "%";
+          row.createSpan({ cls: "completion-rate", text: count + "/" + filtered.length + " (" + rate + "%)" });
+          const sparkWrap = rowWrap.createDiv({ cls: "sparkline-wrap is-hidden" });
+          const canvas2 = sparkWrap.createEl("canvas", { cls: "sparkline-canvas" });
+          canvas2.width = 300;
+          canvas2.height = 48;
+          row.onclick = () => {
+            const wasHidden = sparkWrap.hasClass("is-hidden");
+            itemList.querySelectorAll(".sparkline-wrap").forEach((el) => el.addClass("is-hidden"));
+            if (wasHidden) {
+              sparkWrap.removeClass("is-hidden");
+              drawSparkline(canvas2, itemHistory.slice(-30), item.category === "\u51CF\u5206" || item.points < 0);
+            }
+          };
+        }
+      }
+      statsBody.createEl("h3", { text: "\u6BCF\u65E5\u5F97\u5206\u8D8B\u52BF", cls: "stats-section-title" });
+      const chartWrap = statsBody.createDiv({ cls: "kid-score-chart-wrap" });
+      const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
+      canvas.width = 540;
+      canvas.height = 200;
+      setTimeout(() => {
+        drawBarChart(canvas, filtered.slice(-20));
+      }, 50);
+      if (period === "all" && filtered.length > 7) {
+        statsBody.createEl("h3", { text: "\u6309\u6708\u6C47\u603B", cls: "stats-section-title" });
+        const byMonth = {};
+        for (const s of filtered) {
+          const m = s.date.slice(0, 7);
+          if (!byMonth[m]) byMonth[m] = [];
+          byMonth[m].push(s.total);
+        }
+        const monthWrap = statsBody.createDiv({ cls: "kid-score-month-table-wrap" });
+        const mt = monthWrap.createEl("table", { cls: "kid-score-month-table" });
+        const th = mt.createEl("thead").createEl("tr");
+        ["\u6708\u4EFD", "\u5929\u6570", "\u603B\u5206", "\u65E5\u5747"].forEach((h) => {
+          th.createEl("th", { text: h });
+        });
+        const tb = mt.createEl("tbody");
+        Object.entries(byMonth).sort().forEach((e) => {
+          const sum = e[1].reduce((a, b) => a + b, 0);
+          const av = Math.round(sum / e[1].length);
+          const tr = tb.createEl("tr");
+          tr.createEl("td", { text: e[0] });
+          tr.createEl("td", { text: String(e[1].length) });
+          tr.createEl("td", { text: (sum >= 0 ? "+" : "") + sum });
+          tr.createEl("td", { text: (av >= 0 ? "+" : "") + av });
+        });
+      }
+    };
+    for (const p of periods) {
+      ((period) => {
+        const tab = tabs.createEl("button", {
+          text: period.label,
+          cls: "kid-score-tab " + (period.key === activePeriod ? "is-active" : "")
+        });
+        tab.onclick = () => {
+          activePeriod = period.key;
+          tabs.querySelectorAll(".kid-score-tab").forEach((t) => {
+            t.removeClass("is-active");
+          });
+          tab.addClass("is-active");
+          renderStats(activePeriod);
+        };
+      })(p);
+    }
+    renderStats(activePeriod);
+  }
+  onClose() {
+    super.onClose();
+  }
+};
+
+// src/modals/popups/attach-file-modal.ts
+var AttachFileModal = class extends BaseMobileModal {
+  constructor(app, plugin, label, dateStr, onConfirm) {
+    super(app, plugin);
+    this.label = label;
+    this.dateStr = dateStr;
+    this.onConfirm = onConfirm;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u{1F4CE} \u63D2\u5165" + this.label);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.createEl("div", {
+      cls: "value-popup-hint",
+      text: "\u8F93\u5165\u6587\u4EF6\u540D\uFF08\u4E0D\u542B\u6269\u5C55\u540D\uFF09"
+    });
+    const fileInput = c.createEl("input", { cls: "custom-form-name-input" });
+    fileInput.type = "text";
+    fileInput.placeholder = "\u4F8B\u5982: \u4ECA\u5929\u7684\u7167\u7247";
+    fileInput.autocomplete = "off";
+    bindModalInputFocus(fileInput);
+    const quickName = c.createEl("div", { cls: "value-popup-hint" });
+    quickName.style.cssText = "cursor:pointer;text-decoration:underline;margin-top:6px";
+    quickName.textContent = "\u{1F4A1} \u9ED8\u8BA4: " + this.dateStr + "-" + this.label;
+    quickName.onclick = () => {
+      fileInput.value = this.dateStr + "-" + this.label;
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u63D2\u5165" });
+    ok.onclick = () => {
+      let f = fileInput.value.trim();
+      if (!f) {
+        fileInput.classList.add("is-error");
+        return;
+      }
+      this.onConfirm(f);
+      this.close();
+    };
+  }
+};
+
+// src/modals/popups/edit-item-modal.ts
+var import_obsidian2 = require("obsidian");
+
+// src/ui/emoji-picker.ts
 function showEmojiPicker(callback, container) {
-  var overlay = document.createElement("div");
+  const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
-
-  var popup = document.createElement("div");
+  const popup = document.createElement("div");
   popup.className = "kid-score-emoji-fullpicker";
-
-  // Header
-  var header = document.createElement("div");
+  const header = document.createElement("div");
   header.className = "emoji-fp-header";
   header.textContent = "\u9009\u62E9\u56FE\u6807";
   popup.appendChild(header);
-
-  // Search input
-  var customRow = document.createElement("div");
+  const customRow = document.createElement("div");
   customRow.className = "emoji-fp-custom";
-  var customInput = document.createElement("input");
+  const customInput = document.createElement("input");
   customInput.type = "text";
   customInput.placeholder = "\u641C\u7D22\uFF1A\u8F93\u5165\u4E2D\u6587\u5173\u952E\u5B57\u6216\u76F4\u63A5\u8F93\u5165emoji...";
   customInput.maxLength = 32;
   customInput.className = "emoji-fp-input";
   customInput.setAttribute("inputmode", "text");
-  customInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-  customInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-  customInput.addEventListener("focusout", function(e) {
-    if (overlay.contains(document.activeElement) || !overlay.parentElement) return;
-    // Don't steal focus during IME composition
-    if (customInput.composing) return;
-    e.stopPropagation();
-    setTimeout(function() { if (overlay.parentElement && !overlay.contains(document.activeElement)) customInput.focus(); }, 50);
-  });
-  var customConfirm = document.createElement("button");
+  bindModalInputFocus(customInput);
+  const customConfirm = document.createElement("button");
   customConfirm.className = "value-popup-confirm mod-cta";
   customConfirm.textContent = "\u786E\u5B9A";
   customConfirm.style.padding = "6px 16px";
-  customConfirm.onclick = function() {
-    var v = customInput.value.trim();
-    if (v) { callback(v); overlay.remove(); }
+  const removeOverlay = () => {
+    var _a;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
+      history.back();
+    }
+  };
+  customConfirm.onclick = () => {
+    const v = customInput.value.trim();
+    if (v) {
+      callback(v);
+      removeOverlay();
+    }
   };
   customRow.appendChild(customInput);
   customRow.appendChild(customConfirm);
   popup.appendChild(customRow);
-
-  // Category tabs
-  var catTabs = document.createElement("div");
+  const catTabs = document.createElement("div");
   catTabs.className = "emoji-fp-tabs";
-  var catKeys = Object.keys(EMOJI_DATA);
-
-  var gridWrap = document.createElement("div");
+  const catKeys = Object.keys(EMOJI_DATA);
+  const gridWrap = document.createElement("div");
   gridWrap.className = "emoji-fp-grid-wrap";
-
-  var renderEmojis = function(emojis) {
+  const renderEmojis = (emojis) => {
     gridWrap.innerHTML = "";
-    var grid = document.createElement("div");
+    const grid = document.createElement("div");
     grid.className = "emoji-fp-grid";
-    for (var i = 0; i < emojis.length; i++) {
-      (function(em) {
-        var btn = document.createElement("button");
-        btn.className = "emoji-fp-btn";
-        btn.textContent = em;
-        btn.onclick = function() { callback(em); overlay.remove(); };
-        grid.appendChild(btn);
-      })(emojis[i]);
+    for (const em of emojis) {
+      const btn = document.createElement("button");
+      btn.className = "emoji-fp-btn";
+      btn.textContent = em;
+      btn.onclick = () => {
+        callback(em);
+        removeOverlay();
+      };
+      grid.appendChild(btn);
     }
     if (emojis.length === 0) {
-      var hint = document.createElement("div");
+      const hint = document.createElement("div");
       hint.style.cssText = "text-align:center;color:var(--text-muted);padding:20px;font-size:0.9em;";
       hint.textContent = "\u6CA1\u6709\u627E\u5230\u5339\u914D\u7684 emoji";
       gridWrap.appendChild(hint);
     }
     gridWrap.appendChild(grid);
   };
-
-  var renderCat = function(key) {
+  const renderCat = (key) => {
     renderEmojis(EMOJI_DATA[key]);
   };
-
-  var searchEmojis = function(query) {
-    query = query.toLowerCase();
-    var results = [];
-    var seen = {};
-    for (var em in EMOJI_SEARCH) {
-      if (EMOJI_SEARCH[em].indexOf(query) !== -1) {
-        if (!seen[em]) { results.push(em); seen[em] = true; }
+  const searchEmojis = (query) => {
+    const q = query.toLowerCase();
+    const results = [];
+    const seen = /* @__PURE__ */ new Set();
+    for (const em in EMOJI_SEARCH) {
+      if (EMOJI_SEARCH[em].includes(q)) {
+        if (!seen.has(em)) {
+          results.push(em);
+          seen.add(em);
+        }
       }
     }
-    // Also search through all emoji data for any emoji containing the query text
     if (results.length === 0) {
-      var catKeys2 = Object.keys(EMOJI_DATA);
-      for (var ci = 0; ci < catKeys2.length; ci++) {
-        if (catKeys2[ci].toLowerCase().indexOf(query) !== -1) {
-          var arr = EMOJI_DATA[catKeys2[ci]];
-          for (var ai = 0; ai < arr.length; ai++) { if (!seen[arr[ai]]) { results.push(arr[ai]); seen[arr[ai]] = true; } }
+      for (const ck of catKeys) {
+        if (ck.toLowerCase().includes(q)) {
+          for (const arrEm of EMOJI_DATA[ck]) {
+            if (!seen.has(arrEm)) {
+              results.push(arrEm);
+              seen.add(arrEm);
+            }
+          }
         }
       }
     }
     return results;
   };
-
-  var searchTimer = null;
-  var isComposing = false;
-  customInput.addEventListener("compositionstart", function() { isComposing = true; customInput.composing = true; });
-  customInput.addEventListener("compositionend", function() {
+  let searchTimer = null;
+  let isComposing = false;
+  customInput.addEventListener("compositionstart", () => {
+    isComposing = true;
+    customInput.composing = true;
+  });
+  customInput.addEventListener("compositionend", () => {
     isComposing = false;
     customInput.composing = false;
     doSearch();
   });
-  var doSearch = function() {
-    clearTimeout(searchTimer);
-    searchTimer = setTimeout(function() {
+  const doSearch = () => {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
       if (isComposing) return;
-      var q = customInput.value.trim();
+      const q = customInput.value.trim();
       if (!q) {
-        var activeTab = catTabs.querySelector(".emoji-fp-tab.is-active");
-        if (activeTab) { renderCat(activeTab.title); }
+        const activeTab = catTabs.querySelector(".emoji-fp-tab.is-active");
+        if (activeTab) {
+          renderCat(activeTab.title || "");
+        }
         catTabs.style.display = "";
         return;
       }
-      // If input is purely emoji characters (no letters), don't search — user is typing emoji directly
-      var pureEmoji = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+$/u.test(q);
+      const pureEmoji = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+$/u.test(q);
       if (pureEmoji) return;
       catTabs.style.display = "none";
-      var results = searchEmojis(q);
+      const results = searchEmojis(q);
       renderEmojis(results);
     }, 100);
   };
-  customInput.addEventListener("input", function() {
+  customInput.addEventListener("input", () => {
     if (isComposing) return;
     doSearch();
   });
-
-  for (var k = 0; k < catKeys.length; k++) {
-    (function(key, idx) {
-      var tab = document.createElement("button");
-      tab.className = "emoji-fp-tab" + (idx === 0 ? " is-active" : "");
-      tab.textContent = key.split(" ")[0]; // just the emoji icon
-      tab.title = key;
-      tab.onclick = function() {
-        catTabs.querySelectorAll(".emoji-fp-tab").forEach(function(t) { t.classList.remove("is-active"); });
-        tab.classList.add("is-active");
-        renderCat(key);
-      };
-      catTabs.appendChild(tab);
-    })(catKeys[k], k);
-  }
-
+  catKeys.forEach((key, idx) => {
+    const tab = document.createElement("button");
+    tab.className = "emoji-fp-tab" + (idx === 0 ? " is-active" : "");
+    tab.textContent = key.split(" ")[0];
+    tab.title = key;
+    tab.onclick = () => {
+      catTabs.querySelectorAll(".emoji-fp-tab").forEach((t) => {
+        t.classList.remove("is-active");
+      });
+      tab.classList.add("is-active");
+      renderCat(key);
+    };
+    catTabs.appendChild(tab);
+  });
   popup.appendChild(catTabs);
   popup.appendChild(gridWrap);
-
-  // Render first category
   renderCat(catKeys[0]);
-
-  // Cancel
-  var cancelBtn = document.createElement("button");
+  const cancelBtn = document.createElement("button");
   cancelBtn.className = "value-popup-cancel";
   cancelBtn.textContent = "\u53D6\u6D88";
   cancelBtn.style.marginTop = "8px";
   cancelBtn.style.width = "100%";
-  cancelBtn.onclick = function() { overlay.remove(); };
+  cancelBtn.onclick = () => {
+    removeOverlay();
+  };
   popup.appendChild(cancelBtn);
-
   overlay.appendChild(popup);
-  overlay.addEventListener("mousedown", function(e) { if (e.target === overlay) { e.preventDefault(); overlay.remove(); } });
-  popup.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-  popup.addEventListener("click", function(e) { e.stopPropagation(); });
-  popup.addEventListener("focusin", function(e) { e.stopPropagation(); });
-  popup.addEventListener("focusout", function(e) { e.stopPropagation(); });
+  overlay.addEventListener("mousedown", (e) => {
+    if (e.target === overlay) {
+      e.preventDefault();
+      removeOverlay();
+    }
+  });
+  const onPopstate = (e) => {
+    var _a;
+    if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
+      overlay.remove();
+      window.removeEventListener("popstate", onPopstate);
+    }
+  };
+  history.pushState({ kidScoreOverlay: true }, "");
+  window.addEventListener("popstate", onPopstate);
+  popup.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+  });
+  popup.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+  popup.addEventListener("focusin", (e) => {
+    e.stopPropagation();
+  });
+  popup.addEventListener("focusout", (e) => {
+    e.stopPropagation();
+  });
   getOverlayMount(container).appendChild(overlay);
-  // Give the input focus after render so keyboard appears
-  setTimeout(function() { customInput.focus(); }, 50);
+  setTimeout(() => {
+    customInput.focus();
+  }, 50);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Plugin
-   ═══════════════════════════════════════════════════════════════════════════ */
-var KidScorePlugin = class extends import_obsidian.Plugin {
-  constructor() {
-    super(...arguments);
-    this.settings = DEFAULT_SETTINGS;
+// src/modals/popups/edit-item-modal.ts
+var EditItemModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, onSave) {
+    super(app, plugin);
+    this.item = item;
+    this.onSave = onSave;
   }
-
-  onload() {
-    return __async(this, null, function* () {
-      yield this.loadSettings();
-      // Migrate: add category field to old items per user
-      var changed = false;
-      for (var u of this.settings.users) {
-        if (!u.categories || u.categories.length === 0) {
-          u.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-          changed = true;
-        }
-        for (var it of u.items) {
-          if (!it.category) {
-            it.category = it.points >= 0 ? u.categories[0] : (u.categories[1] || u.categories[0]);
-            changed = true;
-          }
-        }
-      }
-      if (changed) yield this.saveSettings();
-
-      this.addRibbonIcon("star", "Little Milestones 🌱", () => {
-        new DailyScoringModal(this.app, this).open();
-      });
-      this.addCommand({
-        id: "open-daily-score",
-        name: "\u6253\u5F00\u4ECA\u65E5\u6253\u5206",
-        callback: () => new DailyScoringModal(this.app, this).open()
-      });
-      this.addCommand({
-        id: "view-stats",
-        name: "\u67E5\u770B\u6253\u5206\u7EDF\u8BA1",
-        callback: () => new StatsModal(this.app, this).open()
-      });
-      this.addSettingTab(new KidScoreSettingTab(this.app, this));
+  onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
+    super.onOpen();
+    this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u9879\u76EE");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    const emojiRow = document.createElement("div");
+    emojiRow.className = "custom-form-row";
+    emojiRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u56FE\u6807" }));
+    const emojiInput = document.createElement("input");
+    emojiInput.type = "text";
+    emojiInput.className = "custom-form-emoji-input";
+    emojiInput.value = this.item.emoji;
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = document.createElement("button");
+    emojiPickBtn.className = "diary-tool-btn";
+    emojiPickBtn.textContent = "\u{1F50D}";
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.contentEl);
+    };
+    emojiRow.appendChild(emojiInput);
+    emojiRow.appendChild(emojiPickBtn);
+    c.appendChild(emojiRow);
+    const nameRow = document.createElement("div");
+    nameRow.className = "custom-form-row";
+    nameRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u540D\u79F0" }));
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "custom-form-name-input";
+    nameInput.value = this.item.name;
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    nameRow.appendChild(nameInput);
+    c.appendChild(nameRow);
+    const pointsRow = document.createElement("div");
+    pointsRow.className = "custom-form-row";
+    pointsRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u9ED8\u8BA4\u5206\u503C" }));
+    const pc = document.createElement("div");
+    pc.className = "value-popup-controls";
+    const pm = document.createElement("button");
+    pm.className = "value-popup-adjust";
+    pm.textContent = "\u2212";
+    const pi = document.createElement("input");
+    pi.type = "number";
+    pi.className = "value-popup-input";
+    pi.value = String(this.item.points);
+    pi.setAttribute("inputmode", "numeric");
+    bindModalInputFocus(pi);
+    const pp = document.createElement("button");
+    pp.className = "value-popup-adjust";
+    pp.textContent = "+";
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    pc.appendChild(pm);
+    pc.appendChild(pi);
+    pc.appendChild(pp);
+    pointsRow.appendChild(pc);
+    c.appendChild(pointsRow);
+    const noteRow = document.createElement("div");
+    noteRow.className = "custom-form-row";
+    noteRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u5907\u6CE8" }));
+    const noteInput = document.createElement("textarea");
+    noteInput.className = "custom-form-name-input";
+    noteInput.classList.add("custom-form-note-input");
+    noteInput.value = this.item.note || "";
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u957F\u6309\u65F6\u663E\u793A\u5728\u5361\u7247\u4E0A\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    noteRow.appendChild(noteInput);
+    const autoResize = (ta) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    requestAnimationFrame(() => autoResize(noteInput));
+    setTimeout(() => autoResize(noteInput), 60);
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
+    c.appendChild(noteRow);
+    const catRow = document.createElement("div");
+    catRow.className = "custom-form-row";
+    catRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u5206\u7C7B" }));
+    const catSel = document.createElement("select");
+    catSel.className = "custom-form-select";
+    (this.plugin.currentUser.categories || []).forEach((cat) => {
+      const opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      if (cat === this.item.category) opt.selected = true;
+      catSel.appendChild(opt);
     });
-  }
-
-  loadSettings() {
-    return __async(this, null, function* () {
-      var loaded = yield this.loadData() || {};
-      if (loaded.childName !== undefined && !loaded.users) {
-        var mu = makeDefaultUser();
-        mu.name = loaded.childName || "\u5C0F\u670B\u53CB";
-        mu.savePath = loaded.savePath || "Little Milestones/Daily Records";
-        mu.items = loaded.items || [];
-        mu.categories = loaded.categories && loaded.categories.length ? loaded.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-        mu.scoringRules = loaded.scoringRules || "";
-        mu.diaryTemplate = loaded.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-        this.settings = { users: [mu], currentUserId: mu.id, doubleTapThresholds: Object.assign({}, DEFAULT_SETTINGS.doubleTapThresholds) };
-      } else {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, loaded);
-        var dt = Object.assign({}, DEFAULT_SETTINGS.doubleTapThresholds, this.settings.doubleTapThresholds || {});
-        dt.windows = this.sanitizeDoubleTapThreshold(dt.windows, DEFAULT_SETTINGS.doubleTapThresholds.windows);
-        dt.mac = this.sanitizeDoubleTapThreshold(dt.mac, DEFAULT_SETTINGS.doubleTapThresholds.mac);
-        dt.android = this.sanitizeDoubleTapThreshold(dt.android, DEFAULT_SETTINGS.doubleTapThresholds.android);
-        dt.ios = this.sanitizeDoubleTapThreshold(dt.ios, DEFAULT_SETTINGS.doubleTapThresholds.ios);
-        dt.fallback = this.sanitizeDoubleTapThreshold(dt.fallback, DEFAULT_SETTINGS.doubleTapThresholds.fallback);
-        this.settings.doubleTapThresholds = dt;
-        if (!this.settings.users || !this.settings.users.length) {
-          var du = makeDefaultUser();
-          this.settings.users = [du];
-          this.settings.currentUserId = du.id;
-        } else {
-          for (var su of this.settings.users) {
-            if (!su.id) su.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-            if (!su.name) su.name = "小朋友";
-            if (!su.savePath || !String(su.savePath).trim()) su.savePath = "Little Milestones/Daily Records";
-            if (!Array.isArray(su.items)) su.items = [];
-            if (!Array.isArray(su.categories) || !su.categories.length) su.categories = ["加分项", "减分项"];
-            if (typeof su.scoringRules !== "string") su.scoringRules = "";
-            if (!su.diaryTemplate) su.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
-          }
-          var cuid = this.settings.currentUserId;
-          if (!cuid || !this.settings.users.find(function(u) { return u.id === cuid; })) {
-            this.settings.currentUserId = this.settings.users[0].id;
-          }
+    catRow.appendChild(catSel);
+    c.appendChild(catRow);
+    const acts = document.createElement("div");
+    acts.className = "value-popup-actions";
+    const cancelBtn = document.createElement("button");
+    cancelBtn.className = "value-popup-cancel";
+    cancelBtn.textContent = "\u53D6\u6D88";
+    cancelBtn.onclick = () => this.close();
+    const saveBtn = document.createElement("button");
+    saveBtn.className = "value-popup-confirm mod-cta";
+    saveBtn.textContent = "\u4FDD\u5B58";
+    saveBtn.onclick = async () => {
+      try {
+        const n = nameInput.value.trim();
+        if (!n) {
+          nameInput.classList.add("is-error");
+          return;
         }
+        this.item.name = n;
+        this.item.emoji = emojiInput.value.trim() || "\u2B50";
+        this.item.points = parseInt(pi.value) || 0;
+        this.item.note = noteInput.value.trim();
+        this.item.category = catSel.value;
+        await this.plugin.saveSettings();
+        this.close();
+        this.onSave();
+      } catch (e) {
+        new import_obsidian2.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
       }
-    });
-  }
-
-  saveSettings() {
-    return __async(this, null, function* () {
-      yield this.saveData(this.settings);
-    });
-  }
-
-  sanitizeDoubleTapThreshold(value, fallback) {
-    var n = parseInt(String(value), 10);
-    if (!Number.isFinite(n)) return fallback;
-    return Math.max(120, Math.min(600, n));
-  }
-
-  detectPlatformKey() {
-    var ua = (navigator.userAgent || "").toLowerCase();
-    if (/android/.test(ua)) return "android";
-    if (/iphone|ipad|ipod/.test(ua)) return "ios";
-    if (/macintosh|mac os x/.test(ua)) return "mac";
-    if (/windows/.test(ua)) return "windows";
-    return "fallback";
-  }
-
-  getDoubleTapThreshold() {
-    var defaults = DEFAULT_SETTINGS.doubleTapThresholds;
-    var cfg = this.settings.doubleTapThresholds || defaults;
-    var key = this.detectPlatformKey();
-    var fb = this.sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
-    return this.sanitizeDoubleTapThreshold(cfg[key], fb);
-  }
-
-  get currentUser() {
-    var cuid = this.settings.currentUserId;
-    return this.settings.users.find(function(u) { return u.id === cuid; }) || this.settings.users[0];
-  }
-
-  filePath(dateStr) {
-    return (0, import_obsidian.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
-  }
-
-  /* ── Read day data (backward compatible) ── */
-  readDayData(dateStr) {
-    return __async(this, null, function* () {
-      var file = this.app.vault.getAbstractFileByPath(this.filePath(dateStr));
-      if (!(file instanceof import_obsidian.TFile)) return null;
-      var content = yield this.app.vault.read(file);
-      var fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-      if (!fmMatch) return null;
-      var fm = fmMatch[1];
-      var totalMatch = fm.match(/total:\s*(-?\d+)/);
-      var total = totalMatch ? parseInt(totalMatch[1]) : 0;
-      var scores = {};
-      var scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
-      if (scoreBlock) {
-        for (var line of scoreBlock[1].split("\n")) {
-          var kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
-          if (kvNum) { scores[kvNum[1]] = parseInt(kvNum[2]); continue; }
-          var kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
-          if (kvBool) {
-            var itemDef = this.currentUser.items.find(function(it) { return it.id === kvBool[1]; });
-            scores[kvBool[1]] = kvBool[2] === "true" ? (itemDef ? itemDef.points : 1) : 0;
-          }
-        }
-      }
-      var customItems = [];
-      var customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
-      if (customBlock) {
-        var lines = customBlock[1].split("\n");
-        for (var cl of lines) {
-          var cm = cl.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
-          if (cm) {
-            customItems.push({ id: "custom_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6), emoji: cm[1], name: cm[2], points: parseInt(cm[3]) });
-          }
-        }
-      }
-      var diaryContent = "";
-      var diaryHeadingIdx = content.indexOf("## \uD83D\uDCDD \u4ECA\u65E5\u65E5\u8BB0");
-      if (diaryHeadingIdx !== -1) {
-        diaryContent = content.slice(diaryHeadingIdx).replace(/^##\s*\uD83D\uDCDD\s*\u4ECA\u65E5\u65E5\u8BB0\s*\n?/, "").trim();
-      } else {
-        var diaryIdx = content.indexOf(DIARY_MARKER);
-        if (diaryIdx !== -1) {
-          diaryContent = content.slice(diaryIdx + DIARY_MARKER.length).trim();
-          diaryContent = diaryContent.replace(/^##\s*\uD83D\uDCDD\s*\u4ECA\u65E5\u65E5\u8BB0\s*\n?/, "").trim();
-        }
-      }
-      return { date: dateStr, scores: scores, customItems: customItems, total: total, diaryContent: diaryContent };
-    });
-  }
-
-  /* ── Save day data ── */
-  saveDayData(dateStr, scores, customItems, diaryContent) {
-    return __async(this, null, function* () {
-      var items = this.currentUser.items;
-      var d = new Date(dateStr + "T00:00:00");
-      d.setDate(d.getDate() - 1);
-      var yesterdayStr = d.toISOString().slice(0, 10);
-      var yesterdayData = yield this.readDayData(yesterdayStr);
-      var total = 0; var earnedCount = 0; var missedCount = 0;
-      for (var item of items) {
-        var val = scores[item.id] || 0;
-        total += val;
-        if (val > 0) earnedCount++; else missedCount++;
-      }
-      var customTotal = 0;
-      for (var ci of customItems) { customTotal += ci.points; }
-      total += customTotal;
-      var allScores = yield this.getAllScores();
-      var cumulativeTotal = 0; var cumulativeDays = 0;
-      for (var s of allScores) { if (s.date !== dateStr) { cumulativeTotal += s.total; cumulativeDays++; } }
-      var grandTotal = cumulativeTotal + total;
-      var grandDays = cumulativeDays + 1;
-      var grandAvg = grandDays > 0 ? Math.round(grandTotal / grandDays * 10) / 10 : 0;
-      var diaryText = diaryContent || "";
-      var weatherMatch = diaryText.match(/\u5929\u6C14\uFF1A\s*(.+)/);
-      var moodMatch = diaryText.match(/\u5FC3\u60C5\uFF1A\s*(.+)/);
-      var breakfastMatch = diaryText.match(/\u65E9\u9910\uFF1A\s*(.+)/);
-      var lunchMatch = diaryText.match(/\u5348\u9910\uFF1A\s*(.+)/);
-      var dinnerMatch = diaryText.match(/\u665A\u9910\uFF1A\s*(.+)/);
-      var homeCookMatch = diaryText.match(/\u5728\u5BB6\u505A\u996D\uFF1A\s*(.+)/);
-      var exerciseMatch = diaryText.match(/\u8FD0\u52A8\u9879\u76EE\uFF1A\s*(.+)/);
-      var sleepMatch = diaryText.match(/\u7761\u7720\u60C5\u51B5\uFF1A\s*(.+)/);
-      var scoresYaml = items.map(function(item) { return "  " + item.id + ": " + (scores[item.id] || 0); }).join("\n");
-      var customYaml = "";
-      if (customItems.length > 0) {
-        customYaml = "\ncustomItems:\n" + customItems.map(function(ci) { return "  - " + toYamlInline(ci.emoji + "|" + ci.name + "|" + ci.points); }).join("\n");
-      }
-      var scoreDetailYaml = "\nscoreDetail:\n" + items.map(function(item) { var v = scores[item.id] || 0; return "  " + toYamlInline(item.name) + ": " + v; }).join("\n");
-      if (customItems.length > 0) { for (var ci of customItems) { scoreDetailYaml += "\n  " + toYamlInline("临时-" + ci.name) + ": " + ci.points; } }
-      var summaryYaml = "\nsummary:\n  earned: " + earnedCount + "\n  missed: " + missedCount + "\n  customCount: " + customItems.length + "\n  customTotal: " + customTotal + "\n  cumulativeTotal: " + grandTotal + "\n  cumulativeDays: " + grandDays + "\n  cumulativeAvg: " + grandAvg;
-      var tagsYaml = "\ntags:";
-      if (weatherMatch) tagsYaml += "\n  weather: " + toYamlInline(weatherMatch[1].trim());
-      if (moodMatch) tagsYaml += "\n  mood: " + toYamlInline(moodMatch[1].trim());
-      if (homeCookMatch) tagsYaml += "\n  homeCook: " + toYamlInline(homeCookMatch[1].trim());
-      if (exerciseMatch) tagsYaml += "\n  exercise: " + toYamlInline(exerciseMatch[1].trim());
-      if (sleepMatch) tagsYaml += "\n  sleep: " + toYamlInline(sleepMatch[1].trim());
-      tagsYaml += "\n  hasDiary: " + (diaryText.trim().length > 0);
-      var dietYaml = "";
-      if (breakfastMatch || lunchMatch || dinnerMatch) {
-        dietYaml = "\ndiet:";
-        if (breakfastMatch) dietYaml += "\n  breakfast: " + toYamlInline(breakfastMatch[1].trim());
-        if (lunchMatch) dietYaml += "\n  lunch: " + toYamlInline(lunchMatch[1].trim());
-        if (dinnerMatch) dietYaml += "\n  dinner: " + toYamlInline(dinnerMatch[1].trim());
-      }
-
-      // Build markdown tables — grouped by category
-      var hasYesterday = !!yesterdayData;
-      var categories = this.currentUser.categories || [];
-      var tableHeader = hasYesterday
-        ? "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 | \u6628\u65E5 |\n|:---|---:|---:|:---:|:---:|\n"
-        : "| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n";
-
-      var renderRows = function(list) {
-        return list.map(function(item) {
-          var actual = scores[item.id] || 0;
-          var isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-          var status = isDeductItem ? (actual !== 0 ? "\u2B55" : "\uD83D\uDD35") : (actual > 0 ? "\u2705" : "\u274C");
-          var dSign = item.points >= 0 ? "+" : "";
-          var aSign = actual >= 0 ? "+" : "";
-          var cn = (actual !== 0 && actual !== item.points) ? " \u{1F4DD}" : "";
-          var row = "| " + item.emoji + " " + item.name + " | " + dSign + item.points + " | " + aSign + actual + cn + " | " + status;
-          if (hasYesterday) {
-            var yVal = yesterdayData.scores[item.id] || 0;
-            row += " | " + (yVal >= 0 ? "+" : "") + yVal + (yVal > 0 ? " \u2705" : (yVal < 0 ? " \u274C" : " \u2014"));
-          }
-          return row + " |";
-        }).join("\n");
-      };
-
-      var tableContent = "";
-      for (var cat of categories) {
-        var catItems = items.filter(function(it) { return it.category === cat; });
-        if (catItems.length > 0) {
-          tableContent += "\n### " + cat + "\n\n" + tableHeader + renderRows(catItems) + "\n";
-        }
-      }
-      var uncatItems = items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
-      if (uncatItems.length > 0) {
-        tableContent += "\n### \u5176\u4ED6\n\n" + tableHeader + renderRows(uncatItems) + "\n";
-      }
-      if (customItems.length > 0) {
-        var hasCustomNotes = customItems.some(function(ci) { return ci.note && ci.note.trim(); });
-        if (hasCustomNotes) {
-          tableContent += "\n### \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\n\n| \u4E8B\u9879 | \u5F97\u5206 | \u5907\u6CE8 |\n|:---|---:|:---|\n";
-          for (var ci of customItems) { tableContent += "| " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " | " + (ci.note || "") + " |\n"; }
-        } else {
-          tableContent += "\n### \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\n\n| \u4E8B\u9879 | \u5F97\u5206 |\n|:---|---:|\n";
-          for (var ci of customItems) { tableContent += "| " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " |\n"; }
-        }
-      }
-
-      var totalSign = total >= 0 ? "+" : "";
-      var grandSign = grandTotal >= 0 ? "+" : "";
-      var totalItems = items.length;
-      var completionRate = totalItems > 0 ? Math.round(earnedCount / totalItems * 100) : 0;
-      var yesterdayRow = "";
-      if (hasYesterday) {
-        var yTotalSign = yesterdayData.total >= 0 ? "+" : "";
-        yesterdayRow = "\n| \u{1F4C6} \u6628\u65E5\u603B\u5206 | " + yTotalSign + yesterdayData.total + " \u5206 |";
-      }
-
-      var content = "---\ndate: " + dateStr + "\nchild: " + this.currentUser.name + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + this.currentUser.name + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n## \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n\n| \u6307\u6807 | \u6570\u503C |\n|:---|---:|\n| \u{1F3C6} \u4ECA\u65E5\u603B\u5206 | " + totalSign + total + " \u5206 |" + yesterdayRow + "\n| \u2705 \u5B8C\u6210\u9879\u76EE | " + earnedCount + "/" + totalItems + " (" + completionRate + "%) |\n| \u{1F4CC} \u4E34\u65F6\u4E8B\u9879 | " + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206) |\n| \u{1F4C8} \u7D2F\u8BA1\u603B\u5206 | " + grandSign + grandTotal + " \u5206 |\n| \u{1F4C5} \u7D2F\u8BA1\u5929\u6570 | " + grandDays + " \u5929 |\n| \u{1F4CA} \u65E5\u5747\u5F97\u5206 | " + grandAvg + " \u5206 |\n\n---\n" + tableContent + "\n---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || this.currentUser.diaryTemplate) + "\n";
-
-      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
-      if (!this.app.vault.getAbstractFileByPath(dirPath)) { yield this.app.vault.createFolder(dirPath); }
-      var fp = this.filePath(dateStr);
-      var existing = this.app.vault.getAbstractFileByPath(fp);
-      if (existing instanceof import_obsidian.TFile) { yield this.app.vault.modify(existing, content); }
-      else { yield this.app.vault.create(fp, content); }
-      new import_obsidian.Notice("\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + total + " | \u7D2F\u8BA1\uFF1A" + grandSign + grandTotal);
-    });
-  }
-
-  getAllScores() {
-    return __async(this, null, function* () {
-      var dirPath = (0, import_obsidian.normalizePath)(this.currentUser.savePath);
-      var files = this.app.vault.getFiles().filter(function(f) { return f.path.startsWith(dirPath + "/") && f.extension === "md"; });
-      var results = [];
-      for (var file of files) {
-        var dateStr = file.basename;
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-          var score = yield this.readDayData(dateStr);
-          if (score) results.push(score);
-        }
-      }
-      return results.sort(function(a, b) { return a.date.localeCompare(b.date); });
-    });
+    };
+    acts.appendChild(cancelBtn);
+    acts.appendChild(saveBtn);
+    c.appendChild(acts);
   }
 };
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Daily Scoring Modal
-   ═══════════════════════════════════════════════════════════════════════════ */
-var DailyScoringModal = class extends import_obsidian.Modal {
+// src/modals/popups/score-item-modal.ts
+var ScoreItemModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, initialValue, quickOnly, onConfirm, onEdit) {
+    super(app, plugin);
+    this.item = item;
+    this.initialValue = initialValue;
+    this.quickOnly = quickOnly;
+    this.onConfirm = onConfirm;
+    this.onEdit = onEdit;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText(this.item.emoji + " " + this.item.name);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    if (this.item.note) {
+      c.createEl("div", { cls: "value-popup-note", text: this.item.note });
+    }
+    c.createEl("div", {
+      cls: "value-popup-hint",
+      text: "\u9ED8\u8BA4\u5206\u503C\uFF1A" + (this.item.points >= 0 ? "+" : "") + this.item.points
+    });
+    const controls = c.createDiv({ cls: "value-popup-controls" });
+    const minus = controls.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const input = controls.createEl("input", { type: "number", cls: "value-popup-input" });
+    input.value = String(this.initialValue);
+    const plus = controls.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    bindModalInputFocus(input);
+    minus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") - 1);
+    };
+    plus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") + 1);
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u786E\u5B9A" });
+    ok.onclick = () => {
+      this.onConfirm(parseInt(input.value) || 0);
+      this.close();
+    };
+    if (!this.quickOnly) {
+      const delRow = c.createDiv({ cls: "value-popup-del-row" });
+      const editBtn = delRow.createEl("button", { cls: "value-popup-edit-btn", text: "\u270F\uFE0F \u7F16\u8F91\u6B64\u9879\u76EE" });
+      editBtn.onclick = () => {
+        this.close();
+        if (this.onEdit) this.onEdit();
+      };
+      const delBtn = delRow.createEl("button", { cls: "value-popup-del-btn", text: "\u{1F5D1} \u5220\u9664\u6B64\u6253\u5206\u9879" });
+      delBtn.onclick = async () => {
+        if (!confirm("\u786E\u5B9A\u5220\u9664\u6253\u5206\u9879\u300C" + this.item.name + "\u300D\u5417\uFF1F")) return;
+        this.close();
+        const idx = this.plugin.currentUser.items.findIndex((it) => it.id === this.item.id);
+        if (idx !== -1) {
+          this.plugin.currentUser.items.splice(idx, 1);
+          await this.plugin.saveSettings();
+        }
+      };
+    }
+  }
+};
+
+// src/modals/popups/add-item-modal.ts
+var import_obsidian3 = require("obsidian");
+var AddItemModal = class extends BaseMobileModal {
+  constructor(app, plugin, category, onAdded) {
+    super(app, plugin);
+    this.category = category;
+    this.onAdded = onAdded;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u2795 \u65B0\u589E\u6253\u5206\u9879 \xB7 " + this.category);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = "\u2B50";
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u540D\u79F0" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.placeholder = "\u6253\u5206\u9879\u540D\u79F0...";
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = "1";
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
+    ok.onclick = async () => {
+      try {
+        const n = nameInput.value.trim();
+        if (!n) {
+          nameInput.classList.add("is-error");
+          return;
+        }
+        this.plugin.currentUser.items.push({
+          id: "item_" + Date.now(),
+          name: n,
+          points: parseInt(pi.value) || 1,
+          emoji: emojiInput.value.trim() || "\u2B50",
+          category: this.category,
+          note: ""
+        });
+        const cats = this.plugin.currentUser.categories || [];
+        this.plugin.currentUser.items.sort((a, b) => {
+          let ai = cats.indexOf(a.category);
+          if (ai === -1) ai = 9999;
+          let bi = cats.indexOf(b.category);
+          if (bi === -1) bi = 9999;
+          return ai - bi;
+        });
+        await this.plugin.saveSettings();
+        this.close();
+        this.onAdded();
+      } catch (e) {
+        new import_obsidian3.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+      }
+    };
+  }
+};
+
+// src/modals/popups/add-custom-modal.ts
+var AddCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, onAdded) {
+    super(app, plugin);
+    this.onAdded = onAdded;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879");
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    c.createEl("div", { cls: "value-popup-hint", text: "\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0" });
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = "\u2B50";
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.placeholder = "\u4E8B\u9879\u540D\u79F0...";
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = "1";
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
+    ok.onclick = () => {
+      const n = nameInput.value.trim();
+      if (!n) {
+        nameInput.classList.add("is-error");
+        return;
+      }
+      this.onAdded(
+        emojiInput.value.trim() || "\u2B50",
+        n,
+        parseInt(pi.value) || 0,
+        noteInput.value.trim()
+      );
+      this.close();
+    };
+  }
+};
+
+// src/modals/popups/edit-custom-modal.ts
+var EditCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, onSave) {
+    super(app, plugin);
+    this.item = item;
+    this.onSave = onSave;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879");
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = this.item.emoji;
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.value = this.item.name;
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = String(this.item.points);
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.value = this.item.note || "";
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
+    ok.onclick = () => {
+      const n = nameInput.value.trim();
+      if (!n) {
+        nameInput.classList.add("is-error");
+        return;
+      }
+      this.onSave(
+        emojiInput.value.trim() || "\u2B50",
+        n,
+        parseInt(pi.value) || 0,
+        noteInput.value.trim()
+      );
+      this.close();
+    };
+  }
+};
+
+// src/modals/popups/quick-custom-modal.ts
+var QuickCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, onConfirm) {
+    super(app, plugin);
+    this.item = item;
+    this.onConfirm = onConfirm;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText(this.item.emoji + " " + this.item.name);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    if (this.item.note) {
+      c.createEl("div", { cls: "value-popup-note", text: this.item.note });
+    }
+    c.createEl("div", { cls: "value-popup-hint", text: "\u5FEB\u901F\u4FEE\u6539\u5206\u503C" });
+    const controls = c.createDiv({ cls: "value-popup-controls" });
+    const minus = controls.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const input = controls.createEl("input", { type: "number", cls: "value-popup-input" });
+    input.value = String(this.item.points || 0);
+    const plus = controls.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    bindModalInputFocus(input);
+    minus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") - 1);
+    };
+    plus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") + 1);
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
+    ok.onclick = () => {
+      this.onConfirm(parseInt(input.value) || 0);
+      this.close();
+    };
+  }
+};
+
+// src/modals/daily-scoring-modal.ts
+var DailyScoringModal = class extends BaseMobileModal {
   constructor(app, plugin, initialDate) {
-    super(app);
+    super(app, plugin);
     this.scores = {};
     this.customItems = [];
     this.diaryContent = "";
-    this.plugin = plugin;
-    this.dateStr = initialDate || formatDate(0);
+    this.diaryModules = {
+      weather: "",
+      mood: "",
+      todayThing: "",
+      learnedThing: "",
+      happyThing: "",
+      wantToSay: "",
+      freeWrite: ""
+    };
     this.totalDisplay = null;
     this.customItemsContainer = null;
     this.diaryTextarea = null;
     this.activeTab = "score";
+    this.enableKeyboardAdjustment = false;
+    this.dateStr = initialDate || formatDate(0);
   }
-
   onOpen() {
-    return __async(this, null, function* () {
-      yield this.renderModal();
-    });
+    super.onOpen();
+    this.renderModal();
   }
-
-  renderModal() {
-    return __async(this, null, function* () {
-      var self = this;
-      var contentEl = this.contentEl;
-      contentEl.empty();
-      contentEl.addClass("kid-score-modal");
-
-      // Reset state
-      this.scores = {};
-      this.customItems = [];
-      this.diaryContent = "";
-
-      var yesterday = new Date(this.dateStr + "T00:00:00");
-      yesterday.setDate(yesterday.getDate() - 1);
-      var yesterdayStr = yesterday.toISOString().slice(0, 10);
-
-      var existingToday = yield this.plugin.readDayData(this.dateStr);
-      var yesterdayData = yield this.plugin.readDayData(yesterdayStr);
-
-      for (var item of this.plugin.currentUser.items) {
-        if (existingToday && existingToday.scores[item.id] !== undefined) {
-          this.scores[item.id] = existingToday.scores[item.id];
-        } else {
-          this.scores[item.id] = 0;
-        }
-      }
-      if (existingToday) {
-        this.customItems = existingToday.customItems || [];
-        this.diaryContent = existingToday.diaryContent || "";
-      }
-
-      // Header with date navigation
-      var header = contentEl.createDiv({ cls: "kid-score-header" });
-      header.createEl("h2", { text: this.plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
-
-      var dateNav = header.createDiv({ cls: "kid-score-date-nav" });
-      var prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
-      prevBtn.onclick = function() {
-        var d = new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() - 1);
-        self.dateStr = d.toISOString().slice(0, 10);
-        self.renderModal();
-      };
-
-      var dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
-      dateInput.type = "date";
-      dateInput.value = this.dateStr;
-      dateInput.max = formatDate(0);
-      dateInput.onchange = function() {
-        if (dateInput.value) {
-          self.dateStr = dateInput.value;
-          self.renderModal();
-        }
-      };
-
-      var nextBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25B6" });
-      var isToday = this.dateStr === formatDate(0);
-      if (isToday) { nextBtn.disabled = true; nextBtn.style.opacity = "0.3"; }
-      nextBtn.onclick = function() {
-        if (isToday) return;
-        var d = new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() + 1);
-        self.dateStr = d.toISOString().slice(0, 10);
-        self.renderModal();
-      };
-
-      var todayBtn = dateNav.createEl("button", { cls: "date-nav-today" + (isToday ? " is-today" : ""), text: isToday ? "\u4ECA\u5929" : "\u56DE\u5230\u4ECA\u5929" });
-      if (!isToday) {
-        todayBtn.onclick = function() {
-          self.dateStr = formatDate(0);
-          self.renderModal();
-        };
-      }
-
-      // Editing past date indicator
-      if (!isToday) {
-        contentEl.createDiv({ cls: "kid-score-past-banner", text: "\u{1F4C5} \u6B63\u5728\u7F16\u8F91 " + this.dateStr + " \u7684\u8BB0\u5F55" });
-      }
-
-      // Cumulative banner
-      var allScores = yield this.plugin.getAllScores();
-      var cumulativeTotal = allScores.reduce(function(sum, s) { return sum + s.total; }, 0);
-      var cumulativeDays = allScores.length;
-      if (cumulativeDays > 0) {
-        var cSign = cumulativeTotal >= 0 ? "+" : "";
-        var cumDiv = contentEl.createDiv({ cls: "kid-score-cumulative-banner" });
-        cumDiv.createSpan({ cls: "cumulative-label", text: "\u{1F3C5} \u5386\u53F2\u7D2F\u8BA1" });
-        cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
-        cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
-      }
-
-      /* ── User switcher (multi-user) ── */
-      var allUsers = self.plugin.settings.users;
-      if (allUsers.length > 1) {
-        var userSwitcher = contentEl.createDiv({ cls: "kid-score-user-switcher" });
-        allUsers.forEach(function(u) {
-          var uBtn = userSwitcher.createEl("button", {
-            cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
-            text: u.name
-          });
-          uBtn.onclick = function() {
-            return __async(self, null, function* () {
-              self.plugin.settings.currentUserId = u.id;
-              yield self.plugin.saveSettings();
-              yield self.renderModal();
-            });
-          };
-        });
-      }
-
-      /* ── Tab bar ── */
-      var mainTabs = contentEl.createDiv({ cls: "kid-score-main-tabs" });
-      var scoreTab = mainTabs.createEl("button", { text: "\u2B50 \u6253\u5206", cls: "kid-score-main-tab is-active" });
-      var diaryTab = mainTabs.createEl("button", { text: "\u{1F4DD} \u65E5\u8BB0", cls: "kid-score-main-tab" });
-
-
-      var scorePanel = contentEl.createDiv({ cls: "kid-score-tab-panel" });
-      var diaryPanel = contentEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
-
-      scoreTab.onclick = function() {
-        if (self.diaryTextarea) self.diaryContent = self.diaryTextarea.value;
-        self.activeTab = "score";
-        scoreTab.addClass("is-active"); diaryTab.removeClass("is-active");
-        scorePanel.removeClass("is-hidden"); diaryPanel.addClass("is-hidden");
-        contentEl.scrollTop = 0;
-      };
-      diaryTab.onclick = function() {
-        self.activeTab = "diary";
-        diaryTab.addClass("is-active"); scoreTab.removeClass("is-active");
-        diaryPanel.removeClass("is-hidden"); scorePanel.addClass("is-hidden");
-        contentEl.scrollTop = 0;
-      };
-
-      /* ══════════════ Score Panel ══════════════ */
-      if (this.plugin.currentUser.items.length === 0) {
-        scorePanel.createEl("div", { cls: "kid-score-empty", text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01" });
+  isTouchOptimizedMode() {
+    return this.mobilePlatform !== "desktop";
+  }
+  async renderModal() {
+    const self = this;
+    const contentEl = this.contentEl;
+    contentEl.empty();
+    contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+    this.scores = {};
+    this.customItems = [];
+    this.diaryContent = "";
+    this.diaryModules = {
+      weather: "",
+      mood: "",
+      todayThing: "",
+      learnedThing: "",
+      happyThing: "",
+      wantToSay: "",
+      freeWrite: ""
+    };
+    const yesterday = /* @__PURE__ */ new Date(this.dateStr + "T00:00:00");
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+    const existingToday = await this.plugin.readDayData(this.dateStr);
+    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
+    for (const item of this.plugin.currentUser.items) {
+      if (existingToday && existingToday.scores[item.id] !== void 0) {
+        this.scores[item.id] = existingToday.scores[item.id];
       } else {
-        // ── Scoring Rules Section ──
-        var rulesSection = scorePanel.createDiv({ cls: "kid-score-rules-section" });
-        var rulesHeader = rulesSection.createDiv({ cls: "kid-score-rules-header" });
-        var rulesToggle = rulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-        rulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-        var rulesEditBtn = rulesHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-        var rulesBody = rulesSection.createDiv({ cls: "kid-score-rules-body" });
-        var rulesView = rulesBody.createDiv({ cls: "kid-score-rules-view" });
-        var rulesEdit = rulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-        var rulesTextarea = rulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-        rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-        var rulesActRow = rulesEdit.createDiv({ cls: "kid-score-rules-actions" });
-        var rulesSaveBtn = rulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
-        var rulesCancelBtn = rulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
-        var renderRulesView = function() {
-          rulesView.empty();
-          var text = self.plugin.currentUser.scoringRules || "";
-          if (text.trim()) {
-            import_obsidian.MarkdownRenderer.render(self.app, text, rulesView, "", self);
-          } else {
-            rulesView.createEl("p", { cls: "kid-score-rules-empty", text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219" });
+        this.scores[item.id] = 0;
+      }
+    }
+    if (existingToday) {
+      this.customItems = existingToday.customItems || [];
+      this.diaryContent = existingToday.diaryContent || "";
+      this.diaryModules = this.parseDiaryModules(this.diaryContent);
+    }
+    const header = contentEl.createDiv({ cls: "kid-score-header" });
+    header.createEl("h2", { text: this.plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
+    const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
+    const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
+    prevBtn.onclick = () => {
+      const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
+      d.setDate(d.getDate() - 1);
+      self.dateStr = d.toISOString().slice(0, 10);
+      self.renderModal();
+    };
+    const dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
+    dateInput.type = "date";
+    dateInput.value = this.dateStr;
+    dateInput.max = formatDate(0);
+    dateInput.onchange = () => {
+      if (dateInput.value) {
+        self.dateStr = dateInput.value;
+        self.renderModal();
+      }
+    };
+    const calBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u{1F4C5}" });
+    calBtn.title = "\u65E5\u5386\u8DF3\u9009";
+    calBtn.onclick = () => {
+      self.showCalendarPicker();
+    };
+    const nextBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25B6" });
+    const isToday = this.dateStr === formatDate(0);
+    if (isToday) {
+      nextBtn.disabled = true;
+      nextBtn.style.opacity = "0.3";
+    }
+    nextBtn.onclick = () => {
+      if (isToday) return;
+      const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
+      d.setDate(d.getDate() + 1);
+      self.dateStr = d.toISOString().slice(0, 10);
+      self.renderModal();
+    };
+    const todayBtn = dateNav.createEl("button", {
+      cls: "date-nav-today" + (isToday ? " is-today" : ""),
+      text: isToday ? "\u4ECA\u5929" : "\u56DE\u5230\u4ECA\u5929"
+    });
+    if (!isToday) {
+      todayBtn.onclick = () => {
+        self.dateStr = formatDate(0);
+        self.renderModal();
+      };
+    }
+    if (!isToday) {
+      contentEl.createDiv({
+        cls: "kid-score-past-banner",
+        text: "\u{1F4C5} \u6B63\u5728\u7F16\u8F91 " + this.dateStr + " \u7684\u8BB0\u5F55"
+      });
+    }
+    const allScores = await this.plugin.getAllScores();
+    const cumulativeTotal = allScores.reduce((sum, s) => sum + s.total, 0);
+    const cumulativeDays = allScores.length;
+    if (cumulativeDays > 0) {
+      const cSign = cumulativeTotal >= 0 ? "+" : "";
+      const cumDiv = contentEl.createDiv({ cls: "kid-score-cumulative-banner" });
+      cumDiv.createSpan({ cls: "cumulative-label", text: "\u{1F396}\uFE0F \u5386\u53F2\u7D2F\u8BA1" });
+      cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
+      cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
+    }
+    const allUsers = self.plugin.settings.users;
+    const userSwitcher = contentEl.createDiv({ cls: "kid-score-user-switcher" });
+    allUsers.forEach((u) => {
+      const uBtn = userSwitcher.createEl("button", {
+        cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+        text: u.name
+      });
+      if (allUsers.length > 1) {
+        uBtn.onclick = async () => {
+          try {
+            self.plugin.settings.currentUserId = u.id;
+            await self.plugin.saveSettings();
+            await self.renderModal();
+          } catch (e) {
+            new import_obsidian4.Notice("\u274C \u5207\u6362\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
           }
         };
-        renderRulesView();
-        var rulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
-        if (!rulesOpen) { rulesBody.addClass("is-hidden"); }
-        else { rulesToggle.textContent = "\u25BC"; }
-        rulesHeader.addEventListener("click", function(e) {
-          if (e.target === rulesEditBtn || rulesEditBtn.contains(e.target)) return;
-          rulesOpen = !rulesOpen;
-          rulesToggle.textContent = rulesOpen ? "\u25BC" : "\u25B6";
-          rulesBody.toggleClass("is-hidden", !rulesOpen);
-        });
-        var rulesIsEditing = false;
-        rulesEditBtn.addEventListener("click", function(e) {
-          e.stopPropagation();
-          rulesIsEditing = !rulesIsEditing;
-          if (rulesIsEditing) {
-            rulesOpen = true;
-            rulesToggle.textContent = "\u25BC";
-            rulesBody.removeClass("is-hidden");
-            rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-            rulesView.addClass("is-hidden");
-            rulesEdit.removeClass("is-hidden");
-            rulesTextarea.focus();
-          } else {
-            rulesView.removeClass("is-hidden");
-            rulesEdit.addClass("is-hidden");
-          }
-        });
-        rulesSaveBtn.addEventListener("click", function() {
-          return __async(self, null, function* () {
-            self.plugin.currentUser.scoringRules = rulesTextarea.value;
-            yield self.plugin.saveSettings();
-            rulesIsEditing = false;
-            rulesView.removeClass("is-hidden");
-            rulesEdit.addClass("is-hidden");
-            renderRulesView();
-            new import_obsidian.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
+      }
+    });
+    const mainTabs = contentEl.createDiv({ cls: "kid-score-main-tabs" });
+    const scoreTab = mainTabs.createEl("button", {
+      text: "\u2B50 \u6253\u5206",
+      cls: "kid-score-main-tab is-active"
+    });
+    const diaryTab = mainTabs.createEl("button", {
+      text: "\u{1F4DD} \u65E5\u8BB0",
+      cls: "kid-score-main-tab"
+    });
+    const scorePanel = contentEl.createDiv({ cls: "kid-score-tab-panel" });
+    const diaryPanel = contentEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
+    scoreTab.onclick = () => {
+      self.syncDiaryContent();
+      self.activeTab = "score";
+      scoreTab.addClass("is-active");
+      diaryTab.removeClass("is-active");
+      scorePanel.removeClass("is-hidden");
+      diaryPanel.addClass("is-hidden");
+      contentEl.scrollTop = 0;
+    };
+    diaryTab.onclick = () => {
+      self.activeTab = "diary";
+      diaryTab.addClass("is-active");
+      scoreTab.removeClass("is-active");
+      diaryPanel.removeClass("is-hidden");
+      scorePanel.addClass("is-hidden");
+      contentEl.scrollTop = 0;
+    };
+    if (this.plugin.currentUser.items.length === 0) {
+      scorePanel.createEl("div", {
+        cls: "kid-score-empty",
+        text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01"
+      });
+    } else {
+      const rulesSection = scorePanel.createDiv({ cls: "kid-score-rules-section" });
+      const rulesHeader = rulesSection.createDiv({ cls: "kid-score-rules-header" });
+      const rulesToggle = rulesHeader.createEl("span", {
+        cls: "kid-score-rules-toggle",
+        text: "\u25B6"
+      });
+      rulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+      const rulesEditBtn = rulesHeader.createEl("button", {
+        cls: "kid-score-rules-edit-btn",
+        text: "\u270F\uFE0F"
+      });
+      const rulesBody = rulesSection.createDiv({ cls: "kid-score-rules-body" });
+      const rulesView = rulesBody.createDiv({ cls: "kid-score-rules-view" });
+      const rulesEdit = rulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+      const rulesTextarea = rulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+      bindModalInputFocus(rulesTextarea);
+      rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+      const rulesActRow = rulesEdit.createDiv({ cls: "kid-score-rules-actions" });
+      const rulesSaveBtn = rulesActRow.createEl("button", {
+        cls: "mod-cta kid-score-rules-save-btn",
+        text: "\u4FDD\u5B58\u89C4\u5219"
+      });
+      const rulesCancelBtn = rulesActRow.createEl("button", {
+        cls: "kid-score-rules-cancel-btn",
+        text: "\u53D6\u6D88"
+      });
+      const renderRulesView = () => {
+        rulesView.empty();
+        const text = self.plugin.currentUser.scoringRules || "";
+        if (text.trim()) {
+          import_obsidian4.MarkdownRenderer.render(self.app, text, rulesView, "", this);
+        } else {
+          rulesView.createEl("p", {
+            cls: "kid-score-rules-empty",
+            text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
           });
-        });
-        rulesCancelBtn.addEventListener("click", function() {
-          rulesIsEditing = false;
+        }
+      };
+      renderRulesView();
+      let rulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
+      if (!rulesOpen) {
+        rulesBody.addClass("is-hidden");
+      } else {
+        rulesToggle.textContent = "\u25BC";
+      }
+      rulesHeader.addEventListener("click", (e) => {
+        if (e.target === rulesEditBtn || rulesEditBtn.contains(e.target)) return;
+        rulesOpen = !rulesOpen;
+        rulesToggle.textContent = rulesOpen ? "\u25BC" : "\u25B6";
+        rulesBody.toggleClass("is-hidden", !rulesOpen);
+      });
+      let rulesIsEditing = false;
+      rulesEditBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        rulesIsEditing = !rulesIsEditing;
+        if (rulesIsEditing) {
+          rulesOpen = true;
+          rulesToggle.textContent = "\u25BC";
+          rulesBody.removeClass("is-hidden");
+          rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+          rulesView.addClass("is-hidden");
+          rulesEdit.removeClass("is-hidden");
+          rulesTextarea.focus();
+        } else {
           rulesView.removeClass("is-hidden");
           rulesEdit.addClass("is-hidden");
+        }
+      });
+      rulesSaveBtn.addEventListener("click", async () => {
+        self.plugin.currentUser.scoringRules = rulesTextarea.value;
+        await self.plugin.saveSettings();
+        rulesIsEditing = false;
+        rulesView.removeClass("is-hidden");
+        rulesEdit.addClass("is-hidden");
+        renderRulesView();
+        new import_obsidian4.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
+      });
+      rulesCancelBtn.addEventListener("click", () => {
+        rulesIsEditing = false;
+        rulesView.removeClass("is-hidden");
+        rulesEdit.addClass("is-hidden");
+      });
+      if (yesterdayData) {
+        const ySign = yesterdayData.total >= 0 ? "+" : "";
+        scorePanel.createDiv({
+          cls: "kid-score-yesterday-banner",
+          text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayStr + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206"
         });
-
-        if (yesterdayData) {
-          var ySign = yesterdayData.total >= 0 ? "+" : "";
-          scorePanel.createDiv({ cls: "kid-score-yesterday-banner", text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayStr + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206" });
-        }
-        var itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
-        itemsContainer.createDiv({ cls: "kid-score-hint", text: "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \u00B7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C" });
-        this.totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
-
-        // Render by category
-        var categories = this.plugin.currentUser.categories || [];
-        var catRendered = false;
-        for (var cat of categories) {
-          var catItems = this.plugin.currentUser.items.filter(function(it) { return it.category === cat; });
-          if (catItems.length > 0) {
-            if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
-            var catHeader = itemsContainer.createDiv({ cls: "kid-score-cat-header" });
-            catHeader.createEl("h3", { text: cat, cls: "kid-score-section-title" });
-            (function(c) {
-              var addItemBtn = catHeader.createEl("button", { text: "+", cls: "kid-score-add-item-btn" });
-              addItemBtn.onclick = function() { self.showAddItemPopup(c); };
-            })(cat);
-            var grid = itemsContainer.createDiv({ cls: "kid-score-grid" });
-            for (var itm of catItems) { this.renderCard(itm, grid, yesterdayData); }
-            catRendered = true;
+      }
+      const itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
+      itemsContainer.createDiv({
+        cls: "kid-score-hint",
+        text: this.isTouchOptimizedMode() ? "\u{1F4A1} \u70B9\u4E00\u4E0B\u8BB0\u5206\uFF0C\u957F\u6309\u6216\u70B9\u53F3\u4E0A\u89D2\u6309\u94AE\u8C03\u6574\u5206\u503C" : "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \xB7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C"
+      });
+      this.totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
+      const categories = this.plugin.currentUser.categories || [];
+      let catRendered = false;
+      for (const cat of categories) {
+        const catItems = this.plugin.currentUser.items.filter((it) => it.category === cat);
+        if (catItems.length > 0) {
+          if (catRendered) {
+            itemsContainer.createEl("hr", { cls: "kid-score-divider" });
           }
-        }
-        // Uncategorized
-        var uncatItems = this.plugin.currentUser.items.filter(function(it) { return !it.category || categories.indexOf(it.category) === -1; });
-        if (uncatItems.length > 0) {
-          if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
-          itemsContainer.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
-          var grid2 = itemsContainer.createDiv({ cls: "kid-score-grid" });
-          for (var itm of uncatItems) { this.renderCard(itm, grid2, yesterdayData); }
+          const catHeader = itemsContainer.createDiv({ cls: "kid-score-cat-header" });
+          catHeader.createEl("h3", { text: cat, cls: "kid-score-section-title" });
+          ((c) => {
+            const addItemBtn = catHeader.createEl("button", { text: "+", cls: "kid-score-add-item-btn" });
+            addItemBtn.onclick = () => {
+              self.showAddItemPopup(c);
+            };
+          })(cat);
+          const grid = itemsContainer.createDiv({ cls: "kid-score-grid" });
+          for (const itm of catItems) {
+            this.renderCard(itm, grid, yesterdayData);
+          }
           catRendered = true;
         }
-
-        // Custom items
-        if (catRendered) { itemsContainer.createEl("hr", { cls: "kid-score-divider" }); }
-        itemsContainer.createEl("h3", { text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879", cls: "kid-score-section-title" });
-        this.customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
-        this.renderCustomItems();
-        var addCustomBtn = itemsContainer.createEl("button", { text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206", cls: "kid-score-add-custom-btn" });
-        addCustomBtn.onclick = function() { self.showAddCustomItemForm(); };
-        this.updateTotalDisplay();
       }
-
-      /* ══════════════ Diary Panel ══════════════ */
-      this.buildDiaryPanel(diaryPanel);
-
-      /* ══════════════ Action Buttons ══════════════ */
-      var actions = contentEl.createDiv({ cls: "kid-score-actions" });
-      var saveBtn = actions.createEl("button", { text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55", cls: "mod-cta kid-score-save-btn" });
-      saveBtn.onclick = function() {
-        return __async(self, null, function* () {
-          if (self.diaryTextarea) self.diaryContent = self.diaryTextarea.value;
-          yield self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
-          self.close();
-        });
+      const uncatItems = this.plugin.currentUser.items.filter(
+        (it) => !it.category || categories.indexOf(it.category) === -1
+      );
+      if (uncatItems.length > 0) {
+        if (catRendered) {
+          itemsContainer.createEl("hr", { cls: "kid-score-divider" });
+        }
+        itemsContainer.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
+        const grid2 = itemsContainer.createDiv({ cls: "kid-score-grid" });
+        for (const itm of uncatItems) {
+          this.renderCard(itm, grid2, yesterdayData);
+        }
+        catRendered = true;
+      }
+      if (catRendered) {
+        itemsContainer.createEl("hr", { cls: "kid-score-divider" });
+      }
+      itemsContainer.createEl("h3", { text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879", cls: "kid-score-section-title" });
+      this.customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
+      this.renderCustomItems();
+      const addCustomBtn = itemsContainer.createEl("button", {
+        text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
+        cls: "kid-score-add-custom-btn"
+      });
+      addCustomBtn.onclick = () => {
+        self.showAddCustomItemForm();
       };
-      var statsBtn = actions.createEl("button", { text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1", cls: "kid-score-stats-btn" });
-      statsBtn.onclick = function() { self.close(); new StatsModal(self.app, self.plugin).open(); };
+      this.updateTotalDisplay();
+    }
+    const diaryControls = this.buildDiaryPanel(diaryPanel);
+    const actions = contentEl.createDiv({ cls: "kid-score-actions" });
+    const previewBtn = actions.createEl("button", {
+      text: "\u9884\u89C8",
+      cls: "kid-score-preview-btn"
     });
-  }
-
-  buildDiaryPanel(panel) {
-    var self = this;
-    var isPreview = false;
-
-    var toolbar = panel.createDiv({ cls: "diary-toolbar" });
-    var templateBtn = toolbar.createEl("button", { cls: "diary-tool-btn", text: "\u{1F4CB} \u63D2\u5165\u6A21\u677F" });
-    templateBtn.onclick = function() {
-      if (!self.diaryTextarea) return;
-      var template = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      var current = self.diaryTextarea.value;
-      if (current.trim()) {
-        var pos = self.diaryTextarea.selectionStart || current.length;
-        self.diaryTextarea.value = current.slice(0, pos) + "\n\n" + template + current.slice(pos);
-      } else { self.diaryTextarea.value = template; }
-      self.diaryContent = self.diaryTextarea.value;
-      self.diaryTextarea.focus();
+    const saveBtn = actions.createEl("button", {
+      text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
+      cls: "mod-cta kid-score-save-btn"
+    });
+    if (diaryControls && typeof diaryControls.bindPreviewButton === "function") {
+      diaryControls.bindPreviewButton(previewBtn);
+    }
+    previewBtn.onclick = () => {
+      if (diaryControls && typeof diaryControls.togglePreview === "function") diaryControls.togglePreview();
     };
-    [{ t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" }, { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" }, { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }].forEach(function(a) {
-      var btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: a.t });
-      btn.onclick = function() { self.insertAttachment(a.t.split(" ")[1], a.e); };
+    saveBtn.onclick = async () => {
+      self.syncDiaryContent();
+      try {
+        await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+        self.close();
+      } catch (e) {
+        new import_obsidian4.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+      }
+    };
+    const statsBtn = actions.createEl("button", {
+      text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
+      cls: "kid-score-stats-btn"
     });
-    var previewBtn = toolbar.createEl("button", { cls: "diary-tool-btn diary-preview-btn", text: "MD\u6A21\u5F0F" });
-    previewBtn.onclick = function() {
+    statsBtn.onclick = () => {
+      self.close();
+      new StatsModal(self.app, self.plugin).open();
+    };
+  }
+  buildDiaryPanel(panel) {
+    const self = this;
+    let isPreview = false;
+    const moduleFields = [];
+    const moduleConfig = self.plugin.currentUser.diaryModules && self.plugin.currentUser.diaryModules.length ? self.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const syncAndRefresh = () => {
+      self.syncDiaryContent();
+      updateCC();
+      if (!isPreview || !previewWrap) return;
+      previewWrap.empty();
+      import_obsidian4.MarkdownRenderer.render(
+        self.app,
+        self.diaryContent || "_还没有内容_",
+        previewWrap,
+        "",
+        this
+      );
+    };
+    const toolbar = panel.createDiv({ cls: "diary-toolbar" });
+    const templateBtn = toolbar.createEl("button", {
+      cls: "diary-tool-btn",
+      text: "\u{1F4CB} \u586B\u5165\u9ED8\u8BA4\u6A21\u677F"
+    });
+    templateBtn.onclick = () => {
+      if (!self.diaryModules.weather) self.diaryModules.weather = "\u2600\uFE0F \u6674";
+      if (!self.diaryModules.mood) self.diaryModules.mood = "\u{1F60A} \u5F00\u5FC3";
+      if (!self.diaryModules.todayThing) self.diaryModules.todayThing = "\u4ECA\u5929\u6211\u505A\u4E86____\u3002";
+      if (!self.diaryModules.learnedThing) self.diaryModules.learnedThing = "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____\u3002";
+      if (!self.diaryModules.happyThing) self.diaryModules.happyThing = "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____\u3002";
+      if (!self.diaryModules.wantToSay) self.diaryModules.wantToSay = "\u6211\u8FD8\u60F3\u8BF4____\u3002";
+      moduleFields.forEach(({ key, input }) => {
+        if (input.value.trim()) return;
+        input.value = self.diaryModules[key] || "";
+      });
+      if (self.diaryTextarea && !self.diaryTextarea.value.trim()) {
+        self.diaryTextarea.value = "\u4ECA\u5929\u8FD8\u6709\u4E00\u4EF6\u6211\u60F3\u8BB0\u4E0B\u6765\u7684\u4E8B\uFF1A\n";
+        self.diaryModules.freeWrite = self.diaryTextarea.value;
+      }
+      syncAndRefresh();
+      if (moduleFields[0] && moduleFields[0].input) moduleFields[0].input.focus();
+    };
+    [
+      { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
+      { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
+      { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
+    ].forEach((a) => {
+      const btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: a.t });
+      btn.onclick = () => {
+        self.insertAttachment(a.t.split(" ")[1], a.e);
+      };
+    });
+    let previewWrap = null;
+    let updateCC = () => {
+    };
+    let previewButtonBinder = () => {
+    };
+    const updatePreviewButton = () => {
+      previewButtonBinder(isPreview);
+    };
+    const togglePreview = () => {
       isPreview = !isPreview;
       if (isPreview) {
-        self.diaryContent = self.diaryTextarea.value;
+        self.syncDiaryContent();
         self.diaryTextarea.rows = 5;
         previewWrap.style.display = "";
         previewWrap.empty();
-        import_obsidian.MarkdownRenderer.render(self.app, self.diaryContent || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", previewWrap, "", self);
-        self.diaryTextarea.oninput = function() {
-          self.diaryContent = self.diaryTextarea.value; updateCC();
-          previewWrap.empty();
-          import_obsidian.MarkdownRenderer.render(self.app, self.diaryTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", previewWrap, "", self);
+        import_obsidian4.MarkdownRenderer.render(
+          self.app,
+          self.diaryContent || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
+          previewWrap,
+          "",
+          this
+        );
+        self.diaryTextarea.oninput = () => {
+          self.diaryModules.freeWrite = self.diaryTextarea.value;
+          syncAndRefresh();
         };
-        previewBtn.textContent = "\u9884\u89C8\u6A21\u5F0F";
       } else {
         self.diaryTextarea.rows = 12;
         previewWrap.style.display = "none";
-        self.diaryTextarea.oninput = function() { self.diaryContent = self.diaryTextarea.value; updateCC(); };
-        previewBtn.textContent = "MD\u6A21\u5F0F";
+        self.diaryTextarea.oninput = () => {
+          self.diaryModules.freeWrite = self.diaryTextarea.value;
+          syncAndRefresh();
+        };
         self.diaryTextarea.focus();
       }
+      updatePreviewButton();
     };
-
-    var quickRow = panel.createDiv({ cls: "diary-quick-row" });
-    var weatherEmojis = [{ e: "\u2600\uFE0F", l: "\u6674" }, { e: "\u26C5", l: "\u591A\u4E91" }, { e: "\u{1F327}\uFE0F", l: "\u96E8" }, { e: "\u{1F328}\uFE0F", l: "\u96EA" }, { e: "\u{1F32C}\uFE0F", l: "\u98CE" }, { e: "\u{1F324}\uFE0F", l: "\u6674\u8F6C\u591A\u4E91" }];
-    var moodEmojis = [{ e: "\u{1F60A}", l: "\u5F00\u5FC3" }, { e: "\u{1F60E}", l: "\u5F88\u68D2" }, { e: "\u{1F914}", l: "\u601D\u8003" }, { e: "\u{1F622}", l: "\u96BE\u8FC7" }, { e: "\u{1F620}", l: "\u751F\u6C14" }, { e: "\u{1F634}", l: "\u56F0" }];
-
-    var wWrap = quickRow.createDiv({ cls: "diary-quick-group" });
-    wWrap.createSpan({ cls: "diary-quick-label", text: "\u5929\u6C14" });
-    weatherEmojis.forEach(function(w) { var b = wWrap.createEl("button", { cls: "diary-quick-btn", text: w.e }); b.title = w.l; b.onclick = function() { self.insertTextAtCursor(w.e + " " + w.l + " "); }; });
-    var mWrap = quickRow.createDiv({ cls: "diary-quick-group" });
-    mWrap.createSpan({ cls: "diary-quick-label", text: "\u5FC3\u60C5" });
-    moodEmojis.forEach(function(m) { var b = mWrap.createEl("button", { cls: "diary-quick-btn", text: m.e }); b.title = m.l; b.onclick = function() { self.insertTextAtCursor(m.e + " " + m.l + " "); }; });
-
-    var textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
-    this.diaryTextarea = textareaWrap.createEl("textarea", { cls: "diary-textarea", placeholder: "\u5728\u8FD9\u91CC\u8BB0\u5F55\u4ECA\u5929\u7684\u6545\u4E8B...\n\n\u70B9\u51FB\u201C\u63D2\u5165\u6A21\u677F\u201D\u5F00\u59CB\u5199\u65E5\u8BB0\uFF0C\u6216\u76F4\u63A5\u81EA\u7531\u4E66\u5199\u3002" });
-    this.diaryTextarea.value = this.diaryContent || "";
+    const moduleSection = panel.createDiv({ cls: "diary-module-section" });
+    moduleSection.createEl("h4", { cls: "diary-module-title", text: "\uD83E\uDDE9 \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
+    moduleSection.createEl("p", {
+      cls: "diary-module-hint",
+      text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
+    });
+    const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
+    const createModuleField = (moduleDef) => {
+      const card = moduleGrid.createDiv({ cls: "diary-module-card" });
+      card.createSpan({ cls: "diary-module-label", text: moduleDef.label });
+      const isMultiline = moduleDef.kind !== "quick";
+      const input = isMultiline ? card.createEl("textarea", { cls: "diary-module-input is-multiline" }) : card.createEl("input", { cls: "diary-module-input", type: "text" });
+      input.placeholder = moduleDef.placeholder || "";
+      input.value = self.diaryModules[moduleDef.id] || "";
+      bindModalInputFocus(input, { scrollOnIOSFocus: false });
+      input.addEventListener("input", () => {
+        self.diaryModules[moduleDef.id] = input.value.trim();
+        syncAndRefresh();
+      });
+      moduleFields.push({ key: moduleDef.id, input });
+      return input;
+    };
+    const weatherModule = moduleConfig.find((m) => m.id === "weather");
+    const moodModule = moduleConfig.find((m) => m.id === "mood");
+    moduleConfig.filter((m) => m.id !== "weather" && m.id !== "mood").forEach((moduleDef) => createModuleField(moduleDef));
+    const quickRow = panel.createDiv({ cls: "diary-quick-row" });
+    const weatherEmojis = [
+      { e: "\u2600\uFE0F", l: "\u6674" },
+      { e: "\u26C5", l: "\u591A\u4E91" },
+      { e: "\u{1F327}\uFE0F", l: "\u96E8" },
+      { e: "\u{1F328}\uFE0F", l: "\u96EA" },
+      { e: "\u{1F32C}\uFE0F", l: "\u98CE" },
+      { e: "\u{1F324}\uFE0F", l: "\u6674\u8F6C\u591A\u4E91" }
+    ];
+    const moodEmojis = [
+      { e: "\u{1F60A}", l: "\u5F00\u5FC3" },
+      { e: "\u{1F60E}", l: "\u5F88\u68D2" },
+      { e: "\u{1F914}", l: "\u601D\u8003" },
+      { e: "\u{1F622}", l: "\u96BE\u8FC7" },
+      { e: "\u{1F620}", l: "\u751F\u6C14" },
+      { e: "\u{1F634}", l: "\u56F0" }
+    ];
+    const createQuickGroup = (moduleDef, defaults) => {
+      if (!moduleDef) return;
+      let customEmoji = defaults[0].e;
+      const group = quickRow.createDiv({ cls: "diary-quick-group" });
+      const header = group.createDiv({ cls: "diary-quick-header" });
+      header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
+      const valueInput = group.createEl("input", { cls: "diary-quick-value-input", type: "text" });
+      valueInput.placeholder = moduleDef.placeholder || "";
+      valueInput.value = self.diaryModules[moduleDef.id] || "";
+      bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
+      valueInput.addEventListener("input", () => {
+        self.diaryModules[moduleDef.id] = valueInput.value.trim();
+        syncAndRefresh();
+      });
+      moduleFields.push({ key: moduleDef.id, input: valueInput });
+      const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
+      defaults.forEach((entry) => {
+        const b = emojiRow.createEl("button", { cls: "diary-quick-btn", text: entry.e });
+        b.title = entry.l;
+        b.onclick = () => {
+          valueInput.value = entry.e + " " + entry.l;
+          self.diaryModules[moduleDef.id] = valueInput.value.trim();
+          syncAndRefresh();
+        };
+      });
+      const customRow = group.createDiv({ cls: "diary-quick-custom-row" });
+      const emojiBtn = customRow.createEl("button", { cls: "diary-tool-btn diary-quick-picker-btn", text: customEmoji });
+      emojiBtn.title = "\u9009\u62E9\u5176\u4ED6 emoji";
+      emojiBtn.onclick = () => {
+        showEmojiPicker((em) => {
+          customEmoji = em;
+          emojiBtn.textContent = em;
+        }, panel);
+      };
+      const textInput = customRow.createEl("input", { cls: "diary-quick-text-input", type: "text" });
+      textInput.placeholder = "\u8F93\u5165" + moduleDef.label + "\u6216\u8865\u5145\u6587\u5B57";
+      bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+      const addBtn = customRow.createEl("button", { cls: "diary-tool-btn diary-quick-add-btn", text: "\u6DFB\u52A0" });
+      const insertCustom = () => {
+        const text = textInput.value.trim();
+        if (!customEmoji && !text) return;
+        const body = [customEmoji, text].filter(Boolean).join(" ").trim();
+        valueInput.value = body;
+        self.diaryModules[moduleDef.id] = body;
+        syncAndRefresh();
+        textInput.value = "";
+      };
+      addBtn.onclick = insertCustom;
+      textInput.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        insertCustom();
+      });
+      return group;
+    };
+    createQuickGroup(weatherModule, weatherEmojis);
+    createQuickGroup(moodModule, moodEmojis);
+    const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
+    textareaWrap.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+    textareaWrap.createEl("p", {
+      cls: "diary-module-hint",
+      text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
+    });
+    this.diaryTextarea = textareaWrap.createEl("textarea", {
+      cls: "diary-textarea",
+      placeholder: "\u4F8B\u5982\uFF1A\u4ECA\u5929\u653E\u5B66\u540E\uFF0C\u6211\u548C\u5988\u5988\u4E00\u8D77\u53BB\u4E86\u516C\u56ED..."
+    });
+    bindModalInputFocus(this.diaryTextarea);
+    this.diaryTextarea.value = this.diaryModules.freeWrite || "";
     this.diaryTextarea.rows = 12;
-    this.diaryTextarea.oninput = function() { self.diaryContent = self.diaryTextarea.value; updateCC(); };
-
-    var previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
+    this.diaryTextarea.oninput = () => {
+      self.diaryModules.freeWrite = self.diaryTextarea.value;
+      syncAndRefresh();
+    };
+    previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
     previewWrap.style.display = "none";
-
-    var charCount = panel.createDiv({ cls: "diary-char-count" });
-    var updateCC = function() { charCount.textContent = (self.diaryTextarea.value || "").length + " \u5B57"; };
+    const charCount = panel.createDiv({ cls: "diary-char-count" });
+    updateCC = () => {
+      charCount.textContent = (self.diaryContent || "").length + " \u5B57";
+    };
+    self.syncDiaryContent();
     updateCC();
+    updatePreviewButton();
+    return {
+      togglePreview,
+      bindPreviewButton: (btn) => {
+        previewButtonBinder = (active) => {
+          btn.textContent = active ? "\u7EE7\u7EED\u7F16\u8F91" : "\u9884\u89C8";
+          btn.classList.toggle("is-active", active);
+        };
+        updatePreviewButton();
+      }
+    };
   }
-
+  parseDiaryModules(content) {
+    const raw = content || "";
+    const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const readLine = (label) => {
+      const match = raw.match(new RegExp(escapeRegex(label) + "：\\s*(.+)"));
+      return match ? match[1].trim() : "";
+    };
+    const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
+    const result = { freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : "" };
+    moduleConfig.forEach((moduleDef) => {
+      result[moduleDef.id] = readLine(moduleDef.label);
+    });
+    return result;
+  }
+  syncDiaryContent() {
+    const d = this.diaryModules || {};
+    const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const sections = [];
+    const recordLines = [];
+    const storyLines = [];
+    const values = {};
+    const appendSentence = (text) => {
+      const cleaned = String(text || "").trim();
+      if (!cleaned) return;
+      storyLines.push(/[。！？.!?]$/.test(cleaned) ? cleaned : cleaned + "。");
+    };
+    moduleConfig.forEach((moduleDef) => {
+      const value = String(d[moduleDef.id] || "").replace(/\s*\n+\s*/g, " / ").trim();
+      values[moduleDef.id] = value;
+      if (!value) return;
+      recordLines.push(moduleDef.label + "：" + value);
+    });
+    if (values.weather) appendSentence("今天的天气是" + values.weather);
+    if (values.mood) appendSentence("我今天的心情是" + values.mood);
+    if (values.todayThing) appendSentence(values.todayThing);
+    if (values.learnedThing) appendSentence(values.learnedThing);
+    if (values.happyThing) appendSentence(values.happyThing);
+    if (values.wantToSay) appendSentence(values.wantToSay);
+    moduleConfig.forEach((moduleDef) => {
+      if (["weather", "mood", "todayThing", "learnedThing", "happyThing", "wantToSay"].includes(moduleDef.id)) return;
+      if (!values[moduleDef.id]) return;
+      appendSentence(moduleDef.label + "：" + values[moduleDef.id]);
+    });
+    if (storyLines.length) sections.push("### 今天的小日记\n" + storyLines.join("\n"));
+    if (recordLines.length) sections.push("### 小记录\n" + recordLines.join("\n"));
+    if (d.freeWrite && d.freeWrite.trim()) {
+      sections.push("### 自由记录\n" + d.freeWrite.trim());
+    }
+    this.diaryContent = sections.join("\n\n").trim();
+    return this.diaryContent;
+  }
   insertTextAtCursor(text) {
     if (!this.diaryTextarea) return;
-    var ta = this.diaryTextarea; var start = ta.selectionStart; var end = ta.selectionEnd;
+    const ta = this.diaryTextarea;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
     ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
     ta.selectionStart = ta.selectionEnd = start + text.length;
-    this.diaryContent = ta.value; ta.focus();
+    this.diaryModules.freeWrite = ta.value;
+    this.syncDiaryContent();
+    ta.focus();
   }
-
   insertAttachment(label, ext) {
-    var self = this;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup";
-    popup.innerHTML = '<div class="value-popup-header">\u{1F4CE} \u63D2\u5165' + label + '</div><div class="value-popup-hint">\u8F93\u5165\u6587\u4EF6\u540D\uFF08\u4E0D\u542B\u6269\u5C55\u540D\uFF09</div>';
-    var fileInput = document.createElement("input"); fileInput.type = "text"; fileInput.className = "custom-form-name-input"; fileInput.placeholder = "\u4F8B\u5982: \u4ECA\u5929\u7684\u7167\u7247";
-    popup.appendChild(fileInput);
-    var quickName = document.createElement("div"); quickName.className = "value-popup-hint"; quickName.style.cssText = "cursor:pointer;text-decoration:underline"; quickName.textContent = "\u{1F4A1} \u9ED8\u8BA4: " + self.dateStr + "-" + label;
-    quickName.onclick = function() { fileInput.value = self.dateStr + "-" + label; };
-    popup.appendChild(quickName);
-    var acts = document.createElement("div"); acts.className = "value-popup-actions";
-    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u63D2\u5165";
-    ok.onclick = function() { var f = fileInput.value.trim(); if (!f) { fileInput.classList.add("is-error"); return; } if (!f.includes(".")) f += "." + ext; self.insertTextAtCursor("\n![[" + f + "]]\n"); overlay.remove(); };
-    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay); fileInput.focus();
+    const self = this;
+    const attachModal = new AttachFileModal(
+      self.app,
+      self.plugin,
+      label,
+      self.dateStr,
+      (f) => {
+        let filename = f;
+        if (!filename.includes(".")) filename += "." + ext;
+        self.insertTextAtCursor("\n![[" + filename + "]]\n");
+      }
+    );
+    attachModal.open();
   }
-
   renderCard(item, grid, yesterdayData) {
-    var self = this;
-    var scoreVal = this.scores[item.id] || 0;
-    var isEarned = scoreVal > 0;
-    var isNeg = scoreVal < 0 || (scoreVal === 0 && item.points < 0);
-    var isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-    var isDeductedActive = isDeductItem && scoreVal !== 0;
-    var card = grid.createDiv({ cls: "kid-score-card" + (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "") });
+    const self = this;
+    const scoreVal = this.scores[item.id] || 0;
+    const isEarned = scoreVal > 0;
+    const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+    const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+    const isDeductedActive = isDeductItem && scoreVal !== 0;
+    const card = grid.createDiv({
+      cls: "kid-score-card" + (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "")
+    });
     card.dataset.itemId = item.id;
+    const moreBtn = card.createEl("button", {
+      cls: "kid-score-card-more-btn",
+      text: "\u22EF"
+    });
+    moreBtn.setAttribute("aria-label", "\u8C03\u6574\u5206\u503C");
+    moreBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      self.showCustomValuePopup(item, (v) => {
+        self.scores[item.id] = v;
+        self.refreshCard(card, item);
+        self.updateTotalDisplay();
+      }, false);
+    };
     card.createDiv({ cls: "card-emoji", text: item.emoji });
     card.createDiv({ cls: "card-name", text: item.name });
-    if (item.note) { card.createDiv({ cls: "card-note", text: item.note }); }
-    var pointsText = scoreVal !== 0 ? ((scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "")) : ((item.points >= 0 ? "+" : "") + item.points + " \u5206");
+    if (item.note) {
+      card.createDiv({ cls: "card-note", text: item.note });
+    }
+    const pointsText = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
     card.createDiv({ cls: "card-points", text: pointsText });
     if (yesterdayData) {
-      var yScore = yesterdayData.scores[item.id] || 0;
-      var yClass = yScore > 0 ? "was-earned" : (yScore < 0 ? "was-negative" : "was-missed");
-      var ySign = yScore > 0 ? "+" : "";
-      card.createDiv({ cls: "card-yesterday " + yClass, text: "\u6628 " + ySign + yScore + " \u5206" });
+      const yScore = yesterdayData.scores[item.id] || 0;
+      const yClass = yScore > 0 ? "was-earned" : yScore < 0 ? "was-negative" : "was-missed";
+      const ySign = yScore > 0 ? "+" : "";
+      card.createDiv({
+        cls: "card-yesterday " + yClass,
+        text: "\u6628 " + ySign + yScore + " \u5206"
+      });
     } else {
       card.createDiv({ cls: "card-yesterday was-missed", text: "\u6628 -" });
     }
-    var pressTimer = null; var isLongPress = false; var hasMoved = false; var startX = 0; var startY = 0; var clickTimer = null; var lastTapAt = 0;
-    card.addEventListener("pointerdown", function(e) {
-      isLongPress = false; hasMoved = false; startX = e.clientX; startY = e.clientY;
-      pressTimer = setTimeout(function() {
-        if (!hasMoved) { isLongPress = true; self.showCustomValuePopup(item, function(v) { self.scores[item.id] = v; self.refreshCard(card, item); self.updateTotalDisplay(); }, false); }
-      }, 500);
+    let pressTimer = null;
+    let isLongPress = false;
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
+    let clickTimer = null;
+    let lastTapAt = 0;
+    const longPressMs = self.getLongPressDuration();
+    const isTouchMode = self.isTouchOptimizedMode();
+    card.addEventListener("pointerdown", (e) => {
+      if (e.target === moreBtn || moreBtn.contains(e.target)) return;
+      isLongPress = false;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
+      pressTimer = setTimeout(() => {
+        if (!hasMoved) {
+          isLongPress = true;
+          self.triggerHaptic("longpress");
+          self.showCustomValuePopup(item, (v) => {
+            self.scores[item.id] = v;
+            self.refreshCard(card, item);
+            self.updateTotalDisplay();
+          }, false);
+        }
+      }, longPressMs);
     });
-    card.addEventListener("pointermove", function(e) {
+    card.addEventListener("pointermove", (e) => {
       if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
-        hasMoved = true; clearTimeout(pressTimer);
+        hasMoved = true;
+        if (pressTimer) clearTimeout(pressTimer);
       }
     });
-    card.addEventListener("pointerup", function() {
-      clearTimeout(pressTimer);
+    card.addEventListener("pointerup", () => {
+      if (pressTimer) clearTimeout(pressTimer);
       if (!isLongPress && !hasMoved) {
-        var now = Date.now();
-        var threshold = self.plugin.getDoubleTapThreshold();
+        if (isTouchMode) {
+          self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0;
+          self.refreshCard(card, item);
+          self.updateTotalDisplay();
+          return;
+        }
+        const now = Date.now();
+        const threshold = self.plugin.getDoubleTapThreshold();
         if (lastTapAt && now - lastTapAt <= threshold) {
-          if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; }
+          if (clickTimer) {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+          }
           lastTapAt = 0;
-          self.showCustomValuePopup(item, function(v) { self.scores[item.id] = v; self.refreshCard(card, item); self.updateTotalDisplay(); }, true);
+          self.showCustomValuePopup(item, (v) => {
+            self.scores[item.id] = v;
+            self.refreshCard(card, item);
+            self.updateTotalDisplay();
+          }, true);
           return;
         }
         lastTapAt = now;
@@ -1045,7 +3647,7 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           clearTimeout(clickTimer);
           clickTimer = null;
         }
-        clickTimer = setTimeout(function() {
+        clickTimer = setTimeout(() => {
           self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0;
           self.refreshCard(card, item);
           self.updateTotalDisplay();
@@ -1054,218 +3656,141 @@ var DailyScoringModal = class extends import_obsidian.Modal {
         }, threshold + 20);
       }
     });
-    card.addEventListener("pointercancel", function() { clearTimeout(pressTimer); hasMoved = true; lastTapAt = 0; });
-    card.addEventListener("pointerleave", function() { clearTimeout(pressTimer); });
-    card.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+    card.addEventListener("pointercancel", () => {
+      if (pressTimer) clearTimeout(pressTimer);
+      hasMoved = true;
+      lastTapAt = 0;
+    });
+    card.addEventListener("pointerleave", () => {
+      if (pressTimer) clearTimeout(pressTimer);
+    });
+    card.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
   }
-
   refreshCard(card, item) {
-    var scoreVal = this.scores[item.id] || 0;
-    var isEarned = scoreVal > 0;
-    var isNeg = scoreVal < 0 || (scoreVal === 0 && item.points < 0);
-    var isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-    var isDeductedActive = isDeductItem && scoreVal !== 0;
-    card.classList.toggle("is-earned", isEarned); card.classList.toggle("is-negative", isNeg); card.classList.toggle("is-deducted-active", isDeductedActive);
-    var pointsEl = card.querySelector(".card-points");
-    if (pointsEl) { pointsEl.textContent = scoreVal !== 0 ? ((scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "")) : ((item.points >= 0 ? "+" : "") + item.points + " \u5206"); }
+    const scoreVal = this.scores[item.id] || 0;
+    const isEarned = scoreVal > 0;
+    const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+    const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+    const isDeductedActive = isDeductItem && scoreVal !== 0;
+    card.classList.toggle("is-earned", isEarned);
+    card.classList.toggle("is-negative", isNeg);
+    card.classList.toggle("is-deducted-active", isDeductedActive);
+    const pointsEl = card.querySelector(".card-points");
+    if (pointsEl) {
+      pointsEl.textContent = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
+    }
   }
-
-  showCustomValuePopup(item, callback, quickOnly) {
-    if (quickOnly === void 0) quickOnly = false;
-    var self = this;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup";
-
-    var showScoreMode = function() {
-      popup.innerHTML = '<div class="value-popup-header">' + item.emoji + " " + item.name + '</div>' + (item.note ? '<div class="value-popup-note">' + item.note + '</div>' : '') + '<div class="value-popup-hint">\u9ED8\u8BA4\u5206\u503C\uFF1A' + (item.points >= 0 ? "+" : "") + item.points + "</div>";
-      var controls = document.createElement("div"); controls.className = "value-popup-controls";
-      var minus = document.createElement("button"); minus.className = "value-popup-adjust"; minus.textContent = "\u2212";
-      var input = document.createElement("input"); input.type = "number"; input.className = "value-popup-input"; input.value = String(self.scores[item.id] || item.points);
-      var plus = document.createElement("button"); plus.className = "value-popup-adjust"; plus.textContent = "+";
-      input.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-      input.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-      input.addEventListener("click", function(e) { e.stopPropagation(); input.focus(); });
-      minus.onclick = function() { input.value = String(parseInt(input.value || "0") - 1); };
-      plus.onclick = function() { input.value = String(parseInt(input.value || "0") + 1); };
-      controls.appendChild(minus); controls.appendChild(input); controls.appendChild(plus); popup.appendChild(controls);
-      var acts = document.createElement("div"); acts.className = "value-popup-actions";
-      var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-      var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u786E\u5B9A"; ok.onclick = function() { callback(parseInt(input.value) || 0); overlay.remove(); };
-      acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-      if (!quickOnly) {
-        var delRow = document.createElement("div"); delRow.className = "value-popup-del-row";
-        var editBtn = document.createElement("button"); editBtn.className = "value-popup-edit-btn"; editBtn.textContent = "\u270F\uFE0F \u7F16\u8F91\u6B64\u9879\u76EE";
-        editBtn.onclick = function() { showEditMode(); };
-        var delBtn = document.createElement("button"); delBtn.className = "value-popup-del-btn"; delBtn.textContent = "\uD83D\uDDD1 \u5220\u9664\u6B64\u6253\u5206\u9879";
-        delBtn.onclick = function() {
-          return __async(self, null, function* () {
-            overlay.remove();
-            var idx = self.plugin.currentUser.items.findIndex(function(it) { return it.id === item.id; });
-            if (idx !== -1) {
-              self.plugin.currentUser.items.splice(idx, 1);
-              yield self.plugin.saveSettings();
-              yield self.renderModal();
-            }
-          });
-        };
-        delRow.appendChild(editBtn); delRow.appendChild(delBtn); popup.appendChild(delRow);
-      }
-      input.focus(); input.select();
+  showCustomValuePopup(item, callback, quickOnly = false) {
+    const self = this;
+    const openEdit = () => {
+      new EditItemModal(self.app, self.plugin, item, async () => {
+        await self.renderModal();
+      }).open();
     };
-
-    var showEditMode = function() {
-      popup.innerHTML = '<div class="value-popup-header">\u270F\uFE0F \u7F16\u8F91\u9879\u76EE</div>';
-      popup.classList.add("kid-score-custom-form");
-      var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
-      var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
-      var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = item.emoji; emojiInput.maxLength = 2;
-      emojiInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-      emojiInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-      emojiInput.addEventListener("click", function(e) { e.stopPropagation(); emojiInput.focus(); });
-      var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\uD83D\uDD0D"; emojiPickBtn.style.marginLeft = "4px";
-      emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
-      emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn); popup.appendChild(emojiRow);
-      var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
-      var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u540D\u79F0";
-      var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.value = item.name; nameInput.autocomplete = "off";
-      nameInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-      nameInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-      nameInput.addEventListener("click", function(e) { e.stopPropagation(); nameInput.focus(); });
-      nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
-      var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
-      var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u9ED8\u8BA4\u5206\u503C";
-      var pc = document.createElement("div"); pc.className = "value-popup-controls";
-      var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
-      var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = String(item.points);
-      var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
-      pi.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-      pi.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-      pi.addEventListener("click", function(e) { e.stopPropagation(); pi.focus(); });
-      pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
-      pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
-      pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp); pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
-      var noteRow = document.createElement("div"); noteRow.className = "custom-form-row";
-      var noteLabel = document.createElement("span"); noteLabel.className = "custom-form-label"; noteLabel.textContent = "\u5907\u6CE8";
-      var noteInput = document.createElement("input"); noteInput.type = "text"; noteInput.className = "custom-form-name-input"; noteInput.value = item.note || ""; noteInput.placeholder = "\u53EF\u9009\uFF0C\u957F\u6309\u65F6\u663E\u793A\u5728\u5361\u7247\u4E0A..."; noteInput.autocomplete = "off";
-      noteInput.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-      noteInput.addEventListener("touchstart", function(e) { e.stopPropagation(); });
-      noteInput.addEventListener("click", function(e) { e.stopPropagation(); noteInput.focus(); });
-      noteRow.appendChild(noteLabel); noteRow.appendChild(noteInput); popup.appendChild(noteRow);
-      var catRow = document.createElement("div"); catRow.className = "custom-form-row";
-      var catLabel = document.createElement("span"); catLabel.className = "custom-form-label"; catLabel.textContent = "\u5206\u7C7B";
-      var catSel = document.createElement("select"); catSel.className = "custom-form-select";
-      var cats = self.plugin.currentUser.categories || [];
-      cats.forEach(function(c) { var opt = document.createElement("option"); opt.value = c; opt.textContent = c; if (c === item.category) opt.selected = true; catSel.appendChild(opt); });
-      catRow.appendChild(catLabel); catRow.appendChild(catSel); popup.appendChild(catRow);
-      var acts = document.createElement("div"); acts.className = "value-popup-actions";
-      var backBtn = document.createElement("button"); backBtn.className = "value-popup-cancel"; backBtn.textContent = "\u8FD4\u56DE";
-      backBtn.onclick = function() { popup.classList.remove("kid-score-custom-form"); showScoreMode(); };
-      var saveBtn = document.createElement("button"); saveBtn.className = "value-popup-confirm mod-cta"; saveBtn.textContent = "\u4FDD\u5B58";
-      saveBtn.onclick = function() {
-        return __async(self, null, function* () {
-          var n = nameInput.value.trim();
-          if (!n) { nameInput.classList.add("is-error"); return; }
-          item.name = n;
-          item.emoji = emojiInput.value.trim() || "\u2B50";
-          item.points = parseInt(pi.value) || 0;
-          item.note = noteInput.value.trim();
-          item.category = catSel.value;
-          yield self.plugin.saveSettings();
-          overlay.remove();
-          yield self.renderModal();
-        });
-      };
-      acts.appendChild(backBtn); acts.appendChild(saveBtn); popup.appendChild(acts);
-      setTimeout(function() { nameInput.focus(); nameInput.select(); }, 50);
-    };
-
-    showScoreMode();
-    popup.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-    popup.addEventListener("touchstart", function(e) { e.stopPropagation(); }, { passive: true });
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay);
-    setupMobileKeyboard(overlay, popup);
+    new ScoreItemModal(
+      self.app,
+      self.plugin,
+      item,
+      self.scores[item.id] || item.points,
+      quickOnly,
+      (val) => callback(val),
+      () => openEdit()
+    ).open();
   }
-
   showAddItemPopup(category) {
-    var self = this;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup kid-score-custom-form";
-    popup.innerHTML = '<div class="value-popup-header">\u2795 \u65B0\u589E\u6253\u5206\u9879 &middot; ' + category + '</div>';
-    var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
-    var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
-    var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = "\u2B50"; emojiInput.maxLength = 2;
-    var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\uD83D\uDD0D"; emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
-    emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn); popup.appendChild(emojiRow);
-    var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
-    var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u540D\u79F0";
-    var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.placeholder = "\u6253\u5206\u9879\u540D\u79F0..."; nameInput.autocomplete = "off";
-    nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
-    var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
-    var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u5206\u503C";
-    var pc = document.createElement("div"); pc.className = "value-popup-controls";
-    var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
-    var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = "1";
-    var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
-    pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
-    pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
-    pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp); pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
-    var acts = document.createElement("div"); acts.className = "value-popup-actions";
-    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u6DFB\u52A0";
-    ok.onclick = function() {
-      return __async(self, null, function* () {
-        var n = nameInput.value.trim();
-        if (!n) { nameInput.classList.add("is-error"); return; }
-        self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: n, points: parseInt(pi.value) || 1, emoji: emojiInput.value.trim() || "\u2B50", category: category, note: "" });
-        var cats = self.plugin.currentUser.categories || [];
-        self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
-        yield self.plugin.saveSettings();
-        overlay.remove();
-        yield self.renderModal();
-      });
-    };
-    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-    popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay);
-    setupMobileKeyboard(overlay, popup);
-    setTimeout(function() { nameInput.focus(); }, 100);
+    const self = this;
+    new AddItemModal(self.app, self.plugin, category, async () => {
+      await self.renderModal();
+    }).open();
   }
-
   renderCustomItems() {
-    var self = this; var container = this.customItemsContainer; container.empty();
-    if (this.customItems.length === 0) { container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" }); return; }
-    for (var i = 0; i < this.customItems.length; i++) {
-      (function(idx) {
-        var ci = self.customItems[idx];
-        var wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
-        var row = wrap.createDiv({ cls: "kid-score-custom-row" });
-        row.createSpan({ cls: "custom-emoji", text: ci.emoji });
-        row.createSpan({ cls: "custom-name", text: ci.name });
-        row.createSpan({ cls: "custom-points " + (ci.points >= 0 ? "pos" : "neg"), text: (ci.points >= 0 ? "+" : "") + ci.points + " \u5206" });
-        var edit = row.createEl("button", { cls: "custom-edit-btn", text: "\u270F\uFE0F" });
-        edit.onclick = function(e) { e.stopPropagation(); self.showEditCustomItemPopup(idx); };
-        var del = row.createEl("button", { cls: "custom-delete-btn", text: "\u{1F5D1}" });
-        del.onclick = function(e) { e.stopPropagation(); self.customItems.splice(idx, 1); self.renderCustomItems(); self.updateTotalDisplay(); };
-        if (ci.note) { wrap.createDiv({ cls: "custom-item-note", text: ci.note }); }
-        // Long-press to edit
-        var pressTimer = null; var isLongPress = false; var hasMoved = false; var startX = 0; var startY = 0; var lastTapAt = 0;
-        row.addEventListener("pointerdown", function(e) {
-          if (e.target === del || del.contains(e.target) || e.target === edit || edit.contains(e.target)) return;
-          isLongPress = false; hasMoved = false; startX = e.clientX; startY = e.clientY;
-          pressTimer = setTimeout(function() { if (!hasMoved) { isLongPress = true; self.showEditCustomItemPopup(idx); } }, 500);
+    const self = this;
+    const container = this.customItemsContainer;
+    if (!container) return;
+    container.empty();
+    if (this.customItems.length === 0) {
+      container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" });
+      return;
+    }
+    for (let i = 0; i < this.customItems.length; i++) {
+      ((idx) => {
+        const ci = self.customItems[idx];
+        const wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
+        const row = wrap.createDiv({ cls: "kid-score-custom-row" });
+        const main = row.createDiv({ cls: "kid-score-custom-main" });
+        main.createSpan({ cls: "custom-emoji", text: ci.emoji });
+        main.createSpan({ cls: "custom-name", text: ci.name });
+        main.createSpan({
+          cls: "custom-points " + (ci.points >= 0 ? "pos" : "neg"),
+          text: (ci.points >= 0 ? "+" : "") + ci.points + " \u5206"
         });
-        row.addEventListener("pointermove", function(e) {
-          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) { hasMoved = true; clearTimeout(pressTimer); }
+        const quick = row.createEl("button", {
+          cls: "custom-row-more-btn",
+          text: "\u8C03\u5206"
         });
-        row.addEventListener("pointerup", function(e) {
-          clearTimeout(pressTimer);
-          if (e.target === del || del.contains(e.target) || e.target === edit || edit.contains(e.target)) return;
+        quick.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          self.showQuickCustomScorePopup(idx);
+        };
+        const edit = row.createEl("button", { cls: "custom-edit-btn", text: "\u270F\uFE0F" });
+        edit.onclick = (e) => {
+          e.stopPropagation();
+          self.showEditCustomItemPopup(idx);
+        };
+        const del = row.createEl("button", { cls: "custom-delete-btn", text: "\u{1F5D1}" });
+        del.onclick = (e) => {
+          e.stopPropagation();
+          if (!confirm("\u786E\u5B9A\u5220\u9664\u4E34\u65F6\u4E8B\u9879\u300C" + ci.name + "\u300D\u5417\uFF1F")) return;
+          self.customItems.splice(idx, 1);
+          self.renderCustomItems();
+          self.updateTotalDisplay();
+        };
+        if (ci.note) {
+          wrap.createDiv({ cls: "custom-item-note", text: ci.note });
+        }
+        let pressTimer = null;
+        let isLongPress = false;
+        let hasMoved = false;
+        let startX = 0;
+        let startY = 0;
+        let lastTapAt = 0;
+        const longPressMs = self.getLongPressDuration();
+        const isTouchMode = self.isTouchOptimizedMode();
+        row.addEventListener("pointerdown", (e) => {
+          if (e.target === del || del.contains(e.target) || e.target === quick || quick.contains(e.target) || e.target === edit || edit.contains(e.target))
+            return;
+          isLongPress = false;
+          hasMoved = false;
+          startX = e.clientX;
+          startY = e.clientY;
+          pressTimer = setTimeout(() => {
+            if (!hasMoved) {
+              isLongPress = true;
+              self.triggerHaptic("longpress");
+              self.showEditCustomItemPopup(idx);
+            }
+          }, longPressMs);
+        });
+        row.addEventListener("pointermove", (e) => {
+          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
+            hasMoved = true;
+            if (pressTimer) clearTimeout(pressTimer);
+          }
+        });
+        row.addEventListener("pointerup", (e) => {
+          if (pressTimer) clearTimeout(pressTimer);
+          if (e.target === del || del.contains(e.target) || e.target === quick || quick.contains(e.target) || e.target === edit || edit.contains(e.target))
+            return;
           if (isLongPress || hasMoved) return;
-          var now = Date.now();
-          var threshold = self.plugin.getDoubleTapThreshold();
+          if (isTouchMode) {
+            self.showQuickCustomScorePopup(idx);
+            return;
+          }
+          const now = Date.now();
+          const threshold = self.plugin.getDoubleTapThreshold();
           if (lastTapAt && now - lastTapAt <= threshold) {
             lastTapAt = 0;
             self.showQuickCustomScorePopup(idx);
@@ -1273,862 +3798,976 @@ var DailyScoringModal = class extends import_obsidian.Modal {
           }
           lastTapAt = now;
         });
-        row.addEventListener("pointercancel", function() { clearTimeout(pressTimer); hasMoved = true; lastTapAt = 0; });
-        row.addEventListener("contextmenu", function(e) { e.preventDefault(); });
+        row.addEventListener("pointercancel", () => {
+          if (pressTimer) clearTimeout(pressTimer);
+          hasMoved = true;
+          lastTapAt = 0;
+        });
+        row.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+        });
       })(i);
     }
   }
-
   showAddCustomItemForm() {
-    var self = this;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup kid-score-custom-form";
-    popup.innerHTML = '<div class="value-popup-header">\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879</div><div class="value-popup-hint">\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0</div>';
-    var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
-    var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
-    var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = "\u2B50"; emojiInput.maxLength = 2;
-    var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\u{1F50D}"; emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
-    emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn);
-    popup.appendChild(emojiRow);
-    var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
-    var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u4E8B\u9879";
-    var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.placeholder = "\u4E8B\u9879\u540D\u79F0..."; nameInput.autocomplete = "off";
-    nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
-    var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
-    var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u5206\u503C";
-    var pc = document.createElement("div"); pc.className = "value-popup-controls";
-    var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
-    var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = "1";
-    var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
-    pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
-    pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
-    pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp);
-    pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
-    var noteRow = document.createElement("div"); noteRow.className = "custom-form-row";
-    var noteLabel = document.createElement("span"); noteLabel.className = "custom-form-label"; noteLabel.textContent = "\u5907\u6CE8";
-    var noteInput = document.createElement("input"); noteInput.type = "text"; noteInput.className = "custom-form-name-input"; noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D..."; noteInput.autocomplete = "off";
-    noteRow.appendChild(noteLabel); noteRow.appendChild(noteInput); popup.appendChild(noteRow);
-    var acts = document.createElement("div"); acts.className = "value-popup-actions";
-    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u6DFB\u52A0";
-    ok.onclick = function() { var n = nameInput.value.trim(); if (!n) { nameInput.classList.add("is-error"); return; } self.customItems.push({ id: "custom_" + Date.now(), emoji: emojiInput.value.trim() || "\u2B50", name: n, points: parseInt(pi.value) || 0, note: noteInput.value.trim() }); self.renderCustomItems(); self.updateTotalDisplay(); overlay.remove(); };
-    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-    popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay);
-    setupMobileKeyboard(overlay, popup);
-    setTimeout(function() { nameInput.focus(); }, 100);
+    const self = this;
+    new AddCustomModal(self.app, self.plugin, (emoji, name, points, note) => {
+      self.customItems.push({
+        id: "custom_" + Date.now(),
+        emoji,
+        name,
+        points,
+        note
+      });
+      self.renderCustomItems();
+      self.updateTotalDisplay();
+    }).open();
   }
-
   showEditCustomItemPopup(idx) {
-    var self = this;
-    var ci = self.customItems[idx];
+    const self = this;
+    const ci = self.customItems[idx];
     if (!ci) return;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup kid-score-custom-form";
-    popup.innerHTML = '<div class="value-popup-header">\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879</div>';
-    var emojiRow = document.createElement("div"); emojiRow.className = "custom-form-row";
-    var emojiLabel = document.createElement("span"); emojiLabel.className = "custom-form-label"; emojiLabel.textContent = "\u56FE\u6807";
-    var emojiInput = document.createElement("input"); emojiInput.type = "text"; emojiInput.className = "custom-form-emoji-input"; emojiInput.value = ci.emoji; emojiInput.maxLength = 2;
-    var emojiPickBtn = document.createElement("button"); emojiPickBtn.className = "diary-tool-btn"; emojiPickBtn.textContent = "\uD83D\uDD0D"; emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = function() { showEmojiPicker(function(em) { emojiInput.value = em; }, self.containerEl); };
-    emojiRow.appendChild(emojiLabel); emojiRow.appendChild(emojiInput); emojiRow.appendChild(emojiPickBtn); popup.appendChild(emojiRow);
-    var nameRow = document.createElement("div"); nameRow.className = "custom-form-row";
-    var nameLabel = document.createElement("span"); nameLabel.className = "custom-form-label"; nameLabel.textContent = "\u4E8B\u9879";
-    var nameInput = document.createElement("input"); nameInput.type = "text"; nameInput.className = "custom-form-name-input"; nameInput.value = ci.name; nameInput.autocomplete = "off";
-    nameRow.appendChild(nameLabel); nameRow.appendChild(nameInput); popup.appendChild(nameRow);
-    var pointsRow = document.createElement("div"); pointsRow.className = "custom-form-row";
-    var pointsLabel = document.createElement("span"); pointsLabel.className = "custom-form-label"; pointsLabel.textContent = "\u5206\u503C";
-    var pc = document.createElement("div"); pc.className = "value-popup-controls";
-    var pm = document.createElement("button"); pm.className = "value-popup-adjust"; pm.textContent = "\u2212";
-    var pi = document.createElement("input"); pi.type = "number"; pi.className = "value-popup-input"; pi.value = String(ci.points);
-    var pp = document.createElement("button"); pp.className = "value-popup-adjust"; pp.textContent = "+";
-    pm.onclick = function() { pi.value = String(parseInt(pi.value || "0") - 1); };
-    pp.onclick = function() { pi.value = String(parseInt(pi.value || "0") + 1); };
-    pc.appendChild(pm); pc.appendChild(pi); pc.appendChild(pp);
-    pointsRow.appendChild(pointsLabel); pointsRow.appendChild(pc); popup.appendChild(pointsRow);
-    var noteRow2 = document.createElement("div"); noteRow2.className = "custom-form-row";
-    var noteLabel2 = document.createElement("span"); noteLabel2.className = "custom-form-label"; noteLabel2.textContent = "\u5907\u6CE8";
-    var noteInput2 = document.createElement("input"); noteInput2.type = "text"; noteInput2.className = "custom-form-name-input"; noteInput2.value = ci.note || ""; noteInput2.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D..."; noteInput2.autocomplete = "off";
-    noteRow2.appendChild(noteLabel2); noteRow2.appendChild(noteInput2); popup.appendChild(noteRow2);
-    var acts = document.createElement("div"); acts.className = "value-popup-actions";
-    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u4FDD\u5B58";
-    ok.onclick = function() {
-      var n = nameInput.value.trim();
-      if (!n) { nameInput.classList.add("is-error"); return; }
-      self.customItems[idx].emoji = emojiInput.value.trim() || "\u2B50";
-      self.customItems[idx].name = n;
-      self.customItems[idx].points = parseInt(pi.value) || 0;
-      self.customItems[idx].note = noteInput2.value.trim();
+    new EditCustomModal(self.app, self.plugin, ci, (emoji, name, points, note) => {
+      self.customItems[idx].emoji = emoji;
+      self.customItems[idx].name = name;
+      self.customItems[idx].points = points;
+      self.customItems[idx].note = note;
       self.renderCustomItems();
       self.updateTotalDisplay();
-      overlay.remove();
-    };
-    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-    popup.addEventListener("pointerdown", function(e) { e.stopPropagation(); });
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay);
-    setupMobileKeyboard(overlay, popup);
-    setTimeout(function() { nameInput.focus(); nameInput.select(); }, 100);
+    }).open();
   }
-
   showQuickCustomScorePopup(idx) {
-    var self = this;
-    var ci = self.customItems[idx];
+    const self = this;
+    const ci = self.customItems[idx];
     if (!ci) return;
-    var overlay = document.createElement("div"); overlay.className = "kid-score-value-overlay";
-    var popup = document.createElement("div"); popup.className = "kid-score-value-popup";
-    popup.innerHTML = '<div class="value-popup-header">' + ci.emoji + " " + ci.name + '</div>' + (ci.note ? '<div class="value-popup-note">' + ci.note + '</div>' : '') + '<div class="value-popup-hint">\u5FEB\u901F\u4FEE\u6539\u5206\u503C</div>';
-    var controls = document.createElement("div"); controls.className = "value-popup-controls";
-    var minus = document.createElement("button"); minus.className = "value-popup-adjust"; minus.textContent = "\u2212";
-    var input = document.createElement("input"); input.type = "number"; input.className = "value-popup-input"; input.value = String(ci.points || 0);
-    var plus = document.createElement("button"); plus.className = "value-popup-adjust"; plus.textContent = "+";
-    minus.onclick = function() { input.value = String(parseInt(input.value || "0") - 1); };
-    plus.onclick = function() { input.value = String(parseInt(input.value || "0") + 1); };
-    controls.appendChild(minus); controls.appendChild(input); controls.appendChild(plus); popup.appendChild(controls);
-    var acts = document.createElement("div"); acts.className = "value-popup-actions";
-    var cb = document.createElement("button"); cb.className = "value-popup-cancel"; cb.textContent = "\u53D6\u6D88"; cb.onclick = function() { overlay.remove(); };
-    var ok = document.createElement("button"); ok.className = "value-popup-confirm mod-cta"; ok.textContent = "\u4FDD\u5B58";
-    ok.onclick = function() {
-      self.customItems[idx].points = parseInt(input.value) || 0;
+    new QuickCustomModal(self.app, self.plugin, ci, (points) => {
+      self.customItems[idx].points = points;
       self.renderCustomItems();
       self.updateTotalDisplay();
-      overlay.remove();
-    };
-    acts.appendChild(cb); acts.appendChild(ok); popup.appendChild(acts);
-    popup.addEventListener("mousedown", function(e) { e.stopPropagation(); });
-    overlay.appendChild(popup); overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-    getOverlayMount(self.containerEl).appendChild(overlay);
-    setupMobileKeyboard(overlay, popup);
-    setTimeout(function() { input.focus(); input.select(); }, 60);
+    }).open();
   }
-
-  updateTotalDisplay() {
-    if (!this.totalDisplay) return;
-    var total = 0;
-    for (var item of this.plugin.currentUser.items) { total += (this.scores[item.id] || 0); }
-    for (var ci of this.customItems) { total += ci.points; }
-    this.totalDisplay.textContent = "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206";
-  }
-
-  onClose() { this.contentEl.empty(); }
-};
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Stats Modal
-   ═══════════════════════════════════════════════════════════════════════════ */
-var StatsModal = class extends import_obsidian.Modal {
-  constructor(app, plugin) { super(app); this.plugin = plugin; }
-
-  onOpen() {
-    return __async(this, null, function* () {
-      var contentEl = this.contentEl; contentEl.empty(); contentEl.addClass("kid-score-stats-modal");
-      contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
-      var allScores = yield this.plugin.getAllScores();
-      if (allScores.length === 0) { contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" }); return; }
-      var grandTotal = allScores.reduce(function(s, r) { return s + r.total; }, 0);
-      var grandDays = allScores.length;
-      var grandAvg = Math.round(grandTotal / grandDays);
-      var gtSign = grandTotal >= 0 ? "+" : ""; var gaSign = grandAvg >= 0 ? "+" : "";
-      var grandBanner = contentEl.createDiv({ cls: "kid-score-grand-banner" });
-      var gl = grandBanner.createDiv({ cls: "grand-left" });
-      gl.createDiv({ cls: "grand-total-value", text: gtSign + grandTotal });
-      gl.createDiv({ cls: "grand-total-label", text: "\u5386\u53F2\u7D2F\u8BA1\u603B\u5206" });
-      var gr = grandBanner.createDiv({ cls: "grand-right" });
-      gr.createDiv({ text: "\u{1F4C5} \u8BB0\u5F55 " + grandDays + " \u5929", cls: "grand-stat" });
-      gr.createDiv({ text: "\u{1F4C8} \u65E5\u5747 " + gaSign + grandAvg + " \u5206", cls: "grand-stat" });
-      gr.createDiv({ text: "\u{1F5D3} \u8D77\u59CB " + allScores[0].date, cls: "grand-stat" });
-
-      var tabs = contentEl.createDiv({ cls: "kid-score-tabs" });
-      var statsBody = contentEl.createDiv({ cls: "kid-score-stats-body" });
-      var periods = [{ label: "\u672C\u5468", key: "week" }, { label: "\u672C\u6708", key: "month" }, { label: "\u5168\u90E8", key: "all" }];
-      var activePeriod = "week"; var self = this;
-
-      var filterScores = function(period, scores) {
-        var today = new Date();
-        if (period === "week") { var ws = new Date(today); ws.setDate(today.getDate() - today.getDay() + 1); return scores.filter(function(s) { return s.date >= ws.toISOString().slice(0, 10); }); }
-        else if (period === "month") { var ms = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-01"; return scores.filter(function(s) { return s.date >= ms; }); }
-        return scores;
-      };
-
-      var drawBarChart = function(canvas, data) {
-        var ctx = canvas.getContext("2d"); if (!ctx || !data.length) return;
-        var W = canvas.width, H = canvas.height, pad = { top: 24, bottom: 32, left: 8, right: 8 };
-        var chartH = H - pad.top - pad.bottom, midY = pad.top + chartH * 0.6;
-        var maxAbs = Math.max.apply(null, data.map(function(s) { return Math.abs(s.total); }).concat([1]));
-        var barW = Math.max(Math.floor((W - pad.left - pad.right) / data.length) - 4, 6);
-        ctx.clearRect(0, 0, W, H); ctx.fillStyle = "#f5f5f5"; ctx.fillRect(0, 0, W, H);
-        ctx.strokeStyle = "#aaa"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(pad.left, midY); ctx.lineTo(W - pad.right, midY); ctx.stroke(); ctx.setLineDash([]);
-        data.forEach(function(score, i) {
-          var x = pad.left + i * (barW + 4), pixPer = chartH * 0.55 / maxAbs, barH = Math.abs(score.total) * pixPer, isPos = score.total >= 0;
-          ctx.fillStyle = isPos ? "#4ade80" : "#f87171";
-          ctx.fillRect(x, isPos ? midY - barH : midY, barW, barH);
-          ctx.fillStyle = "#333"; ctx.font = "bold " + Math.min(11, barW) + "px sans-serif"; ctx.textAlign = "center";
-          ctx.fillText(String(score.total), x + barW / 2, isPos ? midY - barH - 4 : midY + barH + 12);
-          ctx.font = "9px sans-serif"; ctx.fillStyle = "#999";
-          ctx.fillText(score.date.slice(5), x + barW / 2, H - 4);
-        });
-      };
-
-      var renderStats = function(period) {
-        statsBody.empty();
-        var filtered = filterScores(period, allScores);
-        if (!filtered.length) { statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "kid-score-empty" }); return; }
-        var total = filtered.reduce(function(s, r) { return s + r.total; }, 0);
-        var avg = Math.round(total / filtered.length);
-        var max = Math.max.apply(null, filtered.map(function(s) { return s.total; }));
-        var cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
-        var mkCard = function(l, v, a) { var c = cards.createDiv({ cls: "summary-card " + (a ? "accent" : "") }); c.createDiv({ cls: "card-val", text: v }); c.createDiv({ cls: "card-lbl", text: l }); };
-        mkCard("\u7D2F\u8BA1\u603B\u5206", (total >= 0 ? "+" : "") + total, true);
-        mkCard("\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
-        mkCard("\u6700\u9AD8\u5355\u65E5", "+" + max);
-        mkCard("\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
-        if (self.plugin.currentUser.items.length > 0) {
-          statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
-          var itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-          for (var item of self.plugin.currentUser.items) {
-            var count = filtered.filter(function(s) { return s.scores[item.id] !== undefined && s.scores[item.id] > 0; }).length;
-            var rate = Math.round(count / filtered.length * 100);
-            var row = itemList.createDiv({ cls: "completion-row" });
-            row.createSpan({ cls: "completion-emoji", text: item.emoji }); row.createSpan({ cls: "completion-name", text: item.name });
-            var bw = row.createDiv({ cls: "completion-bar-wrap" }); var bar = bw.createDiv({ cls: "completion-bar " + (item.points >= 0 ? "pos" : "neg") }); bar.style.width = rate + "%";
-            row.createSpan({ cls: "completion-rate", text: count + "/" + filtered.length + " (" + rate + "%)" });
-          }
-        }
-        statsBody.createEl("h3", { text: "\u6BCF\u65E5\u5F97\u5206\u8D8B\u52BF", cls: "stats-section-title" });
-        var canvas = statsBody.createEl("canvas", { cls: "kid-score-chart" }); canvas.width = 540; canvas.height = 200;
-        setTimeout(function() { drawBarChart(canvas, filtered.slice(-20)); }, 50);
-        if (period === "all" && filtered.length > 7) {
-          statsBody.createEl("h3", { text: "\u6309\u6708\u6C47\u603B", cls: "stats-section-title" });
-          var byMonth = {};
-          for (var s of filtered) { var m = s.date.slice(0, 7); if (!byMonth[m]) byMonth[m] = []; byMonth[m].push(s.total); }
-          var mt = statsBody.createEl("table", { cls: "kid-score-month-table" });
-          var th = mt.createEl("thead").createEl("tr");
-          ["\u6708\u4EFD", "\u5929\u6570", "\u603B\u5206", "\u65E5\u5747"].forEach(function(h) { th.createEl("th", { text: h }); });
-          var tb = mt.createEl("tbody");
-          Object.entries(byMonth).sort().forEach(function(e) {
-            var sum = e[1].reduce(function(a, b) { return a + b; }, 0); var av = Math.round(sum / e[1].length);
-            var tr = tb.createEl("tr"); tr.createEl("td", { text: e[0] }); tr.createEl("td", { text: String(e[1].length) });
-            tr.createEl("td", { text: (sum >= 0 ? "+" : "") + sum }); tr.createEl("td", { text: (av >= 0 ? "+" : "") + av });
-          });
-        }
-      };
-
-      for (var p of periods) {
-        (function(period) {
-          var tab = tabs.createEl("button", { text: period.label, cls: "kid-score-tab " + (period.key === activePeriod ? "is-active" : "") });
-          tab.onclick = function() { activePeriod = period.key; tabs.querySelectorAll(".kid-score-tab").forEach(function(t) { t.removeClass("is-active"); }); tab.addClass("is-active"); renderStats(activePeriod); };
-        })(p);
-      }
-      renderStats(activePeriod);
+  async showCalendarPicker() {
+    const self = this;
+    const allScores = await this.plugin.getAllScores();
+    const recordDates = new Set(allScores.map((s) => s.date));
+    const overlay = document.createElement("div");
+    overlay.className = "kid-score-value-overlay";
+    const popup = document.createElement("div");
+    popup.className = "kid-score-calendar-popup";
+    let viewDate = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
+    const header = popup.createDiv({ cls: "cal-header" });
+    const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25C0" });
+    const monthLabel = header.createEl("span", { cls: "cal-month-label" });
+    const nextMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25B6" });
+    const grid = popup.createDiv({ cls: "cal-grid" });
+    ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"].forEach((d) => {
+      grid.createEl("div", { cls: "cal-weekday", text: d });
     });
+    const renderMonth = () => {
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
+      monthLabel.textContent = year + "\u5E74" + (month + 1) + "\u6708";
+      grid.querySelectorAll(".cal-day").forEach((el) => el.remove());
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startOffset = firstDay.getDay();
+      const todayStr = formatDate(0);
+      for (let i = 0; i < startOffset; i++) {
+        grid.createEl("div", { cls: "cal-day is-empty" });
+      }
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const ds = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+        const cell = grid.createEl("button", { cls: "cal-day" });
+        cell.textContent = String(d);
+        if (ds === self.dateStr) cell.addClass("is-selected");
+        if (ds === todayStr) cell.addClass("is-today");
+        if (recordDates.has(ds)) cell.addClass("has-record");
+        cell.onclick = () => {
+          if (ds > todayStr) return;
+          self.dateStr = ds;
+          self.renderModal();
+          removeOverlay();
+        };
+      }
+    };
+    prevMonthBtn.onclick = () => {
+      viewDate.setMonth(viewDate.getMonth() - 1);
+      renderMonth();
+    };
+    nextMonthBtn.onclick = () => {
+      viewDate.setMonth(viewDate.getMonth() + 1);
+      renderMonth();
+    };
+    renderMonth();
+    const cancelBtn = popup.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cancelBtn.style.marginTop = "10px";
+    cancelBtn.style.width = "100%";
+    cancelBtn.onclick = () => {
+      removeOverlay();
+    };
+    popup.appendChild(cancelBtn);
+    overlay.appendChild(popup);
+    const removeOverlay = () => {
+      var _a;
+      overlay.remove();
+      window.removeEventListener("popstate", onPopstate);
+      if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
+        history.back();
+      }
+    };
+    const onPopstate = (e) => {
+      var _a;
+      if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
+        overlay.remove();
+        window.removeEventListener("popstate", onPopstate);
+      }
+    };
+    history.pushState({ kidScoreOverlay: true }, "");
+    window.addEventListener("popstate", onPopstate);
+    overlay.addEventListener("mousedown", (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        removeOverlay();
+      }
+    });
+    document.body.appendChild(overlay);
   }
-
-  onClose() { this.contentEl.empty(); }
+  updateTotalDisplay() {
+    var _a;
+    if (!this.totalDisplay) return;
+    let total = 0;
+    let completed = 0;
+    for (const item of this.plugin.currentUser.items) {
+      const val = this.scores[item.id] || 0;
+      total += val;
+      const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+      if (isDeduct ? val !== 0 : val > 0) {
+        completed++;
+      }
+    }
+    completed += this.customItems.length;
+    const dailyGoal = ((_a = this.plugin.currentUser.goals) == null ? void 0 : _a.daily) || 1;
+    const pct = Math.min(100, Math.round(completed / dailyGoal * 100));
+    this.totalDisplay.empty();
+    this.totalDisplay.createSpan({ text: "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206  " });
+    const goalWrap = this.totalDisplay.createSpan({ cls: "daily-goal-wrap" });
+    goalWrap.createSpan({ cls: "daily-goal-label", text: "\u4ECA\u65E5\u76EE\u6807 " + completed + "/" + dailyGoal });
+    const barWrap = goalWrap.createSpan({ cls: "daily-goal-bar-wrap" });
+    const bar = barWrap.createSpan({ cls: "daily-goal-bar" });
+    bar.style.width = pct + "%";
+    if (pct >= 100) bar.addClass("is-complete");
+  }
 };
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   Settings Tab
-   ═══════════════════════════════════════════════════════════════════════════ */
-var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
-  constructor(app, plugin) { super(app, plugin); this.plugin = plugin; }
-
+// src/settings/settings-tab.ts
+var import_obsidian5 = require("obsidian");
+var KidScoreSettingTab = class extends import_obsidian5.PluginSettingTab {
+  constructor(app, plugin) {
+    super(app, plugin);
+    this.plugin = plugin;
+  }
   display() {
-    var self = this;
-    var containerEl = this.containerEl;
+    const self = this;
+    const containerEl = this.containerEl;
     containerEl.empty();
     containerEl.addClass("kid-score-settings");
-    containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
-
-    /* ── User management ── */
-    containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u4E0B\u65B9\u6240\u6709\u8BBE\u7F6E\u5747\u4E3A\u5F53\u524D\u7528\u6237\u3002" });
-    var userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
-    var renderUserMgr = function() {
-      userMgrWrap.empty();
-      self.plugin.settings.users.forEach(function(u) {
-        var uBtn = userMgrWrap.createEl("button", {
-          cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
-          text: u.name
-        });
-        uBtn.onclick = function() {
-          return __async(self, null, function* () {
-            self.plugin.settings.currentUserId = u.id;
-            yield self.plugin.saveSettings();
-            self.display();
-          });
-        };
+    let pendingScrollItemId = null;
+    const bindSettingsInput = (input) => {
+      bindModalInputFocus(input, {
+        manualTouchFocus: false,
+        scrollOnIOSFocus: false
       });
-      var addUBtn = userMgrWrap.createEl("button", { cls: "kid-score-user-add-btn", text: "\uFF0B \u6DFB\u52A0\u7528\u6237" });
-      addUBtn.onclick = function() {
-        return __async(self, null, function* () {
-          var nu = makeDefaultUser();
-          nu.name = "\u65B0\u7528\u6237";
-          self.plugin.settings.users.push(nu);
-          self.plugin.settings.currentUserId = nu.id;
-          yield self.plugin.saveSettings();
-          self.display();
-        });
-      };
     };
-    renderUserMgr();
-    if (self.plugin.settings.users.length > 1) {
-      new import_obsidian.Setting(containerEl)
-        .setName("\u5220\u9664\u5F53\u524D\u7528\u6237")
-        .setDesc(self.plugin.currentUser.name + " \u7684\u8BBE\u7F6E\u5C06\u88AB\u5220\u9664\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD")
-        .addButton(function(btn) {
-          btn.setButtonText("\u{1F5D1} \u5220\u9664").setWarning().onClick(function() {
-            return __async(self, null, function* () {
-              var users = self.plugin.settings.users;
-              var idx = users.findIndex(function(u) { return u.id === self.plugin.settings.currentUserId; });
+    containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
+    containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
+    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002" });
+    const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+    const showUserDeleteConfirm = (u) => {
+      const delModal = new class extends import_obsidian5.Modal {
+        onOpen() {
+          const m = this;
+          m.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
+          m.modalEl.addClass("kid-score-edit-modal");
+          this._kbCleanup = setupModalKeyboard(this);
+          const c = m.contentEl;
+          c.createDiv({ cls: "value-popup-hint", text: "\u5C06\u5220\u9664\u300C" + u.name + "\u300D\u7684\u6240\u6709\u8BBE\u7F6E\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD\u3002" });
+          const promptEl = c.createDiv();
+          promptEl.style.marginBottom = "6px";
+          promptEl.style.fontSize = "0.9em";
+          promptEl.textContent = "\u8BF7\u8F93\u5165\u300E\u786E\u5B9A\u5220\u9664\u300F\u7EE7\u7EED\uFF1A";
+          const confirmInput = c.createEl("input", { type: "text", cls: "custom-form-name-input" });
+          confirmInput.placeholder = "\u786E\u5B9A\u5220\u9664";
+          confirmInput.autocomplete = "off";
+          bindModalInputFocus(confirmInput);
+          const acts = c.createDiv({ cls: "value-popup-actions" });
+          acts.style.marginTop = "12px";
+          const cancelBtn = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+          cancelBtn.onclick = () => {
+            m.close();
+          };
+          const delBtn = acts.createEl("button", { cls: "value-popup-confirm", text: "\u5220\u9664" });
+          delBtn.style.background = "var(--color-red, #e03131)";
+          delBtn.style.color = "#fff";
+          delBtn.onclick = async () => {
+            if (confirmInput.value.trim() !== "\u786E\u5B9A\u5220\u9664") {
+              confirmInput.classList.add("is-error");
+              confirmInput.focus();
+              return;
+            }
+            try {
+              const users = self.plugin.settings.users;
+              const idx = users.findIndex((uu) => uu.id === u.id);
               if (idx !== -1 && users.length > 1) {
                 users.splice(idx, 1);
                 self.plugin.settings.currentUserId = users[Math.max(0, idx - 1)].id;
-                yield self.plugin.saveSettings();
+                await self.plugin.saveSettings();
+                m.close();
                 self.display();
               }
-            });
-          });
-        });
-    }
-
-    new import_obsidian.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57")
-      .addText(function(t) { return t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.currentUser.name).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.name = v.trim() || "\u5C0F\u670B\u53CB"; yield self.plugin.saveSettings(); renderUserMgr(); }); }); });
-    new import_obsidian.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939")
-      .addText(function(t) { return t.setPlaceholder("Little Milestones/Daily Records").setValue(self.plugin.currentUser.savePath).onChange(function(v) { return __async(self, null, function* () { self.plugin.currentUser.savePath = v.trim() || "Little Milestones/Daily Records"; yield self.plugin.saveSettings(); }); }); });
-
-    containerEl.createEl("h3", { text: "\u{1F3AF} \u53CC\u51FB\u9608\u503C\u8BBE\u7F6E" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u5355\u4F4D\u4E3A\u6BEB\u79D2(ms)\u3002\u5EFA\u8BAE\u8303\u56F4 120-600\u3002\u63D2\u4EF6\u4F1A\u6309\u5F53\u524D\u8BBE\u5907\u7CFB\u7EDF\u81EA\u52A8\u9009\u7528\u5BF9\u5E94\u9608\u503C\u3002" });
-    var dt = self.plugin.settings.doubleTapThresholds || DEFAULT_SETTINGS.doubleTapThresholds;
-    var addThresholdInput = function(key, label, desc, fallback) {
-      new import_obsidian.Setting(containerEl)
-        .setName(label)
-        .setDesc(desc)
-        .addText(function(t) {
-          t.setPlaceholder(String(fallback));
-          t.setValue(String(dt[key]));
-          t.onChange(function(v) {
-            return __async(self, null, function* () {
-              var next = self.plugin.sanitizeDoubleTapThreshold(v, fallback);
-              self.plugin.settings.doubleTapThresholds[key] = next;
-              yield self.plugin.saveSettings();
-            });
-          });
-          return t;
-        });
+            } catch (e) {
+              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+            }
+          };
+        }
+        onClose() {
+          if (this._kbCleanup) this._kbCleanup();
+          this.contentEl.empty();
+        }
+      }(self.plugin.app);
+      delModal.open();
     };
-    addThresholdInput("windows", "Windows \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 220", DEFAULT_SETTINGS.doubleTapThresholds.windows);
-    addThresholdInput("mac", "macOS \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 220", DEFAULT_SETTINGS.doubleTapThresholds.mac);
-    addThresholdInput("android", "Android \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 280", DEFAULT_SETTINGS.doubleTapThresholds.android);
-    addThresholdInput("ios", "iOS \u53CC\u51FB\u9608\u503C", "\u4F8B\u5982 280", DEFAULT_SETTINGS.doubleTapThresholds.ios);
-    addThresholdInput("fallback", "\u5176\u4ED6\u8BBE\u5907\u515C\u5E95\u9608\u503C", "\u65E0\u6CD5\u8BC6\u522B\u7CFB\u7EDF\u65F6\u4F7F\u7528", DEFAULT_SETTINGS.doubleTapThresholds.fallback);
-
-    // ── Category management ──
-    containerEl.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\uFF0C\u53EF\u6DFB\u52A0\u3001\u91CD\u547D\u540D\u3001\u5220\u9664\u3002\u9879\u76EE\u5C06\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A\u3002" });
-    var catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
-
-    // ── Category drag state ──
-    var catDrag = { dragging: false, dragIdx: -1, placeholder: null, ghost: null, rows: [] };
-
-    var getCatDragRowIndex = function(y) {
-      for (var r = 0; r < catDrag.rows.length; r++) {
-        var rect = catDrag.rows[r].getBoundingClientRect();
+    const renderUserMgr = () => {
+      userMgrWrap.empty();
+      self.plugin.settings.users.forEach((u) => {
+        const uBtn = userMgrWrap.createEl("button", {
+          cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
+          text: u.name
+        });
+        let pressTimer = null;
+        let isLongPress = false;
+        let hasMoved = false;
+        let startX = 0;
+        let startY = 0;
+        uBtn.addEventListener("pointerdown", (e) => {
+          isLongPress = false;
+          hasMoved = false;
+          startX = e.clientX;
+          startY = e.clientY;
+          pressTimer = window.setTimeout(() => {
+            if (!hasMoved && self.plugin.settings.users.length > 1) {
+              isLongPress = true;
+              showUserDeleteConfirm(u);
+            }
+          }, 600);
+        });
+        uBtn.addEventListener("pointermove", (e) => {
+          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
+            hasMoved = true;
+            if (pressTimer) clearTimeout(pressTimer);
+          }
+        });
+        uBtn.addEventListener("pointerup", () => {
+          if (pressTimer) clearTimeout(pressTimer);
+          if (!isLongPress && !hasMoved) {
+            self.plugin.settings.currentUserId = u.id;
+            self.plugin.saveSettings().then(() => {
+              self.display();
+            });
+          }
+        });
+        uBtn.addEventListener("pointercancel", () => {
+          if (pressTimer) clearTimeout(pressTimer);
+        });
+      });
+      const addUBtn = userMgrWrap.createEl("button", { cls: "kid-score-user-add-btn", text: "\uFF0B \u6DFB\u52A0\u7528\u6237" });
+      addUBtn.onclick = async () => {
+        try {
+          const nu = makeDefaultUser();
+          nu.name = "\u65B0\u7528\u6237";
+          self.plugin.settings.users.push(nu);
+          self.plugin.settings.currentUserId = nu.id;
+          await self.plugin.saveSettings();
+          self.display();
+        } catch (e) {
+          new import_obsidian5.Notice("\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+        }
+      };
+    };
+    renderUserMgr();
+    new import_obsidian5.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+      (t) => t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.currentUser.name).onChange(async (v) => {
+        const newName = v.trim() || "\u5C0F\u670B\u53CB";
+        const oldName = self.plugin.currentUser.name;
+        if (newName === oldName) return;
+        if (!confirm("\u786E\u5B9A\u5C06\u7528\u6237\u540D\u4FEE\u6539\u4E3A\u300C" + newName + "\u300D\u5417\uFF1F")) return;
+        try {
+          await self.plugin.renameUserInFiles(oldName, newName);
+          self.plugin.currentUser.name = newName;
+          await self.plugin.saveSettings();
+          renderUserMgr();
+          new import_obsidian5.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
+        } catch (e) {
+          console.error("[Little Milestones] renameUserInFiles error", e);
+          new import_obsidian5.Notice("\u274C " + (e instanceof Error ? e.message : String(e)));
+        }
+      })
+    );
+    bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+    new import_obsidian5.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+      (t) => t.setPlaceholder("Little Milestones/Daily Records").setValue(self.plugin.currentUser.savePath).onChange(async (v) => {
+        const newPath = v.trim() || "Little Milestones/Daily Records";
+        const oldPath = self.plugin.currentUser.savePath;
+        if (newPath === oldPath) return;
+        if (!confirm("\u786E\u5B9A\u5C06\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84\u4FEE\u6539\u4E3A\u300C" + newPath + "\u300D\u5417\uFF1F\n\u5DF2\u6709\u7684\u5386\u53F2\u8BB0\u5F55\u5C06\u81EA\u52A8\u8FC1\u79FB\u5230\u65B0\u8DEF\u5F84\u3002")) return;
+        try {
+          await self.plugin.migrateSavePath(oldPath, newPath);
+          self.plugin.currentUser.savePath = newPath;
+          await self.plugin.saveSettings();
+          new import_obsidian5.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
+        } catch (e) {
+          console.error("[Little Milestones] migrateSavePath error", e);
+          new import_obsidian5.Notice("\u274C " + (e instanceof Error ? e.message : String(e)));
+        }
+      })
+    );
+    bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+    const goalsWrap = containerEl.createDiv({ cls: "kid-score-goals-section" });
+    goalsWrap.createEl("h3", { text: "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807" });
+    goalsWrap.createEl("p", { cls: "kid-score-hint", text: "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09" });
+    const goalsGrid = goalsWrap.createDiv({ cls: "kid-score-goals-grid" });
+    const goalFields = [
+      { key: "daily", label: "\u6BCF\u65E5\u76EE\u6807" },
+      { key: "weekly", label: "\u6BCF\u5468\u76EE\u6807" },
+      { key: "monthly", label: "\u6BCF\u6708\u76EE\u6807" }
+    ];
+    for (const gf of goalFields) {
+      const cell = goalsGrid.createDiv({ cls: "kid-score-goal-cell" });
+      cell.createEl("label", { text: gf.label });
+      const inp = cell.createEl("input", { cls: "kid-score-goal-input" });
+      inp.type = "number";
+      inp.min = "1";
+      inp.value = String(self.plugin.currentUser.goals[gf.key] || 1);
+      bindSettingsInput(inp);
+      inp.onchange = async () => {
+        const n = parseInt(inp.value, 10);
+        if (Number.isFinite(n) && n > 0) {
+          self.plugin.currentUser.goals[gf.key] = n;
+          await self.plugin.saveSettings();
+          new import_obsidian5.Notice("\u2705 " + gf.label + "\u5DF2\u66F4\u65B0\u4E3A " + n);
+        }
+      };
+    }
+    renderRulesAndTemplateSections();
+    const catHeaderWrap = containerEl.createDiv({ cls: "kid-score-section-header" });
+    catHeaderWrap.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
+    catHeaderWrap.createSpan({ cls: "kid-score-section-desc", text: "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A" });
+    const catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
+    const catDrag = {
+      dragging: false,
+      dragIdx: -1,
+      placeholder: null,
+      ghost: null,
+      rows: []
+    };
+    const getCatDragRowIndex = (y) => {
+      for (let r = 0; r < catDrag.rows.length; r++) {
+        const rect = catDrag.rows[r].getBoundingClientRect();
         if (y < rect.top + rect.height / 2) return r;
       }
       return catDrag.rows.length;
     };
-
-    var onCatDragMove = function(clientY) {
+    const onCatDragMove = (clientY) => {
       if (!catDrag.dragging) return;
-      catDrag.ghost.style.top = clientY - 20 + "px";
-      var targetIdx = getCatDragRowIndex(clientY);
-      var parent = catDrag.rows[0].parentElement;
+      if (catDrag.ghost) catDrag.ghost.style.top = clientY - 20 + "px";
+      const targetIdx = getCatDragRowIndex(clientY);
+      const parent = catDrag.rows[0].parentElement;
+      if (!parent || !catDrag.placeholder) return;
       if (targetIdx >= catDrag.rows.length) {
         parent.appendChild(catDrag.placeholder);
       } else {
         parent.insertBefore(catDrag.placeholder, catDrag.rows[targetIdx]);
       }
     };
-
-    var onCatDragEnd = function(clientY) {
+    const onCatDragEnd = (clientY) => {
       if (!catDrag.dragging) return;
       catDrag.dragging = false;
       if (catDrag.ghost) catDrag.ghost.remove();
       if (catDrag.placeholder) catDrag.placeholder.remove();
       document.body.style.userSelect = "";
       document.body.style.webkitUserSelect = "";
-
-      var targetIdx = getCatDragRowIndex(clientY);
-      var fromIdx = catDrag.dragIdx;
-      if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.categories.length) {
-        var arr = self.plugin.currentUser.categories;
-        var moved = arr.splice(fromIdx, 1)[0];
+      const targetIdx = getCatDragRowIndex(clientY);
+      let fromIdx = catDrag.dragIdx;
+      if (targetIdx > fromIdx) fromIdx--;
+      const arr = self.plugin.currentUser.categories;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+        const moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
-        __async(self, null, function* () { yield self.plugin.saveSettings(); renderCategories(); renderItems(); })();
+        (async () => {
+          await self.plugin.saveSettings();
+          renderCategories();
+          renderItems();
+        })();
       } else {
         renderCategories();
       }
     };
-
-    var catPointerMoveHandler = function(e) { onCatDragMove(e.clientY); };
-    var catPointerUpHandler = function(e) {
+    const catPointerMoveHandler = (e) => {
+      onCatDragMove(e.clientY);
+    };
+    const catPointerUpHandler = (e) => {
       document.removeEventListener("pointermove", catPointerMoveHandler);
       document.removeEventListener("pointerup", catPointerUpHandler);
+      document.removeEventListener("pointercancel", catPointerCancelHandler);
       onCatDragEnd(e.clientY);
     };
-
-    var renderCategories = function() {
+    const catPointerCancelHandler = () => {
+      document.removeEventListener("pointermove", catPointerMoveHandler);
+      document.removeEventListener("pointerup", catPointerUpHandler);
+      document.removeEventListener("pointercancel", catPointerCancelHandler);
+      catDrag.dragging = false;
+      if (catDrag.ghost) {
+        catDrag.ghost.remove();
+        catDrag.ghost = null;
+      }
+      if (catDrag.placeholder) {
+        catDrag.placeholder.remove();
+        catDrag.placeholder = null;
+      }
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+      renderCategories();
+    };
+    const renderCategories = () => {
       catWrap.empty();
       catDrag.rows = [];
-      var cats = self.plugin.currentUser.categories || [];
-      for (var ci = 0; ci < cats.length; ci++) {
-        (function(idx) {
-          var row = catWrap.createDiv({ cls: "kid-score-cat-row" });
-
-          // Drag handle
-          var handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
-          handle.addEventListener("pointerdown", function(e) {
+      const cats = self.plugin.currentUser.categories || [];
+      for (let ci = 0; ci < cats.length; ci++) {
+        ((idx) => {
+          const row = catWrap.createDiv({ cls: "kid-score-cat-row" });
+          const handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
+          handle.addEventListener("pointerdown", (e) => {
             e.preventDefault();
             catDrag.dragging = true;
             catDrag.dragIdx = idx;
             catDrag.rows = Array.from(catWrap.querySelectorAll(".kid-score-cat-row"));
-
-            var rect = row.getBoundingClientRect();
-            var ghost = row.cloneNode(true);
+            const rect = row.getBoundingClientRect();
+            const ghost = row.cloneNode(true);
             ghost.className = "kid-score-cat-row settings-drag-ghost";
             ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (e.clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;";
             document.body.appendChild(ghost);
             catDrag.ghost = ghost;
-
-            var ph = document.createElement("div");
+            const ph = document.createElement("div");
             ph.className = "settings-drag-placeholder";
             ph.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
-            row.parentElement.insertBefore(ph, row);
+            if (row.parentElement) row.parentElement.insertBefore(ph, row);
             catDrag.placeholder = ph;
-
             row.style.display = "none";
             document.body.style.userSelect = "none";
             document.body.style.webkitUserSelect = "none";
-
             document.addEventListener("pointermove", catPointerMoveHandler);
             document.addEventListener("pointerup", catPointerUpHandler);
+            document.addEventListener("pointercancel", catPointerCancelHandler);
           });
-
-          var input = row.createEl("input", { cls: "settings-name-input" });
+          const input = row.createEl("input", { cls: "settings-name-input" });
+          bindSettingsInput(input);
           input.value = cats[idx];
-          input.onchange = function() {
-            return __async(self, null, function* () {
-              var oldName = self.plugin.currentUser.categories[idx];
-              var newName = input.value.trim();
-              if (!newName) return;
-              self.plugin.currentUser.categories[idx] = newName;
-              for (var it of self.plugin.currentUser.items) { if (it.category === oldName) it.category = newName; }
-              yield self.plugin.saveSettings();
-              renderItems();
-            });
+          input.onchange = async () => {
+            const oldName = self.plugin.currentUser.categories[idx];
+            const newName = input.value.trim();
+            if (!newName) return;
+            self.plugin.currentUser.categories[idx] = newName;
+            for (const it of self.plugin.currentUser.items) {
+              if (it.category === oldName) it.category = newName;
+            }
+            await self.plugin.saveSettings();
+            renderItems();
           };
-
-          // Delete
-          var delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
-          delBtn.onclick = function() {
-            return __async(self, null, function* () {
-              var removedCat = self.plugin.currentUser.categories[idx];
+          const delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
+          delBtn.onclick = async () => {
+            const removedCat = self.plugin.currentUser.categories[idx];
+            if (!confirm("\u786E\u5B9A\u5220\u9664\u5206\u7C7B\u300C" + removedCat + "\u300D\u5417\uFF1F\u8BE5\u5206\u7C7B\u4E0B\u7684\u9879\u76EE\u5C06\u81EA\u52A8\u5F52\u5165\u7B2C\u4E00\u4E2A\u5206\u7C7B\u3002")) return;
+            try {
               self.plugin.currentUser.categories.splice(idx, 1);
-              var fallback = self.plugin.currentUser.categories[0] || "\u5176\u4ED6";
-              for (var it of self.plugin.currentUser.items) { if (it.category === removedCat) it.category = fallback; }
-              yield self.plugin.saveSettings(); renderCategories(); renderItems();
-            });
+              const fallback = self.plugin.currentUser.categories[0] || "\u5176\u4ED6";
+              for (const it of self.plugin.currentUser.items) {
+                if (it.category === removedCat) it.category = fallback;
+              }
+              await self.plugin.saveSettings();
+              renderCategories();
+              renderItems();
+            } catch (e) {
+              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+            }
           };
-
           catDrag.rows.push(row);
         })(ci);
       }
     };
     renderCategories();
-
-    new import_obsidian.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(function(btn) {
-      return btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(function() {
-        return __async(self, null, function* () {
-          self.plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
-          yield self.plugin.saveSettings(); renderCategories(); renderItems();
-        });
-      });
-    });
-
-    new import_obsidian.Setting(containerEl).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(function(btn) {
-      return btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(function() {
-        return __async(self, null, function* () {
-          yield self.plugin.saveSettings();
-          renderCategories();
-          renderItems();
-          new import_obsidian.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
-        });
-      });
-    });
-
-    // ── Scoring items management ──
+    new import_obsidian5.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
+      (btn) => btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(async () => {
+        self.plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
+        await self.plugin.saveSettings();
+        renderCategories();
+        renderItems();
+      })
+    );
+    new import_obsidian5.Setting(containerEl).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
+      (btn) => btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(async () => {
+        await self.plugin.saveSettings();
+        renderCategories();
+        renderItems();
+        new import_obsidian5.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
+      })
+    );
     containerEl.createEl("h3", { text: "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406" });
     containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00emoji\u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002" });
-    var itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
-
-    // ── Drag state ──
-    var dragState = { dragging: false, dragIdx: -1, placeholder: null, ghost: null, startY: 0, rows: [] };
-
-    var getDragRowIndex = function(y) {
-      for (var r = 0; r < dragState.rows.length; r++) {
-        var rect = dragState.rows[r].getBoundingClientRect();
+    const itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
+    const dragState = {
+      dragging: false,
+      dragIdx: -1,
+      placeholder: null,
+      ghost: null,
+      startY: 0,
+      rows: []
+    };
+    const getDragRowIndex = (y) => {
+      for (let r = 0; r < dragState.rows.length; r++) {
+        const rect = dragState.rows[r].getBoundingClientRect();
         if (y < rect.top + rect.height / 2) return r;
       }
       return dragState.rows.length;
     };
-
-    var onDragMove = function(clientY) {
+    const onDragMove = (clientY) => {
       if (!dragState.dragging) return;
-      dragState.ghost.style.top = clientY - 20 + "px";
-      var targetIdx = getDragRowIndex(clientY);
-      var parent = dragState.rows[0].parentElement;
-      // Move placeholder
+      if (dragState.ghost) dragState.ghost.style.top = clientY - 20 + "px";
+      const targetIdx = getDragRowIndex(clientY);
+      const parent = dragState.rows[0].parentElement;
+      if (!parent || !dragState.placeholder) return;
       if (targetIdx >= dragState.rows.length) {
         parent.appendChild(dragState.placeholder);
       } else {
         parent.insertBefore(dragState.placeholder, dragState.rows[targetIdx]);
       }
     };
-
-    var onDragEnd = function(clientY) {
+    const onDragEnd = (clientY) => {
       if (!dragState.dragging) return;
       dragState.dragging = false;
       if (dragState.ghost) dragState.ghost.remove();
       if (dragState.placeholder) dragState.placeholder.remove();
       document.body.style.userSelect = "";
       document.body.style.webkitUserSelect = "";
-
-      var targetIdx = getDragRowIndex(clientY);
-      var fromIdx = dragState.dragIdx;
-      if (targetIdx > fromIdx) targetIdx--;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < self.plugin.currentUser.items.length) {
-        var arr = self.plugin.currentUser.items;
-        var moved = arr.splice(fromIdx, 1)[0];
+      const targetIdx = getDragRowIndex(clientY);
+      let fromIdx = dragState.dragIdx;
+      if (targetIdx > fromIdx) fromIdx--;
+      const arr = self.plugin.currentUser.items;
+      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+        const moved = arr.splice(fromIdx, 1)[0];
         arr.splice(targetIdx, 0, moved);
-        __async(self, null, function* () { yield self.plugin.saveSettings(); renderItems(); })();
+        (async () => {
+          await self.plugin.saveSettings();
+          renderItems();
+        })();
       } else {
         renderItems();
       }
     };
-
-    var pointerMoveHandler = function(e) { onDragMove(e.clientY); };
-    var pointerUpHandler = function(e) {
+    const pointerMoveHandler = (e) => {
+      onDragMove(e.clientY);
+    };
+    const pointerUpHandler = (e) => {
       document.removeEventListener("pointermove", pointerMoveHandler);
       document.removeEventListener("pointerup", pointerUpHandler);
+      document.removeEventListener("pointercancel", pointerCancelHandler);
       onDragEnd(e.clientY);
     };
-
-    var renderItems = function() {
+    const pointerCancelHandler = () => {
+      document.removeEventListener("pointermove", pointerMoveHandler);
+      document.removeEventListener("pointerup", pointerUpHandler);
+      document.removeEventListener("pointercancel", pointerCancelHandler);
+      dragState.dragging = false;
+      if (dragState.ghost) {
+        dragState.ghost.remove();
+        dragState.ghost = null;
+      }
+      if (dragState.placeholder) {
+        dragState.placeholder.remove();
+        dragState.placeholder = null;
+      }
+      document.body.style.userSelect = "";
+      document.body.style.webkitUserSelect = "";
+      renderItems();
+    };
+    const renderItems = () => {
       itemsWrap.empty();
       dragState.rows = [];
       if (self.plugin.currentUser.items.length === 0) {
         itemsWrap.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01" });
         return;
       }
-
-      var headerRow = itemsWrap.createDiv({ cls: "settings-item-row-v2 header-row" });
-      ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach(function(h) { headerRow.createSpan({ text: h, cls: "col-header" }); });
-
-      var lastCat = null;
-      for (var i = 0; i < self.plugin.currentUser.items.length; i++) {
-        (function(idx) {
-          var item = self.plugin.currentUser.items[idx];
-          var thisCat = item.category || "\u5176\u4ED6";
+      const headerRow = itemsWrap.createDiv({ cls: "settings-item-row-v2 header-row" });
+      ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach((h) => {
+        headerRow.createSpan({ text: h, cls: "col-header" });
+      });
+      let lastCat = null;
+      for (let i = 0; i < self.plugin.currentUser.items.length; i++) {
+        ((idx) => {
+          const item = self.plugin.currentUser.items[idx];
+          const thisCat = item.category || "\u5176\u4ED6";
           if (thisCat !== lastCat) {
             lastCat = thisCat;
-            var groupHeader = itemsWrap.createDiv({ cls: "settings-cat-group-header" });
+            const groupHeader = itemsWrap.createDiv({ cls: "settings-cat-group-header" });
             groupHeader.createSpan({ text: thisCat });
           }
-          var wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
-          var row = wrap.createDiv({ cls: "settings-item-row-v2" });
+          const wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
+          wrap.dataset.itemId = item.id;
+          const row = wrap.createDiv({ cls: "settings-item-row-v2" });
           row.dataset.idx = String(idx);
-
-          // Drag handle
-          var handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
-          handle.addEventListener("pointerdown", function(e) {
+          const handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
+          handle.addEventListener("pointerdown", (e) => {
             e.preventDefault();
             dragState.dragging = true;
             dragState.dragIdx = idx;
             dragState.rows = Array.from(itemsWrap.querySelectorAll(".settings-item-wrap"));
             dragState.startY = e.clientY;
-
-            // Create ghost
-            var rect = wrap.getBoundingClientRect();
-            var ghost = wrap.cloneNode(true);
+            const rect = wrap.getBoundingClientRect();
+            const ghost = wrap.cloneNode(true);
             ghost.className = "settings-item-wrap settings-drag-ghost";
             ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (e.clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;padding:4px;";
             document.body.appendChild(ghost);
             dragState.ghost = ghost;
-
-            // Create placeholder
-            var ph = document.createElement("div");
+            const ph = document.createElement("div");
             ph.className = "settings-drag-placeholder";
             ph.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
-            wrap.parentElement.insertBefore(ph, wrap);
+            if (wrap.parentElement) wrap.parentElement.insertBefore(ph, wrap);
             dragState.placeholder = ph;
-
             wrap.style.display = "none";
             document.body.style.userSelect = "none";
             document.body.style.webkitUserSelect = "none";
-
             document.addEventListener("pointermove", pointerMoveHandler);
             document.addEventListener("pointerup", pointerUpHandler);
+            document.addEventListener("pointercancel", pointerCancelHandler);
           });
-
-          // Emoji button — opens full picker
-          var emojiBtn = row.createEl("button", { cls: "settings-emoji-btn", text: item.emoji });
-          emojiBtn.onclick = function() {
-            showEmojiPicker(function(em) {
-              return __async(self, null, function* () {
-                self.plugin.currentUser.items[idx].emoji = em;
-                yield self.plugin.saveSettings();
-                emojiBtn.textContent = em;
-              });
+          const emojiBtn = row.createEl("button", { cls: "settings-emoji-btn", text: item.emoji });
+          emojiBtn.onclick = () => {
+            showEmojiPicker(async (em) => {
+              self.plugin.currentUser.items[idx].emoji = em;
+              await self.plugin.saveSettings();
+              emojiBtn.textContent = em;
             });
           };
-
-          // Name
-          var nameInput = row.createEl("input", { cls: "settings-name-input" });
-          nameInput.type = "text"; nameInput.value = item.name;
-          nameInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].name = nameInput.value; yield self.plugin.saveSettings(); }); };
-
-          // Category dropdown
-          var catSelect = row.createEl("select", { cls: "settings-cat-select" });
-          var cats = self.plugin.currentUser.categories || [];
-          for (var c of cats) {
-            var opt = catSelect.createEl("option", { text: c, value: c });
+          const nameInput = row.createEl("input", { cls: "settings-name-input" });
+          nameInput.type = "text";
+          nameInput.value = item.name;
+          bindSettingsInput(nameInput);
+          nameInput.onchange = async () => {
+            self.plugin.currentUser.items[idx].name = nameInput.value;
+            await self.plugin.saveSettings();
+          };
+          const catSelect = row.createEl("select", { cls: "settings-cat-select" });
+          const cats = self.plugin.currentUser.categories || [];
+          for (const c of cats) {
+            const opt = catSelect.createEl("option", { text: c, value: c });
             if (item.category === c) opt.selected = true;
           }
-          catSelect.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].category = catSelect.value; var cats = self.plugin.currentUser.categories || []; self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; }); yield self.plugin.saveSettings(); renderItems(); }); };
-
-          // Points
-          var pointsInput = row.createEl("input", { cls: "settings-points-input" });
-          pointsInput.type = "number"; pointsInput.value = String(item.points);
-          pointsInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].points = parseInt(pointsInput.value) || 0; yield self.plugin.saveSettings(); }); };
-
-          // Delete
-          var del = row.createEl("button", { text: "\u{1F5D1}", cls: "settings-delete-btn" });
-          del.onclick = function() { return __async(self, null, function* () { self.plugin.currentUser.items.splice(idx, 1); yield self.plugin.saveSettings(); renderItems(); }); };
-
-          // Note (below the main row)
-          var noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
-          var noteInput = noteRow.createEl("input", { cls: "settings-note-input" });
-          noteInput.type = "text";
-          noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09";
+          catSelect.onchange = async () => {
+            self.plugin.currentUser.items[idx].category = catSelect.value;
+            const cats2 = self.plugin.currentUser.categories || [];
+            self.plugin.currentUser.items.sort((a, b) => {
+              let ai = cats2.indexOf(a.category);
+              if (ai === -1) ai = 9999;
+              let bi = cats2.indexOf(b.category);
+              if (bi === -1) bi = 9999;
+              return ai - bi;
+            });
+            await self.plugin.saveSettings();
+            renderItems();
+          };
+          const pointsInput = row.createEl("input", { cls: "settings-points-input" });
+          pointsInput.type = "number";
+          pointsInput.value = String(item.points);
+          bindSettingsInput(pointsInput);
+          pointsInput.onchange = async () => {
+            self.plugin.currentUser.items[idx].points = parseInt(pointsInput.value) || 0;
+            await self.plugin.saveSettings();
+          };
+          const del = row.createEl("button", { text: "\u{1F5D1}", cls: "settings-delete-btn" });
+          del.onclick = async () => {
+            if (!confirm("\u786E\u5B9A\u5220\u9664\u6253\u5206\u9879\u300C" + item.name + "\u300D\u5417\uFF1F")) return;
+            try {
+              self.plugin.currentUser.items.splice(idx, 1);
+              await self.plugin.saveSettings();
+              renderItems();
+            } catch (e) {
+              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+            }
+          };
+          const noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
+          const noteInput = noteRow.createEl("textarea", { cls: "settings-note-input" });
+          noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\uFF0C\u652F\u6301\u591A\u884C";
           noteInput.value = item.note || "";
-          noteInput.onchange = function() { return __async(self, null, function* () { self.plugin.currentUser.items[idx].note = noteInput.value; yield self.plugin.saveSettings(); }); };
-
+          noteInput.rows = 1;
+          const autoResize = (ta) => {
+            ta.style.height = "auto";
+            ta.style.height = ta.scrollHeight + "px";
+          };
+          autoResize(noteInput);
+          noteInput.addEventListener("input", () => autoResize(noteInput));
+          noteInput.addEventListener("focus", () => autoResize(noteInput));
+          bindSettingsInput(noteInput);
+          noteInput.addEventListener("change", async () => {
+            self.plugin.currentUser.items[idx].note = noteInput.value;
+            await self.plugin.saveSettings();
+          });
           dragState.rows.push(wrap);
         })(i);
       }
-
-      // Insert "+ 添加" button after each category group
-      var groupHeaders = Array.from(itemsWrap.querySelectorAll(".settings-cat-group-header"));
-      groupHeaders.forEach(function(header, hi) {
-        var cat = header.querySelector("span").textContent;
-        var nextSibling = groupHeaders[hi + 1] || null;
-        var addBtn = document.createElement("button");
+      const groupHeaders = Array.from(itemsWrap.querySelectorAll(".settings-cat-group-header"));
+      groupHeaders.forEach((header, hi) => {
+        var _a;
+        const cat = ((_a = header.querySelector("span")) == null ? void 0 : _a.textContent) || "";
+        const nextSibling = groupHeaders[hi + 1] || null;
+        const addBtn = document.createElement("button");
         addBtn.className = "settings-cat-add-btn";
         addBtn.textContent = "+ \u5728\u300C" + cat + "\u300D\u6DFB\u52A0\u9879\u76EE";
-        (function(c) {
-          addBtn.onclick = function() {
-            return __async(self, null, function* () {
-              self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: c, note: "" });
-              var cats2 = self.plugin.currentUser.categories || [];
-              self.plugin.currentUser.items.sort(function(a, b) { var ai = cats2.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats2.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
-              yield self.plugin.saveSettings();
+        ((c) => {
+          addBtn.onclick = async () => {
+            try {
+              const newItemId = "item_" + Date.now();
+              self.plugin.currentUser.items.push({
+                id: newItemId,
+                name: "\u65B0\u9879\u76EE",
+                points: 1,
+                emoji: "\u2B50",
+                category: c,
+                note: ""
+              });
+              const cats2 = self.plugin.currentUser.categories || [];
+              self.plugin.currentUser.items.sort((a, b) => {
+                let ai = cats2.indexOf(a.category);
+                if (ai === -1) ai = 9999;
+                let bi = cats2.indexOf(b.category);
+                if (bi === -1) bi = 9999;
+                return ai - bi;
+              });
+              await self.plugin.saveSettings();
+              pendingScrollItemId = newItemId;
               renderItems();
-            });
+            } catch (e) {
+              new import_obsidian5.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+            }
           };
         })(cat);
-        if (nextSibling) { itemsWrap.insertBefore(addBtn, nextSibling); } else { itemsWrap.appendChild(addBtn); }
+        if (nextSibling) {
+          itemsWrap.insertBefore(addBtn, nextSibling);
+        } else {
+          itemsWrap.appendChild(addBtn);
+        }
       });
+      if (pendingScrollItemId) {
+        requestAnimationFrame(() => {
+          const newItemEl = itemsWrap.querySelector(
+            '.settings-item-wrap[data-item-id="' + pendingScrollItemId + '"]'
+          );
+          if (newItemEl) {
+            newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
+            newItemEl.addClass("is-new-item");
+            window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
+          }
+          pendingScrollItemId = null;
+        });
+      }
     };
-
     renderItems();
-
-    new import_obsidian.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE")
-      .addButton(function(btn) {
-        return btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(function() {
-          return __async(self, null, function* () {
-            var defaultCat = self.plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
-            self.plugin.currentUser.items.push({ id: "item_" + Date.now(), name: "\u65B0\u9879\u76EE", points: 1, emoji: "\u2B50", category: defaultCat, note: "" });
-            var cats = self.plugin.currentUser.categories || [];
-            self.plugin.currentUser.items.sort(function(a, b) { var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999; var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999; return ai - bi; });
-            yield self.plugin.saveSettings(); renderItems();
-          });
+    new import_obsidian5.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+      (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
+        const defaultCat = self.plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
+        const newItemId = "item_" + Date.now();
+        self.plugin.currentUser.items.push({
+          id: newItemId,
+          name: "\u65B0\u9879\u76EE",
+          points: 1,
+          emoji: "\u2B50",
+          category: defaultCat,
+          note: ""
         });
+        const cats = self.plugin.currentUser.categories || [];
+        self.plugin.currentUser.items.sort((a, b) => {
+          let ai = cats.indexOf(a.category);
+          if (ai === -1) ai = 9999;
+          let bi = cats.indexOf(b.category);
+          if (bi === -1) bi = 9999;
+          return ai - bi;
+        });
+        await self.plugin.saveSettings();
+        pendingScrollItemId = newItemId;
+        renderItems();
       })
-      .addButton(function(btn) {
-        return btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(function() {
-          return __async(self, null, function* () {
-            var cats = self.plugin.currentUser.categories || [];
-            self.plugin.currentUser.items.sort(function(a, b) {
-              var ai = cats.indexOf(a.category); if (ai === -1) ai = 9999;
-              var bi = cats.indexOf(b.category); if (bi === -1) bi = 9999;
-              return ai - bi;
-            });
-            yield self.plugin.saveSettings(); renderItems();
-            new import_obsidian.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
-          });
+    ).addButton(
+      (btn) => btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(async () => {
+        const cats = self.plugin.currentUser.categories || [];
+        self.plugin.currentUser.items.sort((a, b) => {
+          let ai = cats.indexOf(a.category);
+          if (ai === -1) ai = 9999;
+          let bi = cats.indexOf(b.category);
+          if (bi === -1) bi = 9999;
+          return ai - bi;
         });
-      });
-
-    // ── Scoring rules (same card style as scoring page) ──
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u8FD9\u91CC\u7684\u89C4\u5219\u4E0E\u300C\u6253\u5206\u9875\u300D\u5B8C\u5168\u540C\u6B65\uFF0C\u4FEE\u6539\u4EFB\u610F\u4E00\u5904\u90FD\u4F1A\u751F\u6548\u3002" });
-    var settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-    var settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
-    var settingsRulesToggle = settingsRulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-    settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-    var settingsRulesEditBtn = settingsRulesHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-    var settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
-    var settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
-    var settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-    var settingsRulesTextarea = settingsRulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-    settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
-    settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-    var settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
-    var settingsRulesSaveBtn = settingsRulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
-    var settingsRulesCancelBtn = settingsRulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
-    var renderSettingsRules = function() {
-      settingsRulesView.empty();
-      var text = self.plugin.currentUser.scoringRules || "";
-      if (text.trim()) {
-        import_obsidian.MarkdownRenderer.render(self.app, text, settingsRulesView, "", self);
+        await self.plugin.saveSettings();
+        renderItems();
+        new import_obsidian5.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
+      })
+    );
+    function renderRulesAndTemplateSections() {
+      const settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+      const settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
+      const settingsRulesToggle = settingsRulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
+      settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+      settingsRulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
+      const settingsRulesEditBtn = settingsRulesHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
+      const settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
+      const settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
+      const settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+      const settingsRulesTextarea = settingsRulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+      settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
+      settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+      const settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
+      const settingsRulesSaveBtn = settingsRulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
+      const settingsRulesCancelBtn = settingsRulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
+      const renderSettingsRules = () => {
+        settingsRulesView.empty();
+        const text = self.plugin.currentUser.scoringRules || "";
+        if (text.trim()) {
+          import_obsidian5.MarkdownRenderer.render(self.app, text, settingsRulesView, "", self.plugin);
+        } else {
+          settingsRulesView.createEl("p", { cls: "kid-score-rules-empty", text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219" });
+        }
+      };
+      renderSettingsRules();
+      let settingsRulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
+      if (!settingsRulesOpen) {
+        settingsRulesBody.addClass("is-hidden");
       } else {
-        settingsRulesView.createEl("p", { cls: "kid-score-rules-empty", text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219" });
-      }
-    };
-    renderSettingsRules();
-    var settingsRulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
-    if (!settingsRulesOpen) { settingsRulesBody.addClass("is-hidden"); } else { settingsRulesToggle.textContent = "\u25BC"; }
-    settingsRulesHeader.addEventListener("click", function(e) {
-      if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
-      settingsRulesOpen = !settingsRulesOpen;
-      settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
-      settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
-    });
-    var settingsRulesIsEditing = false;
-    settingsRulesEditBtn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      settingsRulesIsEditing = !settingsRulesIsEditing;
-      if (settingsRulesIsEditing) {
-        settingsRulesOpen = true;
         settingsRulesToggle.textContent = "\u25BC";
-        settingsRulesBody.removeClass("is-hidden");
-        settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-        settingsRulesView.addClass("is-hidden");
-        settingsRulesEdit.removeClass("is-hidden");
-        settingsRulesTextarea.focus();
-      } else {
-        settingsRulesView.removeClass("is-hidden");
-        settingsRulesEdit.addClass("is-hidden");
       }
-    });
-    settingsRulesSaveBtn.addEventListener("click", function() {
-      return __async(self, null, function* () {
+      settingsRulesHeader.addEventListener("click", (e) => {
+        if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
+        settingsRulesOpen = !settingsRulesOpen;
+        settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
+        settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
+      });
+      let settingsRulesIsEditing = false;
+      settingsRulesEditBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        settingsRulesIsEditing = !settingsRulesIsEditing;
+        if (settingsRulesIsEditing) {
+          settingsRulesOpen = true;
+          settingsRulesToggle.textContent = "\u25BC";
+          settingsRulesBody.removeClass("is-hidden");
+          settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
+          settingsRulesView.addClass("is-hidden");
+          settingsRulesEdit.removeClass("is-hidden");
+          settingsRulesTextarea.focus();
+        } else {
+          settingsRulesView.removeClass("is-hidden");
+          settingsRulesEdit.addClass("is-hidden");
+        }
+      });
+      settingsRulesSaveBtn.addEventListener("click", async () => {
         self.plugin.currentUser.scoringRules = settingsRulesTextarea.value;
-        yield self.plugin.saveSettings();
+        await self.plugin.saveSettings();
         renderSettingsRules();
         settingsRulesIsEditing = false;
         settingsRulesView.removeClass("is-hidden");
         settingsRulesEdit.addClass("is-hidden");
-        new import_obsidian.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+        new import_obsidian5.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
       });
-    });
-    settingsRulesCancelBtn.addEventListener("click", function() {
-      settingsRulesIsEditing = false;
-      settingsRulesView.removeClass("is-hidden");
-      settingsRulesEdit.addClass("is-hidden");
-    });
-
-    // ── Diary template (same card style as scoring rules) ──
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u6BCF\u65E5\u65E5\u8BB0\u7684\u9ED8\u8BA4\u6A21\u677F\u3002\u652F\u6301 Markdown\uFF0C\u4E0E\u6253\u5206\u9875\u76F4\u63A5\u540C\u6B65\u3002" });
-    var tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-    var tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
-    var tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-    tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
-    var tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-    var tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
-    var tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
-    var tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-    var tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-    tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-    tmplTextarea.style.minHeight = "220px";
-    var tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
-    tmplPreviewWrap.style.display = "none";
-    var tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
-    var tmplPreviewBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "MD\u9884\u89C8" });
-    var tmplSaveBtn = tmplActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u6A21\u677F" });
-    var tmplCancelBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
-    var renderTemplateView = function() {
-      tmplView.empty();
-      var text = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      import_obsidian.MarkdownRenderer.render(self.app, text, tmplView, "", self);
-    };
-    renderTemplateView();
-    var tmplOpen = true;
-    tmplToggle.textContent = "\u25BC";
-    var tmplIsEditing = false;
-    var tmplIsPreview = false;
-    var refreshTemplatePreview = function() {
-      tmplPreviewWrap.empty();
-      import_obsidian.MarkdownRenderer.render(self.app, tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", tmplPreviewWrap, "", self);
-    };
-    tmplHeader.addEventListener("click", function(e) {
-      if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
-      tmplOpen = !tmplOpen;
-      tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
-      tmplBody.toggleClass("is-hidden", !tmplOpen);
-    });
-    tmplEditBtn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      tmplIsEditing = !tmplIsEditing;
-      if (tmplIsEditing) {
-        tmplOpen = true;
-        tmplToggle.textContent = "\u25BC";
-        tmplBody.removeClass("is-hidden");
-        tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-        tmplView.addClass("is-hidden");
-        tmplEdit.removeClass("is-hidden");
-        tmplIsPreview = false;
-        tmplPreviewWrap.style.display = "none";
-        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-        tmplTextarea.focus();
-      } else {
-        tmplView.removeClass("is-hidden");
-        tmplEdit.addClass("is-hidden");
-      }
-    });
-    tmplPreviewBtn.addEventListener("click", function() {
-      tmplIsPreview = !tmplIsPreview;
-      if (tmplIsPreview) {
+      settingsRulesCancelBtn.addEventListener("click", () => {
+        settingsRulesIsEditing = false;
+        settingsRulesView.removeClass("is-hidden");
+        settingsRulesEdit.addClass("is-hidden");
+      });
+      const tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+      const tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
+      const tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
+      tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
+      tmplHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
+      const tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
+      const tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
+      const tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
+      const tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+      const tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+      tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+      tmplTextarea.style.minHeight = "220px";
+      const tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
+      tmplPreviewWrap.style.display = "none";
+      const tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
+      const tmplPreviewBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "MD\u9884\u89C8" });
+      const tmplSaveBtn = tmplActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u6A21\u677F" });
+      const tmplCancelBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
+      const renderTemplateView = () => {
+        tmplView.empty();
+        const text = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+        import_obsidian5.MarkdownRenderer.render(self.app, text, tmplView, "", self.plugin);
+      };
+      renderTemplateView();
+      let tmplOpen = true;
+      tmplToggle.textContent = "\u25BC";
+      let tmplIsEditing = false;
+      let tmplIsPreview = false;
+      const refreshTemplatePreview = () => {
+        tmplPreviewWrap.empty();
+        import_obsidian5.MarkdownRenderer.render(
+          self.app,
+          tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
+          tmplPreviewWrap,
+          "",
+          self.plugin
+        );
+      };
+      tmplHeader.addEventListener("click", (e) => {
+        if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
+        tmplOpen = !tmplOpen;
+        tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
+        tmplBody.toggleClass("is-hidden", !tmplOpen);
+      });
+      tmplEditBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        tmplIsEditing = !tmplIsEditing;
+        if (tmplIsEditing) {
+          tmplOpen = true;
+          tmplToggle.textContent = "\u25BC";
+          tmplBody.removeClass("is-hidden");
+          tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+          tmplView.addClass("is-hidden");
+          tmplEdit.removeClass("is-hidden");
+          tmplIsPreview = false;
+          tmplPreviewWrap.style.display = "none";
+          tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+          tmplTextarea.focus();
+        } else {
+          tmplView.removeClass("is-hidden");
+          tmplEdit.addClass("is-hidden");
+        }
+      });
+      tmplPreviewBtn.addEventListener("click", () => {
+        tmplIsPreview = !tmplIsPreview;
+        if (tmplIsPreview) {
+          refreshTemplatePreview();
+          tmplPreviewWrap.style.display = "";
+          tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
+        } else {
+          tmplPreviewWrap.style.display = "none";
+          tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+        }
+      });
+      tmplTextarea.addEventListener("input", () => {
+        if (!tmplIsPreview) return;
         refreshTemplatePreview();
-        tmplPreviewWrap.style.display = "";
-        tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
-      } else {
-        tmplPreviewWrap.style.display = "none";
-        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-      }
-    });
-    tmplTextarea.addEventListener("input", function() {
-      if (!tmplIsPreview) return;
-      refreshTemplatePreview();
-    });
-    tmplSaveBtn.addEventListener("click", function() {
-      return __async(self, null, function* () {
+      });
+      tmplSaveBtn.addEventListener("click", async () => {
         self.plugin.currentUser.diaryTemplate = tmplTextarea.value;
-        yield self.plugin.saveSettings();
+        await self.plugin.saveSettings();
         renderTemplateView();
         tmplIsEditing = false;
         tmplIsPreview = false;
@@ -2136,60 +4775,431 @@ var KidScoreSettingTab = class extends import_obsidian.PluginSettingTab {
         tmplPreviewBtn.textContent = "MD\u9884\u89C8";
         tmplView.removeClass("is-hidden");
         tmplEdit.addClass("is-hidden");
-        new import_obsidian.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
+        new import_obsidian5.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
       });
-    });
-    tmplCancelBtn.addEventListener("click", function() {
-      tmplIsEditing = false;
-      tmplIsPreview = false;
-      tmplPreviewWrap.style.display = "none";
-      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-      tmplView.removeClass("is-hidden");
-      tmplEdit.addClass("is-hidden");
-    });
-
-    // ── Export / Import ──
-    containerEl.createEl("h3", { text: "\uD83D\uDCE6 \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E")
-      .setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6")
-      .addButton(function(btn) {
-        btn.setButtonText("\uD83D\uDCE4 \u5BFC\u51FA").onClick(function() {
-          var data = { categories: self.plugin.currentUser.categories, items: self.plugin.currentUser.items };
-          var json = JSON.stringify(data, null, 2);
-          var blob = new Blob([json], { type: "application/json" });
-          var url = URL.createObjectURL(blob);
-          var a = document.createElement("a");
-          a.href = url; a.download = "little-milestones-config.json"; a.click();
-          URL.revokeObjectURL(url);
-        });
+      tmplCancelBtn.addEventListener("click", () => {
+        tmplIsEditing = false;
+        tmplIsPreview = false;
+        tmplPreviewWrap.style.display = "none";
+        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+        tmplView.removeClass("is-hidden");
+        tmplEdit.addClass("is-hidden");
       });
-    new import_obsidian.Setting(containerEl)
-      .setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E")
-      .setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09")
-      .addButton(function(btn) {
-        btn.setButtonText("\uD83D\uDCE5 \u5BFC\u5165").onClick(function() {
-          var fileInput = document.createElement("input");
-          fileInput.type = "file"; fileInput.accept = ".json";
-          fileInput.onchange = function() {
-            return __async(self, null, function* () {
-              var file = fileInput.files && fileInput.files[0];
-              if (!file) return;
-              try {
-                var text = yield file.text();
-                var data = JSON.parse(text);
-                if (Array.isArray(data.items)) self.plugin.currentUser.items = data.items;
-                if (Array.isArray(data.categories)) self.plugin.currentUser.categories = data.categories;
-                yield self.plugin.saveSettings();
-                self.display();
-                new import_obsidian.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
-              } catch (e) {
-                new import_obsidian.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
-              }
-            });
+      const diaryModulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+      const diaryModulesHeader = diaryModulesSection.createDiv({ cls: "kid-score-rules-header" });
+      const diaryModulesToggle = diaryModulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
+      diaryModulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\uD83E\uDDE9 \u65E5\u8BB0\u6A21\u5757" });
+      diaryModulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u53EF\u4EE5\u81EA\u5B9A\u4E49\u663E\u793A\u5728\u6253\u5206\u9875\u7684\u5E38\u7528\u8BB0\u5F55\u6A21\u5757" });
+      const diaryModulesBody = diaryModulesSection.createDiv({ cls: "kid-score-rules-body" });
+      let diaryModulesOpen = true;
+      const ensureDiaryModules = () => {
+        if (!Array.isArray(self.plugin.currentUser.diaryModules) || self.plugin.currentUser.diaryModules.length === 0) {
+          self.plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+        }
+      };
+      const renderDiaryModulesSettings = () => {
+        ensureDiaryModules();
+        diaryModulesBody.empty();
+        const hint = diaryModulesBody.createEl("p", { cls: "kid-score-hint", text: "\u4F60\u53EF\u4EE5\u4FEE\u6539\u6A21\u5757\u540D\u79F0\u548C\u63D0\u793A\u6587\u6848\uFF0C\u4E5F\u53EF\u4EE5\u65B0\u589E\u6216\u5220\u9664\u6A21\u5757\u3002\u5929\u6C14/\u5FC3\u60C5\u4F1A\u4FDD\u7559\u5FEB\u6377 emoji \u529F\u80FD\u3002" });
+        hint.style.marginBottom = "10px";
+        const list = diaryModulesBody.createDiv({ cls: "diary-module-settings-list" });
+        self.plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
+          const row = list.createDiv({ cls: "diary-module-settings-row" });
+          const labelInput = row.createEl("input", { cls: "diary-module-settings-input", type: "text" });
+          labelInput.value = moduleDef.label || "";
+          labelInput.placeholder = "\u6A21\u5757\u540D\u79F0";
+          bindSettingsInput(labelInput);
+          labelInput.onchange = async () => {
+            self.plugin.currentUser.diaryModules[idx].label = labelInput.value.trim() || moduleDef.label || "\u65B0\u6A21\u5757";
+            await self.plugin.saveSettings();
+            renderDiaryModulesSettings();
           };
-          fileInput.click();
+          const placeholderInput = row.createEl("input", { cls: "diary-module-settings-input is-wide", type: "text" });
+          placeholderInput.value = moduleDef.placeholder || "";
+          placeholderInput.placeholder = "\u63D0\u793A\u6587\u6848";
+          bindSettingsInput(placeholderInput);
+          placeholderInput.onchange = async () => {
+            self.plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
+            await self.plugin.saveSettings();
+          };
+          const kindSelect = row.createEl("select", { cls: "diary-module-settings-select" });
+          [
+            { value: "quick", label: "\u5355\u884C\u5FEB\u6377" },
+            { value: "multi", label: "\u591A\u884C\u8BB0\u5F55" }
+          ].forEach((optionDef) => {
+            const opt = kindSelect.createEl("option", { text: optionDef.label, value: optionDef.value });
+            if ((moduleDef.kind || "multi") === optionDef.value) opt.selected = true;
+          });
+          kindSelect.onchange = async () => {
+            self.plugin.currentUser.diaryModules[idx].kind = kindSelect.value;
+            await self.plugin.saveSettings();
+          };
+          const delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
+          delBtn.onclick = async () => {
+            self.plugin.currentUser.diaryModules.splice(idx, 1);
+            await self.plugin.saveSettings();
+            renderDiaryModulesSettings();
+          };
         });
+        const actRow = diaryModulesBody.createDiv({ cls: "kid-score-rules-actions" });
+        const addBtn = actRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\uFF0B \u65B0\u589E\u6A21\u5757" });
+        addBtn.onclick = async () => {
+          self.plugin.currentUser.diaryModules.push({
+            id: "module_" + Date.now(),
+            label: "\u65B0\u6A21\u5757",
+            placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
+            kind: "multi"
+          });
+          await self.plugin.saveSettings();
+          renderDiaryModulesSettings();
+        };
+        const resetBtn = actRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757" });
+        resetBtn.onclick = async () => {
+          self.plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+          await self.plugin.saveSettings();
+          renderDiaryModulesSettings();
+        };
+      };
+      renderDiaryModulesSettings();
+      diaryModulesHeader.addEventListener("click", () => {
+        diaryModulesOpen = !diaryModulesOpen;
+        diaryModulesToggle.textContent = diaryModulesOpen ? "\u25BC" : "\u25B6";
+        diaryModulesBody.toggleClass("is-hidden", !diaryModulesOpen);
       });
+    }
+    containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
+    new import_obsidian5.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+      btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
+        const data = { categories: self.plugin.currentUser.categories, items: self.plugin.currentUser.items };
+        const json = JSON.stringify(data, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "little-milestones-config.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    });
+    new import_obsidian5.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+      btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = ".json";
+        fileInput.onchange = async () => {
+          const file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+          try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (Array.isArray(data.items)) self.plugin.currentUser.items = data.items;
+            if (Array.isArray(data.categories)) self.plugin.currentUser.categories = data.categories;
+            await self.plugin.saveSettings();
+            self.display();
+            new import_obsidian5.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
+          } catch (e) {
+            new import_obsidian5.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
+          }
+        };
+        fileInput.click();
+      });
+    });
+  }
+};
+
+// src/main.ts
+var KidScorePlugin = class extends import_obsidian6.Plugin {
+  constructor() {
+    super(...arguments);
+    this.settings = DEFAULT_SETTINGS;
+  }
+  async onload() {
+    await this.loadSettings();
+    let changed = false;
+    for (const u of this.settings.users) {
+      if (!u.categories || u.categories.length === 0) {
+        u.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+        changed = true;
+      }
+      for (const it of u.items) {
+        if (!it.category) {
+          it.category = it.points >= 0 ? u.categories[0] : u.categories[1] || u.categories[0];
+          changed = true;
+        }
+      }
+    }
+    if (changed) await this.saveSettings();
+    this.addRibbonIcon("star", "Little Milestones \u{1F331}", () => {
+      new DailyScoringModal(this.app, this).open();
+    });
+    this.addCommand({
+      id: "open-daily-score",
+      name: "\u6253\u5F00\u4ECA\u65E5\u6253\u5206",
+      callback: () => new DailyScoringModal(this.app, this).open()
+    });
+    this.addCommand({
+      id: "view-stats",
+      name: "\u67E5\u770B\u6253\u5206\u7EDF\u8BA1",
+      callback: () => new StatsModal(this.app, this).open()
+    });
+    this.addSettingTab(new KidScoreSettingTab(this.app, this));
+  }
+  async loadSettings() {
+    const loaded = await this.loadData() || {};
+    if (loaded.childName !== void 0 && !loaded.users) {
+      const mu = makeDefaultUser();
+      mu.name = loaded.childName || "\u5C0F\u670B\u53CB";
+      mu.savePath = loaded.savePath || "Little Milestones/Daily Records";
+      mu.items = loaded.items || [];
+      mu.categories = loaded.categories && loaded.categories.length ? loaded.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+      mu.scoringRules = loaded.scoringRules || "";
+      mu.diaryTemplate = loaded.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+      mu.diaryModules = Array.isArray(loaded.diaryModules) && loaded.diaryModules.length ? loaded.diaryModules : makeDefaultDiaryModules();
+      this.settings = {
+        users: [mu],
+        currentUserId: mu.id,
+        doubleTapThresholds: {
+          ...DEFAULT_SETTINGS.doubleTapThresholds
+        }
+      };
+    } else {
+      this.settings = { ...DEFAULT_SETTINGS, ...loaded };
+      const dt = {
+        ...DEFAULT_SETTINGS.doubleTapThresholds,
+        ...this.settings.doubleTapThresholds || {}
+      };
+      dt.windows = this.sanitizeDoubleTapThreshold(
+        dt.windows,
+        DEFAULT_SETTINGS.doubleTapThresholds.windows
+      );
+      dt.mac = this.sanitizeDoubleTapThreshold(
+        dt.mac,
+        DEFAULT_SETTINGS.doubleTapThresholds.mac
+      );
+      dt.android = this.sanitizeDoubleTapThreshold(
+        dt.android,
+        DEFAULT_SETTINGS.doubleTapThresholds.android
+      );
+      dt.ios = this.sanitizeDoubleTapThreshold(
+        dt.ios,
+        DEFAULT_SETTINGS.doubleTapThresholds.ios
+      );
+      dt.fallback = this.sanitizeDoubleTapThreshold(
+        dt.fallback,
+        DEFAULT_SETTINGS.doubleTapThresholds.fallback
+      );
+      this.settings.doubleTapThresholds = dt;
+      if (!this.settings.users || !this.settings.users.length) {
+        const du = makeDefaultUser();
+        this.settings.users = [du];
+        this.settings.currentUserId = du.id;
+      } else {
+        for (const su of this.settings.users) {
+          if (!su.id)
+            su.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+          if (!su.name) su.name = "\u5C0F\u670B\u53CB";
+          if (!su.savePath || !String(su.savePath).trim())
+            su.savePath = "Little Milestones/Daily Records";
+          if (!Array.isArray(su.items)) su.items = [];
+          if (!Array.isArray(su.categories) || !su.categories.length)
+            su.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+          if (typeof su.scoringRules !== "string") su.scoringRules = "";
+          if (!su.diaryTemplate) su.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
+          if (!Array.isArray(su.diaryModules) || su.diaryModules.length === 0) su.diaryModules = makeDefaultDiaryModules();
+          if (!su.goals) su.goals = { daily: 10, weekly: 70, monthly: 300 };
+        }
+        const cuid = this.settings.currentUserId;
+        if (!cuid || !this.settings.users.find((u) => u.id === cuid)) {
+          this.settings.currentUserId = this.settings.users[0].id;
+        }
+      }
+    }
+  }
+  async saveSettings() {
+    await this.saveData(this.settings);
+  }
+  sanitizeDoubleTapThreshold(value, fallback) {
+    const n = parseInt(String(value), 10);
+    if (!Number.isFinite(n)) return fallback;
+    return Math.max(120, Math.min(600, n));
+  }
+  detectPlatformKey() {
+    const ua = (navigator.userAgent || "").toLowerCase();
+    if (/android/.test(ua)) return "android";
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    if (/macintosh|mac os x/.test(ua)) return "mac";
+    if (/windows/.test(ua)) return "windows";
+    return "fallback";
+  }
+  getDoubleTapThreshold() {
+    const defaults = DEFAULT_SETTINGS.doubleTapThresholds;
+    const cfg = this.settings.doubleTapThresholds || defaults;
+    const key = this.detectPlatformKey();
+    const fb = this.sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
+    return this.sanitizeDoubleTapThreshold(
+      cfg[key],
+      fb
+    );
+  }
+  get currentUser() {
+    const cuid = this.settings.currentUserId;
+    return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
+  }
+  filePath(dateStr) {
+    return (0, import_obsidian6.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+  }
+  async readDayData(dateStr) {
+    const file = this.app.vault.getAbstractFileByPath(this.filePath(dateStr));
+    if (!(file instanceof import_obsidian6.TFile)) return null;
+    const content = await this.app.vault.read(file);
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) return null;
+    const fm = fmMatch[1];
+    const totalMatch = fm.match(/total:\s*(-?\d+)/);
+    const total = totalMatch ? parseInt(totalMatch[1]) : 0;
+    const scores = {};
+    const scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
+    if (scoreBlock) {
+      for (const line of scoreBlock[1].split("\n")) {
+        const kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
+        if (kvNum) {
+          scores[kvNum[1]] = parseInt(kvNum[2]);
+          continue;
+        }
+        const kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
+        if (kvBool) {
+          const itemDef = this.currentUser.items.find(
+            (it) => it.id === kvBool[1]
+          );
+          scores[kvBool[1]] = kvBool[2] === "true" ? itemDef ? itemDef.points : 1 : 0;
+        }
+      }
+    }
+    const customItems = [];
+    const customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
+    if (customBlock) {
+      const lines = customBlock[1].split("\n");
+      for (const cl of lines) {
+        const cm = cl.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
+        if (cm) {
+          customItems.push({
+            id: "custom_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+            emoji: cm[1],
+            name: cm[2],
+            points: parseInt(cm[3])
+          });
+        }
+      }
+    }
+    let diaryContent = "";
+    const diaryHeadingIdx = content.indexOf("## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0");
+    if (diaryHeadingIdx !== -1) {
+      diaryContent = content.slice(diaryHeadingIdx).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+    } else {
+      const diaryIdx = content.indexOf(DIARY_MARKER);
+      if (diaryIdx !== -1) {
+        diaryContent = content.slice(diaryIdx + DIARY_MARKER.length).trim();
+        diaryContent = diaryContent.replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+      }
+    }
+    return {
+      date: dateStr,
+      child: this.currentUser.name,
+      scores,
+      customItems,
+      total,
+      diaryContent
+    };
+  }
+  async saveDayData(dateStr, scores, customItems, diaryContent) {
+    try {
+      const composer = new DayDataComposer(this);
+      const builder = new MarkdownReportBuilder();
+      const report = await composer.compose(dateStr, scores, customItems, diaryContent);
+      const fileContent = builder.build(report);
+      const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
+      if (!this.app.vault.getAbstractFileByPath(dirPath)) {
+        await this.app.vault.createFolder(dirPath);
+      }
+      const fp = this.filePath(dateStr);
+      const existing = this.app.vault.getAbstractFileByPath(fp);
+      if (existing instanceof import_obsidian6.TFile) {
+        await this.app.vault.modify(existing, fileContent);
+      } else {
+        await this.app.vault.create(fp, fileContent);
+      }
+      const totalSign = report.total >= 0 ? "+" : "";
+      const grandSign = report.grandTotal >= 0 ? "+" : "";
+      new import_obsidian6.Notice("\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal);
+    } catch (e) {
+      console.error("[Little Milestones] saveDayData failed", e);
+      new import_obsidian6.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+      throw e;
+    }
+  }
+  async renameUserInFiles(oldName, newName) {
+    const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
+    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(dirPath + "/") && f.extension === "md");
+    let errorCount = 0;
+    for (const file of files) {
+      try {
+        const content = await this.app.vault.read(file);
+        const childRe = new RegExp("^child:\\s*" + oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "gm");
+        const titleRe = new RegExp("(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)", "g");
+        const newContent = content.replace(childRe, "child: " + newName).replace(titleRe, "$1" + newName + "$2");
+        if (newContent !== content) {
+          await this.app.vault.modify(file, newContent);
+        }
+      } catch (e) {
+        errorCount++;
+        console.error("[Little Milestones] renameUserInFiles failed for", file.path, e);
+      }
+    }
+    if (errorCount > 0) {
+      throw new Error("\u7528\u6237\u540D\u540C\u6B65\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u8BF7\u67E5\u770B\u63A7\u5236\u53F0\u65E5\u5FD7");
+    }
+  }
+  async migrateSavePath(oldPath, newPath) {
+    const oldDir = (0, import_obsidian6.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian6.normalizePath)(newPath);
+    if (oldDir === newDir) return;
+    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(oldDir + "/") && f.extension === "md");
+    if (files.length === 0) return;
+    if (!this.app.vault.getAbstractFileByPath(newDir)) {
+      await this.app.vault.createFolder(newDir);
+    }
+    let errorCount = 0;
+    for (const file of files) {
+      try {
+        const newFilePath = (0, import_obsidian6.normalizePath)(newDir + "/" + file.name);
+        const existing = this.app.vault.getAbstractFileByPath(newFilePath);
+        if (existing instanceof import_obsidian6.TFile) {
+          const oldContent = await this.app.vault.read(file);
+          await this.app.vault.modify(existing, oldContent);
+          await this.app.vault.delete(file, true);
+        } else {
+          await this.app.vault.rename(file, newFilePath);
+        }
+      } catch (e) {
+        errorCount++;
+        console.error("[Little Milestones] migrateSavePath failed for", file.path, e);
+      }
+    }
+    if (errorCount > 0) {
+      throw new Error("\u8DEF\u5F84\u8FC1\u79FB\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u5EFA\u8BAE\u624B\u52A8\u68C0\u67E5\u5E76\u8FC1\u79FB");
+    }
+  }
+  async getAllScores() {
+    const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
+    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(dirPath + "/") && f.extension === "md");
+    const results = [];
+    for (const file of files) {
+      const dateStr = file.basename;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const score = await this.readDayData(dateStr);
+        if (score) results.push(score);
+      }
+    }
+    return results.sort((a, b) => a.date.localeCompare(b.date));
   }
 };

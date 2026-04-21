@@ -1,0 +1,322 @@
+/* ─── 打分 Modal ─────────────────────────────────────────────────────────────── */
+
+.kid-score-modal {
+  padding: 8px;
+  max-width: 560px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.kid-score-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.3em;
+}
+
+.kid-score-date {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  margin: 0 0 12px;
+}
+
+/* Cumulative banner (daily modal) */
+.kid-score-cumulative-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-radius: 10px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+}
+.cumulative-label { font-size: 0.82em; color: #92400e; }
+.cumulative-value { font-size: 1.3em; font-weight: 800; color: #b45309; flex: 1; text-align: center; }
+.cumulative-days  { font-size: 0.78em; color: #92400e; white-space: nowrap; }
+
+/* Grand cumulative banner (stats modal) */
+.kid-score-grand-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, var(--interactive-accent), #6366f1);
+  color: white;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.grand-left { text-align: center; min-width: 80px; }
+.grand-total-value { font-size: 2em; font-weight: 900; line-height: 1; }
+.grand-total-label { font-size: 0.75em; opacity: 0.85; margin-top: 2px; }
+.grand-right { display: flex; flex-direction: column; gap: 4px; }
+.grand-stat { font-size: 0.85em; opacity: 0.9; }
+
+.kid-score-yesterday-banner {
+  background: var(--background-secondary);
+  border-left: 3px solid var(--color-blue, #3b82f6);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.88em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.kid-score-hint {
+  color: var(--text-muted);
+  font-size: 0.82em;
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.kid-score-cat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kid-score-section-title {
+  font-size: 0.95em;
+  color: var(--text-muted);
+  margin: 16px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex: 1;
+}
+
+.kid-score-add-item-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px dashed var(--text-muted);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.2em;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.kid-score-add-item-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.kid-score-rules-edit-btn,
+.custom-edit-btn,
+.custom-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+/* ─── Score Cards Grid ───────────────────────────────────────────────────────── */
+
+.kid-score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.kid-score-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+  border-radius: 12px;
+  border: 2px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: 100px;
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
+  touch-action: manipulation;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.kid-score-card-more-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  background: rgba(var(--background-primary-rgb, 255, 255, 255), 0.92);
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  z-index: 1;
+}
+
+.kid-score-card-more-btn:hover {
+  color: var(--text-normal);
+  background: var(--background-primary);
+}
+
+.kid-score-card:hover {
+  border-color: var(--interactive-accent);
+  -webkit-transform: translateY(-2px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.kid-score-card:active {
+  -webkit-transform: scale(0.97);
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+.kid-score-card.is-earned {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: #4ade80;
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
+}
+
+.kid-score-card.is-negative.is-earned {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border-color: #f87171;
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
+}
+
+.kid-score-card.is-negative {
+  border-color: #fca5a5;
+  background: rgba(252, 165, 165, 0.05);
+}
+
+.kid-score-card.is-deducted-active {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  border-color: #f87171;
+  box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
+}
+
+.kid-score-card.is-deducted-active::after {
+  content: "⭕";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+  animation: pulse 1s infinite;
+}
+
+
+.card-emoji {
+  font-size: 1.8em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.card-name {
+  font-size: 0.82em;
+  font-weight: 600;
+  color: var(--text-normal);
+  line-height: 1.2;
+}
+
+.card-note {
+  font-size: 0.7em;
+  color: var(--text-faint);
+  line-height: 1.35;
+  margin-top: 2px;
+  width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-points {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.is-earned .card-points {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.is-negative.is-earned .card-points {
+  color: #dc2626;
+}
+
+.card-yesterday {
+  font-size: 0.68em;
+  margin-top: 3px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--background-modifier-border);
+  color: var(--text-muted);
+}
+
+.card-yesterday.was-earned {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.15);
+}
+.card-yesterday.was-missed {
+  color: #9ca3af;
+}
+.card-yesterday.was-negative {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.12);
+}
+/* ─── Total + Actions ────────────────────────────────────────────────────────── */
+
+.kid-score-total-display {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: 700;
+  padding: 12px;
+  background: var(--background-secondary);
+  border-radius: 8px;
+  margin: 16px 0 12px;
+  color: var(--interactive-accent);
+}
+
+.kid-score-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.kid-score-save-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.kid-score-stats-btn {
+  padding: 10px 18px;
+  font-size: 1em;
+}
+
+.kid-score-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 24px 16px;
+  font-size: 0.95em;
+  background: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 12px;
+}

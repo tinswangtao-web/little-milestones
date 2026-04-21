@@ -1,0 +1,935 @@
+/* ─── 移动端适配 ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+  /* Modal base */
+  .kid-score-modal {
+    padding: 6px;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-bottom: 140px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kid-score-header h2 {
+    margin-bottom: 6px;
+    font-size: 1.12em;
+    line-height: 1.3;
+  }
+
+  /* Prevent body scroll when modal open */
+  .kid-score-modal .modal-content {
+    overscroll-behavior: contain;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ensure focused inputs remain visible above virtual keyboard */
+  .kid-score-modal input,
+  .kid-score-modal textarea,
+  .kid-score-modal .custom-form-name-input,
+  .kid-score-modal .value-popup-input,
+  .kid-score-modal .date-nav-input,
+  .kid-score-modal .kid-score-rules-textarea {
+    scroll-margin-bottom: 120px;
+  }
+
+  /* Score cards */
+  .kid-score-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .kid-score-card {
+    min-height: 80px;
+    padding: 18px 8px 12px;
+    /* Larger tap target */
+    -webkit-tap-highlight-color: transparent;
+  }
+  .kid-score-card-more-btn {
+    display: inline-flex;
+  }
+  .card-emoji { font-size: 1.6em; }
+  .card-name { font-size: 0.8em; }
+  .card-points { font-size: 0.75em; }
+
+  /* Stats */
+  .kid-score-summary-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .kid-score-actions {
+    flex-direction: column;
+    position: sticky;
+    bottom: 0;
+    margin-top: 12px;
+    padding: 10px 0 calc(env(safe-area-inset-bottom, 4px) + 2px);
+    background: linear-gradient(to top, var(--background-primary) 75%, rgba(0,0,0,0));
+    backdrop-filter: blur(4px);
+    z-index: 3;
+  }
+
+  .kid-score-save-btn,
+  .kid-score-stats-btn {
+    padding: 14px 10px;
+    font-size: 1.05em;
+    border-radius: 10px;
+  }
+
+  .kid-score-add-item-btn,
+  .kid-score-rules-edit-btn,
+  .custom-edit-btn,
+  .custom-delete-btn {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 10px;
+  }
+
+  .kid-score-yesterday-banner,
+  .kid-score-past-banner {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+    font-size: 0.8em;
+    line-height: 1.4;
+    border-radius: 10px;
+  }
+
+  .completion-name { flex: 0 0 80px; font-size: 0.8em; }
+  .kid-score-tabs { flex-wrap: wrap; gap: 6px; }
+  .kid-score-tab {
+    flex: 1 1 calc(33.333% - 6px);
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.92em;
+    border-radius: 12px;
+  }
+  .kid-score-stats-modal {
+    padding: 4px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .completion-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: 6px;
+  }
+
+  .completion-emoji {
+    margin-top: 2px;
+  }
+
+  .completion-name {
+    flex: 1 1 calc(100% - 28px);
+    min-width: 0;
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  .completion-bar-wrap {
+    flex: 1 1 100%;
+    margin-left: 28px;
+  }
+
+  .completion-rate {
+    flex: 1 1 100%;
+    margin-left: 28px;
+    text-align: left;
+    font-size: 0.8em;
+  }
+
+  .kid-score-chart-wrap,
+  .kid-score-month-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .kid-score-chart {
+    min-width: 480px;
+    margin-bottom: 16px;
+  }
+
+  .kid-score-month-table {
+    min-width: 360px;
+  }
+
+  .settings-item-row {
+    grid-template-columns: 44px 1fr 60px 32px !important;
+    gap: 6px !important;
+  }
+
+  .kid-score-settings .setting-item {
+    display: block;
+    padding: 12px 0;
+  }
+
+  .kid-score-settings .setting-item-info {
+    margin-bottom: 8px;
+  }
+
+  .kid-score-settings .setting-item-control {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .kid-score-settings .setting-item-control input[type="text"],
+  .kid-score-settings .setting-item-control textarea,
+  .kid-score-settings .setting-item-control select {
+    width: 100%;
+  }
+
+  .kid-score-settings .setting-item button {
+    min-height: 44px;
+  }
+
+  .kid-score-goals-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .kid-score-cat-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .kid-score-cat-row .settings-name-input {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .settings-item-wrap {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 12px;
+  }
+
+  /* Popup — centered, safe from edges */
+  .kid-score-value-overlay {
+    padding: 12px;
+    align-items: flex-end; /* slide up from bottom on mobile */
+  }
+
+  .kid-score-value-popup {
+    min-width: auto;
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    border-radius: 14px 14px 0 0;
+    padding: 20px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .value-popup-adjust {
+    width: 52px;
+    height: 52px;
+    font-size: 1.5em;
+  }
+
+  .value-popup-input {
+    width: 90px;
+    height: 52px;
+    font-size: 1.5em;
+  }
+
+  .value-popup-cancel,
+  .value-popup-confirm {
+    padding: 14px;
+    font-size: 1.05em;
+    min-height: 48px;
+    border-radius: 8px;
+  }
+
+  /* Custom form mobile */
+  .custom-form-emoji-quick {
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .emoji-quick-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1.2em;
+  }
+
+  .custom-form-row {
+    flex-wrap: wrap;
+  }
+
+  .custom-form-label {
+    flex: 0 0 100%;
+    margin-bottom: 2px;
+  }
+
+  .custom-form-emoji-input {
+    width: 50px;
+    height: 44px;
+    font-size: 1.5em;
+  }
+
+  .custom-form-name-input {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    font-size: 16px;
+    border-radius: 6px;
+  }
+  textarea.custom-form-name-input {
+    min-height: 60px;
+    height: auto;
+    padding: 6px 8px;
+    resize: vertical;
+    line-height: 1.5;
+    font-family: inherit;
+    overflow: hidden;
+  }
+
+  .custom-form-row .value-popup-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Emoji picker — bottom sheet on mobile */
+  .kid-score-emoji-picker {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 14px 14px 0 0;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    grid-template-columns: repeat(8, 1fr);
+    max-height: 50vh;
+    overflow-y: auto;
+    box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
+    z-index: 10001;
+  }
+
+  .emoji-option {
+    font-size: 1.4em;
+    padding: 6px;
+  }
+
+  .kid-score-custom-row {
+    gap: 6px;
+    padding: 10px;
+    min-height: 48px;
+    border-radius: 8px;
+    align-items: flex-start;
+  }
+
+  .kid-score-custom-main {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .custom-name {
+    font-size: 0.85em;
+    flex: 1 1 100%;
+    white-space: normal;
+  }
+
+  .custom-points {
+    font-size: 0.82em;
+  }
+
+  .custom-row-more-btn {
+    display: inline-flex;
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.8em;
+  }
+
+  .custom-delete-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kid-score-add-custom-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    font-size: 0.95em;
+    min-height: 48px;
+    border-radius: 8px;
+    line-height: 1.5;
+  }
+
+  .kid-score-cumulative-banner {
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 4px 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .cumulative-label,
+  .cumulative-days {
+    font-size: 0.74em;
+  }
+
+  .cumulative-value {
+    width: 100%;
+    font-size: 1.1em;
+    text-align: left;
+  }
+
+  /* User switcher */
+  .kid-score-user-switcher {
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    padding-bottom: 0;
+  }
+  .kid-score-user-btn {
+    flex-shrink: 0;
+    padding: 10px 12px;
+    font-size: 0.92em;
+    min-height: 42px;
+    border-radius: 999px;
+    line-height: 1.35;
+  }
+  .kid-score-user-add-btn {
+    flex-shrink: 0;
+    padding: 10px 12px;
+    font-size: 0.92em;
+    min-height: 42px;
+    border-radius: 999px;
+    line-height: 1.35;
+  }
+
+  /* Main tabs */
+  .kid-score-main-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin-top: 2px;
+    background: var(--background-primary);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .kid-score-daily-modal {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+  .kid-score-main-tab {
+    padding: 14px 10px !important;
+    font-size: 1.05em !important;
+    min-height: 48px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Diary mobile */
+  .diary-toolbar {
+    gap: 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .diary-tool-btn {
+    padding: 10px 12px;
+    font-size: 0.85em;
+    flex-shrink: 0;
+    min-height: 44px;
+    scroll-snap-align: start;
+    border-radius: 10px;
+  }
+
+  .diary-quick-row {
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .diary-quick-group {
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    padding: 6px 8px;
+    border-radius: 12px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+  }
+
+  .diary-quick-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 1.3em;
+    border-radius: 6px;
+  }
+
+  .diary-quick-label {
+    padding-right: 2px;
+  }
+
+  .diary-textarea {
+    min-height: 200px;
+    font-size: 16px; /* prevents iOS zoom on focus */
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  /* Section titles */
+  .kid-score-section-title {
+    font-size: 0.88em;
+    margin: 12px 0 6px;
+  }
+
+  /* Total display */
+  .kid-score-total-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 1em;
+    padding: 10px 12px;
+    margin: 10px 0 8px;
+    border-radius: 12px;
+    text-align: left;
+    line-height: 1.35;
+  }
+
+  .kid-score-empty {
+    padding: 18px 14px;
+    font-size: 0.88em;
+  }
+
+  .kid-score-custom-empty {
+    font-size: 0.82em;
+    padding: 12px 10px;
+  }
+
+  .daily-goal-wrap {
+    width: 100%;
+    margin-left: 0;
+    gap: 4px;
+  }
+
+  .daily-goal-label {
+    font-size: 0.74em;
+  }
+
+  .daily-goal-bar-wrap {
+    width: 100%;
+    max-width: none;
+    height: 7px;
+  }
+
+  /* Hint text */
+  .kid-score-hint {
+    font-size: 0.78em;
+    margin-bottom: 8px;
+  }
+
+  /* Card note mobile — wraps within fixed-width card */
+  .card-note {
+    font-size: 0.62em;
+    max-height: 3.9em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Note row mobile */
+  .settings-item-note-row { padding-left: 28px; }
+
+  /* Date navigation mobile */
+  .kid-score-date-nav {
+    gap: 6px;
+    margin: 6px 0 10px;
+    flex-wrap: wrap;
+  }
+  .date-nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  .date-nav-input {
+    min-width: 120px;
+    height: 40px;
+    font-size: 16px; /* prevent iOS zoom */
+    border-radius: 8px;
+  }
+  .date-nav-today {
+    padding: 8px 14px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    border-radius: 20px;
+  }
+  .kid-score-past-banner {
+    font-size: 0.8em;
+  }
+
+  /* Full emoji picker mobile — bottom sheet */
+  .kid-score-emoji-fullpicker {
+    min-width: auto;
+    max-width: 100%;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    padding: 16px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    max-height: 85vh;
+  }
+  .kid-score-value-overlay:has(.kid-score-emoji-fullpicker) {
+    align-items: flex-end;
+  }
+  .emoji-fp-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .emoji-fp-btn {
+    font-size: 1.6em;
+    padding: 8px;
+  }
+  .emoji-fp-tab {
+    padding: 8px 10px;
+    font-size: 0.78em;
+    border-radius: 8px;
+  }
+  .emoji-fp-grid-wrap {
+    max-height: 45vh;
+  }
+  .emoji-fp-input {
+    height: 40px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  .kid-score-modal.is-mobile-ios .date-nav-input,
+  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
+  .kid-score-modal.is-mobile-ios .custom-form-name-input,
+  .kid-score-modal.is-mobile-ios .value-popup-input {
+    font-size: 16px;
+  }
+
+  .kid-score-modal.is-mobile-android .kid-score-card {
+    transition: border-color 0.08s ease, transform 0.08s ease, background 0.08s ease;
+  }
+
+  .kid-score-modal.is-mobile-android .kid-score-card:active {
+    transform: scale(0.98);
+  }
+
+  .kid-score-modal.is-mobile-android .kid-score-main-tab:active,
+  .kid-score-modal.is-mobile-android .diary-tool-btn:active,
+  .kid-score-modal.is-mobile-android .value-popup-adjust:active {
+    transform: scale(0.98);
+  }
+
+  .kid-score-rules-section {
+    margin-bottom: 10px;
+    border-radius: 12px;
+  }
+
+  .kid-score-rules-header {
+    gap: 6px;
+    padding: 9px 10px;
+  }
+
+  .kid-score-rules-title {
+    font-size: 0.84em;
+  }
+
+  .kid-score-rules-body {
+    padding: 10px;
+  }
+
+  .kid-score-rules-view {
+    font-size: 0.82em;
+    line-height: 1.5;
+  }
+
+  .kid-score-rules-textarea {
+    min-height: 100px;
+    font-size: 0.84em;
+  }
+
+  .kid-score-rules-actions {
+    margin-top: 10px;
+    justify-content: stretch;
+  }
+
+  .kid-score-rules-save-btn,
+  .kid-score-rules-cancel-btn {
+    flex: 1;
+    min-height: 40px;
+  }
+
+  /* Settings v2 mobile */
+  .settings-item-row-v2.header-row {
+    display: none !important;
+  }
+
+  .settings-item-row-v2 {
+    grid-template-columns: 24px 40px minmax(0, 1fr) 36px !important;
+    gap: 8px !important;
+    align-items: start;
+    padding: 0 !important;
+    border-bottom: none;
+    font-size: 0.88em;
+  }
+
+  .settings-item-row-v2 .settings-drag-handle {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    padding-top: 10px;
+  }
+
+  .settings-item-row-v2 .settings-emoji-btn {
+    grid-column: 2;
+    grid-row: 1;
+    width: 40px;
+    height: 40px;
+  }
+
+  .settings-item-row-v2 .settings-name-input {
+    grid-column: 3;
+    grid-row: 1;
+    min-height: 40px;
+  }
+
+  .settings-item-row-v2 .settings-delete-btn {
+    grid-column: 4;
+    grid-row: 1;
+    width: 36px;
+    height: 40px;
+    padding: 0;
+  }
+
+  .settings-item-row-v2 .settings-cat-select {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    min-height: 40px;
+  }
+
+  .settings-item-row-v2 .settings-points-input {
+    grid-column: 4;
+    grid-row: 2;
+    min-height: 40px;
+    min-width: 0;
+  }
+
+  /* Unified mobile input sizing — keep all fields the same height/font */
+  .settings-name-input,
+  .settings-points-input,
+  .settings-cat-select,
+  .settings-note-input {
+    min-height: 38px;
+    height: auto;
+    font-size: 0.82em;
+    padding: 6px;
+    border-radius: 6px;
+  }
+  .settings-drag-handle {
+    font-size: 1em;
+  }
+  .kid-score-cat-row {
+    gap: 6px;
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .settings-item-note-row {
+    padding: 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
+  .settings-note-input {
+    min-height: 64px;
+    font-size: 0.86em;
+  }
+
+  /* Stats cards mobile */
+  .summary-card {
+    padding: 12px 8px;
+    border-radius: 10px;
+  }
+
+  .card-val {
+    font-size: 1.3em;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .card-lbl {
+    font-size: 0.75em;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* Grand banner mobile */
+  .kid-score-grand-banner {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .grand-left {
+    text-align: center;
+    min-width: 70px;
+  }
+
+  .grand-total-value {
+    font-size: 1.8em;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .grand-total-label {
+    font-size: 0.75em;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .grand-right {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .grand-stat {
+    font-size: 0.85em;
+    opacity: 0.9;
+  }
+}
+
+/* ─── 超小屏幕进一步适配 ────────────────────────────────────────────────────── */
+
+@media (max-width: 360px) {
+  .kid-score-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .kid-score-card {
+    min-height: 68px;
+    padding: 18px 4px 8px;
+  }
+
+  .card-emoji { font-size: 1.3em; }
+  .card-name { font-size: 0.72em; }
+  .card-points { font-size: 0.7em; }
+
+  .kid-score-summary-cards {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+
+  .kid-score-emoji-picker {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+
+  .diary-quick-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 1.15em;
+  }
+
+  .diary-tool-btn {
+    padding: 8px;
+    font-size: 0.78em;
+  }
+
+  .kid-score-main-tab {
+    padding: 14px 10px !important;
+    font-size: 1.05em !important;
+    min-height: 48px !important;
+    height: auto !important;
+  }
+  .kid-score-user-btn,
+  .kid-score-user-add-btn {
+    padding: 14px 16px;
+    font-size: 1.05em;
+    min-height: 48px;
+    border-radius: 10px;
+  }
+
+  /* Date nav extra-small */
+  .date-nav-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .date-nav-input {
+    min-width: 100px;
+  }
+
+  /* Emoji picker extra-small */
+  .emoji-fp-grid {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+  .emoji-fp-btn {
+    font-size: 1.4em;
+    padding: 6px;
+  }
+
+  /* Settings v2 extra-small */
+  .settings-item-row-v2 {
+    grid-template-columns: 22px 36px minmax(0, 1fr) 34px !important;
+    font-size: 0.82em;
+  }
+
+  .settings-item-wrap {
+    padding: 8px;
+  }
+
+  .settings-item-row-v2 .settings-emoji-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .settings-item-row-v2 .settings-delete-btn,
+  .settings-item-row-v2 .settings-points-input,
+  .settings-item-row-v2 .settings-cat-select,
+  .settings-item-row-v2 .settings-name-input {
+    min-height: 36px;
+  }
+
+  .kid-score-chart {
+    min-width: 420px;
+  }
+}
+
+/* ─── 平板/横屏优化 ─────────────────────────────────────────────────────────── */
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .kid-score-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .kid-score-value-overlay {
+    align-items: center;
+  }
+}

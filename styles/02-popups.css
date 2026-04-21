@@ -1,0 +1,496 @@
+/* ─── Long Press Value Popup ────────────────────────────────────────────────── */
+
+.kid-score-value-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.kid-score-value-popup {
+  background: var(--background-primary);
+  border-radius: 14px;
+  padding: 20px;
+  min-width: 260px;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  animation: kid-score-popup-in 0.15s ease-out;
+}
+
+.kid-score-value-overlay.is-keyboard-open {
+  align-items: flex-start;
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+}
+
+.kid-score-value-overlay.is-keyboard-open .kid-score-value-popup {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
+
+.value-popup-header {
+  font-size: 1.15em;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.value-popup-note {
+  font-size: 0.82em;
+  color: var(--text-accent);
+  text-align: left;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  background: var(--background-modifier-hover);
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.45;
+  max-width: 100%;
+  height: auto;
+}
+
+.value-popup-del-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: 10px;
+  flex-wrap: wrap;
+}
+
+.value-popup-del-btn {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 0.82em;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  opacity: 0.75;
+  transition: opacity 0.15s, background 0.15s;
+}
+.value-popup-del-btn:hover {
+  opacity: 1;
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.value-popup-edit-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82em;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 4px;
+  opacity: 0.75;
+  transition: opacity 0.15s, background 0.15s;
+}
+.value-popup-edit-btn:hover {
+  opacity: 1;
+  color: var(--text-normal);
+  background: var(--background-modifier-hover);
+}
+
+.custom-form-select {
+  flex: 1;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.value-popup-hint {
+  font-size: 0.82em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.value-popup-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.value-popup-adjust {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  font-size: 1.4em;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+.value-popup-adjust:hover {
+  background: var(--background-modifier-hover);
+}
+.value-popup-adjust:active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+.value-popup-input {
+  width: 80px;
+  height: 44px;
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: 700;
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  -moz-appearance: textfield;
+  /* iOS/Android: ensure input is tappable and keyboard appears */
+  pointer-events: auto !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
+}
+.value-popup-input::-webkit-outer-spin-button,
+.value-popup-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.value-popup-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.value-popup-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.value-popup-cancel,
+.value-popup-confirm {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--background-modifier-border);
+  transition: all 0.1s;
+}
+.value-popup-cancel {
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+.value-popup-cancel:hover {
+  background: var(--background-modifier-hover);
+}
+.value-popup-confirm {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+.value-popup-confirm:hover {
+  filter: brightness(1.1);
+}
+
+/* ─── Custom Item Form (popup) ──────────────────────────────────────────────── */
+
+.kid-score-custom-form {
+  max-width: 360px;
+}
+
+/* Modal wrapper for edit/add forms (replaces fixed overlay for Android keyboard) */
+
+/* ── Constrain modal to a sensible width so there's no huge whitespace ── */
+.modal.kid-score-edit-modal {
+  width: 90vw;
+  max-width: 460px;
+  min-width: 280px;
+}
+
+.kid-score-edit-modal .modal-content,
+.kid-score-import-modal .modal-content {
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+/* Form fills the modal content area (remove the 360px cap from the generic rule) */
+.kid-score-edit-modal .kid-score-custom-form {
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Labels wide enough for "默认分值" (4 CJK chars) without wrapping */
+.kid-score-edit-modal .custom-form-label {
+  flex: 0 0 auto;
+  min-width: 56px;
+  white-space: nowrap;
+}
+
+/* Buttons fill full row width */
+.kid-score-edit-modal .value-popup-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 10px;
+  justify-content: stretch;
+}
+.kid-score-edit-modal .value-popup-cancel,
+.kid-score-edit-modal .value-popup-confirm {
+  flex: 1;
+}
+
+.kid-score-edit-modal .value-popup-hint {
+  margin-bottom: 12px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+/* Force all inputs/textareas inside our custom modals to be tappable on Android/iOS */
+.kid-score-edit-modal input,
+.kid-score-edit-modal textarea,
+.kid-score-edit-modal select,
+.kid-score-import-modal input,
+.kid-score-import-modal textarea {
+  pointer-events: auto !important;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure flex layout is not overridden by Obsidian theme inside modals */
+.kid-score-edit-modal .custom-form-row,
+.kid-score-import-modal .custom-form-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.custom-form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.custom-form-label {
+  flex: 0 0 40px;
+  font-size: 0.88em;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.custom-form-emoji-input {
+  width: 50px;
+  height: 36px;
+  font-size: 1.3em;
+  text-align: center;
+  touch-action: manipulation;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+
+.custom-form-emoji-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+  padding-left: 50px;
+}
+
+.emoji-quick-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 1.1em;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 0;
+  transition: background 0.1s;
+}
+.emoji-quick-btn:hover {
+  background: var(--background-modifier-hover);
+}
+
+.custom-form-name-input {
+  flex: 1;
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid var(--background-modifier-border);
+  touch-action: manipulation;
+  border-radius: 6px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.95em;
+}
+.custom-form-name-input.is-error {
+  border-color: #f87171;
+  animation: kid-score-shake 0.3s ease;
+}
+textarea.custom-form-name-input {
+  min-height: 52px;
+  height: auto;
+  padding: 6px 8px;
+  resize: vertical;
+  line-height: 1.5;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.kid-score-edit-modal textarea.custom-form-name-input {
+  max-height: min(40vh, 280px);
+  overflow-y: auto;
+}
+
+
+.custom-form-row .value-popup-controls {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* ─── Full Emoji Picker (iOS-like) ─────────────────────────────────────────── */
+
+.kid-score-emoji-fullpicker {
+  background: var(--background-primary);
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 320px;
+  max-width: 420px;
+  width: 90vw;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
+  animation: kid-score-popup-in 0.15s ease-out;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.emoji-fp-header {
+  font-size: 1.1em;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.emoji-fp-custom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.emoji-fp-input {
+  flex: 1;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 0.9em;
+  text-align: left;
+  min-width: 0;
+}
+.emoji-fp-input::placeholder {
+  font-size: 0.85em;
+  color: var(--text-faint);
+}
+.emoji-fp-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.emoji-fp-tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  scrollbar-width: none;
+}
+.emoji-fp-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.emoji-fp-tab {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: 0.8em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.emoji-fp-tab:hover {
+  background: var(--background-modifier-hover);
+}
+.emoji-fp-tab.is-active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+.emoji-fp-grid-wrap {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 50vh;
+  min-height: 200px;
+}
+
+.emoji-fp-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+}
+
+.emoji-fp-btn {
+  font-size: 1.5em;
+  padding: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.1s;
+  line-height: 1;
+}
+.emoji-fp-btn:hover {
+  background: var(--background-modifier-hover);
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+}
+.emoji-fp-btn:active {
+  -webkit-transform: scale(0.95);
+  transform: scale(0.95);
+}

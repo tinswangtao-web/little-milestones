@@ -1,0 +1,145 @@
+/* ─── Custom Items ──────────────────────────────────────────────────────────── */
+
+.kid-score-custom-items {
+  margin-bottom: 10px;
+}
+
+.kid-score-custom-wrap {
+  margin-bottom: 6px;
+}
+
+.kid-score-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.kid-score-custom-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.custom-item-note {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  padding: 2px 10px 4px 10px;
+  font-style: italic;
+}
+
+.kid-score-custom-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85em;
+  padding: 12px;
+  background: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 10px;
+}
+
+.custom-emoji {
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+.custom-name {
+  flex: 1;
+  font-size: 0.9em;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-points {
+  font-size: 0.88em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.custom-points.pos { color: #16a34a; }
+.custom-points.neg { color: #dc2626; }
+
+.custom-delete-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 2px 4px;
+  border-radius: 8px;
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.custom-delete-btn:hover {
+  opacity: 1;
+  border-color: rgba(220, 38, 38, 0.18);
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.custom-edit-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: 2px 4px;
+  border-radius: 8px;
+  opacity: 0.7;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.custom-edit-btn:hover {
+  opacity: 1;
+  border-color: var(--background-modifier-border);
+  background: var(--background-modifier-hover);
+}
+
+.custom-row-more-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-muted);
+  font-size: 0.78em;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.custom-row-more-btn:hover {
+  color: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+}
+
+.kid-score-add-custom-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 2px dashed var(--background-modifier-border);
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.9em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 8px;
+}
+.kid-score-add-custom-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  background: var(--background-secondary);
+}
+

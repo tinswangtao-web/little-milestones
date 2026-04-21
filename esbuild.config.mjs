@@ -1,7 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
-import { execSync } from "child_process";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -11,10 +11,28 @@ const prod = process.argv[2] === "production";
 
 // Obsidian vault plugin directory — adjust if needed
 const VAULT_PLUGIN_DIR =
-  "C:/Users/FinalHome/Documents/Obsidian Vault/.obsidian/plugins/little-milestones";
+  "/Users/tins-macmini/Documents/Obsidian Vault/.obsidian/plugins/little-milestones";
+
+function buildStyles() {
+  const styleDir = path.join(__dirname, "styles");
+  const outFile = path.join(__dirname, "styles.css");
+  if (!fs.existsSync(styleDir)) return;
+  const files = fs
+    .readdirSync(styleDir)
+    .filter((f) => f.endsWith(".css"))
+    .sort();
+  let css = "";
+  for (const f of files) {
+    css += fs.readFileSync(path.join(styleDir, f), "utf-8") + "\n";
+  }
+  fs.writeFileSync(outFile, css);
+  console.log(`✓ styles.css built from ${files.length} modules`);
+}
+
+buildStyles();
 
 const context = await esbuild.context({
-  entryPoints: ["main.ts"],
+  entryPoints: ["src/main.ts"],
   bundle: true,
   external: [
     "obsidian",
@@ -38,6 +56,7 @@ const context = await esbuild.context({
   sourcemap: prod ? false : "inline",
   treeShaking: true,
   outfile: "main.js",
+  allowOverwrite: true,
   plugins: prod
     ? []
     : [
@@ -45,14 +64,13 @@ const context = await esbuild.context({
           name: "deploy-on-build",
           setup(build) {
             build.onEnd(() => {
+              buildStyles();
               try {
-                execSync(
-                  `cp main.js "${VAULT_PLUGIN_DIR}/main.js" && cp styles.css "${VAULT_PLUGIN_DIR}/styles.css"`,
-                  { stdio: "inherit", shell: "bash" }
-                );
+                fs.copyFileSync("main.js", path.join(VAULT_PLUGIN_DIR, "main.js"));
+                fs.copyFileSync("styles.css", path.join(VAULT_PLUGIN_DIR, "styles.css"));
                 console.log("✓ Deployed to Obsidian vault");
               } catch (e) {
-                console.error("Deploy failed:", e.message);
+                console.error("Deploy failed:", e?.message || e);
               }
             });
           },

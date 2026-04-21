@@ -1,0 +1,293 @@
+/* ─── Main Tabs (打分 / 日记) ────────────────────────────────────────────────── */
+
+.kid-score-main-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--interactive-accent);
+  flex-shrink: 0;
+}
+
+.kid-score-main-tab {
+  flex: 1;
+  /* Explicit height + flex layout so Obsidian Mobile theme can't collapse the button */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: auto !important;
+  min-height: 44px !important;
+  padding: 10px 16px !important;
+  line-height: 1.2;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  transition: all 0.15s;
+  position: relative;
+  box-sizing: border-box;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.kid-score-main-tab.is-active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+.kid-score-main-tab:not(.is-active):hover {
+  background: var(--background-modifier-hover);
+}
+
+.diary-tab-badge {
+  color: #f59e0b;
+  font-size: 1.4em;
+  line-height: 1;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.kid-score-main-tab.is-active .diary-tab-badge {
+  color: #fde68a;
+}
+
+.kid-score-tab-panel {
+  /* visible by default */
+}
+
+.kid-score-tab-panel.is-hidden {
+  display: none;
+}
+
+/* ─── Diary Panel ───────────────────────────────────────────────────────────── */
+
+.diary-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.diary-tool-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.1s;
+  white-space: nowrap;
+}
+
+.diary-tool-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--interactive-accent);
+  background: var(--background-primary);
+}
+
+.diary-tool-btn:active {
+  background: var(--interactive-accent);
+  color: white;
+}
+
+.diary-preview-btn {
+  min-width: 88px;
+  justify-content: center;
+}
+
+.diary-quick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.diary-quick-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.diary-quick-label {
+  font-size: 0.78em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-right: 2px;
+}
+
+.diary-quick-btn {
+  width: 32px;
+  height: 32px;
+  font-size: 1.15em;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0;
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diary-quick-btn:hover {
+  background: var(--background-modifier-hover);
+  -webkit-transform: scale(1.15);
+  transform: scale(1.15);
+}
+
+.diary-quick-btn:active {
+  -webkit-transform: scale(0.95);
+  transform: scale(0.95);
+}
+
+.diary-textarea-wrap {
+  margin-bottom: 6px;
+}
+
+.diary-textarea {
+  width: 100%;
+  min-height: 240px;
+  padding: 12px;
+  border: 2px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.95em;
+  font-family: var(--font-text, inherit);
+  line-height: 1.6;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.diary-textarea:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb, 99, 102, 241), 0.15);
+}
+
+.diary-textarea::placeholder {
+  color: var(--text-faint);
+  font-size: 0.9em;
+}
+
+.diary-char-count {
+  text-align: right;
+  font-size: 0.75em;
+  color: var(--text-faint);
+  padding-right: 4px;
+  min-height: 1.2em;
+}
+
+/* ─── Diary Preview ────────────────────────────────────────────────────────── */
+
+.diary-preview-btn {
+  margin-left: auto;
+}
+
+.diary-preview-wrap {
+  min-height: 240px;
+  padding: 12px 16px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  line-height: 1.7;
+}
+
+.diary-preview-settings {
+  min-height: 160px;
+  margin: 8px 0;
+}
+
+/* ─── Date Navigation ──────────────────────────────────────────────────────── */
+
+.kid-score-date-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 12px;
+  flex-wrap: wrap;
+}
+
+.date-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  font-size: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.date-nav-btn:hover:not(:disabled) {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+
+.date-nav-input {
+  flex: 1;
+  min-width: 140px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+  font-size: 0.95em;
+  text-align: center;
+  font-weight: 600;
+}
+.date-nav-input:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+}
+
+.date-nav-today {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--interactive-accent);
+  background: var(--background-secondary);
+  color: var(--interactive-accent);
+  font-size: 0.85em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.date-nav-today:hover {
+  background: var(--interactive-accent);
+  color: white;
+}
+.date-nav-today.is-today {
+  background: var(--interactive-accent);
+  color: white;
+  cursor: default;
+  opacity: 0.7;
+}
+
+.kid-score-past-banner {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
