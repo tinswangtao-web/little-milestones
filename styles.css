@@ -2392,21 +2392,35 @@ textarea.custom-form-name-input {
   }
 
   .kid-score-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     position: sticky;
     bottom: 0;
     margin-top: 12px;
     padding: 10px 0 calc(env(safe-area-inset-bottom, 4px) + 2px);
-    background: linear-gradient(to top, var(--background-primary) 75%, rgba(0,0,0,0));
+    background: linear-gradient(to top, var(--background-primary) 78%, rgba(0,0,0,0));
     backdrop-filter: blur(4px);
     z-index: 3;
   }
 
+  .kid-score-preview-btn,
   .kid-score-save-btn,
   .kid-score-stats-btn {
+    min-height: 46px;
     padding: 14px 10px;
-    font-size: 1.05em;
-    border-radius: 10px;
+    font-size: 1em;
+    border-radius: 12px;
+  }
+
+  .kid-score-preview-btn,
+  .kid-score-save-btn {
+    grid-row: 1;
+  }
+
+  .kid-score-stats-btn {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 
   .kid-score-add-item-btn,
@@ -2773,51 +2787,92 @@ textarea.custom-form-name-input {
 
   /* Diary mobile */
   .diary-toolbar {
-    gap: 4px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    scroll-snap-type: x proximity;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
   .diary-tool-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     padding: 10px 12px;
     font-size: 0.85em;
-    flex-shrink: 0;
     min-height: 44px;
-    scroll-snap-align: start;
     border-radius: 10px;
   }
 
   .diary-quick-row {
-    gap: 8px;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    scroll-snap-type: x proximity;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
   .diary-quick-group {
-    flex-wrap: nowrap;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-    padding: 6px 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    min-width: 0;
+    padding: 10px;
     border-radius: 12px;
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
   }
 
-  .diary-quick-btn {
-    width: 38px;
-    height: 38px;
-    font-size: 1.3em;
-    border-radius: 6px;
+  .diary-quick-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
   .diary-quick-label {
     padding-right: 2px;
+    font-size: 0.82em;
+  }
+
+  .diary-quick-value-input,
+  .diary-quick-text-input {
+    width: 100%;
+    min-width: 0;
+    min-height: 40px;
+    font-size: 16px;
+    border-radius: 10px;
+    padding: 8px 10px;
+    box-sizing: border-box;
+  }
+
+  .diary-quick-emoji-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .diary-quick-btn {
+    width: 100%;
+    height: 40px;
+    font-size: 1.2em;
+    border-radius: 8px;
+  }
+
+  .diary-quick-custom-row {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr) 72px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .diary-quick-picker-btn,
+  .diary-quick-add-btn {
+    width: 100%;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .diary-textarea {
@@ -2952,6 +3007,26 @@ textarea.custom-form-name-input {
     height: 40px;
     font-size: 16px;
     border-radius: 8px;
+  }
+
+  .kid-score-date-nav {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .date-nav-input {
+    grid-column: 2;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .date-nav-today {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 40px;
+    justify-self: stretch;
   }
 
   .kid-score-modal.is-mobile-ios .date-nav-input,
@@ -3182,9 +3257,12 @@ textarea.custom-form-name-input {
   }
 
   .diary-quick-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 1.15em;
+    height: 36px;
+    font-size: 1.1em;
+  }
+
+  .diary-quick-emoji-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .diary-tool-btn {
