@@ -2,7 +2,7 @@
 - `task`: 2026-04-20-mobile-ux
 - `status`: awaiting-user-validation
 - `last-actor`: kimi-code
-- `last-commit`: 193c96f (.agents scaffolding) / 226bc86 (mobile UX fix) / 937a838 (STATE + log) / 502bd80 (refactor plugin structure) / 7810df3 (split settings sections) / 7f20e12 (polish mobile diary) / d782694 (tighten collaboration rules) / d97cb35 (kimi review) / 0a7abd9 (kimi implementation fixes)
+- `last-commit`: 193c96f (.agents scaffolding) / 226bc86 (mobile UX fix) / 937a838 (STATE + log) / 502bd80 (refactor plugin structure) / 7810df3 (split settings sections) / 7f20e12 (polish mobile diary) / d782694 (tighten collaboration rules) / d97cb35 (kimi review) / 0a7abd9 (kimi implementation fixes) / 670d08e (kimi scoring-page fixes)
 - `active-worktree`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones/.claude/worktrees/sleepy-engelbart-925e6b
 - `write-scope`: none
 - `read-scope`: main.js, styles.css, .agents/**
