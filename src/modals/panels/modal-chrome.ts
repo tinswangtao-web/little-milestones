@@ -9,7 +9,6 @@ interface RenderDailyHeaderOptions {
   allScores: Array<{ total: number }>;
   onPrevDay: () => void;
   onNextDay: () => void;
-  onPickDate: (dateStr: string) => void;
   onCalendar: () => void;
   onGoToday: () => void;
   onSwitchUser: (userId: string) => Promise<void>;
@@ -41,7 +40,6 @@ export function renderDailyHeader({
   allScores,
   onPrevDay,
   onNextDay,
-  onPickDate,
   onCalendar,
   onGoToday,
   onSwitchUser,
@@ -51,13 +49,10 @@ export function renderDailyHeader({
   const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
   const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "◀" });
   prevBtn.onclick = onPrevDay;
-  const dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
-  dateInput.type = "date";
-  dateInput.value = dateStr;
-  dateInput.max = formatDate(0);
-  dateInput.onchange = () => {
-    if (dateInput.value) onPickDate(dateInput.value);
-  };
+  dateNav.createEl("button", {
+    cls: "date-nav-display",
+    text: dateStr,
+  });
   const calBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "📅" });
   calBtn.title = "日历跳选";
   calBtn.onclick = onCalendar;

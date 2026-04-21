@@ -99,10 +99,6 @@ export class DailyScoringModal extends BaseMobileModal {
         self.dateStr = d.toISOString().slice(0, 10);
         self.renderModal();
       },
-      onPickDate: (dateStr) => {
-        self.dateStr = dateStr;
-        self.renderModal();
-      },
       onCalendar: () => self.showCalendarPicker(),
       onGoToday: () => {
         self.dateStr = formatDate(0);

@@ -32,7 +32,7 @@
   .kid-score-modal textarea,
   .kid-score-modal .custom-form-name-input,
   .kid-score-modal .value-popup-input,
-  .kid-score-modal .date-nav-input,
+  .kid-score-modal .date-nav-display,
   .kid-score-modal .kid-score-rules-textarea {
     scroll-margin-bottom: 120px;
   }
@@ -634,12 +634,16 @@
     height: 40px;
     border-radius: 50%;
   }
-  .date-nav-input {
+  .date-nav-display {
     min-width: 0;
     width: 100%;
     height: 40px;
-    font-size: 16px; /* prevent iOS zoom */
+    padding: 0 8px;
+    font-size: 0.95em;
     border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .date-nav-today {
     grid-column: 2 / 4;
@@ -688,7 +692,7 @@
     border-radius: 8px;
   }
 
-  .kid-score-modal.is-mobile-ios .date-nav-input,
+  .kid-score-modal.is-mobile-ios .date-nav-display,
   .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
   .kid-score-modal.is-mobile-ios .custom-form-name-input,
   .kid-score-modal.is-mobile-ios .value-popup-input {
@@ -948,7 +952,7 @@
     width: 36px;
     height: 36px;
   }
-  .date-nav-input {
+  .date-nav-display {
     min-width: 100px;
   }
 

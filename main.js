@@ -3269,7 +3269,6 @@ function renderDailyHeader({
   allScores,
   onPrevDay,
   onNextDay,
-  onPickDate,
   onCalendar,
   onGoToday,
   onSwitchUser
@@ -3279,13 +3278,10 @@ function renderDailyHeader({
   const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
   const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
   prevBtn.onclick = onPrevDay;
-  const dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
-  dateInput.type = "date";
-  dateInput.value = dateStr;
-  dateInput.max = formatDate(0);
-  dateInput.onchange = () => {
-    if (dateInput.value) onPickDate(dateInput.value);
-  };
+  dateNav.createEl("button", {
+    cls: "date-nav-display",
+    text: dateStr
+  });
   const calBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u{1F4C5}" });
   calBtn.title = "\u65E5\u5386\u8DF3\u9009";
   calBtn.onclick = onCalendar;
@@ -3888,10 +3884,6 @@ var DailyScoringModal = class extends BaseMobileModal {
         const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
         d.setDate(d.getDate() + 1);
         self.dateStr = d.toISOString().slice(0, 10);
-        self.renderModal();
-      },
-      onPickDate: (dateStr) => {
-        self.dateStr = dateStr;
         self.renderModal();
       },
       onCalendar: () => self.showCalendarPicker(),

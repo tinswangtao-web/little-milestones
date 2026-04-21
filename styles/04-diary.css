@@ -238,7 +238,7 @@
   border-color: var(--interactive-accent);
 }
 
-.date-nav-input {
+.date-nav-display {
   flex: 1;
   min-width: 140px;
   height: 36px;
@@ -250,10 +250,13 @@
   font-size: 0.95em;
   text-align: center;
   font-weight: 600;
-}
-.date-nav-input:focus {
-  border-color: var(--interactive-accent);
-  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: default;
 }
 
 .date-nav-today {
