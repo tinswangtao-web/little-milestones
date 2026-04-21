@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Implementation completed. Lock released by kimi-code.
+- `notes`: Vault sync completed. Lock released by kimi-code.

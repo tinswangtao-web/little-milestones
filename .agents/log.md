@@ -4,3 +4,4 @@
 - 2026-04-20 12:25 [codex] moved build-pipeline-recovery to next-task queue to avoid conflicting with active mobile-ux handoff
 - 2026-04-21 16:00 [kimi] completed second review of codex refactor commits 502bd80..d782694; findings recorded in .agents/reviews/2026-04-21-codex-refactor-review.md
 - 2026-04-21 16:30 [kimi] implemented review fixes: R2 iOS keyboard (removed magic timeouts), R3 settings scroll fallback, R4 unified platform detection into utils/platform.ts, R5 confirmed overflow-x already present, R6 restored touch-scroll readonly guard in settings-tab.ts, R7 added MODULE_MAP to main.ts; also fixed CSS syntax error in 06-settings.css; built artifacts (main.js/styles.css); commit 0a7abd9
+- 2026-04-21 16:45 [kimi] synced main.js, styles.css, manifest.json to Obsidian Vault; all 3 files verified with diff
