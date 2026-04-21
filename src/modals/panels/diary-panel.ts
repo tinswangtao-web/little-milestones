@@ -7,7 +7,7 @@ import type { DiaryModuleValues } from "../../types";
 import {
   createDiaryModuleField,
   createDiaryQuickGroup,
-  fillDefaultDiaryTemplate,
+  ensureDefaultDiaryTemplate,
 } from "./diary-panel-fields";
 
 export interface DiaryPanelControls {
@@ -32,6 +32,8 @@ interface DiaryPanelBuilderOptions {
   updateDiaryModules: (values: DiaryModuleValues) => void;
   composeDiaryContent: () => string;
   insertAttachment: (label: string, ext: string) => void;
+  insertDiaryText: (text: string) => void;
+  wrapDiarySelection: (prefix: string, suffix?: string, placeholder?: string) => void;
 }
 
 export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelControls {
@@ -46,6 +48,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     updateDiaryModules,
     composeDiaryContent,
     insertAttachment,
+    insertDiaryText,
+    wrapDiarySelection,
   } = options;
 
   const diaryModules = options.diaryModules;
@@ -84,20 +88,13 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   };
 
   const toolbar = panel.createDiv({ cls: "diary-toolbar" });
-  const templateBtn = toolbar.createEl("button", {
-    cls: "diary-tool-btn",
-    text: "📋 填入默认模板",
-  });
-  templateBtn.onclick = () => {
-    fillDefaultDiaryTemplate({
-      diaryModules,
-      moduleFields,
-      diaryTextarea,
-      setDiaryTextarea,
-      updateDiaryModules,
-      syncAndRefresh,
+  const createToolButton = (text: string, onClick: () => void, extraCls = "") => {
+    const btn = toolbar.createEl("button", {
+      cls: "diary-tool-btn" + (extraCls ? " " + extraCls : ""),
+      text,
     });
-    if (moduleFields[0]) moduleFields[0].input.focus();
+    btn.onclick = onClick;
+    return btn;
   };
 
   [
@@ -105,9 +102,18 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     { t: "🎬 视频", e: "mp4" },
     { t: "🎵 音频", e: "mp3" },
   ].forEach((asset) => {
-    const btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: asset.t });
-    btn.onclick = () => insertAttachment(asset.t.split(" ")[1], asset.e);
+    createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
   });
+  createToolButton("B 加粗", () => wrapDiarySelection("**", "**", "重点内容"), "is-format");
+  createToolButton("I 斜体", () => wrapDiarySelection("*", "*", "想法"), "is-format");
+  createToolButton("H 标题", () => insertDiaryText("\n### 小标题\n"), "is-format");
+  createToolButton("• 列表", () => insertDiaryText("\n- "), "is-format");
+  createToolButton("❝ 引用", () => insertDiaryText("\n> "), "is-format");
+  createToolButton(
+    "↔︎ 居中",
+    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "写在中间的话"),
+    "is-format"
+  );
 
   const togglePreview = () => {
     isPreview = !isPreview;
@@ -213,6 +219,15 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     syncAndRefresh();
   };
   setDiaryTextarea(diaryTextarea);
+
+  ensureDefaultDiaryTemplate({
+    diaryModules,
+    moduleFields,
+    diaryTextarea,
+    setDiaryTextarea,
+    updateDiaryModules,
+    syncAndRefresh,
+  });
 
   previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
   previewWrap.style.display = "none";

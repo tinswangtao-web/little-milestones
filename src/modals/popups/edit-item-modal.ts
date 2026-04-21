@@ -6,6 +6,8 @@ import { bindModalInputFocus } from "../../utils/dom";
 import { showEmojiPicker } from "../../ui/emoji-picker";
 
 export class EditItemModal extends BaseMobileModal {
+  protected enableManualDragAdjustment = true;
+
   constructor(
     app: App,
     plugin: KidScorePlugin,

@@ -5,6 +5,8 @@ import type { CustomScoreItem } from "../../types";
 import { bindModalInputFocus } from "../../utils/dom";
 
 export class QuickCustomModal extends BaseMobileModal {
+  protected enableManualDragAdjustment = true;
+
   constructor(
     app: App,
     plugin: KidScorePlugin,

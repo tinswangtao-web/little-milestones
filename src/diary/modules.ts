@@ -31,7 +31,6 @@ export function composeDiaryContent(
   moduleConfig: DiaryModuleDefinition[]
 ): string {
   const sections: string[] = [];
-  const recordLines: string[] = [];
   const storyLines: string[] = [];
   const normalizedValues: Record<string, string> = {};
 
@@ -46,8 +45,6 @@ export function composeDiaryContent(
       .replace(/\s*\n+\s*/g, " / ")
       .trim();
     normalizedValues[moduleDef.id] = value;
-    if (!value) return;
-    recordLines.push(moduleDef.label + "：" + value);
   });
 
   if (normalizedValues.weather) appendSentence("今天的天气是" + normalizedValues.weather);
@@ -70,7 +67,6 @@ export function composeDiaryContent(
   });
 
   if (storyLines.length) sections.push("### 今天的小日记\n" + storyLines.join("\n"));
-  if (recordLines.length) sections.push("### 小记录\n" + recordLines.join("\n"));
   if (values.freeWrite && values.freeWrite.trim()) {
     sections.push("### 自由记录\n" + values.freeWrite.trim());
   }

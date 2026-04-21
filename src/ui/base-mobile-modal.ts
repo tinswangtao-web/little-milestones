@@ -11,6 +11,7 @@ export abstract class BaseMobileModal extends Modal {
   private _kbCleanup: KeyboardCleanup | null = null;
   private _dragCleanup: DragCleanup | null = null;
   protected enableKeyboardAdjustment = true;
+  protected enableManualDragAdjustment = false;
 
   constructor(app: App, plugin: KidScorePlugin) {
     super(app);
@@ -28,7 +29,7 @@ export abstract class BaseMobileModal extends Modal {
     if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
       this._kbCleanup = setupModalKeyboard(this);
     }
-    if (this.mobilePlatform !== "desktop") {
+    if (this.enableManualDragAdjustment && this.mobilePlatform !== "desktop") {
       this._dragCleanup = attachModalDragGesture(this);
     }
   }

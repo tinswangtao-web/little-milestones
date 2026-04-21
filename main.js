@@ -1455,6 +1455,7 @@ var BaseMobileModal = class extends import_obsidian.Modal {
     this._kbCleanup = null;
     this._dragCleanup = null;
     this.enableKeyboardAdjustment = true;
+    this.enableManualDragAdjustment = false;
     this.plugin = plugin;
   }
   onOpen() {
@@ -1468,7 +1469,7 @@ var BaseMobileModal = class extends import_obsidian.Modal {
     if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
       this._kbCleanup = setupModalKeyboard2(this);
     }
-    if (this.mobilePlatform !== "desktop") {
+    if (this.enableManualDragAdjustment && this.mobilePlatform !== "desktop") {
       this._dragCleanup = attachModalDragGesture(this);
     }
   }
@@ -2323,7 +2324,7 @@ function createDiaryQuickGroup({
     cls: "diary-quick-text-input",
     type: "text"
   });
-  textInput.placeholder = "\u8F93\u5165" + moduleDef.label + "\u6216\u8865\u5145\u6587\u5B57";
+  textInput.placeholder = moduleDef.id === "weather" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5929\u6C14\uFF0C\u6BD4\u5982 \u9634\u5929\u6709\u98CE" : moduleDef.id === "mood" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5FC3\u60C5\uFF0C\u6BD4\u5982 \u6709\u70B9\u7D27\u5F20" : "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u8865\u5145\u4E00\u53E5";
   bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
@@ -2346,7 +2347,7 @@ function createDiaryQuickGroup({
     insertCustom();
   });
 }
-function fillDefaultDiaryTemplate({
+function ensureDefaultDiaryTemplate({
   diaryModules,
   moduleFields,
   diaryTextarea,
@@ -2354,6 +2355,8 @@ function fillDefaultDiaryTemplate({
   updateDiaryModules,
   syncAndRefresh
 }) {
+  const hasAnyContent = Object.values(diaryModules).some((value) => String(value || "").trim().length > 0) || moduleFields.some(({ input }) => input.value.trim().length > 0) || !!(diaryTextarea == null ? void 0 : diaryTextarea.value.trim());
+  if (hasAnyContent) return;
   if (!diaryModules.weather) diaryModules.weather = "\u2600\uFE0F \u6674";
   if (!diaryModules.mood) diaryModules.mood = "\u{1F60A} \u5F00\u5FC3";
   if (!diaryModules.todayThing) diaryModules.todayThing = "\u4ECA\u5929\u6211\u505A\u4E86____\u3002";
@@ -2385,7 +2388,9 @@ function buildDiaryPanel(options) {
     updateDiaryContent,
     updateDiaryModules,
     composeDiaryContent: composeDiaryContent2,
-    insertAttachment
+    insertAttachment,
+    insertDiaryText,
+    wrapDiarySelection
   } = options;
   const diaryModules = options.diaryModules;
   let currentDiaryContent = diaryContent;
@@ -2416,29 +2421,31 @@ function buildDiaryPanel(options) {
     });
   };
   const toolbar = panel.createDiv({ cls: "diary-toolbar" });
-  const templateBtn = toolbar.createEl("button", {
-    cls: "diary-tool-btn",
-    text: "\u{1F4CB} \u586B\u5165\u9ED8\u8BA4\u6A21\u677F"
-  });
-  templateBtn.onclick = () => {
-    fillDefaultDiaryTemplate({
-      diaryModules,
-      moduleFields,
-      diaryTextarea,
-      setDiaryTextarea,
-      updateDiaryModules,
-      syncAndRefresh
+  const createToolButton = (text, onClick, extraCls = "") => {
+    const btn = toolbar.createEl("button", {
+      cls: "diary-tool-btn" + (extraCls ? " " + extraCls : ""),
+      text
     });
-    if (moduleFields[0]) moduleFields[0].input.focus();
+    btn.onclick = onClick;
+    return btn;
   };
   [
     { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
     { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
     { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
   ].forEach((asset) => {
-    const btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: asset.t });
-    btn.onclick = () => insertAttachment(asset.t.split(" ")[1], asset.e);
+    createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
   });
+  createToolButton("B \u52A0\u7C97", () => wrapDiarySelection("**", "**", "\u91CD\u70B9\u5185\u5BB9"), "is-format");
+  createToolButton("I \u659C\u4F53", () => wrapDiarySelection("*", "*", "\u60F3\u6CD5"), "is-format");
+  createToolButton("H \u6807\u9898", () => insertDiaryText("\n### \u5C0F\u6807\u9898\n"), "is-format");
+  createToolButton("\u2022 \u5217\u8868", () => insertDiaryText("\n- "), "is-format");
+  createToolButton("\u275D \u5F15\u7528", () => insertDiaryText("\n> "), "is-format");
+  createToolButton(
+    "\u2194\uFE0E \u5C45\u4E2D",
+    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "\u5199\u5728\u4E2D\u95F4\u7684\u8BDD"),
+    "is-format"
+  );
   const togglePreview = () => {
     isPreview = !isPreview;
     if (isPreview) {
@@ -2536,6 +2543,14 @@ function buildDiaryPanel(options) {
     syncAndRefresh();
   };
   setDiaryTextarea(diaryTextarea);
+  ensureDefaultDiaryTemplate({
+    diaryModules,
+    moduleFields,
+    diaryTextarea,
+    setDiaryTextarea,
+    updateDiaryModules,
+    syncAndRefresh
+  });
   previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
   previewWrap.style.display = "none";
   charCount = panel.createDiv({ cls: "diary-char-count" });
@@ -2562,6 +2577,7 @@ var AddCustomModal = class extends BaseMobileModal {
   constructor(app, plugin, onAdded) {
     super(app, plugin);
     this.onAdded = onAdded;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -2644,6 +2660,7 @@ var AddItemModal = class extends BaseMobileModal {
     super(app, plugin);
     this.category = category;
     this.onAdded = onAdded;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -2741,6 +2758,7 @@ var AttachFileModal = class extends BaseMobileModal {
     this.label = label;
     this.dateStr = dateStr;
     this.onConfirm = onConfirm;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -2784,6 +2802,7 @@ var EditCustomModal = class extends BaseMobileModal {
     super(app, plugin);
     this.item = item;
     this.onSave = onSave;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -2868,6 +2887,7 @@ var EditItemModal = class extends BaseMobileModal {
     super(app, plugin);
     this.item = item;
     this.onSave = onSave;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     this.modalEl.addClass("kid-score-edit-modal");
@@ -3009,6 +3029,7 @@ var QuickCustomModal = class extends BaseMobileModal {
     super(app, plugin);
     this.item = item;
     this.onConfirm = onConfirm;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -3051,6 +3072,7 @@ var ScoreItemModal = class extends BaseMobileModal {
     this.quickOnly = quickOnly;
     this.onConfirm = onConfirm;
     this.onEdit = onEdit;
+    this.enableManualDragAdjustment = true;
   }
   onOpen() {
     super.onOpen();
@@ -3163,7 +3185,6 @@ function parseDiaryModules(content, moduleConfig) {
 }
 function composeDiaryContent(values, moduleConfig) {
   const sections = [];
-  const recordLines = [];
   const storyLines = [];
   const normalizedValues = {};
   const appendSentence = (text) => {
@@ -3174,8 +3195,6 @@ function composeDiaryContent(values, moduleConfig) {
   moduleConfig.forEach((moduleDef) => {
     const value = String(values[moduleDef.id] || "").replace(/\s*\n+\s*/g, " / ").trim();
     normalizedValues[moduleDef.id] = value;
-    if (!value) return;
-    recordLines.push(moduleDef.label + "\uFF1A" + value);
   });
   if (normalizedValues.weather) appendSentence("\u4ECA\u5929\u7684\u5929\u6C14\u662F" + normalizedValues.weather);
   if (normalizedValues.mood) appendSentence("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F" + normalizedValues.mood);
@@ -3193,7 +3212,6 @@ function composeDiaryContent(values, moduleConfig) {
     appendSentence(moduleDef.label + "\uFF1A" + normalizedValues[moduleDef.id]);
   });
   if (storyLines.length) sections.push("### \u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0\n" + storyLines.join("\n"));
-  if (recordLines.length) sections.push("### \u5C0F\u8BB0\u5F55\n" + recordLines.join("\n"));
   if (values.freeWrite && values.freeWrite.trim()) {
     sections.push("### \u81EA\u7531\u8BB0\u5F55\n" + values.freeWrite.trim());
   }
@@ -3944,7 +3962,9 @@ var DailyScoringModal = class extends BaseMobileModal {
         this.diaryModules = values;
       },
       composeDiaryContent: () => this.syncDiaryContent(),
-      insertAttachment: (label, ext) => this.insertAttachment(label, ext)
+      insertAttachment: (label, ext) => this.insertAttachment(label, ext),
+      insertDiaryText: (text) => this.insertTextAtCursor(text),
+      wrapDiarySelection: (prefix, suffix, placeholder) => this.wrapDiarySelection(prefix, suffix, placeholder)
     });
     renderBottomActions({
       containerEl: contentEl,
@@ -3983,6 +4003,21 @@ var DailyScoringModal = class extends BaseMobileModal {
     const end = ta.selectionEnd;
     ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
     ta.selectionStart = ta.selectionEnd = start + text.length;
+    this.diaryModules.freeWrite = ta.value;
+    this.syncDiaryContent();
+    ta.focus();
+  }
+  wrapDiarySelection(prefix, suffix = "", placeholder = "") {
+    if (!this.diaryTextarea) return;
+    const ta = this.diaryTextarea;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = ta.value.slice(start, end);
+    const body = selected || placeholder;
+    const text = prefix + body + suffix;
+    ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+    const cursorPos = start + text.length;
+    ta.selectionStart = ta.selectionEnd = cursorPos;
     this.diaryModules.freeWrite = ta.value;
     this.syncDiaryContent();
     ta.focus();
@@ -5094,6 +5129,13 @@ function renderItemSettingsList({
           }
           newItemEl.addClass("is-new-item");
           window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
+          const nameInput = newItemEl.querySelector(".settings-name-input");
+          if (nameInput) {
+            window.setTimeout(() => {
+              nameInput.focus();
+              nameInput.select();
+            }, 220);
+          }
         }
         setPendingScrollItemId(null);
       });

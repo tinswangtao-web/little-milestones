@@ -343,6 +343,13 @@ export function renderItemSettingsList({
 
           newItemEl.addClass("is-new-item");
           window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
+          const nameInput = newItemEl.querySelector<HTMLInputElement>(".settings-name-input");
+          if (nameInput) {
+            window.setTimeout(() => {
+              nameInput.focus();
+              nameInput.select();
+            }, 220);
+          }
         }
         setPendingScrollItemId(null);
       });

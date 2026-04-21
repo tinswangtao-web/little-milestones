@@ -22,7 +22,7 @@ interface CreateDiaryQuickGroupOptions {
   panel: HTMLElement;
 }
 
-interface FillDefaultDiaryTemplateOptions {
+interface EnsureDefaultDiaryTemplateOptions {
   diaryModules: DiaryModuleValues;
   moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }>;
   diaryTextarea: HTMLTextAreaElement | null;
@@ -117,7 +117,12 @@ export function createDiaryQuickGroup({
     cls: "diary-quick-text-input",
     type: "text",
   });
-  textInput.placeholder = "输入" + moduleDef.label + "或补充文字";
+  textInput.placeholder =
+    moduleDef.id === "weather"
+      ? "也可以自己写天气，比如 阴天有风"
+      : moduleDef.id === "mood"
+        ? "也可以自己写心情，比如 有点紧张"
+        : "也可以自己补充一句";
   bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
@@ -143,14 +148,19 @@ export function createDiaryQuickGroup({
   });
 }
 
-export function fillDefaultDiaryTemplate({
+export function ensureDefaultDiaryTemplate({
   diaryModules,
   moduleFields,
   diaryTextarea,
   setDiaryTextarea,
   updateDiaryModules,
   syncAndRefresh,
-}: FillDefaultDiaryTemplateOptions): void {
+}: EnsureDefaultDiaryTemplateOptions): void {
+  const hasAnyContent =
+    Object.values(diaryModules).some((value) => String(value || "").trim().length > 0) ||
+    moduleFields.some(({ input }) => input.value.trim().length > 0) ||
+    !!diaryTextarea?.value.trim();
+  if (hasAnyContent) return;
   if (!diaryModules.weather) diaryModules.weather = "☀️ 晴";
   if (!diaryModules.mood) diaryModules.mood = "😊 开心";
   if (!diaryModules.todayThing) diaryModules.todayThing = "今天我做了____。";

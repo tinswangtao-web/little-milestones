@@ -4,6 +4,8 @@ import type KidScorePlugin from "../../main";
 import { bindModalInputFocus } from "../../utils/dom";
 
 export class AttachFileModal extends BaseMobileModal {
+  protected enableManualDragAdjustment = true;
+
   constructor(
     app: App,
     plugin: KidScorePlugin,

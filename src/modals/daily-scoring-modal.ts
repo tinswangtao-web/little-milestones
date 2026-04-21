@@ -161,6 +161,9 @@ export class DailyScoringModal extends BaseMobileModal {
       },
       composeDiaryContent: () => this.syncDiaryContent(),
       insertAttachment: (label, ext) => this.insertAttachment(label, ext),
+      insertDiaryText: (text) => this.insertTextAtCursor(text),
+      wrapDiarySelection: (prefix, suffix, placeholder) =>
+        this.wrapDiarySelection(prefix, suffix, placeholder),
     });
     renderBottomActions({
       containerEl: contentEl,
@@ -200,6 +203,22 @@ export class DailyScoringModal extends BaseMobileModal {
     const end = ta.selectionEnd;
     ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
     ta.selectionStart = ta.selectionEnd = start + text.length;
+    this.diaryModules.freeWrite = ta.value;
+    this.syncDiaryContent();
+    ta.focus();
+  }
+
+  wrapDiarySelection(prefix: string, suffix = "", placeholder = "") {
+    if (!this.diaryTextarea) return;
+    const ta = this.diaryTextarea;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    const selected = ta.value.slice(start, end);
+    const body = selected || placeholder;
+    const text = prefix + body + suffix;
+    ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+    const cursorPos = start + text.length;
+    ta.selectionStart = ta.selectionEnd = cursorPos;
     this.diaryModules.freeWrite = ta.value;
     this.syncDiaryContent();
     ta.focus();

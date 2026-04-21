@@ -222,6 +222,21 @@
   width: 90vw;
   max-width: 460px;
   min-width: 280px;
+  transform: translateY(
+    calc(
+      var(--keyboard-modal-offset, 0px) + var(--manual-modal-offset, 0px)
+    )
+  );
+  transition: transform 0.22s ease;
+  will-change: transform;
+}
+
+.modal.kid-score-edit-modal.is-dragging-position {
+  transition: none;
+}
+
+.modal.kid-score-edit-modal.is-settling-position {
+  transition: transform 0.22s ease;
 }
 
 .kid-score-edit-modal .modal-content,
