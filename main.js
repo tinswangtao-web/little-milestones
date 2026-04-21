@@ -5333,6 +5333,8 @@ function renderUserSettingsSection({
 var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
+    this.touchGuardCleanup = null;
+    this.touchGuardReleaseTimer = null;
     this.plugin = plugin;
   }
   display() {
@@ -5380,11 +5382,23 @@ var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
       containerEl,
       refresh: () => self.display()
     });
+    this.detachTouchScrollGuard();
     if (isTouchDevice()) {
       let touchStartX = 0;
       let touchStartY = 0;
       let touchMoved = false;
+      const releaseReadonlyInputs = () => {
+        if (this.touchGuardReleaseTimer !== null) {
+          window.clearTimeout(this.touchGuardReleaseTimer);
+          this.touchGuardReleaseTimer = null;
+        }
+        const inputs = containerEl.querySelectorAll(
+          'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
+        );
+        inputs.forEach((inp) => inp.removeAttribute("readonly"));
+      };
       const onTouchStart = (e) => {
+        releaseReadonlyInputs();
         if (!e.touches || e.touches.length !== 1) return;
         const touch = e.touches[0];
         touchStartX = touch.clientX;
@@ -5404,17 +5418,43 @@ var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
       };
       const onTouchEnd = () => {
         if (touchMoved) {
-          window.setTimeout(() => {
-            const inputs = containerEl.querySelectorAll(
-              'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
-            );
-            inputs.forEach((inp) => inp.removeAttribute("readonly"));
-          }, 120);
+          this.touchGuardReleaseTimer = window.setTimeout(
+            releaseReadonlyInputs,
+            120
+          );
         }
+      };
+      const onTouchCancel = () => {
+        touchMoved = false;
+        releaseReadonlyInputs();
       };
       containerEl.addEventListener("touchstart", onTouchStart, { passive: true });
       containerEl.addEventListener("touchmove", onTouchMove, { passive: true });
       containerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+      containerEl.addEventListener("touchcancel", onTouchCancel, {
+        passive: true
+      });
+      this.touchGuardCleanup = () => {
+        releaseReadonlyInputs();
+        containerEl.removeEventListener("touchstart", onTouchStart);
+        containerEl.removeEventListener("touchmove", onTouchMove);
+        containerEl.removeEventListener("touchend", onTouchEnd);
+        containerEl.removeEventListener("touchcancel", onTouchCancel);
+      };
+    }
+  }
+  hide() {
+    this.detachTouchScrollGuard();
+    super.hide();
+  }
+  detachTouchScrollGuard() {
+    if (this.touchGuardCleanup) {
+      this.touchGuardCleanup();
+      this.touchGuardCleanup = null;
+    }
+    if (this.touchGuardReleaseTimer !== null) {
+      window.clearTimeout(this.touchGuardReleaseTimer);
+      this.touchGuardReleaseTimer = null;
     }
   }
 };
