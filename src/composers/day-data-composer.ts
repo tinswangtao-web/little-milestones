@@ -1,5 +1,7 @@
 import type { DayData, DayReport, ScoreItem, CustomScoreItem } from "../types";
 import type KidScorePlugin from "../main";
+import { makeDefaultDiaryModules } from "../constants";
+import { readDiaryLine } from "../diary/modules";
 
 export class DayDataComposer {
   constructor(private plugin: KidScorePlugin) {}
@@ -74,8 +76,13 @@ export class DayDataComposer {
     if (total > 0) streak++;
 
     const diaryText = diaryContent || "";
-    const weatherMatch = diaryText.match(/天气：\s*(.+)/);
-    const moodMatch = diaryText.match(/心情：\s*(.+)/);
+    const diaryModules =
+      this.plugin.currentUser.diaryModules &&
+      this.plugin.currentUser.diaryModules.length
+        ? this.plugin.currentUser.diaryModules
+        : makeDefaultDiaryModules();
+    const weatherModule = diaryModules.find((moduleDef) => moduleDef.id === "weather");
+    const moodModule = diaryModules.find((moduleDef) => moduleDef.id === "mood");
     const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
     const lunchMatch = diaryText.match(/午餐：\s*(.+)/);
     const dinnerMatch = diaryText.match(/晚餐：\s*(.+)/);
@@ -104,8 +111,8 @@ export class DayDataComposer {
       hasYesterday: !!yesterdayData,
       yesterdayData,
       tags: {
-        weather: weatherMatch ? weatherMatch[1].trim() : undefined,
-        mood: moodMatch ? moodMatch[1].trim() : undefined,
+        weather: weatherModule ? readDiaryLine(diaryText, weatherModule.label) || undefined : undefined,
+        mood: moodModule ? readDiaryLine(diaryText, moodModule.label) || undefined : undefined,
         homeCook: homeCookMatch ? homeCookMatch[1].trim() : undefined,
         exercise: exerciseMatch ? exerciseMatch[1].trim() : undefined,
         sleep: sleepMatch ? sleepMatch[1].trim() : undefined,

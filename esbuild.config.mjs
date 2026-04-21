@@ -6,12 +6,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const prod = process.argv[2] === "production";
-
-// Obsidian vault plugin directory — adjust if needed
-const VAULT_PLUGIN_DIR =
-  "/Users/tins-macmini/Documents/Obsidian Vault/.obsidian/plugins/little-milestones";
+const args = process.argv.slice(2);
+const prod = args.includes("production") || args.includes("--production");
+const watchMode = args.includes("--watch") || !prod;
+const outfileArg = args.find((arg) => arg.startsWith("--outfile="));
+const outfile = outfileArg ? outfileArg.slice("--outfile=".length) : "main.js";
 
 function buildStyles() {
   const styleDir = path.join(__dirname, "styles");
@@ -55,30 +54,12 @@ const context = await esbuild.context({
   logLevel: "info",
   sourcemap: prod ? false : "inline",
   treeShaking: true,
-  outfile: "main.js",
+  outfile,
   allowOverwrite: true,
-  plugins: prod
-    ? []
-    : [
-        {
-          name: "deploy-on-build",
-          setup(build) {
-            build.onEnd(() => {
-              buildStyles();
-              try {
-                fs.copyFileSync("main.js", path.join(VAULT_PLUGIN_DIR, "main.js"));
-                fs.copyFileSync("styles.css", path.join(VAULT_PLUGIN_DIR, "styles.css"));
-                console.log("✓ Deployed to Obsidian vault");
-              } catch (e) {
-                console.error("Deploy failed:", e?.message || e);
-              }
-            });
-          },
-        },
-      ],
+  plugins: [],
 });
 
-if (prod) {
+if (!watchMode) {
   await context.rebuild();
   process.exit(0);
 } else {

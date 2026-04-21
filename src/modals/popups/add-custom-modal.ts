@@ -56,6 +56,7 @@ export class AddCustomModal extends BaseMobileModal {
     const noteRow = c.createDiv({ cls: "custom-form-row" });
     noteRow.createSpan({ cls: "custom-form-label", text: "备注" });
     const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
     noteInput.placeholder = "可选，将显示在文档页中，支持多行";
     noteInput.autocomplete = "off";
     bindModalInputFocus(noteInput);

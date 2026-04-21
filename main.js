@@ -22,133 +22,9 @@ __export(main_exports, {
   default: () => KidScorePlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian6 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 
-// src/constants.ts
-var DEFAULT_DIARY_TEMPLATE = `### \u5929\u6C14\u4E0E\u5FC3\u60C5
-\u5929\u6C14\uFF1A
-\u5FC3\u60C5\uFF1A
-
-### \u4ECA\u65E5\u6D3B\u52A8
-\u5730\u70B9\uFF1A
-\u6D3B\u52A8\uFF1A
-
-### \u996E\u98DF\u8BB0\u5F55
-\u65E9\u9910\uFF1A
-\u5348\u9910\uFF1A
-\u665A\u9910\uFF1A
-\u96F6\u98DF/\u6C34\u679C\uFF1A
-\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426
-\u83DC\u5355\uFF1A
-\u8BC4\u4EF7\uFF1A
-
-### \u8FD0\u52A8\u4E0E\u5065\u5EB7
-\u8FD0\u52A8\u9879\u76EE\uFF1A
-\u8FD0\u52A8\u65F6\u957F\uFF1A
-\u7761\u7720\u60C5\u51B5\uFF1A
-
-### \u5B66\u4E60\u4E0E\u6210\u957F
-
-
-### \u5176\u4ED6\u8BB0\u5F55
-
-`;
-var DIARY_TEMPLATES = {
-  default: {
-    name: "\u9ED8\u8BA4\u6A21\u677F",
-    content: DEFAULT_DIARY_TEMPLATE
-  },
-  simple: {
-    name: "\u7B80\u6D01\u6A21\u677F",
-    content: `### \u4ECA\u5929\u7684\u611F\u53D7
-
-### \u4E00\u5929\u7684\u603B\u7ED3
-
-### \u6700\u4F7F\u6211\u4E50\u513F\u7684\u4E8B
-
-### \u6700\u4F60\u89C9\u5F97\u9700\u8981\u6301\u7EED\u52A0\u6C61\u7684\u4E8B
-`
-  },
-  detailed: {
-    name: "\u8BE6\u7EC6\u6A21\u677F",
-    content: `# \u4ECA\u65E5\u8BB0\u5F55
-
-## \u5929\u6C14\u4E0E\u5FC3\u60C5
-- \u5929\u6C14\uFF1A
-- \u5FC3\u60C5\uFF1A
-- \u7279\u6B8A\u611F\u53D7\uFF1A
-
-## \u65E5\u5E38\u751F\u6D3B
-- \u65E9\u9910\uFF1A
-- \u5348\u9910\uFF1A
-- \u665A\u9910\uFF1A
-- \u96F6\u98DF\u548C\u6C34\u679C\uFF1A
-
-## \u6D3B\u52A8\u4E0E\u5065\u5EB7
-- \u6B63\u5E38\u8FD0\u52A8\uFF1A
-- \u7761\u7720\u60C5\u51B5\uFF1A
-- \u5065\u5EB7\u611F\u53D7\uFF1A
-
-## \u5B66\u4E60\u4E0E\u6210\u957F
-- \u5B66\u4E60\u5185\u5BB9\uFF1A
-- \u5B66\u4E60\u611F\u53D7\uFF1A
-- \u6210\u957F\u7684\u70B9\uFF1A
-
-## \u5176\u4ED6\u8BB0\u5F55
-- \u7279\u6B8A\u4E8B\u4EF6\uFF1A
-- \u611F\u6069\u8BB0\u5F55\uFF1A
-- \u672A\u6765\u8BA1\u5212\uFF1A
-`
-  },
-  creative: {
-    name: "\u521B\u610F\u6A21\u677F",
-    content: `\u{1F3A8} \u4ECA\u5929\u7684\u6545\u4E8B
-
-\u{1F4DD} \u6211\u7684\u611F\u53D7
-
-\u{1F31F} \u6700\u6F6E\u5149\u7684\u70B9
-
-\u{1F308} \u672A\u6765\u7684\u5E0C\u671B
-
-\u{1F4A1} \u4E00\u70B9\u611F\u6069
-`
-  }
-};
-function makeDefaultDiaryModules() {
-  return [
-    { id: "weather", label: "\u4ECA\u5929\u5929\u6C14", placeholder: "\u9009\u4E00\u4E2A\u5929\u6C14\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199", kind: "quick" },
-    { id: "mood", label: "\u4ECA\u5929\u5FC3\u60C5", placeholder: "\u9009\u4E00\u4E2A\u5FC3\u60C5\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199", kind: "quick" },
-    { id: "todayThing", label: "\u4ECA\u5929\u6211\u505A\u4E86...", placeholder: "\u4F8B\u5982\uFF1A\u6211\u4E0A\u4E86\u6570\u5B66\u8BFE\uFF0C\u8FD8\u753B\u4E86\u753B", kind: "multi" },
-    { id: "learnedThing", label: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86...", placeholder: "\u4F8B\u5982\uFF1A\u6211\u5B66\u4F1A\u4E86\u5199\u201C\u6625\u201D\u5B57", kind: "multi" },
-    { id: "happyThing", label: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F...", placeholder: "\u4F8B\u5982\uFF1A\u4E0B\u8BFE\u540E\u6211\u548C\u540C\u5B66\u4E00\u8D77\u73A9", kind: "multi" },
-    { id: "wantToSay", label: "\u6211\u8FD8\u60F3\u8BF4...", placeholder: "\u53EF\u4EE5\u5199\u60F3\u5BF9\u7238\u7238\u5988\u5988\u6216\u81EA\u5DF1\u8BF4\u7684\u8BDD", kind: "multi" }
-  ];
-}
-function makeDefaultUser() {
-  return {
-    id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-    name: "\u5C0F\u670B\u53CB",
-    savePath: "Little Milestones/Daily Records",
-    items: [],
-    categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
-    scoringRules: "",
-    diaryTemplate: DEFAULT_DIARY_TEMPLATE,
-    diaryModules: makeDefaultDiaryModules(),
-    goals: { daily: 10, weekly: 70, monthly: 300 }
-  };
-}
-var DEFAULT_SETTINGS = {
-  users: [],
-  currentUserId: "",
-  doubleTapThresholds: {
-    windows: 220,
-    mac: 240,
-    android: 320,
-    ios: 300,
-    fallback: 260
-  }
-};
-var DIARY_MARKER = "<!-- DIARY_START -->";
+// src/data/emoji-data.ts
 var EMOJI_DATA = {
   "\u{1F600} \u7B11\u8138": ["\u{1F600}", "\u{1F603}", "\u{1F604}", "\u{1F601}", "\u{1F606}", "\u{1F605}", "\u{1F923}", "\u{1F602}", "\u{1F642}", "\u{1F643}", "\u{1F609}", "\u{1F60A}", "\u{1F607}", "\u{1F970}", "\u{1F60D}", "\u{1F929}", "\u{1F618}", "\u{1F617}", "\u{1F61A}", "\u{1F619}", "\u{1F972}", "\u{1F60B}", "\u{1F61B}", "\u{1F61C}", "\u{1F92A}", "\u{1F61D}", "\u{1F911}", "\u{1F917}", "\u{1F92D}", "\u{1F92B}", "\u{1F914}", "\u{1FAE1}", "\u{1F910}", "\u{1F928}", "\u{1F610}", "\u{1F611}", "\u{1F636}", "\u{1FAE5}", "\u{1F60F}", "\u{1F612}", "\u{1F644}", "\u{1F62C}", "\u{1F925}", "\u{1F60C}", "\u{1F614}", "\u{1F62A}", "\u{1F924}", "\u{1F634}", "\u{1F637}", "\u{1F912}", "\u{1F915}", "\u{1F922}", "\u{1F92E}", "\u{1F975}", "\u{1F976}", "\u{1F974}", "\u{1F635}", "\u{1F92F}", "\u{1F920}", "\u{1F973}", "\u{1F978}", "\u{1F60E}", "\u{1F913}", "\u{1F9D0}", "\u{1F615}", "\u{1FAE4}", "\u{1F61F}", "\u{1F641}", "\u{1F62E}", "\u{1F62F}", "\u{1F632}", "\u{1F633}", "\u{1F97A}", "\u{1F979}", "\u{1F627}", "\u{1F628}", "\u{1F630}", "\u{1F625}", "\u{1F622}", "\u{1F62D}", "\u{1F631}", "\u{1F616}", "\u{1F623}", "\u{1F61E}", "\u{1F613}", "\u{1F629}", "\u{1F62B}", "\u{1F971}", "\u{1F624}", "\u{1F621}", "\u{1F620}", "\u{1F92C}", "\u{1F608}", "\u{1F47F}", "\u{1F480}", "\u2620\uFE0F", "\u{1F4A9}", "\u{1F921}", "\u{1F479}", "\u{1F47A}", "\u{1F47B}", "\u{1F47D}", "\u{1F47E}", "\u{1F916}"],
   "\u{1F44B} \u624B\u52BF": ["\u{1F44B}", "\u{1F91A}", "\u{1F590}\uFE0F", "\u270B", "\u{1F596}", "\u{1FAF1}", "\u{1FAF2}", "\u{1FAF3}", "\u{1FAF4}", "\u{1F44C}", "\u{1F90C}", "\u{1F90F}", "\u270C\uFE0F", "\u{1F91E}", "\u{1FAF0}", "\u{1F91F}", "\u{1F918}", "\u{1F919}", "\u{1F448}", "\u{1F449}", "\u{1F446}", "\u{1F595}", "\u{1F447}", "\u261D\uFE0F", "\u{1FAF5}", "\u{1F44D}", "\u{1F44E}", "\u270A", "\u{1F44A}", "\u{1F91B}", "\u{1F91C}", "\u{1F44F}", "\u{1F64C}", "\u{1FAF6}", "\u{1F450}", "\u{1F932}", "\u{1F91D}", "\u{1F64F}", "\u{1F4AA}", "\u{1F9BE}", "\u{1F9BF}", "\u{1F9B5}", "\u{1F9B6}", "\u{1F442}", "\u{1F9BB}", "\u{1F443}", "\u{1F9E0}", "\u{1FAC0}", "\u{1FAC1}", "\u{1F9B7}", "\u{1F9B4}", "\u{1F440}", "\u{1F441}\uFE0F", "\u{1F445}", "\u{1F444}"],
@@ -1181,265 +1057,108 @@ var EMOJI_SEARCH = {
   "\u2122\uFE0F": "\u5546\u6807 trade mark"
 };
 
-// src/composers/day-data-composer.ts
-var DayDataComposer = class {
-  constructor(plugin) {
-    this.plugin = plugin;
-  }
-  async compose(dateStr, scores, customItems, diaryContent) {
-    const items = this.plugin.currentUser.items;
-    const childName = this.plugin.currentUser.name;
-    const d = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
-    d.setDate(d.getDate() - 1);
-    const yesterdayStr = d.toISOString().slice(0, 10);
-    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
-    let total = 0;
-    let earnedCount = 0;
-    let missedCount = 0;
-    let positiveCount = 0;
-    let negativeCount = 0;
-    for (const item of items) {
-      const val = scores[item.id] || 0;
-      total += val;
-      const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
-      if (isDeduct) {
-        if (val !== 0) {
-          earnedCount++;
-          negativeCount++;
-        } else {
-          missedCount++;
-        }
-      } else {
-        if (val > 0) {
-          earnedCount++;
-          positiveCount++;
-        } else {
-          missedCount++;
-        }
-      }
-    }
-    let customTotal = 0;
-    for (const ci of customItems) {
-      customTotal += ci.points;
-    }
-    total += customTotal;
-    const allScores = await this.plugin.getAllScores();
-    let cumulativeTotal = 0;
-    let cumulativeDays = 0;
-    for (const s of allScores) {
-      if (s.date !== dateStr) {
-        cumulativeTotal += s.total;
-        cumulativeDays++;
-      }
-    }
-    const grandTotal = cumulativeTotal + total;
-    const grandDays = cumulativeDays + 1;
-    const grandAvg = grandDays > 0 ? Math.round(grandTotal / grandDays * 10) / 10 : 0;
-    let streak = 0;
-    const sortedScores = [...allScores].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    for (const s of sortedScores) {
-      if (s.total > 0) streak++;
-      else break;
-    }
-    if (total > 0) streak++;
-    const diaryText = diaryContent || "";
-    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const diaryModules = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
-    const weatherLabel = ((diaryModules.find((m) => m.id === "weather") || {}).label || "\u5929\u6C14").trim();
-    const moodLabel = ((diaryModules.find((m) => m.id === "mood") || {}).label || "\u5FC3\u60C5").trim();
-    const weatherMatch = diaryText.match(new RegExp(escapeRegex(weatherLabel) + "：\\s*(.+)"));
-    const moodMatch = diaryText.match(new RegExp(escapeRegex(moodLabel) + "：\\s*(.+)"));
-    const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
-    const lunchMatch = diaryText.match(/午餐：\s*(.+)/);
-    const dinnerMatch = diaryText.match(/晚餐：\s*(.+)/);
-    const homeCookMatch = diaryText.match(/在家做饭：\s*(.+)/);
-    const exerciseMatch = diaryText.match(/运动项目：\s*(.+)/);
-    const sleepMatch = diaryText.match(/睡眠情况：\s*(.+)/);
-    return {
-      dateStr,
-      childName,
-      scores,
-      customItems,
-      diaryContent,
-      total,
-      earnedCount,
-      missedCount,
-      positiveCount,
-      negativeCount,
-      customTotal,
-      totalItems: items.length,
-      completionRate: items.length > 0 ? Math.round(earnedCount / items.length * 100) : 0,
-      grandTotal,
-      grandDays,
-      grandAvg,
-      streak,
-      hasYesterday: !!yesterdayData,
-      yesterdayData,
-      tags: {
-        weather: weatherMatch ? weatherMatch[1].trim() : void 0,
-        mood: moodMatch ? moodMatch[1].trim() : void 0,
-        homeCook: homeCookMatch ? homeCookMatch[1].trim() : void 0,
-        exercise: exerciseMatch ? exerciseMatch[1].trim() : void 0,
-        sleep: sleepMatch ? sleepMatch[1].trim() : void 0,
-        hasDiary: diaryText.trim().length > 0
-      },
-      diet: {
-        breakfast: breakfastMatch ? breakfastMatch[1].trim() : void 0,
-        lunch: lunchMatch ? lunchMatch[1].trim() : void 0,
-        dinner: dinnerMatch ? dinnerMatch[1].trim() : void 0
-      },
-      items,
-      categories: this.plugin.currentUser.categories || []
-    };
-  }
-};
+// src/constants.ts
+var DEFAULT_DIARY_TEMPLATE = `### \u5929\u6C14\u4E0E\u5FC3\u60C5
+\u5929\u6C14\uFF1A
+\u5FC3\u60C5\uFF1A
 
-// src/utils/yaml.ts
-function toYamlInline(value) {
-  const safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return '"' + safe + '"';
+### \u4ECA\u65E5\u6D3B\u52A8
+\u5730\u70B9\uFF1A
+\u6D3B\u52A8\uFF1A
+
+### \u996E\u98DF\u8BB0\u5F55
+\u65E9\u9910\uFF1A
+\u5348\u9910\uFF1A
+\u665A\u9910\uFF1A
+\u96F6\u98DF/\u6C34\u679C\uFF1A
+\u5728\u5BB6\u505A\u996D\uFF1A\u662F/\u5426
+\u83DC\u5355\uFF1A
+\u8BC4\u4EF7\uFF1A
+
+### \u8FD0\u52A8\u4E0E\u5065\u5EB7
+\u8FD0\u52A8\u9879\u76EE\uFF1A
+\u8FD0\u52A8\u65F6\u957F\uFF1A
+\u7761\u7720\u60C5\u51B5\uFF1A
+
+### \u5B66\u4E60\u4E0E\u6210\u957F
+
+
+### \u5176\u4ED6\u8BB0\u5F55
+
+`;
+function makeDefaultDiaryModules() {
+  return [
+    {
+      id: "weather",
+      label: "\u4ECA\u5929\u5929\u6C14",
+      placeholder: "\u9009\u4E00\u4E2A\u5929\u6C14\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199",
+      kind: "quick"
+    },
+    {
+      id: "mood",
+      label: "\u4ECA\u5929\u5FC3\u60C5",
+      placeholder: "\u9009\u4E00\u4E2A\u5FC3\u60C5\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199",
+      kind: "quick"
+    },
+    {
+      id: "todayThing",
+      label: "\u4ECA\u5929\u6211\u505A\u4E86...",
+      placeholder: "\u4F8B\u5982\uFF1A\u6211\u4E0A\u4E86\u6570\u5B66\u8BFE\uFF0C\u8FD8\u753B\u4E86\u753B",
+      kind: "multi"
+    },
+    {
+      id: "learnedThing",
+      label: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86...",
+      placeholder: "\u4F8B\u5982\uFF1A\u6211\u5B66\u4F1A\u4E86\u5199\u201C\u6625\u201D\u5B57",
+      kind: "multi"
+    },
+    {
+      id: "happyThing",
+      label: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F...",
+      placeholder: "\u4F8B\u5982\uFF1A\u4E0B\u8BFE\u540E\u6211\u548C\u540C\u5B66\u4E00\u8D77\u73A9",
+      kind: "multi"
+    },
+    {
+      id: "wantToSay",
+      label: "\u6211\u8FD8\u60F3\u8BF4...",
+      placeholder: "\u53EF\u4EE5\u5199\u60F3\u5BF9\u7238\u7238\u5988\u5988\u6216\u81EA\u5DF1\u8BF4\u7684\u8BDD",
+      kind: "multi"
+    }
+  ];
 }
-
-// src/renderers/report-builder.ts
-var MarkdownReportBuilder = class {
-  build(report) {
-    const {
-      dateStr,
-      childName,
-      scores,
-      customItems,
-      diaryContent,
-      total,
-      earnedCount,
-      missedCount,
-      positiveCount,
-      negativeCount,
-      customTotal,
-      totalItems,
-      completionRate,
-      grandTotal,
-      grandDays,
-      grandAvg,
-      streak,
-      hasYesterday,
-      yesterdayData,
-      tags,
-      diet,
-      items,
-      categories
-    } = report;
-    const scoresYaml = items.map((item) => "  " + item.id + ": " + (scores[item.id] || 0)).join("\n");
-    let customYaml = "";
-    if (customItems.length > 0) {
-      customYaml = "\ncustomItems:\n" + customItems.map((ci) => "  - " + toYamlInline(ci.emoji + "|" + ci.name + "|" + ci.points)).join("\n");
-    }
-    let scoreDetailYaml = "\nscoreDetail:\n" + items.map((item) => {
-      const v = scores[item.id] || 0;
-      return "  " + toYamlInline(item.name) + ": " + v;
-    }).join("\n");
-    if (customItems.length > 0) {
-      for (const ci of customItems) {
-        scoreDetailYaml += "\n  " + toYamlInline("\u4E34\u65F6-" + ci.name) + ": " + ci.points;
-      }
-    }
-    const summaryYaml = "\nsummary:\n  earned: " + earnedCount + "\n  missed: " + missedCount + "\n  positiveCount: " + positiveCount + "\n  negativeCount: " + negativeCount + "\n  customCount: " + customItems.length + "\n  customTotal: " + customTotal + "\n  cumulativeTotal: " + grandTotal + "\n  cumulativeDays: " + grandDays + "\n  cumulativeAvg: " + grandAvg + "\n  streak: " + streak;
-    let tagsYaml = "\ntags:";
-    if (tags.weather) tagsYaml += "\n  weather: " + toYamlInline(tags.weather);
-    if (tags.mood) tagsYaml += "\n  mood: " + toYamlInline(tags.mood);
-    if (tags.homeCook) tagsYaml += "\n  homeCook: " + toYamlInline(tags.homeCook);
-    if (tags.exercise) tagsYaml += "\n  exercise: " + toYamlInline(tags.exercise);
-    if (tags.sleep) tagsYaml += "\n  sleep: " + toYamlInline(tags.sleep);
-    tagsYaml += "\n  hasDiary: " + tags.hasDiary;
-    let dietYaml = "";
-    if (diet.breakfast || diet.lunch || diet.dinner) {
-      dietYaml = "\ndiet:";
-      if (diet.breakfast) dietYaml += "\n  breakfast: " + toYamlInline(diet.breakfast);
-      if (diet.lunch) dietYaml += "\n  lunch: " + toYamlInline(diet.lunch);
-      if (diet.dinner) dietYaml += "\n  dinner: " + toYamlInline(diet.dinner);
-    }
-    const totalSign = total >= 0 ? "+" : "";
-    const grandSign = grandTotal >= 0 ? "+" : "";
-    const renderProgressBar = (pct) => {
-      const filled = Math.round(pct / 5);
-      const empty = 20 - filled;
-      return "`" + "\u2588".repeat(filled) + "\u2591".repeat(empty) + " " + pct + "%`";
-    };
-    const renderScoreCell = (actual, isDeduct) => {
-      const sign = actual >= 0 ? "+" : "";
-      const color = isDeduct ? "#dc2626" : "#16a34a";
-      return '<span style="color:' + color + ';font-weight:600">' + sign + actual + "</span>";
-    };
-    let summaryCallout = "> [!summary] \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n> - \u{1F3C6} \u4ECA\u65E5\u603B\u5206\uFF1A**" + totalSign + total + " \u5206**\n";
-    if (hasYesterday && yesterdayData) {
-      const yTotalSign = yesterdayData.total >= 0 ? "+" : "";
-      summaryCallout += "> - \u{1F4C5} \u6628\u65E5\u603B\u5206\uFF1A" + yTotalSign + yesterdayData.total + " \u5206\n";
-    }
-    summaryCallout += "> - \u2705 \u5B8C\u6210\u9879\u76EE\uFF1A**" + earnedCount + "/" + totalItems + " (" + completionRate + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + customItems.length + " \u9879 (" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + streak + " \u5929\n";
-    const dailyGoal = 10;
-    const goalPct = Math.min(100, Math.round(earnedCount / dailyGoal * 100));
-    const goalCallout = "> [!tip] \u{1F3AF} \u4ECA\u65E5\u76EE\u6807\n> \u5B8C\u6210\u9879\u76EE **" + earnedCount + "/" + dailyGoal + "** \xB7 " + renderProgressBar(goalPct) + "\n";
-    const renderCategoryTable = (list) => {
-      let rows = "";
-      for (const item of list) {
-        const actual = scores[item.id] || 0;
-        const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-        const status = isDeductItem ? actual !== 0 ? "\u2B55" : "\u{1F535}" : actual > 0 ? "\u2705" : "\u274C";
-        const dSign = item.points >= 0 ? "+" : "";
-        const cn = actual !== 0 && actual !== item.points ? " \u{1F4DD}" : "";
-        rows += "| " + item.emoji + " " + item.name + " | " + dSign + item.points + " | " + renderScoreCell(actual, isDeductItem) + cn + " | " + status + " |\n";
-        if (hasYesterday && yesterdayData) {
-          const yVal = yesterdayData.scores[item.id] || 0;
-          const ySign = yVal >= 0 ? "+" : "";
-          const yIcon = yVal > 0 ? "\u2705" : yVal < 0 ? "\u274C" : "\u2014";
-          rows += "> [!quote]- \u6628\u65E5\uFF1A" + item.name + " " + ySign + yVal + " \u5206 " + yIcon + "\n";
-        }
-      }
-      return rows;
-    };
-    let tableContent = "";
-    for (const cat of categories) {
-      const catItems = items.filter((it) => it.category === cat);
-      if (catItems.length > 0) {
-        tableContent += "\n### " + cat + "\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryTable(catItems) + "\n";
-      }
-    }
-    const uncatItems = items.filter(
-      (it) => !it.category || categories.indexOf(it.category) === -1
-    );
-    if (uncatItems.length > 0) {
-      tableContent += "\n### \u5176\u4ED6\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryTable(uncatItems) + "\n";
-    }
-    let customCallout = "";
-    if (customItems.length > 0) {
-      const hasCustomNotes = customItems.some((ci) => ci.note && ci.note.trim());
-      customCallout = "\n> [!info] \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF08" + customItems.length + " \u9879\uFF0C" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206\uFF09\n";
-      if (hasCustomNotes) {
-        customCallout += "> | \u4E8B\u9879 | \u5F97\u5206 | \u5907\u6CE8 |\n> |:---|---:|:---|\n";
-        for (const ci of customItems) {
-          customCallout += "> | " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " | " + (ci.note || "") + " |\n";
-        }
-      } else {
-        customCallout += "> | \u4E8B\u9879 | \u5F97\u5206 |\n> |:---|---:|\n";
-        for (const ci of customItems) {
-          customCallout += "> | " + ci.emoji + " " + ci.name + " | " + (ci.points >= 0 ? "+" : "") + ci.points + " |\n";
-        }
-      }
-      customCallout += "\n";
-    }
-    const fileContent = "---\ndate: " + dateStr + "\nchild: " + childName + "\ntotal: " + total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n# \u{1F4CB} " + dateStr + " " + childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n" + summaryCallout + "\n" + goalCallout + "\n---\n" + tableContent + customCallout + "---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (diaryContent || "") + "\n";
-    return fileContent;
+function makeDefaultUser() {
+  return {
+    id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+    name: "\u5C0F\u670B\u53CB",
+    savePath: "Little Milestones/Daily Records",
+    items: [],
+    categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
+    scoringRules: "",
+    diaryTemplate: DEFAULT_DIARY_TEMPLATE,
+    diaryModules: makeDefaultDiaryModules(),
+    goals: { daily: 10, weekly: 70, monthly: 300 }
+  };
+}
+var DEFAULT_SETTINGS = {
+  users: [],
+  currentUserId: "",
+  doubleTapThresholds: {
+    windows: 220,
+    mac: 240,
+    android: 320,
+    ios: 300,
+    fallback: 260
   }
 };
+var DIARY_MARKER = "<!-- DIARY_START -->";
 
 // src/modals/daily-scoring-modal.ts
-var import_obsidian4 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/ui/base-mobile-modal.ts
 var import_obsidian = require("obsidian");
 
-// src/utils/mobile.ts
+// src/utils/mobile-keyboard.ts
 function setupModalKeyboard(modal) {
   const cEl = modal.containerEl;
   const mEl = modal.modalEl;
@@ -1485,7 +1204,10 @@ function setupModalKeyboard(modal) {
   const getKeyboardHeight = () => {
     if (!window.visualViewport) return 0;
     const vv = window.visualViewport;
-    const raw = Math.max(0, stableViewportHeight - vv.height - Math.max(0, vv.offsetTop || 0));
+    const raw = Math.max(
+      0,
+      stableViewportHeight - vv.height - Math.max(0, vv.offsetTop || 0)
+    );
     if (raw < 70) {
       stableViewportHeight = Math.max(stableViewportHeight, vv.height);
       return 0;
@@ -1544,7 +1266,10 @@ function setupModalKeyboard(modal) {
     const focused = document.activeElement;
     if (focused && contentEl.contains(focused)) {
       setTimeout(() => {
-        ensureTargetVisible(focused, focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104);
+        ensureTargetVisible(
+          focused,
+          focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104
+        );
       }, isIOS ? 180 : 60);
     }
   };
@@ -1588,7 +1313,7 @@ function setupModalKeyboard(modal) {
   window.addEventListener("resize", onWinResize);
   mEl.addEventListener("focusin", onFocusIn);
   applyLayout();
-  return function cleanup() {
+  return () => {
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", onVVChange);
       window.visualViewport.removeEventListener("scroll", onVVChange);
@@ -1626,166 +1351,9 @@ function setupModalKeyboard(modal) {
   };
 }
 
-// src/ui/base-mobile-modal.ts
-var BaseMobileModal = class extends import_obsidian.Modal {
-  constructor(app, plugin) {
-    super(app);
-    this.mobilePlatform = "desktop";
-    this._kbCleanup = null;
-    this._dragCleanup = null;
-    this.enableKeyboardAdjustment = true;
-    this.plugin = plugin;
-  }
-  onOpen() {
-    this.mobilePlatform = this.detectMobilePlatform();
-    this.modalEl.toggleClass("is-mobile-ios", this.mobilePlatform === "ios");
-    this.modalEl.toggleClass(
-      "is-mobile-android",
-      this.mobilePlatform === "android"
-    );
-    this.titleEl.addClass("kid-score-modal-title");
-    if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
-      this._kbCleanup = setupModalKeyboard(this);
-    }
-    if (this.mobilePlatform !== "desktop") {
-      this._dragCleanup = attachModalDragGesture(this);
-    }
-  }
-  onClose() {
-    if (this._kbCleanup) {
-      this._kbCleanup();
-      this._kbCleanup = null;
-    }
-    if (this._dragCleanup) {
-      this._dragCleanup();
-      this._dragCleanup = null;
-    }
-    this.contentEl.empty();
-  }
-  detectMobilePlatform() {
-    const ua = (navigator.userAgent || "").toLowerCase();
-    if (/android/.test(ua)) return "android";
-    if (/iphone|ipad|ipod/.test(ua)) return "ios";
-    return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
-  }
-  getLongPressDuration() {
-    if (this.mobilePlatform === "ios") return 560;
-    if (this.mobilePlatform === "android") return 460;
-    return 500;
-  }
-  triggerHaptic(type) {
-    if (this.mobilePlatform !== "android") return;
-    if (!navigator.vibrate) return;
-    navigator.vibrate(type === "longpress" ? 12 : 8);
-  }
-};
-
-// src/utils/date.ts
-function formatDate(offset = 0) {
-  const d = /* @__PURE__ */ new Date();
-  d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
-}
-
-// src/utils/dom.ts
-function getOverlayMount(containerEl) {
-  return document.body.classList.contains("is-mobile") ? document.body : containerEl || document.body;
-}
-function bindModalInputFocus(input, options = {}) {
-  if (!input) return;
-  const inp = input;
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isIOS = /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
-  const {
-    manualTouchFocus = true,
-    scrollOnIOSFocus = true
-  } = options;
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchMoved = false;
-  if (inp.tagName === "INPUT" && inp.type === "number") {
-    inp.setAttribute("inputmode", "numeric");
-  }
-  input.setAttribute("tabindex", "0");
-  input.addEventListener("mousedown", (e) => {
-    e.stopPropagation();
-  });
-  if (isTouch) {
-    input.addEventListener("touchstart", (e) => {
-      const touch = e.touches[0];
-      touchStartX = touch ? touch.clientX : 0;
-      touchStartY = touch ? touch.clientY : 0;
-      touchMoved = false;
-      e.stopPropagation();
-    }, { passive: true });
-    input.addEventListener("touchmove", (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-      if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
-        touchMoved = true;
-      }
-    }, { passive: true });
-    input.addEventListener("touchend", (e) => {
-      e.stopPropagation();
-      if (!manualTouchFocus || touchMoved) return;
-      inp.focus();
-    });
-  }
-  const setIOSKeyboardFocusState = (on) => {
-    if (!isIOS) return;
-    const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
-    const scroller = input.closest(".modal-content");
-    if (!modal || !scroller) return;
-    modal.classList.toggle("has-ios-keyboard-focus", on);
-    if (on) {
-      const target = input;
-      const forceScroll = () => {
-        const scrollerRect = scroller.getBoundingClientRect();
-        const inputRect = target.getBoundingClientRect();
-        const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
-        const desiredTop = Math.max(0, inputTop - Math.max(16, scroller.clientHeight * 0.1));
-        scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
-      };
-      setTimeout(forceScroll, 80);
-      setTimeout(forceScroll, 260);
-      setTimeout(forceScroll, 520);
-      setTimeout(forceScroll, 860);
-    }
-  };
-  input.addEventListener("focus", () => {
-    if (!scrollOnIOSFocus) return;
-    if (!isIOS) return;
-    setIOSKeyboardFocusState(true);
-    const scrollWithinModal = () => {
-      const scroller = input.closest(".modal-content");
-      if (!scroller) {
-        if (input.scrollIntoView) input.scrollIntoView({ block: "center", behavior: "smooth" });
-        return;
-      }
-      const scrollerRect = scroller.getBoundingClientRect();
-      const inputRect = input.getBoundingClientRect();
-      const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
-      const desiredTop = Math.max(0, inputTop - Math.max(18, scroller.clientHeight * 0.12));
-      scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
-    };
-    const doScroll = (delay) => {
-      setTimeout(() => {
-        scrollWithinModal();
-      }, delay);
-    };
-    doScroll(400);
-    doScroll(650);
-  });
-  input.addEventListener("blur", () => {
-    if (!isIOS) return;
-    setTimeout(() => {
-      const active = document.activeElement;
-      if (active && active.closest && active.closest(".kid-score-edit-modal, .kid-score-import-modal") === input.closest(".kid-score-edit-modal, .kid-score-import-modal")) {
-        return;
-      }
-      setIOSKeyboardFocusState(false);
-    }, 180);
-  });
+// src/utils/mobile.ts
+function setupModalKeyboard2(modal) {
+  return setupModalKeyboard(modal);
 }
 function attachModalDragGesture(modal) {
   if (!modal) return null;
@@ -1796,7 +1364,9 @@ function attachModalDragGesture(modal) {
   let dragging = false;
   let lastDeltaY = 0;
   const isInteractiveTarget = (target) => {
-    return !!(target && target.closest && target.closest("input, textarea, select, button, .clickable-icon, .modal-close-button"));
+    return !!(target && target.closest && target.closest(
+      "input, textarea, select, button, .clickable-icon, .modal-close-button"
+    ));
   };
   const readOffset = () => parseInt(modalEl.dataset.manualModalOffset || "0", 10) || 0;
   const writeOffset = (next) => {
@@ -1865,6 +1435,347 @@ function attachModalDragGesture(modal) {
   };
 }
 
+// src/ui/base-mobile-modal.ts
+var BaseMobileModal = class extends import_obsidian.Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.mobilePlatform = "desktop";
+    this._kbCleanup = null;
+    this._dragCleanup = null;
+    this.enableKeyboardAdjustment = true;
+    this.plugin = plugin;
+  }
+  onOpen() {
+    this.mobilePlatform = this.detectMobilePlatform();
+    this.modalEl.toggleClass("is-mobile-ios", this.mobilePlatform === "ios");
+    this.modalEl.toggleClass(
+      "is-mobile-android",
+      this.mobilePlatform === "android"
+    );
+    this.titleEl.addClass("kid-score-modal-title");
+    if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
+      this._kbCleanup = setupModalKeyboard2(this);
+    }
+    if (this.mobilePlatform !== "desktop") {
+      this._dragCleanup = attachModalDragGesture(this);
+    }
+  }
+  onClose() {
+    if (this._kbCleanup) {
+      this._kbCleanup();
+      this._kbCleanup = null;
+    }
+    if (this._dragCleanup) {
+      this._dragCleanup();
+      this._dragCleanup = null;
+    }
+    this.contentEl.empty();
+  }
+  detectMobilePlatform() {
+    const ua = (navigator.userAgent || "").toLowerCase();
+    if (/android/.test(ua)) return "android";
+    if (/iphone|ipad|ipod/.test(ua)) return "ios";
+    return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
+  }
+  getLongPressDuration() {
+    if (this.mobilePlatform === "ios") return 560;
+    if (this.mobilePlatform === "android") return 460;
+    return 500;
+  }
+  triggerHaptic(type) {
+    if (this.mobilePlatform !== "android") return;
+    if (!navigator.vibrate) return;
+    navigator.vibrate(type === "longpress" ? 12 : 8);
+  }
+};
+
+// src/utils/date.ts
+function formatDate(offset = 0) {
+  const d = /* @__PURE__ */ new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+// src/modals/panels/stats-panel.ts
+function renderStatsPanel(statsBody, plugin, allScores, period) {
+  statsBody.empty();
+  const filtered = filterScores(period, allScores);
+  if (!filtered.length) {
+    statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "kid-score-empty" });
+    return;
+  }
+  const total = filtered.reduce((sum, record) => sum + record.total, 0);
+  const avg = Math.round(total / filtered.length * 10) / 10;
+  const max = Math.max(...filtered.map((record) => record.total));
+  const streak = countPositiveStreak(filtered);
+  const positiveDays = filtered.filter((record) => record.total > 0).length;
+  const negativeDays = filtered.filter((record) => record.total < 0).length;
+  const currentUser = plugin.currentUser;
+  const cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
+  renderSummaryCard(cards, "\u7D2F\u8BA1\u603B\u5206", (total >= 0 ? "+" : "") + total, true);
+  renderSummaryCard(cards, "\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
+  renderSummaryCard(cards, "\u6700\u9AD8\u5355\u65E5", "+" + max);
+  renderSummaryCard(cards, "\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
+  renderSummaryCard(cards, "\u8FDE\u7EED\u6253\u5206", streak + " \u5929");
+  renderSummaryCard(cards, "\u6B63\u9762\u5929\u6570", positiveDays + " \u5929");
+  renderSummaryCard(cards, "\u8D1F\u9762\u5929\u6570", negativeDays + " \u5929");
+  renderGoalCard(cards, currentUser, filtered, period);
+  if (currentUser.items.length > 0) {
+    renderCategoryCompletion(statsBody, currentUser.items, currentUser.categories || [], filtered);
+    renderItemCompletion(statsBody, currentUser.items, filtered);
+  }
+  statsBody.createEl("h3", { text: "\u6BCF\u65E5\u5F97\u5206\u8D8B\u52BF", cls: "stats-section-title" });
+  const chartWrap = statsBody.createDiv({ cls: "kid-score-chart-wrap" });
+  const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
+  canvas.width = 540;
+  canvas.height = 200;
+  setTimeout(() => {
+    drawBarChart(canvas, filtered.slice(-20));
+  }, 50);
+  if (period === "all" && filtered.length > 7) {
+    renderMonthlySummary(statsBody, filtered);
+  }
+}
+function filterScores(period, scores) {
+  const today = /* @__PURE__ */ new Date();
+  if (period === "week") {
+    const weekStart = new Date(today);
+    weekStart.setDate(today.getDate() - today.getDay() + 1);
+    return scores.filter((score) => score.date >= weekStart.toISOString().slice(0, 10));
+  }
+  if (period === "month") {
+    const monthStart = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-01";
+    return scores.filter((score) => score.date >= monthStart);
+  }
+  return scores;
+}
+function renderSummaryCard(cards, label, value, accent = false) {
+  const card = cards.createDiv({ cls: "summary-card " + (accent ? "accent" : "") });
+  card.createDiv({ cls: "card-val", text: value });
+  card.createDiv({ cls: "card-lbl", text: label });
+}
+function renderGoalCard(cards, currentUser, filtered, period) {
+  const goals = currentUser.goals || { daily: 10, weekly: 70, monthly: 300 };
+  let goalLabel = "";
+  let goalTarget = 0;
+  let goalCompleted = 0;
+  if (period === "week") {
+    goalLabel = "\u672C\u5468\u76EE\u6807";
+    goalTarget = goals.weekly;
+    goalCompleted = filtered.reduce(
+      (sum, day) => sum + calcCompleted(currentUser.items, day),
+      0
+    );
+  } else if (period === "month") {
+    goalLabel = "\u672C\u6708\u76EE\u6807";
+    goalTarget = goals.monthly;
+    goalCompleted = filtered.reduce(
+      (sum, day) => sum + calcCompleted(currentUser.items, day),
+      0
+    );
+  }
+  if (goalTarget <= 0) return;
+  const goalPct = Math.min(100, Math.round(goalCompleted / goalTarget * 100));
+  const goalCard = cards.createDiv({ cls: "summary-card goal-card" });
+  goalCard.createDiv({ cls: "card-val", text: goalCompleted + "/" + goalTarget });
+  goalCard.createDiv({ cls: "card-lbl", text: goalLabel });
+  const wrap = goalCard.createDiv({ cls: "summary-goal-bar-wrap" });
+  const bar = wrap.createDiv({ cls: "summary-goal-bar" });
+  bar.style.width = goalPct + "%";
+  if (goalPct >= 100) bar.addClass("is-complete");
+}
+function calcCompleted(items, day) {
+  let completed = (day.customItems || []).length;
+  for (const item of items) {
+    const val = day.scores[item.id] || 0;
+    const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+    if (isDeduct ? val !== 0 : val > 0) completed++;
+  }
+  return completed;
+}
+function renderCategoryCompletion(statsBody, items, categories, filtered) {
+  const categoryStats = {};
+  categories.forEach((category) => {
+    categoryStats[category] = { total: 0, completed: 0 };
+  });
+  for (const item of items) {
+    const category = item.category || "\u5176\u4ED6";
+    if (!categoryStats[category]) categoryStats[category] = { total: 0, completed: 0 };
+    categoryStats[category].total++;
+    const count = filtered.filter(
+      (day) => day.scores[item.id] !== void 0 && isItemDone(item, day.scores[item.id])
+    ).length;
+    categoryStats[category].completed += count;
+  }
+  statsBody.createEl("h3", { text: "\u5206\u7C7B\u5B8C\u6210\u7387", cls: "stats-section-title" });
+  const list = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  Object.entries(categoryStats).forEach(([category, stats]) => {
+    const rate = Math.round(stats.completed / (stats.total * filtered.length) * 100);
+    const row = list.createDiv({ cls: "completion-row" });
+    row.createSpan({ cls: "completion-emoji", text: "\u{1F4CB}" });
+    row.createSpan({ cls: "completion-name", text: category });
+    const wrap = row.createDiv({ cls: "completion-bar-wrap" });
+    const bar = wrap.createDiv({ cls: "completion-bar pos" });
+    bar.style.width = rate + "%";
+    row.createSpan({ cls: "completion-rate", text: rate + "%" });
+  });
+}
+function renderItemCompletion(statsBody, items, filtered) {
+  statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
+  const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  for (const item of items) {
+    const itemHistory = filtered.slice().sort((a, b) => a.date.localeCompare(b.date)).map((day) => day.scores[item.id] || 0);
+    const count = filtered.filter(
+      (day) => day.scores[item.id] !== void 0 && isItemDone(item, day.scores[item.id])
+    ).length;
+    const rate = Math.round(count / filtered.length * 100);
+    const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
+    const row = rowWrap.createDiv({ cls: "completion-row" });
+    row.createSpan({ cls: "completion-emoji", text: item.emoji });
+    row.createSpan({ cls: "completion-name", text: item.name });
+    const wrap = row.createDiv({ cls: "completion-bar-wrap" });
+    const bar = wrap.createDiv({
+      cls: "completion-bar " + (item.points >= 0 ? "pos" : "neg")
+    });
+    bar.style.width = rate + "%";
+    row.createSpan({
+      cls: "completion-rate",
+      text: count + "/" + filtered.length + " (" + rate + "%)"
+    });
+    const sparkWrap = rowWrap.createDiv({ cls: "sparkline-wrap is-hidden" });
+    const canvas = sparkWrap.createEl("canvas", { cls: "sparkline-canvas" });
+    canvas.width = 300;
+    canvas.height = 48;
+    row.onclick = () => {
+      const wasHidden = sparkWrap.hasClass("is-hidden");
+      itemList.querySelectorAll(".sparkline-wrap").forEach((el) => {
+        el.addClass("is-hidden");
+      });
+      if (wasHidden) {
+        sparkWrap.removeClass("is-hidden");
+        drawSparkline(
+          canvas,
+          itemHistory.slice(-30),
+          item.category === "\u51CF\u5206" || item.points < 0
+        );
+      }
+    };
+  }
+}
+function renderMonthlySummary(statsBody, filtered) {
+  statsBody.createEl("h3", { text: "\u6309\u6708\u6C47\u603B", cls: "stats-section-title" });
+  const byMonth = {};
+  for (const day of filtered) {
+    const month = day.date.slice(0, 7);
+    if (!byMonth[month]) byMonth[month] = [];
+    byMonth[month].push(day.total);
+  }
+  const wrap = statsBody.createDiv({ cls: "kid-score-month-table-wrap" });
+  const table = wrap.createEl("table", { cls: "kid-score-month-table" });
+  const th = table.createEl("thead").createEl("tr");
+  ["\u6708\u4EFD", "\u5929\u6570", "\u603B\u5206", "\u65E5\u5747"].forEach((header) => {
+    th.createEl("th", { text: header });
+  });
+  const tbody = table.createEl("tbody");
+  Object.entries(byMonth).sort().forEach(([month, values]) => {
+    const sum = values.reduce((a, b) => a + b, 0);
+    const avg = Math.round(sum / values.length);
+    const tr = tbody.createEl("tr");
+    tr.createEl("td", { text: month });
+    tr.createEl("td", { text: String(values.length) });
+    tr.createEl("td", { text: (sum >= 0 ? "+" : "") + sum });
+    tr.createEl("td", { text: (avg >= 0 ? "+" : "") + avg });
+  });
+}
+function isItemDone(item, val) {
+  const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+  return isDeduct ? val !== 0 : val > 0;
+}
+function countPositiveStreak(filtered) {
+  let streak = 0;
+  const sortedScores = filtered.slice().sort((a, b) => +new Date(b.date) - +new Date(a.date));
+  for (const score of sortedScores) {
+    if (score.total > 0) streak++;
+    else break;
+  }
+  return streak;
+}
+function drawBarChart(canvas, data) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx || !data.length) return;
+  const width = canvas.width;
+  const height = canvas.height;
+  const pad = { top: 24, bottom: 32, left: 8, right: 8 };
+  const chartHeight = height - pad.top - pad.bottom;
+  const midY = pad.top + chartHeight * 0.6;
+  const maxAbs = Math.max(...data.map((score) => Math.abs(score.total)).concat([1]));
+  const barWidth = Math.max(
+    Math.floor((width - pad.left - pad.right) / data.length) - 4,
+    6
+  );
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#f5f5f5";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#aaa";
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(pad.left, midY);
+  ctx.lineTo(width - pad.right, midY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  data.forEach((score, index) => {
+    const x = pad.left + index * (barWidth + 4);
+    const pixPer = chartHeight * 0.55 / maxAbs;
+    const barHeight = Math.abs(score.total) * pixPer;
+    const isPositive = score.total >= 0;
+    ctx.fillStyle = isPositive ? "#4ade80" : "#f87171";
+    ctx.fillRect(x, isPositive ? midY - barHeight : midY, barWidth, barHeight);
+    ctx.fillStyle = "#333";
+    ctx.font = "bold " + Math.min(11, barWidth) + "px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      String(score.total),
+      x + barWidth / 2,
+      isPositive ? midY - barHeight - 4 : midY + barHeight + 12
+    );
+    ctx.font = "9px sans-serif";
+    ctx.fillStyle = "#999";
+    ctx.fillText(score.date.slice(5), x + barWidth / 2, height - 4);
+  });
+}
+function drawSparkline(canvas, data, isDeduct) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx || data.length === 0) return;
+  const width = canvas.width;
+  const height = canvas.height;
+  const pad = 4;
+  const maxAbs = Math.max(...data.map((value) => Math.abs(value)), 1);
+  const step = data.length > 1 ? (width - pad * 2) / (data.length - 1) : 0;
+  const baselineY = height / 2;
+  ctx.clearRect(0, 0, width, height);
+  ctx.strokeStyle = isDeduct ? "#f87171" : "#4ade80";
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  data.forEach((value, index) => {
+    const x = pad + index * step;
+    const y = baselineY - value / maxAbs * (baselineY - pad);
+    if (index === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+  ctx.fillStyle = isDeduct ? "#f87171" : "#4ade80";
+  data.forEach((value, index) => {
+    const x = pad + index * step;
+    const y = baselineY - value / maxAbs * (baselineY - pad);
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
 // src/modals/stats-modal.ts
 var StatsModal = class extends BaseMobileModal {
   constructor(app, plugin) {
@@ -1903,242 +1814,8 @@ var StatsModal = class extends BaseMobileModal {
       { label: "\u5168\u90E8", key: "all" }
     ];
     let activePeriod = "week";
-    const self = this;
-    const filterScores = (period, scores) => {
-      const today = /* @__PURE__ */ new Date();
-      if (period === "week") {
-        const ws = new Date(today);
-        ws.setDate(today.getDate() - today.getDay() + 1);
-        return scores.filter((s) => s.date >= ws.toISOString().slice(0, 10));
-      } else if (period === "month") {
-        const ms = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-01";
-        return scores.filter((s) => s.date >= ms);
-      }
-      return scores;
-    };
-    const drawBarChart = (canvas, data) => {
-      const ctx = canvas.getContext("2d");
-      if (!ctx || !data.length) return;
-      const W = canvas.width, H = canvas.height;
-      const pad = { top: 24, bottom: 32, left: 8, right: 8 };
-      const chartH = H - pad.top - pad.bottom;
-      const midY = pad.top + chartH * 0.6;
-      const maxAbs = Math.max(...data.map((s) => Math.abs(s.total)).concat([1]));
-      const barW = Math.max(Math.floor((W - pad.left - pad.right) / data.length) - 4, 6);
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#f5f5f5";
-      ctx.fillRect(0, 0, W, H);
-      ctx.strokeStyle = "#aaa";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(pad.left, midY);
-      ctx.lineTo(W - pad.right, midY);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      data.forEach((score, i) => {
-        const x = pad.left + i * (barW + 4);
-        const pixPer = chartH * 0.55 / maxAbs;
-        const barH = Math.abs(score.total) * pixPer;
-        const isPos = score.total >= 0;
-        ctx.fillStyle = isPos ? "#4ade80" : "#f87171";
-        ctx.fillRect(x, isPos ? midY - barH : midY, barW, barH);
-        ctx.fillStyle = "#333";
-        ctx.font = "bold " + Math.min(11, barW) + "px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(String(score.total), x + barW / 2, isPos ? midY - barH - 4 : midY + barH + 12);
-        ctx.font = "9px sans-serif";
-        ctx.fillStyle = "#999";
-        ctx.fillText(score.date.slice(5), x + barW / 2, H - 4);
-      });
-    };
     const renderStats = (period) => {
-      statsBody.empty();
-      const filtered = filterScores(period, allScores);
-      if (!filtered.length) {
-        statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "kid-score-empty" });
-        return;
-      }
-      const total = filtered.reduce((s, r) => s + r.total, 0);
-      const avg = Math.round(total / filtered.length * 10) / 10;
-      const max = Math.max(...filtered.map((s) => s.total));
-      let streak = 0;
-      const sortedScores = filtered.sort((a, b) => +new Date(b.date) - +new Date(a.date));
-      for (const s of sortedScores) {
-        if (s.total > 0) streak++;
-        else break;
-      }
-      const positiveDays = filtered.filter((s) => s.total > 0).length;
-      const negativeDays = filtered.filter((s) => s.total < 0).length;
-      const neutralDays = filtered.filter((s) => s.total === 0).length;
-      const calcCompleted = (day) => {
-        let completed = (day.customItems || []).length;
-        for (const item of self.plugin.currentUser.items) {
-          const val = day.scores[item.id] || 0;
-          const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
-          if (isDeduct ? val !== 0 : val > 0) completed++;
-        }
-        return completed;
-      };
-      const cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
-      const mkCard = (l, v, a) => {
-        const c = cards.createDiv({ cls: "summary-card " + (a ? "accent" : "") });
-        c.createDiv({ cls: "card-val", text: v });
-        c.createDiv({ cls: "card-lbl", text: l });
-      };
-      mkCard("\u7D2F\u8BA1\u603B\u5206", (total >= 0 ? "+" : "") + total, true);
-      mkCard("\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
-      mkCard("\u6700\u9AD8\u5355\u65E5", "+" + max);
-      mkCard("\u8BB0\u5F55\u5929\u6570", filtered.length + " \u5929");
-      mkCard("\u8FDE\u7EED\u6253\u5206", streak + " \u5929");
-      mkCard("\u6B63\u9762\u5929\u6570", positiveDays + " \u5929");
-      mkCard("\u8D1F\u9762\u5929\u6570", negativeDays + " \u5929");
-      const goals = self.plugin.currentUser.goals || { daily: 10, weekly: 70, monthly: 300 };
-      let goalLabel = "";
-      let goalTarget = 0;
-      let goalCompleted = 0;
-      if (period === "week") {
-        goalLabel = "\u672C\u5468\u76EE\u6807";
-        goalTarget = goals.weekly;
-        goalCompleted = filtered.reduce((s, d) => s + calcCompleted(d), 0);
-      } else if (period === "month") {
-        goalLabel = "\u672C\u6708\u76EE\u6807";
-        goalTarget = goals.monthly;
-        goalCompleted = filtered.reduce((s, d) => s + calcCompleted(d), 0);
-      }
-      if (goalTarget > 0) {
-        const goalPct = Math.min(100, Math.round(goalCompleted / goalTarget * 100));
-        const goalCard = cards.createDiv({ cls: "summary-card goal-card" });
-        goalCard.createDiv({ cls: "card-val", text: goalCompleted + "/" + goalTarget });
-        goalCard.createDiv({ cls: "card-lbl", text: goalLabel });
-        const gBarWrap = goalCard.createDiv({ cls: "summary-goal-bar-wrap" });
-        const gBar = gBarWrap.createDiv({ cls: "summary-goal-bar" });
-        gBar.style.width = goalPct + "%";
-        if (goalPct >= 100) gBar.addClass("is-complete");
-      }
-      if (self.plugin.currentUser.items.length > 0) {
-        const categories = self.plugin.currentUser.categories || [];
-        const categoryStats = {};
-        categories.forEach((cat) => {
-          categoryStats[cat] = { total: 0, completed: 0 };
-        });
-        const isItemDone = (item, val) => {
-          const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
-          return isDeduct ? val !== 0 : val > 0;
-        };
-        for (const item of self.plugin.currentUser.items) {
-          const cat = item.category || "\u5176\u4ED6";
-          if (!categoryStats[cat]) {
-            categoryStats[cat] = { total: 0, completed: 0 };
-          }
-          categoryStats[cat].total++;
-          const count = filtered.filter((s) => s.scores[item.id] !== void 0 && isItemDone(item, s.scores[item.id])).length;
-          categoryStats[cat].completed += count;
-        }
-        statsBody.createEl("h3", { text: "\u6807\u9898\u5206\u7C7B\u5B8C\u6210\u7387", cls: "stats-section-title" });
-        const categoryList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-        Object.entries(categoryStats).forEach(([cat, stats]) => {
-          const rate = Math.round(stats.completed / (stats.total * filtered.length) * 100);
-          const row2 = categoryList.createDiv({ cls: "completion-row" });
-          row2.createSpan({ cls: "completion-emoji", text: "\u{1F4CB}" });
-          row2.createSpan({ cls: "completion-name", text: cat });
-          const bw2 = row2.createDiv({ cls: "completion-bar-wrap" });
-          const bar2 = bw2.createDiv({ cls: "completion-bar pos" });
-          bar2.style.width = rate + "%";
-          row2.createSpan({ cls: "completion-rate", text: rate + "%" });
-        });
-        statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
-        const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-        const drawSparkline = (canvas2, data, isDeduct) => {
-          const ctx = canvas2.getContext("2d");
-          if (!ctx || data.length === 0) return;
-          const W = canvas2.width;
-          const H = canvas2.height;
-          ctx.clearRect(0, 0, W, H);
-          const pad = 4;
-          const maxAbs = Math.max(...data.map((v) => Math.abs(v)), 1);
-          const step = data.length > 1 ? (W - pad * 2) / (data.length - 1) : 0;
-          const baselineY = H / 2;
-          ctx.strokeStyle = isDeduct ? "#f87171" : "#4ade80";
-          ctx.lineWidth = 2;
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.beginPath();
-          data.forEach((v, i) => {
-            const x = pad + i * step;
-            const y = baselineY - v / maxAbs * (baselineY - pad);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-          });
-          ctx.stroke();
-          ctx.fillStyle = isDeduct ? "#f87171" : "#4ade80";
-          data.forEach((v, i) => {
-            const x = pad + i * step;
-            const y = baselineY - v / maxAbs * (baselineY - pad);
-            ctx.beginPath();
-            ctx.arc(x, y, 2, 0, Math.PI * 2);
-            ctx.fill();
-          });
-        };
-        for (const item of self.plugin.currentUser.items) {
-          const itemHistory = filtered.slice().sort((a, b) => a.date.localeCompare(b.date)).map((s) => s.scores[item.id] || 0);
-          const count = filtered.filter((s) => s.scores[item.id] !== void 0 && isItemDone(item, s.scores[item.id])).length;
-          const rate = Math.round(count / filtered.length * 100);
-          const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
-          const row = rowWrap.createDiv({ cls: "completion-row" });
-          row.createSpan({ cls: "completion-emoji", text: item.emoji });
-          row.createSpan({ cls: "completion-name", text: item.name });
-          const bw = row.createDiv({ cls: "completion-bar-wrap" });
-          const bar = bw.createDiv({ cls: "completion-bar " + (item.points >= 0 ? "pos" : "neg") });
-          bar.style.width = rate + "%";
-          row.createSpan({ cls: "completion-rate", text: count + "/" + filtered.length + " (" + rate + "%)" });
-          const sparkWrap = rowWrap.createDiv({ cls: "sparkline-wrap is-hidden" });
-          const canvas2 = sparkWrap.createEl("canvas", { cls: "sparkline-canvas" });
-          canvas2.width = 300;
-          canvas2.height = 48;
-          row.onclick = () => {
-            const wasHidden = sparkWrap.hasClass("is-hidden");
-            itemList.querySelectorAll(".sparkline-wrap").forEach((el) => el.addClass("is-hidden"));
-            if (wasHidden) {
-              sparkWrap.removeClass("is-hidden");
-              drawSparkline(canvas2, itemHistory.slice(-30), item.category === "\u51CF\u5206" || item.points < 0);
-            }
-          };
-        }
-      }
-      statsBody.createEl("h3", { text: "\u6BCF\u65E5\u5F97\u5206\u8D8B\u52BF", cls: "stats-section-title" });
-      const chartWrap = statsBody.createDiv({ cls: "kid-score-chart-wrap" });
-      const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
-      canvas.width = 540;
-      canvas.height = 200;
-      setTimeout(() => {
-        drawBarChart(canvas, filtered.slice(-20));
-      }, 50);
-      if (period === "all" && filtered.length > 7) {
-        statsBody.createEl("h3", { text: "\u6309\u6708\u6C47\u603B", cls: "stats-section-title" });
-        const byMonth = {};
-        for (const s of filtered) {
-          const m = s.date.slice(0, 7);
-          if (!byMonth[m]) byMonth[m] = [];
-          byMonth[m].push(s.total);
-        }
-        const monthWrap = statsBody.createDiv({ cls: "kid-score-month-table-wrap" });
-        const mt = monthWrap.createEl("table", { cls: "kid-score-month-table" });
-        const th = mt.createEl("thead").createEl("tr");
-        ["\u6708\u4EFD", "\u5929\u6570", "\u603B\u5206", "\u65E5\u5747"].forEach((h) => {
-          th.createEl("th", { text: h });
-        });
-        const tb = mt.createEl("tbody");
-        Object.entries(byMonth).sort().forEach((e) => {
-          const sum = e[1].reduce((a, b) => a + b, 0);
-          const av = Math.round(sum / e[1].length);
-          const tr = tb.createEl("tr");
-          tr.createEl("td", { text: e[0] });
-          tr.createEl("td", { text: String(e[1].length) });
-          tr.createEl("td", { text: (sum >= 0 ? "+" : "") + sum });
-          tr.createEl("td", { text: (av >= 0 ? "+" : "") + av });
-        });
-      }
+      renderStatsPanel(statsBody, this.plugin, allScores, period);
     };
     for (const p of periods) {
       ((period) => {
@@ -2163,52 +1840,235 @@ var StatsModal = class extends BaseMobileModal {
   }
 };
 
-// src/modals/popups/attach-file-modal.ts
-var AttachFileModal = class extends BaseMobileModal {
-  constructor(app, plugin, label, dateStr, onConfirm) {
-    super(app, plugin);
-    this.label = label;
-    this.dateStr = dateStr;
-    this.onConfirm = onConfirm;
+// src/modals/popups/calendar-picker.ts
+function openCalendarPicker({
+  currentDate,
+  recordDates,
+  onSelect
+}) {
+  const overlay = document.createElement("div");
+  overlay.className = "kid-score-value-overlay";
+  const popup = document.createElement("div");
+  popup.className = "kid-score-calendar-popup";
+  let viewDate = /* @__PURE__ */ new Date(currentDate + "T00:00:00");
+  const header = popup.createDiv({ cls: "cal-header" });
+  const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25C0" });
+  const monthLabel = header.createEl("span", { cls: "cal-month-label" });
+  const nextMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25B6" });
+  const grid = popup.createDiv({ cls: "cal-grid" });
+  ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"].forEach((d) => {
+    grid.createEl("div", { cls: "cal-weekday", text: d });
+  });
+  const removeOverlay = () => {
+    var _a;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
+      history.back();
+    }
+  };
+  const renderMonth = () => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+    monthLabel.textContent = year + "\u5E74" + (month + 1) + "\u6708";
+    grid.querySelectorAll(".cal-day").forEach((el) => el.remove());
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startOffset = firstDay.getDay();
+    const todayStr = formatDate(0);
+    for (let i = 0; i < startOffset; i++) {
+      grid.createEl("div", { cls: "cal-day is-empty" });
+    }
+    for (let d = 1; d <= lastDay.getDate(); d++) {
+      const ds = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+      const cell = grid.createEl("button", { cls: "cal-day" });
+      cell.textContent = String(d);
+      if (ds === currentDate) cell.addClass("is-selected");
+      if (ds === todayStr) cell.addClass("is-today");
+      if (recordDates.has(ds)) cell.addClass("has-record");
+      cell.onclick = () => {
+        if (ds > todayStr) return;
+        onSelect(ds);
+        removeOverlay();
+      };
+    }
+  };
+  prevMonthBtn.onclick = () => {
+    viewDate.setMonth(viewDate.getMonth() - 1);
+    renderMonth();
+  };
+  nextMonthBtn.onclick = () => {
+    viewDate.setMonth(viewDate.getMonth() + 1);
+    renderMonth();
+  };
+  renderMonth();
+  const cancelBtn = popup.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+  cancelBtn.style.marginTop = "10px";
+  cancelBtn.style.width = "100%";
+  cancelBtn.onclick = () => {
+    removeOverlay();
+  };
+  popup.appendChild(cancelBtn);
+  overlay.appendChild(popup);
+  const onPopstate = (e) => {
+    var _a;
+    if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
+      overlay.remove();
+      window.removeEventListener("popstate", onPopstate);
+    }
+  };
+  history.pushState({ kidScoreOverlay: true }, "");
+  window.addEventListener("popstate", onPopstate);
+  overlay.addEventListener("mousedown", (e) => {
+    if (e.target === overlay) {
+      e.preventDefault();
+      removeOverlay();
+    }
+  });
+  document.body.appendChild(overlay);
+}
+
+// src/modals/panels/diary-panel.ts
+var import_obsidian2 = require("obsidian");
+
+// src/utils/dom.ts
+function getOverlayMount(containerEl) {
+  return document.body.classList.contains("is-mobile") ? document.body : containerEl || document.body;
+}
+function bindModalInputFocus(input, options = {}) {
+  if (!input) return;
+  const inp = input;
+  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const isIOS = /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const {
+    manualTouchFocus = true,
+    scrollOnIOSFocus = true
+  } = options;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchMoved = false;
+  if (inp.tagName === "INPUT" && inp.type === "number") {
+    inp.setAttribute("inputmode", "numeric");
   }
-  onOpen() {
-    super.onOpen();
-    this.titleEl.setText("\u{1F4CE} \u63D2\u5165" + this.label);
-    this.modalEl.addClass("kid-score-edit-modal");
-    const c = this.contentEl;
-    c.createEl("div", {
-      cls: "value-popup-hint",
-      text: "\u8F93\u5165\u6587\u4EF6\u540D\uFF08\u4E0D\u542B\u6269\u5C55\u540D\uFF09"
+  input.setAttribute("tabindex", "0");
+  input.addEventListener("mousedown", (e) => {
+    e.stopPropagation();
+  });
+  if (isTouch) {
+    input.addEventListener("touchstart", (e) => {
+      const touch = e.touches[0];
+      touchStartX = touch ? touch.clientX : 0;
+      touchStartY = touch ? touch.clientY : 0;
+      touchMoved = false;
+      e.stopPropagation();
+    }, { passive: true });
+    input.addEventListener("touchmove", (e) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
+        touchMoved = true;
+      }
+    }, { passive: true });
+    input.addEventListener("touchend", (e) => {
+      e.stopPropagation();
+      if (!manualTouchFocus || touchMoved) return;
+      inp.focus();
     });
-    const fileInput = c.createEl("input", { cls: "custom-form-name-input" });
-    fileInput.type = "text";
-    fileInput.placeholder = "\u4F8B\u5982: \u4ECA\u5929\u7684\u7167\u7247";
-    fileInput.autocomplete = "off";
-    bindModalInputFocus(fileInput);
-    const quickName = c.createEl("div", { cls: "value-popup-hint" });
-    quickName.style.cssText = "cursor:pointer;text-decoration:underline;margin-top:6px";
-    quickName.textContent = "\u{1F4A1} \u9ED8\u8BA4: " + this.dateStr + "-" + this.label;
-    quickName.onclick = () => {
-      fileInput.value = this.dateStr + "-" + this.label;
-    };
-    const acts = c.createDiv({ cls: "value-popup-actions" });
-    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cb.onclick = () => this.close();
-    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u63D2\u5165" });
-    ok.onclick = () => {
-      let f = fileInput.value.trim();
-      if (!f) {
-        fileInput.classList.add("is-error");
+  }
+  const setIOSKeyboardFocusState = (on) => {
+    if (!isIOS) return;
+    const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
+    const scroller = input.closest(".modal-content");
+    if (!modal || !scroller) return;
+    modal.classList.toggle("has-ios-keyboard-focus", on);
+    if (on) {
+      const target = input;
+      const forceScroll = () => {
+        const scrollerRect = scroller.getBoundingClientRect();
+        const inputRect = target.getBoundingClientRect();
+        const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
+        const desiredTop = Math.max(
+          0,
+          inputTop - Math.max(16, scroller.clientHeight * 0.1)
+        );
+        scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
+      };
+      setTimeout(forceScroll, 80);
+      setTimeout(forceScroll, 260);
+      setTimeout(forceScroll, 520);
+      setTimeout(forceScroll, 860);
+    }
+  };
+  input.addEventListener("focus", () => {
+    if (!scrollOnIOSFocus) return;
+    if (!isIOS) return;
+    setIOSKeyboardFocusState(true);
+    const scrollWithinModal = () => {
+      const scroller = input.closest(".modal-content");
+      if (!scroller) {
+        if (input.scrollIntoView) input.scrollIntoView({ block: "center", behavior: "smooth" });
         return;
       }
-      this.onConfirm(f);
-      this.close();
+      const scrollerRect = scroller.getBoundingClientRect();
+      const inputRect = input.getBoundingClientRect();
+      const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
+      const desiredTop = Math.max(
+        0,
+        inputTop - Math.max(18, scroller.clientHeight * 0.12)
+      );
+      scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
     };
-  }
-};
+    const doScroll = (delay) => {
+      setTimeout(() => {
+        scrollWithinModal();
+      }, delay);
+    };
+    doScroll(400);
+    doScroll(650);
+  });
+  input.addEventListener("blur", () => {
+    if (!isIOS) return;
+    setTimeout(() => {
+      const active = document.activeElement;
+      if (active && active.closest && active.closest(".kid-score-edit-modal, .kid-score-import-modal") === input.closest(".kid-score-edit-modal, .kid-score-import-modal")) {
+        return;
+      }
+      setIOSKeyboardFocusState(false);
+    }, 180);
+  });
+}
 
-// src/modals/popups/edit-item-modal.ts
-var import_obsidian2 = require("obsidian");
+// src/ui/emoji-picker-search.ts
+function getEmojiCategoryKeys() {
+  return Object.keys(EMOJI_DATA);
+}
+function getEmojiCategoryItems(key) {
+  return EMOJI_DATA[key] || [];
+}
+function searchEmojis(query, categoryKeys) {
+  const q = query.toLowerCase();
+  const results = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const emoji in EMOJI_SEARCH) {
+    if (EMOJI_SEARCH[emoji].includes(q) && !seen.has(emoji)) {
+      results.push(emoji);
+      seen.add(emoji);
+    }
+  }
+  if (results.length === 0) {
+    for (const key of categoryKeys) {
+      if (key.toLowerCase().includes(q)) {
+        for (const emoji of getEmojiCategoryItems(key)) {
+          if (!seen.has(emoji)) {
+            results.push(emoji);
+            seen.add(emoji);
+          }
+        }
+      }
+    }
+  }
+  return results;
+}
 
 // src/ui/emoji-picker.ts
 function showEmojiPicker(callback, container) {
@@ -2253,7 +2113,7 @@ function showEmojiPicker(callback, container) {
   popup.appendChild(customRow);
   const catTabs = document.createElement("div");
   catTabs.className = "emoji-fp-tabs";
-  const catKeys = Object.keys(EMOJI_DATA);
+  const catKeys = getEmojiCategoryKeys();
   const gridWrap = document.createElement("div");
   gridWrap.className = "emoji-fp-grid-wrap";
   const renderEmojis = (emojis) => {
@@ -2279,33 +2139,7 @@ function showEmojiPicker(callback, container) {
     gridWrap.appendChild(grid);
   };
   const renderCat = (key) => {
-    renderEmojis(EMOJI_DATA[key]);
-  };
-  const searchEmojis = (query) => {
-    const q = query.toLowerCase();
-    const results = [];
-    const seen = /* @__PURE__ */ new Set();
-    for (const em in EMOJI_SEARCH) {
-      if (EMOJI_SEARCH[em].includes(q)) {
-        if (!seen.has(em)) {
-          results.push(em);
-          seen.add(em);
-        }
-      }
-    }
-    if (results.length === 0) {
-      for (const ck of catKeys) {
-        if (ck.toLowerCase().includes(q)) {
-          for (const arrEm of EMOJI_DATA[ck]) {
-            if (!seen.has(arrEm)) {
-              results.push(arrEm);
-              seen.add(arrEm);
-            }
-          }
-        }
-      }
-    }
-    return results;
+    renderEmojis(getEmojiCategoryItems(key));
   };
   let searchTimer = null;
   let isComposing = false;
@@ -2334,7 +2168,7 @@ function showEmojiPicker(callback, container) {
       const pureEmoji = /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+$/u.test(q);
       if (pureEmoji) return;
       catTabs.style.display = "none";
-      const results = searchEmojis(q);
+      const results = searchEmojis(q, catKeys);
       renderEmojis(results);
     }, 100);
   };
@@ -2402,7 +2236,600 @@ function showEmojiPicker(callback, container) {
   }, 50);
 }
 
+// src/modals/panels/diary-panel-fields.ts
+function createDiaryModuleField({
+  moduleGrid,
+  moduleDef,
+  diaryModules,
+  moduleFields,
+  updateDiaryModules,
+  syncAndRefresh
+}) {
+  const card = moduleGrid.createDiv({ cls: "diary-module-card" });
+  card.createSpan({ cls: "diary-module-label", text: moduleDef.label });
+  const isMultiline = moduleDef.kind !== "quick";
+  const input = isMultiline ? card.createEl("textarea", { cls: "diary-module-input is-multiline" }) : card.createEl("input", { cls: "diary-module-input", type: "text" });
+  input.placeholder = moduleDef.placeholder || "";
+  input.value = diaryModules[moduleDef.id] || "";
+  bindModalInputFocus(input, { scrollOnIOSFocus: false });
+  input.addEventListener("input", () => {
+    diaryModules[moduleDef.id] = input.value.trim();
+    updateDiaryModules(diaryModules);
+    syncAndRefresh();
+  });
+  moduleFields.push({ key: moduleDef.id, input });
+}
+function createDiaryQuickGroup({
+  quickRow,
+  moduleDef,
+  defaults,
+  diaryModules,
+  moduleFields,
+  updateDiaryModules,
+  syncAndRefresh,
+  panel
+}) {
+  if (!moduleDef) return;
+  let customEmoji = defaults[0].e;
+  const group = quickRow.createDiv({ cls: "diary-quick-group" });
+  const header = group.createDiv({ cls: "diary-quick-header" });
+  header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
+  const valueInput = group.createEl("input", {
+    cls: "diary-quick-value-input",
+    type: "text"
+  });
+  valueInput.placeholder = moduleDef.placeholder || "";
+  valueInput.value = diaryModules[moduleDef.id] || "";
+  bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
+  valueInput.addEventListener("input", () => {
+    diaryModules[moduleDef.id] = valueInput.value.trim();
+    updateDiaryModules(diaryModules);
+    syncAndRefresh();
+  });
+  moduleFields.push({ key: moduleDef.id, input: valueInput });
+  const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
+  defaults.forEach((entry) => {
+    const btn = emojiRow.createEl("button", {
+      cls: "diary-quick-btn",
+      text: entry.e
+    });
+    btn.title = entry.l;
+    btn.onclick = () => {
+      valueInput.value = entry.e + " " + entry.l;
+      diaryModules[moduleDef.id] = valueInput.value.trim();
+      updateDiaryModules(diaryModules);
+      syncAndRefresh();
+    };
+  });
+  const customRow = group.createDiv({ cls: "diary-quick-custom-row" });
+  const emojiBtn = customRow.createEl("button", {
+    cls: "diary-tool-btn diary-quick-picker-btn",
+    text: customEmoji
+  });
+  emojiBtn.title = "\u9009\u62E9\u5176\u4ED6 emoji";
+  emojiBtn.onclick = () => {
+    showEmojiPicker((emoji) => {
+      customEmoji = emoji;
+      emojiBtn.textContent = emoji;
+    }, panel);
+  };
+  const textInput = customRow.createEl("input", {
+    cls: "diary-quick-text-input",
+    type: "text"
+  });
+  textInput.placeholder = "\u8F93\u5165" + moduleDef.label + "\u6216\u8865\u5145\u6587\u5B57";
+  bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+  const addBtn = customRow.createEl("button", {
+    cls: "diary-tool-btn diary-quick-add-btn",
+    text: "\u6DFB\u52A0"
+  });
+  const insertCustom = () => {
+    const text = textInput.value.trim();
+    if (!customEmoji && !text) return;
+    const body = [customEmoji, text].filter(Boolean).join(" ").trim();
+    valueInput.value = body;
+    diaryModules[moduleDef.id] = body;
+    updateDiaryModules(diaryModules);
+    syncAndRefresh();
+    textInput.value = "";
+  };
+  addBtn.onclick = insertCustom;
+  textInput.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    insertCustom();
+  });
+}
+function fillDefaultDiaryTemplate({
+  diaryModules,
+  moduleFields,
+  diaryTextarea,
+  setDiaryTextarea,
+  updateDiaryModules,
+  syncAndRefresh
+}) {
+  if (!diaryModules.weather) diaryModules.weather = "\u2600\uFE0F \u6674";
+  if (!diaryModules.mood) diaryModules.mood = "\u{1F60A} \u5F00\u5FC3";
+  if (!diaryModules.todayThing) diaryModules.todayThing = "\u4ECA\u5929\u6211\u505A\u4E86____\u3002";
+  if (!diaryModules.learnedThing) diaryModules.learnedThing = "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____\u3002";
+  if (!diaryModules.happyThing) diaryModules.happyThing = "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____\u3002";
+  if (!diaryModules.wantToSay) diaryModules.wantToSay = "\u6211\u8FD8\u60F3\u8BF4____\u3002";
+  moduleFields.forEach(({ key, input }) => {
+    if (input.value.trim()) return;
+    input.value = diaryModules[key] || "";
+  });
+  if (diaryTextarea && !diaryTextarea.value.trim()) {
+    diaryTextarea.value = "\u4ECA\u5929\u8FD8\u6709\u4E00\u4EF6\u6211\u60F3\u8BB0\u4E0B\u6765\u7684\u4E8B\uFF1A\n";
+    diaryModules.freeWrite = diaryTextarea.value;
+    setDiaryTextarea(diaryTextarea);
+  }
+  updateDiaryModules(diaryModules);
+  syncAndRefresh();
+}
+
+// src/modals/panels/diary-panel.ts
+function buildDiaryPanel(options) {
+  const {
+    app,
+    plugin,
+    component,
+    panel,
+    diaryContent,
+    setDiaryTextarea,
+    updateDiaryContent,
+    updateDiaryModules,
+    composeDiaryContent: composeDiaryContent2,
+    insertAttachment
+  } = options;
+  const diaryModules = options.diaryModules;
+  let currentDiaryContent = diaryContent;
+  const moduleFields = [];
+  const moduleConfig = plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length ? plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+  let isPreview = false;
+  let previewWrap = null;
+  let previewButtonBinder = (_active) => {
+  };
+  let diaryTextarea = null;
+  let textareaWrap = null;
+  let charCount = null;
+  const updateCharCount = () => {
+    if (charCount) charCount.textContent = (currentDiaryContent || "").length + " \u5B57";
+  };
+  const syncAndRefresh = () => {
+    currentDiaryContent = composeDiaryContent2();
+    updateDiaryContent(currentDiaryContent);
+    updateCharCount();
+    if (!isPreview || !previewWrap) return;
+    previewWrap.empty();
+    import_obsidian2.MarkdownRenderer.render(app, currentDiaryContent || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", previewWrap, "", component);
+  };
+  const scrollDiaryTargetIntoView = (target) => {
+    if (!target) return;
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+    });
+  };
+  const toolbar = panel.createDiv({ cls: "diary-toolbar" });
+  const templateBtn = toolbar.createEl("button", {
+    cls: "diary-tool-btn",
+    text: "\u{1F4CB} \u586B\u5165\u9ED8\u8BA4\u6A21\u677F"
+  });
+  templateBtn.onclick = () => {
+    fillDefaultDiaryTemplate({
+      diaryModules,
+      moduleFields,
+      diaryTextarea,
+      setDiaryTextarea,
+      updateDiaryModules,
+      syncAndRefresh
+    });
+    if (moduleFields[0]) moduleFields[0].input.focus();
+  };
+  [
+    { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
+    { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
+    { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
+  ].forEach((asset) => {
+    const btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: asset.t });
+    btn.onclick = () => insertAttachment(asset.t.split(" ")[1], asset.e);
+  });
+  const togglePreview = () => {
+    isPreview = !isPreview;
+    if (isPreview) {
+      currentDiaryContent = composeDiaryContent2();
+      updateDiaryContent(currentDiaryContent);
+      if (diaryTextarea) diaryTextarea.rows = 5;
+      if (previewWrap) {
+        previewWrap.style.display = "";
+        previewWrap.empty();
+        import_obsidian2.MarkdownRenderer.render(app, currentDiaryContent || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_", previewWrap, "", component);
+      }
+      scrollDiaryTargetIntoView(previewWrap);
+    } else {
+      if (diaryTextarea) {
+        diaryTextarea.rows = 12;
+        diaryTextarea.focus();
+      }
+      if (previewWrap) previewWrap.style.display = "none";
+      scrollDiaryTargetIntoView(textareaWrap);
+    }
+    previewButtonBinder(isPreview);
+  };
+  const moduleSection = panel.createDiv({ cls: "diary-module-section" });
+  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
+  moduleSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
+  });
+  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
+  const weatherModule = moduleConfig.find((moduleDef) => moduleDef.id === "weather");
+  const moodModule = moduleConfig.find((moduleDef) => moduleDef.id === "mood");
+  moduleConfig.filter((moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood").forEach(
+    (moduleDef) => createDiaryModuleField({
+      moduleGrid,
+      moduleDef,
+      diaryModules,
+      moduleFields,
+      updateDiaryModules,
+      syncAndRefresh
+    })
+  );
+  const quickRow = panel.createDiv({ cls: "diary-quick-row" });
+  const weatherEmojis = [
+    { e: "\u2600\uFE0F", l: "\u6674" },
+    { e: "\u26C5", l: "\u591A\u4E91" },
+    { e: "\u{1F327}\uFE0F", l: "\u96E8" },
+    { e: "\u{1F328}\uFE0F", l: "\u96EA" },
+    { e: "\u{1F32C}\uFE0F", l: "\u98CE" },
+    { e: "\u{1F324}\uFE0F", l: "\u6674\u8F6C\u591A\u4E91" }
+  ];
+  const moodEmojis = [
+    { e: "\u{1F60A}", l: "\u5F00\u5FC3" },
+    { e: "\u{1F60E}", l: "\u5F88\u68D2" },
+    { e: "\u{1F914}", l: "\u601D\u8003" },
+    { e: "\u{1F622}", l: "\u96BE\u8FC7" },
+    { e: "\u{1F620}", l: "\u751F\u6C14" },
+    { e: "\u{1F634}", l: "\u56F0" }
+  ];
+  createDiaryQuickGroup({
+    quickRow,
+    moduleDef: weatherModule,
+    defaults: weatherEmojis,
+    diaryModules,
+    moduleFields,
+    updateDiaryModules,
+    syncAndRefresh,
+    panel
+  });
+  createDiaryQuickGroup({
+    quickRow,
+    moduleDef: moodModule,
+    defaults: moodEmojis,
+    diaryModules,
+    moduleFields,
+    updateDiaryModules,
+    syncAndRefresh,
+    panel
+  });
+  textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
+  textareaWrap.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+  textareaWrap.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
+  });
+  diaryTextarea = textareaWrap.createEl("textarea", {
+    cls: "diary-textarea",
+    placeholder: "\u4F8B\u5982\uFF1A\u4ECA\u5929\u653E\u5B66\u540E\uFF0C\u6211\u548C\u5988\u5988\u4E00\u8D77\u53BB\u4E86\u516C\u56ED..."
+  });
+  bindModalInputFocus(diaryTextarea);
+  diaryTextarea.value = diaryModules.freeWrite || "";
+  diaryTextarea.rows = 12;
+  diaryTextarea.oninput = () => {
+    diaryModules.freeWrite = diaryTextarea.value;
+    updateDiaryModules(diaryModules);
+    syncAndRefresh();
+  };
+  setDiaryTextarea(diaryTextarea);
+  previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
+  previewWrap.style.display = "none";
+  charCount = panel.createDiv({ cls: "diary-char-count" });
+  updateDiaryContent(currentDiaryContent);
+  updateCharCount();
+  return {
+    togglePreview,
+    bindActionButtons: ({ previewBtn, saveBtn, statsBtn, actions }) => {
+      previewButtonBinder = (active) => {
+        previewBtn.textContent = active ? "\u8FD4\u56DE\u7F16\u8F91" : "\u67E5\u770B\u9884\u89C8";
+        previewBtn.classList.toggle("is-active", active);
+        saveBtn.textContent = active ? "\u{1F4BE} \u786E\u8BA4\u4FDD\u5B58" : "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55";
+        saveBtn.classList.toggle("is-preview-ready", active);
+        if (statsBtn) statsBtn.classList.toggle("is-muted-during-preview", active);
+        actions.classList.toggle("is-preview-mode", active);
+      };
+      previewButtonBinder(isPreview);
+    }
+  };
+}
+
+// src/modals/popups/add-custom-modal.ts
+var AddCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, onAdded) {
+    super(app, plugin);
+    this.onAdded = onAdded;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879");
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    c.createEl("div", { cls: "value-popup-hint", text: "\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0" });
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = "\u2B50";
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.placeholder = "\u4E8B\u9879\u540D\u79F0...";
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = "1";
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
+    ok.onclick = () => {
+      const n = nameInput.value.trim();
+      if (!n) {
+        nameInput.classList.add("is-error");
+        return;
+      }
+      this.onAdded(
+        emojiInput.value.trim() || "\u2B50",
+        n,
+        parseInt(pi.value) || 0,
+        noteInput.value.trim()
+      );
+      this.close();
+    };
+  }
+};
+
+// src/modals/popups/add-item-modal.ts
+var import_obsidian3 = require("obsidian");
+var AddItemModal = class extends BaseMobileModal {
+  constructor(app, plugin, category, onAdded) {
+    super(app, plugin);
+    this.category = category;
+    this.onAdded = onAdded;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u2795 \u65B0\u589E\u6253\u5206\u9879 \xB7 " + this.category);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = "\u2B50";
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u540D\u79F0" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.placeholder = "\u6253\u5206\u9879\u540D\u79F0...";
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = "1";
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
+    ok.onclick = async () => {
+      try {
+        const n = nameInput.value.trim();
+        if (!n) {
+          nameInput.classList.add("is-error");
+          return;
+        }
+        this.plugin.currentUser.items.push({
+          id: "item_" + Date.now(),
+          name: n,
+          points: parseInt(pi.value) || 1,
+          emoji: emojiInput.value.trim() || "\u2B50",
+          category: this.category,
+          note: ""
+        });
+        const cats = this.plugin.currentUser.categories || [];
+        this.plugin.currentUser.items.sort((a, b) => {
+          let ai = cats.indexOf(a.category);
+          if (ai === -1) ai = 9999;
+          let bi = cats.indexOf(b.category);
+          if (bi === -1) bi = 9999;
+          return ai - bi;
+        });
+        await this.plugin.saveSettings();
+        this.close();
+        this.onAdded();
+      } catch (e) {
+        new import_obsidian3.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+      }
+    };
+  }
+};
+
+// src/modals/popups/attach-file-modal.ts
+var AttachFileModal = class extends BaseMobileModal {
+  constructor(app, plugin, label, dateStr, onConfirm) {
+    super(app, plugin);
+    this.label = label;
+    this.dateStr = dateStr;
+    this.onConfirm = onConfirm;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u{1F4CE} \u63D2\u5165" + this.label);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.createEl("div", {
+      cls: "value-popup-hint",
+      text: "\u8F93\u5165\u6587\u4EF6\u540D\uFF08\u4E0D\u542B\u6269\u5C55\u540D\uFF09"
+    });
+    const fileInput = c.createEl("input", { cls: "custom-form-name-input" });
+    fileInput.type = "text";
+    fileInput.placeholder = "\u4F8B\u5982: \u4ECA\u5929\u7684\u7167\u7247";
+    fileInput.autocomplete = "off";
+    bindModalInputFocus(fileInput);
+    const quickName = c.createEl("div", { cls: "value-popup-hint" });
+    quickName.style.cssText = "cursor:pointer;text-decoration:underline;margin-top:6px";
+    quickName.textContent = "\u{1F4A1} \u9ED8\u8BA4: " + this.dateStr + "-" + this.label;
+    quickName.onclick = () => {
+      fileInput.value = this.dateStr + "-" + this.label;
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u63D2\u5165" });
+    ok.onclick = () => {
+      let f = fileInput.value.trim();
+      if (!f) {
+        fileInput.classList.add("is-error");
+        return;
+      }
+      this.onConfirm(f);
+      this.close();
+    };
+  }
+};
+
+// src/modals/popups/edit-custom-modal.ts
+var EditCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, onSave) {
+    super(app, plugin);
+    this.item = item;
+    this.onSave = onSave;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879");
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    c.addClass("kid-score-custom-form");
+    const emojiRow = c.createDiv({ cls: "custom-form-row" });
+    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
+    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    emojiInput.value = this.item.emoji;
+    emojiInput.maxLength = 2;
+    bindModalInputFocus(emojiInput);
+    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
+    emojiPickBtn.style.marginLeft = "4px";
+    emojiPickBtn.onclick = () => {
+      showEmojiPicker((em) => {
+        emojiInput.value = em;
+      }, this.containerEl);
+    };
+    const nameRow = c.createDiv({ cls: "custom-form-row" });
+    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
+    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    nameInput.value = this.item.name;
+    nameInput.autocomplete = "off";
+    bindModalInputFocus(nameInput);
+    const pointsRow = c.createDiv({ cls: "custom-form-row" });
+    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
+    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
+    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
+    pi.value = String(this.item.points);
+    bindModalInputFocus(pi);
+    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    pm.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") - 1);
+    };
+    pp.onclick = () => {
+      pi.value = String(parseInt(pi.value || "0") + 1);
+    };
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.value = this.item.note || "";
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
+    ok.onclick = () => {
+      const n = nameInput.value.trim();
+      if (!n) {
+        nameInput.classList.add("is-error");
+        return;
+      }
+      this.onSave(
+        emojiInput.value.trim() || "\u2B50",
+        n,
+        parseInt(pi.value) || 0,
+        noteInput.value.trim()
+      );
+      this.close();
+    };
+  }
+};
+
 // src/modals/popups/edit-item-modal.ts
+var import_obsidian4 = require("obsidian");
 var EditItemModal = class extends BaseMobileModal {
   constructor(app, plugin, item, onSave) {
     super(app, plugin);
@@ -2534,12 +2961,51 @@ var EditItemModal = class extends BaseMobileModal {
         this.close();
         this.onSave();
       } catch (e) {
-        new import_obsidian2.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+        new import_obsidian4.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
       }
     };
     acts.appendChild(cancelBtn);
     acts.appendChild(saveBtn);
     c.appendChild(acts);
+  }
+};
+
+// src/modals/popups/quick-custom-modal.ts
+var QuickCustomModal = class extends BaseMobileModal {
+  constructor(app, plugin, item, onConfirm) {
+    super(app, plugin);
+    this.item = item;
+    this.onConfirm = onConfirm;
+  }
+  onOpen() {
+    super.onOpen();
+    this.titleEl.setText(this.item.emoji + " " + this.item.name);
+    this.modalEl.addClass("kid-score-edit-modal");
+    const c = this.contentEl;
+    if (this.item.note) {
+      c.createEl("div", { cls: "value-popup-note", text: this.item.note });
+    }
+    c.createEl("div", { cls: "value-popup-hint", text: "\u5FEB\u901F\u4FEE\u6539\u5206\u503C" });
+    const controls = c.createDiv({ cls: "value-popup-controls" });
+    const minus = controls.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
+    const input = controls.createEl("input", { type: "number", cls: "value-popup-input" });
+    input.value = String(this.item.points || 0);
+    const plus = controls.createEl("button", { cls: "value-popup-adjust", text: "+" });
+    bindModalInputFocus(input);
+    minus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") - 1);
+    };
+    plus.onclick = () => {
+      input.value = String(parseInt(input.value || "0") + 1);
+    };
+    const acts = c.createDiv({ cls: "value-popup-actions" });
+    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
+    cb.onclick = () => this.close();
+    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
+    ok.onclick = () => {
+      this.onConfirm(parseInt(input.value) || 0);
+      this.close();
+    };
   }
 };
 
@@ -2606,277 +3072,734 @@ var ScoreItemModal = class extends BaseMobileModal {
   }
 };
 
-// src/modals/popups/add-item-modal.ts
-var import_obsidian3 = require("obsidian");
-var AddItemModal = class extends BaseMobileModal {
-  constructor(app, plugin, category, onAdded) {
-    super(app, plugin);
-    this.category = category;
-    this.onAdded = onAdded;
-  }
-  onOpen() {
-    super.onOpen();
-    this.titleEl.setText("\u2795 \u65B0\u589E\u6253\u5206\u9879 \xB7 " + this.category);
-    this.modalEl.addClass("kid-score-edit-modal");
-    const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
-    const emojiRow = c.createDiv({ cls: "custom-form-row" });
-    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
-    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
-    emojiInput.value = "\u2B50";
-    emojiInput.maxLength = 2;
-    bindModalInputFocus(emojiInput);
-    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
-    emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = () => {
-      showEmojiPicker((em) => {
-        emojiInput.value = em;
-      }, this.containerEl);
-    };
-    const nameRow = c.createDiv({ cls: "custom-form-row" });
-    nameRow.createSpan({ cls: "custom-form-label", text: "\u540D\u79F0" });
-    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
-    nameInput.placeholder = "\u6253\u5206\u9879\u540D\u79F0...";
-    nameInput.autocomplete = "off";
-    bindModalInputFocus(nameInput);
-    const pointsRow = c.createDiv({ cls: "custom-form-row" });
-    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
-    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
-    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
-    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
-    pi.value = "1";
-    bindModalInputFocus(pi);
-    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
-    pm.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") - 1);
-    };
-    pp.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") + 1);
-    };
-    const acts = c.createDiv({ cls: "value-popup-actions" });
-    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cb.onclick = () => this.close();
-    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
-    ok.onclick = async () => {
-      try {
-        const n = nameInput.value.trim();
-        if (!n) {
-          nameInput.classList.add("is-error");
-          return;
-        }
-        this.plugin.currentUser.items.push({
-          id: "item_" + Date.now(),
-          name: n,
-          points: parseInt(pi.value) || 1,
-          emoji: emojiInput.value.trim() || "\u2B50",
-          category: this.category,
-          note: ""
-        });
-        const cats = this.plugin.currentUser.categories || [];
-        this.plugin.currentUser.items.sort((a, b) => {
-          let ai = cats.indexOf(a.category);
-          if (ai === -1) ai = 9999;
-          let bi = cats.indexOf(b.category);
-          if (bi === -1) bi = 9999;
-          return ai - bi;
-        });
-        await this.plugin.saveSettings();
-        this.close();
-        this.onAdded();
-      } catch (e) {
-        new import_obsidian3.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-      }
-    };
-  }
-};
+// src/modals/helpers/daily-modal-actions.ts
+function openScoreItemValueModal(options) {
+  const { app, plugin, item, currentValue, quickOnly = false, onValue, onRefresh } = options;
+  const openEdit = () => {
+    new EditItemModal(app, plugin, item, async () => {
+      await onRefresh();
+    }).open();
+  };
+  new ScoreItemModal(app, plugin, item, currentValue, quickOnly, onValue, openEdit).open();
+}
+function openAddItemModal(app, plugin, category, onRefresh) {
+  new AddItemModal(app, plugin, category, async () => {
+    await onRefresh();
+  }).open();
+}
+function openAttachmentInsertModal(options) {
+  const { app, plugin, label, ext, dateStr, onInsert } = options;
+  new AttachFileModal(app, plugin, label, dateStr, (fileName) => {
+    let filename = fileName;
+    if (!filename.includes(".")) filename += "." + ext;
+    onInsert("\n![[" + filename + "]]\n");
+  }).open();
+}
+function openAddCustomItemModal(options) {
+  new AddCustomModal(options.app, options.plugin, options.onSubmit).open();
+}
+function openEditCustomItemModal(options) {
+  const { app, plugin, customItem, onSubmit } = options;
+  if (!customItem) return;
+  new EditCustomModal(app, plugin, customItem, onSubmit).open();
+}
+function openQuickCustomAdjustModal(options) {
+  const { app, plugin, customItem, onSubmit } = options;
+  if (!customItem) return;
+  new QuickCustomModal(app, plugin, customItem, onSubmit).open();
+}
 
-// src/modals/popups/add-custom-modal.ts
-var AddCustomModal = class extends BaseMobileModal {
-  constructor(app, plugin, onAdded) {
-    super(app, plugin);
-    this.onAdded = onAdded;
-  }
-  onOpen() {
-    super.onOpen();
-    this.titleEl.setText("\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879");
-    this.modalEl.addClass("kid-score-edit-modal");
-    const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
-    c.createEl("div", { cls: "value-popup-hint", text: "\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0" });
-    const emojiRow = c.createDiv({ cls: "custom-form-row" });
-    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
-    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
-    emojiInput.value = "\u2B50";
-    emojiInput.maxLength = 2;
-    bindModalInputFocus(emojiInput);
-    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
-    emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = () => {
-      showEmojiPicker((em) => {
-        emojiInput.value = em;
-      }, this.containerEl);
-    };
-    const nameRow = c.createDiv({ cls: "custom-form-row" });
-    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
-    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
-    nameInput.placeholder = "\u4E8B\u9879\u540D\u79F0...";
-    nameInput.autocomplete = "off";
-    bindModalInputFocus(nameInput);
-    const pointsRow = c.createDiv({ cls: "custom-form-row" });
-    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
-    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
-    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
-    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
-    pi.value = "1";
-    bindModalInputFocus(pi);
-    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
-    pm.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") - 1);
-    };
-    pp.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") + 1);
-    };
-    const noteRow = c.createDiv({ cls: "custom-form-row" });
-    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
-    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
-    noteInput.addClass("custom-form-note-input");
-    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
-    noteInput.autocomplete = "off";
-    bindModalInputFocus(noteInput);
-    const acts = c.createDiv({ cls: "value-popup-actions" });
-    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cb.onclick = () => this.close();
-    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u6DFB\u52A0" });
-    ok.onclick = () => {
-      const n = nameInput.value.trim();
-      if (!n) {
-        nameInput.classList.add("is-error");
-        return;
-      }
-      this.onAdded(
-        emojiInput.value.trim() || "\u2B50",
-        n,
-        parseInt(pi.value) || 0,
-        noteInput.value.trim()
-      );
-      this.close();
-    };
-  }
-};
-
-// src/modals/popups/edit-custom-modal.ts
-var EditCustomModal = class extends BaseMobileModal {
-  constructor(app, plugin, item, onSave) {
-    super(app, plugin);
-    this.item = item;
-    this.onSave = onSave;
-  }
-  onOpen() {
-    super.onOpen();
-    this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879");
-    this.modalEl.addClass("kid-score-edit-modal");
-    const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
-    const emojiRow = c.createDiv({ cls: "custom-form-row" });
-    emojiRow.createSpan({ cls: "custom-form-label", text: "\u56FE\u6807" });
-    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
-    emojiInput.value = this.item.emoji;
-    emojiInput.maxLength = 2;
-    bindModalInputFocus(emojiInput);
-    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "\u{1F50D}" });
-    emojiPickBtn.style.marginLeft = "4px";
-    emojiPickBtn.onclick = () => {
-      showEmojiPicker((em) => {
-        emojiInput.value = em;
-      }, this.containerEl);
-    };
-    const nameRow = c.createDiv({ cls: "custom-form-row" });
-    nameRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
-    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
-    nameInput.value = this.item.name;
-    nameInput.autocomplete = "off";
-    bindModalInputFocus(nameInput);
-    const pointsRow = c.createDiv({ cls: "custom-form-row" });
-    pointsRow.createSpan({ cls: "custom-form-label", text: "\u5206\u503C" });
-    const pc = pointsRow.createDiv({ cls: "value-popup-controls" });
-    const pm = pc.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
-    const pi = pc.createEl("input", { type: "number", cls: "value-popup-input" });
-    pi.value = String(this.item.points);
-    bindModalInputFocus(pi);
-    const pp = pc.createEl("button", { cls: "value-popup-adjust", text: "+" });
-    pm.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") - 1);
-    };
-    pp.onclick = () => {
-      pi.value = String(parseInt(pi.value || "0") + 1);
-    };
-    const noteRow = c.createDiv({ cls: "custom-form-row" });
-    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
-    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
-    noteInput.addClass("custom-form-note-input");
-    noteInput.value = this.item.note || "";
-    noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
-    noteInput.autocomplete = "off";
-    bindModalInputFocus(noteInput);
-    const acts = c.createDiv({ cls: "value-popup-actions" });
-    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cb.onclick = () => this.close();
-    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
-    ok.onclick = () => {
-      const n = nameInput.value.trim();
-      if (!n) {
-        nameInput.classList.add("is-error");
-        return;
-      }
-      this.onSave(
-        emojiInput.value.trim() || "\u2B50",
-        n,
-        parseInt(pi.value) || 0,
-        noteInput.value.trim()
-      );
-      this.close();
-    };
-  }
-};
-
-// src/modals/popups/quick-custom-modal.ts
-var QuickCustomModal = class extends BaseMobileModal {
-  constructor(app, plugin, item, onConfirm) {
-    super(app, plugin);
-    this.item = item;
-    this.onConfirm = onConfirm;
-  }
-  onOpen() {
-    super.onOpen();
-    this.titleEl.setText(this.item.emoji + " " + this.item.name);
-    this.modalEl.addClass("kid-score-edit-modal");
-    const c = this.contentEl;
-    if (this.item.note) {
-      c.createEl("div", { cls: "value-popup-note", text: this.item.note });
+// src/diary/modules.ts
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function readDiaryLine(content, label) {
+  const match = content.match(new RegExp(escapeRegex(label) + "\uFF1A\\s*(.+)"));
+  return match ? match[1].trim() : "";
+}
+function parseDiaryModules(content, moduleConfig) {
+  const raw = content || "";
+  const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
+  const result = {
+    freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : ""
+  };
+  moduleConfig.forEach((moduleDef) => {
+    result[moduleDef.id] = readDiaryLine(raw, moduleDef.label);
+  });
+  return result;
+}
+function composeDiaryContent(values, moduleConfig) {
+  const sections = [];
+  const recordLines = [];
+  const storyLines = [];
+  const normalizedValues = {};
+  const appendSentence = (text) => {
+    const cleaned = String(text || "").trim();
+    if (!cleaned) return;
+    storyLines.push(/[。！？.!?]$/.test(cleaned) ? cleaned : cleaned + "\u3002");
+  };
+  moduleConfig.forEach((moduleDef) => {
+    const value = String(values[moduleDef.id] || "").replace(/\s*\n+\s*/g, " / ").trim();
+    normalizedValues[moduleDef.id] = value;
+    if (!value) return;
+    recordLines.push(moduleDef.label + "\uFF1A" + value);
+  });
+  if (normalizedValues.weather) appendSentence("\u4ECA\u5929\u7684\u5929\u6C14\u662F" + normalizedValues.weather);
+  if (normalizedValues.mood) appendSentence("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F" + normalizedValues.mood);
+  if (normalizedValues.todayThing) appendSentence(normalizedValues.todayThing);
+  if (normalizedValues.learnedThing) appendSentence(normalizedValues.learnedThing);
+  if (normalizedValues.happyThing) appendSentence(normalizedValues.happyThing);
+  if (normalizedValues.wantToSay) appendSentence(normalizedValues.wantToSay);
+  moduleConfig.forEach((moduleDef) => {
+    if (["weather", "mood", "todayThing", "learnedThing", "happyThing", "wantToSay"].includes(
+      moduleDef.id
+    )) {
+      return;
     }
-    c.createEl("div", { cls: "value-popup-hint", text: "\u5FEB\u901F\u4FEE\u6539\u5206\u503C" });
-    const controls = c.createDiv({ cls: "value-popup-controls" });
-    const minus = controls.createEl("button", { cls: "value-popup-adjust", text: "\u2212" });
-    const input = controls.createEl("input", { type: "number", cls: "value-popup-input" });
-    input.value = String(this.item.points || 0);
-    const plus = controls.createEl("button", { cls: "value-popup-adjust", text: "+" });
-    bindModalInputFocus(input);
-    minus.onclick = () => {
-      input.value = String(parseInt(input.value || "0") - 1);
-    };
-    plus.onclick = () => {
-      input.value = String(parseInt(input.value || "0") + 1);
-    };
-    const acts = c.createDiv({ cls: "value-popup-actions" });
-    const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cb.onclick = () => this.close();
-    const ok = acts.createEl("button", { cls: "value-popup-confirm mod-cta", text: "\u4FDD\u5B58" });
-    ok.onclick = () => {
-      this.onConfirm(parseInt(input.value) || 0);
-      this.close();
-    };
+    if (!normalizedValues[moduleDef.id]) return;
+    appendSentence(moduleDef.label + "\uFF1A" + normalizedValues[moduleDef.id]);
+  });
+  if (storyLines.length) sections.push("### \u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0\n" + storyLines.join("\n"));
+  if (recordLines.length) sections.push("### \u5C0F\u8BB0\u5F55\n" + recordLines.join("\n"));
+  if (values.freeWrite && values.freeWrite.trim()) {
+    sections.push("### \u81EA\u7531\u8BB0\u5F55\n" + values.freeWrite.trim());
   }
-};
+  return sections.join("\n\n").trim();
+}
+
+// src/modals/helpers/daily-modal-state.ts
+async function loadDailyModalState(plugin, dateStr) {
+  const yesterday = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const existingToday = await plugin.readDayData(dateStr);
+  const yesterdayData = await plugin.readDayData(yesterdayStr);
+  const allScores = await plugin.getAllScores();
+  const scores = {};
+  for (const item of plugin.currentUser.items) {
+    if (existingToday && existingToday.scores[item.id] !== void 0) {
+      scores[item.id] = existingToday.scores[item.id];
+    } else {
+      scores[item.id] = 0;
+    }
+  }
+  const customItems = (existingToday == null ? void 0 : existingToday.customItems) || [];
+  const diaryContent = (existingToday == null ? void 0 : existingToday.diaryContent) || "";
+  const moduleConfig = plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length ? plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+  const diaryModules = diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {};
+  return {
+    yesterdayData,
+    allScores,
+    scores,
+    customItems,
+    diaryContent,
+    diaryModules
+  };
+}
+
+// src/modals/helpers/daily-total-display.ts
+function renderDailyTotalDisplay({
+  element,
+  items,
+  scores,
+  customItems,
+  dailyGoal
+}) {
+  let total = 0;
+  let completed = 0;
+  for (const item of items) {
+    const val = scores[item.id] || 0;
+    total += val;
+    const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+    if (isDeduct ? val !== 0 : val > 0) {
+      completed++;
+    }
+  }
+  completed += customItems.length;
+  const pct = Math.min(100, Math.round(completed / dailyGoal * 100));
+  element.empty();
+  element.createSpan({ text: "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206  " });
+  const goalWrap = element.createSpan({ cls: "daily-goal-wrap" });
+  goalWrap.createSpan({ cls: "daily-goal-label", text: "\u4ECA\u65E5\u76EE\u6807 " + completed + "/" + dailyGoal });
+  const barWrap = goalWrap.createSpan({ cls: "daily-goal-bar-wrap" });
+  const bar = barWrap.createSpan({ cls: "daily-goal-bar" });
+  bar.style.width = pct + "%";
+  if (pct >= 100) bar.addClass("is-complete");
+}
+
+// src/modals/panels/modal-chrome.ts
+var import_obsidian5 = require("obsidian");
+function renderDailyHeader({
+  containerEl,
+  plugin,
+  dateStr,
+  allScores,
+  onPrevDay,
+  onNextDay,
+  onPickDate,
+  onCalendar,
+  onGoToday,
+  onSwitchUser
+}) {
+  const header = containerEl.createDiv({ cls: "kid-score-header" });
+  header.createEl("h2", { text: plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
+  const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
+  const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
+  prevBtn.onclick = onPrevDay;
+  const dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
+  dateInput.type = "date";
+  dateInput.value = dateStr;
+  dateInput.max = formatDate(0);
+  dateInput.onchange = () => {
+    if (dateInput.value) onPickDate(dateInput.value);
+  };
+  const calBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u{1F4C5}" });
+  calBtn.title = "\u65E5\u5386\u8DF3\u9009";
+  calBtn.onclick = onCalendar;
+  const nextBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25B6" });
+  const isToday = dateStr === formatDate(0);
+  if (isToday) {
+    nextBtn.disabled = true;
+    nextBtn.style.opacity = "0.3";
+  }
+  nextBtn.onclick = () => {
+    if (!isToday) onNextDay();
+  };
+  const todayBtn = dateNav.createEl("button", {
+    cls: "date-nav-today" + (isToday ? " is-today" : ""),
+    text: isToday ? "\u4ECA\u5929" : "\u56DE\u5230\u4ECA\u5929"
+  });
+  if (!isToday) {
+    todayBtn.onclick = onGoToday;
+    containerEl.createDiv({
+      cls: "kid-score-past-banner",
+      text: "\u{1F4C5} \u6B63\u5728\u7F16\u8F91 " + dateStr + " \u7684\u8BB0\u5F55"
+    });
+  }
+  const cumulativeTotal = allScores.reduce((sum, s) => sum + s.total, 0);
+  const cumulativeDays = allScores.length;
+  if (cumulativeDays > 0) {
+    const cSign = cumulativeTotal >= 0 ? "+" : "";
+    const cumDiv = containerEl.createDiv({ cls: "kid-score-cumulative-banner" });
+    cumDiv.createSpan({ cls: "cumulative-label", text: "\u{1F396}\uFE0F \u5386\u53F2\u7D2F\u8BA1" });
+    cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
+    cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
+  }
+  const userSwitcher = containerEl.createDiv({ cls: "kid-score-user-switcher" });
+  plugin.settings.users.forEach((u) => {
+    const uBtn = userSwitcher.createEl("button", {
+      cls: "kid-score-user-btn" + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
+      text: u.name
+    });
+    if (plugin.settings.users.length > 1) {
+      uBtn.onclick = async () => {
+        try {
+          await onSwitchUser(u.id);
+        } catch (e) {
+          new import_obsidian5.Notice("\u274C \u5207\u6362\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+        }
+      };
+    }
+  });
+}
+function renderMainTabs({
+  containerEl,
+  onShowScore,
+  onShowDiary
+}) {
+  const mainTabs = containerEl.createDiv({ cls: "kid-score-main-tabs" });
+  const scoreTab = mainTabs.createEl("button", {
+    text: "\u2B50 \u6253\u5206",
+    cls: "kid-score-main-tab is-active"
+  });
+  const diaryTab = mainTabs.createEl("button", {
+    text: "\u{1F4DD} \u65E5\u8BB0",
+    cls: "kid-score-main-tab"
+  });
+  const scorePanel = containerEl.createDiv({ cls: "kid-score-tab-panel" });
+  const diaryPanel = containerEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
+  scoreTab.onclick = () => {
+    scoreTab.addClass("is-active");
+    diaryTab.removeClass("is-active");
+    scorePanel.removeClass("is-hidden");
+    diaryPanel.addClass("is-hidden");
+    onShowScore();
+  };
+  diaryTab.onclick = () => {
+    diaryTab.addClass("is-active");
+    scoreTab.removeClass("is-active");
+    diaryPanel.removeClass("is-hidden");
+    scorePanel.addClass("is-hidden");
+    onShowDiary();
+  };
+  return { scorePanel, diaryPanel };
+}
+function renderBottomActions({
+  containerEl,
+  onPreview,
+  onSave,
+  onStats,
+  bindDiaryActions
+}) {
+  const actions = containerEl.createDiv({ cls: "kid-score-actions" });
+  const previewBtn = actions.createEl("button", {
+    text: "\u67E5\u770B\u9884\u89C8",
+    cls: "kid-score-preview-btn"
+  });
+  const saveBtn = actions.createEl("button", {
+    text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
+    cls: "mod-cta kid-score-save-btn"
+  });
+  const statsBtn = actions.createEl("button", {
+    text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
+    cls: "kid-score-stats-btn"
+  });
+  bindDiaryActions({ previewBtn, saveBtn, statsBtn, actions });
+  previewBtn.onclick = onPreview;
+  saveBtn.onclick = () => void onSave();
+  statsBtn.onclick = onStats;
+}
+
+// src/modals/helpers/press-gesture.ts
+function attachPressGesture({
+  element,
+  longPressMs,
+  isTouchMode,
+  onLongPress,
+  onSingleTap,
+  onDoubleTap,
+  getDoubleTapThreshold,
+  shouldIgnoreTarget
+}) {
+  let pressTimer = null;
+  let clickTimer = null;
+  let isLongPress = false;
+  let hasMoved = false;
+  let startX = 0;
+  let startY = 0;
+  let lastTapAt = 0;
+  const ignoreTarget = (target) => shouldIgnoreTarget ? shouldIgnoreTarget(target) : false;
+  element.addEventListener("pointerdown", (e) => {
+    if (ignoreTarget(e.target)) return;
+    isLongPress = false;
+    hasMoved = false;
+    startX = e.clientX;
+    startY = e.clientY;
+    if (!onLongPress) return;
+    pressTimer = setTimeout(() => {
+      if (!hasMoved) {
+        isLongPress = true;
+        onLongPress();
+      }
+    }, longPressMs);
+  });
+  element.addEventListener("pointermove", (e) => {
+    if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
+      hasMoved = true;
+      if (pressTimer) clearTimeout(pressTimer);
+    }
+  });
+  element.addEventListener("pointerup", (e) => {
+    if (pressTimer) clearTimeout(pressTimer);
+    if (ignoreTarget(e.target) || isLongPress || hasMoved) return;
+    if (isTouchMode) {
+      onSingleTap == null ? void 0 : onSingleTap();
+      return;
+    }
+    if (!onDoubleTap) {
+      onSingleTap == null ? void 0 : onSingleTap();
+      return;
+    }
+    const now = Date.now();
+    const threshold = getDoubleTapThreshold ? getDoubleTapThreshold() : 260;
+    if (lastTapAt && now - lastTapAt <= threshold) {
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+        clickTimer = null;
+      }
+      lastTapAt = 0;
+      onDoubleTap();
+      return;
+    }
+    lastTapAt = now;
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+      clickTimer = null;
+    }
+    if (onSingleTap) {
+      clickTimer = setTimeout(() => {
+        onSingleTap();
+        clickTimer = null;
+        lastTapAt = 0;
+      }, threshold + 20);
+    }
+  });
+  element.addEventListener("pointercancel", () => {
+    if (pressTimer) clearTimeout(pressTimer);
+    hasMoved = true;
+    lastTapAt = 0;
+  });
+  element.addEventListener("pointerleave", () => {
+    if (pressTimer) clearTimeout(pressTimer);
+  });
+  element.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+  });
+}
+
+// src/modals/panels/score-items-panel.ts
+function renderScoreCard({
+  item,
+  grid,
+  yesterdayData,
+  getScore,
+  isTouchMode,
+  longPressMs,
+  getDoubleTapThreshold,
+  triggerHaptic,
+  onToggleScore,
+  onCustomValue
+}) {
+  const scoreVal = getScore(item.id);
+  const isEarned = scoreVal > 0;
+  const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+  const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+  const isDeductedActive = isDeductItem && scoreVal !== 0;
+  const card = grid.createDiv({
+    cls: "kid-score-card" + (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "")
+  });
+  card.dataset.itemId = item.id;
+  const moreBtn = card.createEl("button", {
+    cls: "kid-score-card-more-btn",
+    text: "\u22EF"
+  });
+  moreBtn.setAttribute("aria-label", "\u8C03\u6574\u5206\u503C");
+  moreBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onCustomValue(item, false, card);
+  };
+  card.createDiv({ cls: "card-emoji", text: item.emoji });
+  card.createDiv({ cls: "card-name", text: item.name });
+  if (item.note) {
+    card.createDiv({ cls: "card-note", text: item.note });
+  }
+  const pointsText = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
+  card.createDiv({ cls: "card-points", text: pointsText });
+  if (yesterdayData) {
+    const yScore = yesterdayData.scores[item.id] || 0;
+    const yClass = yScore > 0 ? "was-earned" : yScore < 0 ? "was-negative" : "was-missed";
+    const ySign = yScore > 0 ? "+" : "";
+    card.createDiv({
+      cls: "card-yesterday " + yClass,
+      text: "\u6628 " + ySign + yScore + " \u5206"
+    });
+  } else {
+    card.createDiv({ cls: "card-yesterday was-missed", text: "\u6628 -" });
+  }
+  attachPressGesture({
+    element: card,
+    longPressMs,
+    isTouchMode,
+    getDoubleTapThreshold,
+    shouldIgnoreTarget: (target) => target === moreBtn || moreBtn.contains(target),
+    onLongPress: () => {
+      triggerHaptic("longpress");
+      onCustomValue(item, false, card);
+    },
+    onSingleTap: () => {
+      onToggleScore(item);
+    },
+    onDoubleTap: () => {
+      onCustomValue(item, true, card);
+    }
+  });
+  return card;
+}
+function refreshScoreCard(card, item, scoreVal) {
+  const isEarned = scoreVal > 0;
+  const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+  const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+  const isDeductedActive = isDeductItem && scoreVal !== 0;
+  card.classList.toggle("is-earned", isEarned);
+  card.classList.toggle("is-negative", isNeg);
+  card.classList.toggle("is-deducted-active", isDeductedActive);
+  const pointsEl = card.querySelector(".card-points");
+  if (pointsEl) {
+    pointsEl.textContent = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
+  }
+}
+function renderCustomItemsList({
+  container,
+  customItems,
+  isTouchMode,
+  longPressMs,
+  onQuickAdjust,
+  onEdit,
+  onDelete
+}) {
+  container.empty();
+  if (customItems.length === 0) {
+    container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" });
+    return;
+  }
+  for (let i = 0; i < customItems.length; i++) {
+    ((idx) => {
+      const ci = customItems[idx];
+      const wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
+      const row = wrap.createDiv({ cls: "kid-score-custom-row" });
+      const main = row.createDiv({ cls: "kid-score-custom-main" });
+      main.createSpan({ cls: "custom-emoji", text: ci.emoji });
+      main.createSpan({ cls: "custom-name", text: ci.name });
+      main.createSpan({
+        cls: "custom-points " + (ci.points >= 0 ? "pos" : "neg"),
+        text: (ci.points >= 0 ? "+" : "") + ci.points + " \u5206"
+      });
+      const quick = row.createEl("button", {
+        cls: "custom-row-more-btn",
+        text: "\u8C03\u5206"
+      });
+      quick.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onQuickAdjust(idx);
+      };
+      const edit = row.createEl("button", { cls: "custom-edit-btn", text: "\u270F\uFE0F" });
+      edit.onclick = (e) => {
+        e.stopPropagation();
+        onEdit(idx);
+      };
+      const del = row.createEl("button", { cls: "custom-delete-btn", text: "\u{1F5D1}" });
+      del.onclick = (e) => {
+        e.stopPropagation();
+        onDelete(idx);
+      };
+      if (ci.note) {
+        wrap.createDiv({ cls: "custom-item-note", text: ci.note });
+      }
+      attachPressGesture({
+        element: row,
+        longPressMs,
+        isTouchMode,
+        shouldIgnoreTarget: (target) => target === del || del.contains(target) || target === quick || quick.contains(target) || target === edit || edit.contains(target),
+        onLongPress: () => {
+          onEdit(idx);
+        },
+        onSingleTap: () => {
+          onQuickAdjust(idx);
+        },
+        onDoubleTap: () => {
+          onQuickAdjust(idx);
+        }
+      });
+    })(i);
+  }
+}
+
+// src/modals/panels/rules-section.ts
+var import_obsidian6 = require("obsidian");
+function renderRulesSection({
+  app,
+  component,
+  plugin,
+  container,
+  onAfterRulesSaved
+}) {
+  const section = container.createDiv({ cls: "kid-score-rules-section" });
+  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const toggle = header.createEl("span", {
+    cls: "kid-score-rules-toggle",
+    text: "\u25B6"
+  });
+  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  const editBtn = header.createEl("button", {
+    cls: "kid-score-rules-edit-btn",
+    text: "\u270F\uFE0F"
+  });
+  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  const view = body.createDiv({ cls: "kid-score-rules-view" });
+  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+  bindModalInputFocus(textarea);
+  textarea.value = plugin.currentUser.scoringRules || "";
+  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const saveBtn = actions.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\u4FDD\u5B58\u89C4\u5219"
+  });
+  const cancelBtn = actions.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u53D6\u6D88"
+  });
+  const renderView = () => {
+    view.empty();
+    const text = plugin.currentUser.scoringRules || "";
+    if (text.trim()) {
+      import_obsidian6.MarkdownRenderer.render(app, text, view, "", component);
+    } else {
+      view.createEl("p", {
+        cls: "kid-score-rules-empty",
+        text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
+      });
+    }
+  };
+  renderView();
+  let open = !!(plugin.currentUser.scoringRules && plugin.currentUser.scoringRules.trim());
+  if (!open) {
+    body.addClass("is-hidden");
+  } else {
+    toggle.textContent = "\u25BC";
+  }
+  header.addEventListener("click", (e) => {
+    if (e.target === editBtn || editBtn.contains(e.target)) return;
+    open = !open;
+    toggle.textContent = open ? "\u25BC" : "\u25B6";
+    body.toggleClass("is-hidden", !open);
+  });
+  let isEditing = false;
+  editBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    isEditing = !isEditing;
+    if (isEditing) {
+      open = true;
+      toggle.textContent = "\u25BC";
+      body.removeClass("is-hidden");
+      textarea.value = plugin.currentUser.scoringRules || "";
+      view.addClass("is-hidden");
+      edit.removeClass("is-hidden");
+      textarea.focus();
+    } else {
+      view.removeClass("is-hidden");
+      edit.addClass("is-hidden");
+    }
+  });
+  saveBtn.addEventListener("click", async () => {
+    plugin.currentUser.scoringRules = textarea.value;
+    await plugin.saveSettings();
+    isEditing = false;
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+    renderView();
+    onAfterRulesSaved();
+    new import_obsidian6.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
+  });
+  cancelBtn.addEventListener("click", () => {
+    isEditing = false;
+    view.removeClass("is-hidden");
+    edit.addClass("is-hidden");
+  });
+  return section;
+}
+
+// src/modals/panels/score-category-sections.ts
+function renderScoreCategorySections({
+  plugin,
+  container,
+  yesterdayData,
+  renderScoreCard: renderScoreCard2,
+  onAddItem
+}) {
+  const categories = plugin.currentUser.categories || [];
+  let catRendered = false;
+  for (const category of categories) {
+    const items = plugin.currentUser.items.filter((item) => item.category === category);
+    if (items.length === 0) continue;
+    if (catRendered) {
+      container.createEl("hr", { cls: "kid-score-divider" });
+    }
+    const header = container.createDiv({ cls: "kid-score-cat-header" });
+    header.createEl("h3", { text: category, cls: "kid-score-section-title" });
+    const addItemBtn = header.createEl("button", {
+      text: "+",
+      cls: "kid-score-add-item-btn"
+    });
+    addItemBtn.onclick = () => onAddItem(category);
+    const grid = container.createDiv({ cls: "kid-score-grid" });
+    for (const item of items) {
+      renderScoreCard2(item, grid, yesterdayData);
+    }
+    catRendered = true;
+  }
+  const uncategorized = plugin.currentUser.items.filter(
+    (item) => !item.category || categories.indexOf(item.category) === -1
+  );
+  if (uncategorized.length > 0) {
+    if (catRendered) {
+      container.createEl("hr", { cls: "kid-score-divider" });
+    }
+    container.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
+    const grid = container.createDiv({ cls: "kid-score-grid" });
+    for (const item of uncategorized) {
+      renderScoreCard2(item, grid, yesterdayData);
+    }
+    catRendered = true;
+  }
+  return catRendered;
+}
+
+// src/modals/panels/score-panel.ts
+function renderScorePanel({
+  app,
+  component,
+  plugin,
+  scorePanel,
+  yesterdayData,
+  isTouchOptimizedMode,
+  renderScoreCard: renderScoreCard2,
+  renderCustomItems,
+  onAddItem,
+  onAddCustom,
+  onSetTotalDisplay,
+  onAfterRulesSaved
+}) {
+  if (plugin.currentUser.items.length === 0) {
+    scorePanel.createEl("div", {
+      cls: "kid-score-empty",
+      text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01"
+    });
+    return null;
+  }
+  renderRulesSection({
+    app,
+    component,
+    plugin,
+    container: scorePanel,
+    onAfterRulesSaved
+  });
+  if (yesterdayData) {
+    const ySign = yesterdayData.total >= 0 ? "+" : "";
+    scorePanel.createDiv({
+      cls: "kid-score-yesterday-banner",
+      text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayData.date + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206"
+    });
+  }
+  const itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
+  itemsContainer.createDiv({
+    cls: "kid-score-hint",
+    text: isTouchOptimizedMode ? "\u{1F4A1} \u70B9\u4E00\u4E0B\u8BB0\u5206\uFF0C\u957F\u6309\u6216\u70B9\u53F3\u4E0A\u89D2\u6309\u94AE\u8C03\u6574\u5206\u503C" : "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \xB7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C"
+  });
+  const totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
+  onSetTotalDisplay(totalDisplay);
+  const catRendered = renderScoreCategorySections({
+    plugin,
+    container: itemsContainer,
+    yesterdayData,
+    renderScoreCard: renderScoreCard2,
+    onAddItem
+  });
+  if (catRendered) {
+    itemsContainer.createEl("hr", { cls: "kid-score-divider" });
+  }
+  itemsContainer.createEl("h3", { text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879", cls: "kid-score-section-title" });
+  const customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
+  renderCustomItems();
+  const addCustomBtn = itemsContainer.createEl("button", {
+    text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
+    cls: "kid-score-add-custom-btn"
+  });
+  addCustomBtn.onclick = () => onAddCustom();
+  return { totalDisplay, customItemsContainer };
+}
 
 // src/modals/daily-scoring-modal.ts
 var DailyScoringModal = class extends BaseMobileModal {
@@ -2885,18 +3808,11 @@ var DailyScoringModal = class extends BaseMobileModal {
     this.scores = {};
     this.customItems = [];
     this.diaryContent = "";
-    this.diaryModules = {
-      weather: "",
-      mood: "",
-      todayThing: "",
-      learnedThing: "",
-      happyThing: "",
-      wantToSay: "",
-      freeWrite: ""
-    };
     this.totalDisplay = null;
     this.customItemsContainer = null;
     this.diaryTextarea = null;
+    this.diaryModules = {};
+    this.diaryControls = null;
     this.activeTab = "score";
     this.enableKeyboardAdjustment = false;
     this.dateStr = initialDate || formatDate(0);
@@ -2916,604 +3832,123 @@ var DailyScoringModal = class extends BaseMobileModal {
     this.scores = {};
     this.customItems = [];
     this.diaryContent = "";
-    this.diaryModules = {
-      weather: "",
-      mood: "",
-      todayThing: "",
-      learnedThing: "",
-      happyThing: "",
-      wantToSay: "",
-      freeWrite: ""
-    };
-    const yesterday = /* @__PURE__ */ new Date(this.dateStr + "T00:00:00");
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().slice(0, 10);
-    const existingToday = await this.plugin.readDayData(this.dateStr);
-    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
-    for (const item of this.plugin.currentUser.items) {
-      if (existingToday && existingToday.scores[item.id] !== void 0) {
-        this.scores[item.id] = existingToday.scores[item.id];
-      } else {
-        this.scores[item.id] = 0;
-      }
-    }
-    if (existingToday) {
-      this.customItems = existingToday.customItems || [];
-      this.diaryContent = existingToday.diaryContent || "";
-      this.diaryModules = this.parseDiaryModules(this.diaryContent);
-    }
-    const header = contentEl.createDiv({ cls: "kid-score-header" });
-    header.createEl("h2", { text: this.plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
-    const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
-    const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
-    prevBtn.onclick = () => {
-      const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
-      d.setDate(d.getDate() - 1);
-      self.dateStr = d.toISOString().slice(0, 10);
-      self.renderModal();
-    };
-    const dateInput = dateNav.createEl("input", { cls: "date-nav-input" });
-    dateInput.type = "date";
-    dateInput.value = this.dateStr;
-    dateInput.max = formatDate(0);
-    dateInput.onchange = () => {
-      if (dateInput.value) {
-        self.dateStr = dateInput.value;
+    this.diaryModules = {};
+    this.diaryControls = null;
+    const state = await loadDailyModalState(this.plugin, this.dateStr);
+    const yesterdayData = state.yesterdayData;
+    this.scores = state.scores;
+    this.customItems = state.customItems;
+    this.diaryContent = state.diaryContent;
+    this.diaryModules = state.diaryModules;
+    renderDailyHeader({
+      containerEl: contentEl,
+      plugin: this.plugin,
+      dateStr: this.dateStr,
+      allScores: state.allScores,
+      onPrevDay: () => {
+        const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
+        d.setDate(d.getDate() - 1);
+        self.dateStr = d.toISOString().slice(0, 10);
         self.renderModal();
-      }
-    };
-    const calBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u{1F4C5}" });
-    calBtn.title = "\u65E5\u5386\u8DF3\u9009";
-    calBtn.onclick = () => {
-      self.showCalendarPicker();
-    };
-    const nextBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25B6" });
-    const isToday = this.dateStr === formatDate(0);
-    if (isToday) {
-      nextBtn.disabled = true;
-      nextBtn.style.opacity = "0.3";
-    }
-    nextBtn.onclick = () => {
-      if (isToday) return;
-      const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
-      d.setDate(d.getDate() + 1);
-      self.dateStr = d.toISOString().slice(0, 10);
-      self.renderModal();
-    };
-    const todayBtn = dateNav.createEl("button", {
-      cls: "date-nav-today" + (isToday ? " is-today" : ""),
-      text: isToday ? "\u4ECA\u5929" : "\u56DE\u5230\u4ECA\u5929"
-    });
-    if (!isToday) {
-      todayBtn.onclick = () => {
+      },
+      onNextDay: () => {
+        const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
+        d.setDate(d.getDate() + 1);
+        self.dateStr = d.toISOString().slice(0, 10);
+        self.renderModal();
+      },
+      onPickDate: (dateStr) => {
+        self.dateStr = dateStr;
+        self.renderModal();
+      },
+      onCalendar: () => self.showCalendarPicker(),
+      onGoToday: () => {
         self.dateStr = formatDate(0);
         self.renderModal();
-      };
-    }
-    if (!isToday) {
-      contentEl.createDiv({
-        cls: "kid-score-past-banner",
-        text: "\u{1F4C5} \u6B63\u5728\u7F16\u8F91 " + this.dateStr + " \u7684\u8BB0\u5F55"
-      });
-    }
-    const allScores = await this.plugin.getAllScores();
-    const cumulativeTotal = allScores.reduce((sum, s) => sum + s.total, 0);
-    const cumulativeDays = allScores.length;
-    if (cumulativeDays > 0) {
-      const cSign = cumulativeTotal >= 0 ? "+" : "";
-      const cumDiv = contentEl.createDiv({ cls: "kid-score-cumulative-banner" });
-      cumDiv.createSpan({ cls: "cumulative-label", text: "\u{1F396}\uFE0F \u5386\u53F2\u7D2F\u8BA1" });
-      cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
-      cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
-    }
-    const allUsers = self.plugin.settings.users;
-    const userSwitcher = contentEl.createDiv({ cls: "kid-score-user-switcher" });
-    allUsers.forEach((u) => {
-      const uBtn = userSwitcher.createEl("button", {
-        cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
-        text: u.name
-      });
-      if (allUsers.length > 1) {
-        uBtn.onclick = async () => {
-          try {
-            self.plugin.settings.currentUserId = u.id;
-            await self.plugin.saveSettings();
-            await self.renderModal();
-          } catch (e) {
-            new import_obsidian4.Notice("\u274C \u5207\u6362\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-          }
-        };
-      }
-    });
-    const mainTabs = contentEl.createDiv({ cls: "kid-score-main-tabs" });
-    const scoreTab = mainTabs.createEl("button", {
-      text: "\u2B50 \u6253\u5206",
-      cls: "kid-score-main-tab is-active"
-    });
-    const diaryTab = mainTabs.createEl("button", {
-      text: "\u{1F4DD} \u65E5\u8BB0",
-      cls: "kid-score-main-tab"
-    });
-    const scorePanel = contentEl.createDiv({ cls: "kid-score-tab-panel" });
-    const diaryPanel = contentEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
-    scoreTab.onclick = () => {
-      self.syncDiaryContent();
-      self.activeTab = "score";
-      scoreTab.addClass("is-active");
-      diaryTab.removeClass("is-active");
-      scorePanel.removeClass("is-hidden");
-      diaryPanel.addClass("is-hidden");
-      contentEl.scrollTop = 0;
-    };
-    diaryTab.onclick = () => {
-      self.activeTab = "diary";
-      diaryTab.addClass("is-active");
-      scoreTab.removeClass("is-active");
-      diaryPanel.removeClass("is-hidden");
-      scorePanel.addClass("is-hidden");
-      contentEl.scrollTop = 0;
-    };
-    if (this.plugin.currentUser.items.length === 0) {
-      scorePanel.createEl("div", {
-        cls: "kid-score-empty",
-        text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01"
-      });
-    } else {
-      const rulesSection = scorePanel.createDiv({ cls: "kid-score-rules-section" });
-      const rulesHeader = rulesSection.createDiv({ cls: "kid-score-rules-header" });
-      const rulesToggle = rulesHeader.createEl("span", {
-        cls: "kid-score-rules-toggle",
-        text: "\u25B6"
-      });
-      rulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-      const rulesEditBtn = rulesHeader.createEl("button", {
-        cls: "kid-score-rules-edit-btn",
-        text: "\u270F\uFE0F"
-      });
-      const rulesBody = rulesSection.createDiv({ cls: "kid-score-rules-body" });
-      const rulesView = rulesBody.createDiv({ cls: "kid-score-rules-view" });
-      const rulesEdit = rulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-      const rulesTextarea = rulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-      bindModalInputFocus(rulesTextarea);
-      rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-      const rulesActRow = rulesEdit.createDiv({ cls: "kid-score-rules-actions" });
-      const rulesSaveBtn = rulesActRow.createEl("button", {
-        cls: "mod-cta kid-score-rules-save-btn",
-        text: "\u4FDD\u5B58\u89C4\u5219"
-      });
-      const rulesCancelBtn = rulesActRow.createEl("button", {
-        cls: "kid-score-rules-cancel-btn",
-        text: "\u53D6\u6D88"
-      });
-      const renderRulesView = () => {
-        rulesView.empty();
-        const text = self.plugin.currentUser.scoringRules || "";
-        if (text.trim()) {
-          import_obsidian4.MarkdownRenderer.render(self.app, text, rulesView, "", this);
-        } else {
-          rulesView.createEl("p", {
-            cls: "kid-score-rules-empty",
-            text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
-          });
-        }
-      };
-      renderRulesView();
-      let rulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
-      if (!rulesOpen) {
-        rulesBody.addClass("is-hidden");
-      } else {
-        rulesToggle.textContent = "\u25BC";
-      }
-      rulesHeader.addEventListener("click", (e) => {
-        if (e.target === rulesEditBtn || rulesEditBtn.contains(e.target)) return;
-        rulesOpen = !rulesOpen;
-        rulesToggle.textContent = rulesOpen ? "\u25BC" : "\u25B6";
-        rulesBody.toggleClass("is-hidden", !rulesOpen);
-      });
-      let rulesIsEditing = false;
-      rulesEditBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        rulesIsEditing = !rulesIsEditing;
-        if (rulesIsEditing) {
-          rulesOpen = true;
-          rulesToggle.textContent = "\u25BC";
-          rulesBody.removeClass("is-hidden");
-          rulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-          rulesView.addClass("is-hidden");
-          rulesEdit.removeClass("is-hidden");
-          rulesTextarea.focus();
-        } else {
-          rulesView.removeClass("is-hidden");
-          rulesEdit.addClass("is-hidden");
-        }
-      });
-      rulesSaveBtn.addEventListener("click", async () => {
-        self.plugin.currentUser.scoringRules = rulesTextarea.value;
+      },
+      onSwitchUser: async (userId) => {
+        self.plugin.settings.currentUserId = userId;
         await self.plugin.saveSettings();
-        rulesIsEditing = false;
-        rulesView.removeClass("is-hidden");
-        rulesEdit.addClass("is-hidden");
-        renderRulesView();
-        new import_obsidian4.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
-      });
-      rulesCancelBtn.addEventListener("click", () => {
-        rulesIsEditing = false;
-        rulesView.removeClass("is-hidden");
-        rulesEdit.addClass("is-hidden");
-      });
-      if (yesterdayData) {
-        const ySign = yesterdayData.total >= 0 ? "+" : "";
-        scorePanel.createDiv({
-          cls: "kid-score-yesterday-banner",
-          text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayStr + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206"
-        });
+        await self.renderModal();
       }
-      const itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
-      itemsContainer.createDiv({
-        cls: "kid-score-hint",
-        text: this.isTouchOptimizedMode() ? "\u{1F4A1} \u70B9\u4E00\u4E0B\u8BB0\u5206\uFF0C\u957F\u6309\u6216\u70B9\u53F3\u4E0A\u89D2\u6309\u94AE\u8C03\u6574\u5206\u503C" : "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \xB7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C"
-      });
-      this.totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
-      const categories = this.plugin.currentUser.categories || [];
-      let catRendered = false;
-      for (const cat of categories) {
-        const catItems = this.plugin.currentUser.items.filter((it) => it.category === cat);
-        if (catItems.length > 0) {
-          if (catRendered) {
-            itemsContainer.createEl("hr", { cls: "kid-score-divider" });
-          }
-          const catHeader = itemsContainer.createDiv({ cls: "kid-score-cat-header" });
-          catHeader.createEl("h3", { text: cat, cls: "kid-score-section-title" });
-          ((c) => {
-            const addItemBtn = catHeader.createEl("button", { text: "+", cls: "kid-score-add-item-btn" });
-            addItemBtn.onclick = () => {
-              self.showAddItemPopup(c);
-            };
-          })(cat);
-          const grid = itemsContainer.createDiv({ cls: "kid-score-grid" });
-          for (const itm of catItems) {
-            this.renderCard(itm, grid, yesterdayData);
-          }
-          catRendered = true;
-        }
-      }
-      const uncatItems = this.plugin.currentUser.items.filter(
-        (it) => !it.category || categories.indexOf(it.category) === -1
-      );
-      if (uncatItems.length > 0) {
-        if (catRendered) {
-          itemsContainer.createEl("hr", { cls: "kid-score-divider" });
-        }
-        itemsContainer.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
-        const grid2 = itemsContainer.createDiv({ cls: "kid-score-grid" });
-        for (const itm of uncatItems) {
-          this.renderCard(itm, grid2, yesterdayData);
-        }
-        catRendered = true;
-      }
-      if (catRendered) {
-        itemsContainer.createEl("hr", { cls: "kid-score-divider" });
-      }
-      itemsContainer.createEl("h3", { text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879", cls: "kid-score-section-title" });
-      this.customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
-      this.renderCustomItems();
-      const addCustomBtn = itemsContainer.createEl("button", {
-        text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
-        cls: "kid-score-add-custom-btn"
-      });
-      addCustomBtn.onclick = () => {
-        self.showAddCustomItemForm();
-      };
-      this.updateTotalDisplay();
-    }
-    const diaryControls = this.buildDiaryPanel(diaryPanel);
-    const actions = contentEl.createDiv({ cls: "kid-score-actions" });
-    const previewBtn = actions.createEl("button", {
-      text: "\u9884\u89C8",
-      cls: "kid-score-preview-btn"
     });
-    const saveBtn = actions.createEl("button", {
-      text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
-      cls: "mod-cta kid-score-save-btn"
-    });
-    if (diaryControls && typeof diaryControls.bindPreviewButton === "function") {
-      diaryControls.bindPreviewButton(previewBtn);
-    }
-    previewBtn.onclick = () => {
-      if (diaryControls && typeof diaryControls.togglePreview === "function") diaryControls.togglePreview();
-    };
-    saveBtn.onclick = async () => {
-      self.syncDiaryContent();
-      try {
-        await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
-        self.close();
-      } catch (e) {
-        new import_obsidian4.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-      }
-    };
-    const statsBtn = actions.createEl("button", {
-      text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
-      cls: "kid-score-stats-btn"
-    });
-    statsBtn.onclick = () => {
-      self.close();
-      new StatsModal(self.app, self.plugin).open();
-    };
-  }
-  buildDiaryPanel(panel) {
-    const self = this;
-    let isPreview = false;
-    const moduleFields = [];
-    const moduleConfig = self.plugin.currentUser.diaryModules && self.plugin.currentUser.diaryModules.length ? self.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
-    const syncAndRefresh = () => {
-      self.syncDiaryContent();
-      updateCC();
-      if (!isPreview || !previewWrap) return;
-      previewWrap.empty();
-      import_obsidian4.MarkdownRenderer.render(
-        self.app,
-        self.diaryContent || "_还没有内容_",
-        previewWrap,
-        "",
-        this
-      );
-    };
-    const toolbar = panel.createDiv({ cls: "diary-toolbar" });
-    const templateBtn = toolbar.createEl("button", {
-      cls: "diary-tool-btn",
-      text: "\u{1F4CB} \u586B\u5165\u9ED8\u8BA4\u6A21\u677F"
-    });
-    templateBtn.onclick = () => {
-      if (!self.diaryModules.weather) self.diaryModules.weather = "\u2600\uFE0F \u6674";
-      if (!self.diaryModules.mood) self.diaryModules.mood = "\u{1F60A} \u5F00\u5FC3";
-      if (!self.diaryModules.todayThing) self.diaryModules.todayThing = "\u4ECA\u5929\u6211\u505A\u4E86____\u3002";
-      if (!self.diaryModules.learnedThing) self.diaryModules.learnedThing = "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____\u3002";
-      if (!self.diaryModules.happyThing) self.diaryModules.happyThing = "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____\u3002";
-      if (!self.diaryModules.wantToSay) self.diaryModules.wantToSay = "\u6211\u8FD8\u60F3\u8BF4____\u3002";
-      moduleFields.forEach(({ key, input }) => {
-        if (input.value.trim()) return;
-        input.value = self.diaryModules[key] || "";
-      });
-      if (self.diaryTextarea && !self.diaryTextarea.value.trim()) {
-        self.diaryTextarea.value = "\u4ECA\u5929\u8FD8\u6709\u4E00\u4EF6\u6211\u60F3\u8BB0\u4E0B\u6765\u7684\u4E8B\uFF1A\n";
-        self.diaryModules.freeWrite = self.diaryTextarea.value;
-      }
-      syncAndRefresh();
-      if (moduleFields[0] && moduleFields[0].input) moduleFields[0].input.focus();
-    };
-    [
-      { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
-      { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
-      { t: "\u{1F3B5} \u97F3\u9891", e: "mp3" }
-    ].forEach((a) => {
-      const btn = toolbar.createEl("button", { cls: "diary-tool-btn", text: a.t });
-      btn.onclick = () => {
-        self.insertAttachment(a.t.split(" ")[1], a.e);
-      };
-    });
-    let previewWrap = null;
-    let updateCC = () => {
-    };
-    let previewButtonBinder = () => {
-    };
-    const updatePreviewButton = () => {
-      previewButtonBinder(isPreview);
-    };
-    const togglePreview = () => {
-      isPreview = !isPreview;
-      if (isPreview) {
+    const { scorePanel, diaryPanel } = renderMainTabs({
+      containerEl: contentEl,
+      onShowScore: () => {
         self.syncDiaryContent();
-        self.diaryTextarea.rows = 5;
-        previewWrap.style.display = "";
-        previewWrap.empty();
-        import_obsidian4.MarkdownRenderer.render(
-          self.app,
-          self.diaryContent || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
-          previewWrap,
-          "",
-          this
-        );
-        self.diaryTextarea.oninput = () => {
-          self.diaryModules.freeWrite = self.diaryTextarea.value;
-          syncAndRefresh();
-        };
-      } else {
-        self.diaryTextarea.rows = 12;
-        previewWrap.style.display = "none";
-        self.diaryTextarea.oninput = () => {
-          self.diaryModules.freeWrite = self.diaryTextarea.value;
-          syncAndRefresh();
-        };
-        self.diaryTextarea.focus();
+        self.activeTab = "score";
+        contentEl.scrollTop = 0;
+      },
+      onShowDiary: () => {
+        self.activeTab = "diary";
+        contentEl.scrollTop = 0;
       }
-      updatePreviewButton();
-    };
-    const moduleSection = panel.createDiv({ cls: "diary-module-section" });
-    moduleSection.createEl("h4", { cls: "diary-module-title", text: "\uD83E\uDDE9 \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
-    moduleSection.createEl("p", {
-      cls: "diary-module-hint",
-      text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
     });
-    const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
-    const createModuleField = (moduleDef) => {
-      const card = moduleGrid.createDiv({ cls: "diary-module-card" });
-      card.createSpan({ cls: "diary-module-label", text: moduleDef.label });
-      const isMultiline = moduleDef.kind !== "quick";
-      const input = isMultiline ? card.createEl("textarea", { cls: "diary-module-input is-multiline" }) : card.createEl("input", { cls: "diary-module-input", type: "text" });
-      input.placeholder = moduleDef.placeholder || "";
-      input.value = self.diaryModules[moduleDef.id] || "";
-      bindModalInputFocus(input, { scrollOnIOSFocus: false });
-      input.addEventListener("input", () => {
-        self.diaryModules[moduleDef.id] = input.value.trim();
-        syncAndRefresh();
-      });
-      moduleFields.push({ key: moduleDef.id, input });
-      return input;
-    };
-    const weatherModule = moduleConfig.find((m) => m.id === "weather");
-    const moodModule = moduleConfig.find((m) => m.id === "mood");
-    moduleConfig.filter((m) => m.id !== "weather" && m.id !== "mood").forEach((moduleDef) => createModuleField(moduleDef));
-    const quickRow = panel.createDiv({ cls: "diary-quick-row" });
-    const weatherEmojis = [
-      { e: "\u2600\uFE0F", l: "\u6674" },
-      { e: "\u26C5", l: "\u591A\u4E91" },
-      { e: "\u{1F327}\uFE0F", l: "\u96E8" },
-      { e: "\u{1F328}\uFE0F", l: "\u96EA" },
-      { e: "\u{1F32C}\uFE0F", l: "\u98CE" },
-      { e: "\u{1F324}\uFE0F", l: "\u6674\u8F6C\u591A\u4E91" }
-    ];
-    const moodEmojis = [
-      { e: "\u{1F60A}", l: "\u5F00\u5FC3" },
-      { e: "\u{1F60E}", l: "\u5F88\u68D2" },
-      { e: "\u{1F914}", l: "\u601D\u8003" },
-      { e: "\u{1F622}", l: "\u96BE\u8FC7" },
-      { e: "\u{1F620}", l: "\u751F\u6C14" },
-      { e: "\u{1F634}", l: "\u56F0" }
-    ];
-    const createQuickGroup = (moduleDef, defaults) => {
-      if (!moduleDef) return;
-      let customEmoji = defaults[0].e;
-      const group = quickRow.createDiv({ cls: "diary-quick-group" });
-      const header = group.createDiv({ cls: "diary-quick-header" });
-      header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
-      const valueInput = group.createEl("input", { cls: "diary-quick-value-input", type: "text" });
-      valueInput.placeholder = moduleDef.placeholder || "";
-      valueInput.value = self.diaryModules[moduleDef.id] || "";
-      bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
-      valueInput.addEventListener("input", () => {
-        self.diaryModules[moduleDef.id] = valueInput.value.trim();
-        syncAndRefresh();
-      });
-      moduleFields.push({ key: moduleDef.id, input: valueInput });
-      const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
-      defaults.forEach((entry) => {
-        const b = emojiRow.createEl("button", { cls: "diary-quick-btn", text: entry.e });
-        b.title = entry.l;
-        b.onclick = () => {
-          valueInput.value = entry.e + " " + entry.l;
-          self.diaryModules[moduleDef.id] = valueInput.value.trim();
-          syncAndRefresh();
-        };
-      });
-      const customRow = group.createDiv({ cls: "diary-quick-custom-row" });
-      const emojiBtn = customRow.createEl("button", { cls: "diary-tool-btn diary-quick-picker-btn", text: customEmoji });
-      emojiBtn.title = "\u9009\u62E9\u5176\u4ED6 emoji";
-      emojiBtn.onclick = () => {
-        showEmojiPicker((em) => {
-          customEmoji = em;
-          emojiBtn.textContent = em;
-        }, panel);
-      };
-      const textInput = customRow.createEl("input", { cls: "diary-quick-text-input", type: "text" });
-      textInput.placeholder = "\u8F93\u5165" + moduleDef.label + "\u6216\u8865\u5145\u6587\u5B57";
-      bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
-      const addBtn = customRow.createEl("button", { cls: "diary-tool-btn diary-quick-add-btn", text: "\u6DFB\u52A0" });
-      const insertCustom = () => {
-        const text = textInput.value.trim();
-        if (!customEmoji && !text) return;
-        const body = [customEmoji, text].filter(Boolean).join(" ").trim();
-        valueInput.value = body;
-        self.diaryModules[moduleDef.id] = body;
-        syncAndRefresh();
-        textInput.value = "";
-      };
-      addBtn.onclick = insertCustom;
-      textInput.addEventListener("keydown", (e) => {
-        if (e.key !== "Enter") return;
-        e.preventDefault();
-        insertCustom();
-      });
-      return group;
-    };
-    createQuickGroup(weatherModule, weatherEmojis);
-    createQuickGroup(moodModule, moodEmojis);
-    const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
-    textareaWrap.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
-    textareaWrap.createEl("p", {
-      cls: "diary-module-hint",
-      text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
+    const renderedScorePanel = renderScorePanel({
+      app: this.app,
+      component: this,
+      plugin: this.plugin,
+      scorePanel,
+      yesterdayData,
+      isTouchOptimizedMode: this.isTouchOptimizedMode(),
+      renderScoreCard: (item, grid, previousDay) => this.renderScoreCard(item, grid, previousDay),
+      renderCustomItems: () => this.renderCustomItems(),
+      onAddItem: (category) => self.showAddItemPopup(category),
+      onAddCustom: () => self.showAddCustomItemForm(),
+      onSetTotalDisplay: (element) => {
+        this.totalDisplay = element;
+      },
+      onAfterRulesSaved: () => this.updateTotalDisplay()
     });
-    this.diaryTextarea = textareaWrap.createEl("textarea", {
-      cls: "diary-textarea",
-      placeholder: "\u4F8B\u5982\uFF1A\u4ECA\u5929\u653E\u5B66\u540E\uFF0C\u6211\u548C\u5988\u5988\u4E00\u8D77\u53BB\u4E86\u516C\u56ED..."
+    this.customItemsContainer = (renderedScorePanel == null ? void 0 : renderedScorePanel.customItemsContainer) || null;
+    this.updateTotalDisplay();
+    this.diaryControls = buildDiaryPanel({
+      app: this.app,
+      plugin: this.plugin,
+      component: this,
+      panel: diaryPanel,
+      diaryContent: this.diaryContent,
+      diaryModules: this.diaryModules,
+      setDiaryTextarea: (textarea) => {
+        this.diaryTextarea = textarea;
+      },
+      updateDiaryContent: (content) => {
+        this.diaryContent = content;
+      },
+      updateDiaryModules: (values) => {
+        this.diaryModules = values;
+      },
+      composeDiaryContent: () => this.syncDiaryContent(),
+      insertAttachment: (label, ext) => this.insertAttachment(label, ext)
     });
-    bindModalInputFocus(this.diaryTextarea);
-    this.diaryTextarea.value = this.diaryModules.freeWrite || "";
-    this.diaryTextarea.rows = 12;
-    this.diaryTextarea.oninput = () => {
-      self.diaryModules.freeWrite = self.diaryTextarea.value;
-      syncAndRefresh();
-    };
-    previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
-    previewWrap.style.display = "none";
-    const charCount = panel.createDiv({ cls: "diary-char-count" });
-    updateCC = () => {
-      charCount.textContent = (self.diaryContent || "").length + " \u5B57";
-    };
-    self.syncDiaryContent();
-    updateCC();
-    updatePreviewButton();
-    return {
-      togglePreview,
-      bindPreviewButton: (btn) => {
-        previewButtonBinder = (active) => {
-          btn.textContent = active ? "\u7EE7\u7EED\u7F16\u8F91" : "\u9884\u89C8";
-          btn.classList.toggle("is-active", active);
-        };
-        updatePreviewButton();
+    renderBottomActions({
+      containerEl: contentEl,
+      onPreview: () => {
+        var _a;
+        (_a = this.diaryControls) == null ? void 0 : _a.togglePreview();
+      },
+      onSave: async () => {
+        self.syncDiaryContent();
+        try {
+          await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+          self.close();
+        } catch (e) {
+          new import_obsidian7.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+        }
+      },
+      onStats: () => {
+        self.close();
+        new StatsModal(self.app, self.plugin).open();
+      },
+      bindDiaryActions: (buttons) => {
+        var _a;
+        return (_a = this.diaryControls) == null ? void 0 : _a.bindActionButtons(buttons);
       }
-    };
-  }
-  parseDiaryModules(content) {
-    const raw = content || "";
-    const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
-    const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const readLine = (label) => {
-      const match = raw.match(new RegExp(escapeRegex(label) + "：\\s*(.+)"));
-      return match ? match[1].trim() : "";
-    };
-    const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
-    const result = { freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : "" };
-    moduleConfig.forEach((moduleDef) => {
-      result[moduleDef.id] = readLine(moduleDef.label);
     });
-    return result;
   }
   syncDiaryContent() {
-    const d = this.diaryModules || {};
     const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
-    const sections = [];
-    const recordLines = [];
-    const storyLines = [];
-    const values = {};
-    const appendSentence = (text) => {
-      const cleaned = String(text || "").trim();
-      if (!cleaned) return;
-      storyLines.push(/[。！？.!?]$/.test(cleaned) ? cleaned : cleaned + "。");
-    };
-    moduleConfig.forEach((moduleDef) => {
-      const value = String(d[moduleDef.id] || "").replace(/\s*\n+\s*/g, " / ").trim();
-      values[moduleDef.id] = value;
-      if (!value) return;
-      recordLines.push(moduleDef.label + "：" + value);
-    });
-    if (values.weather) appendSentence("今天的天气是" + values.weather);
-    if (values.mood) appendSentence("我今天的心情是" + values.mood);
-    if (values.todayThing) appendSentence(values.todayThing);
-    if (values.learnedThing) appendSentence(values.learnedThing);
-    if (values.happyThing) appendSentence(values.happyThing);
-    if (values.wantToSay) appendSentence(values.wantToSay);
-    moduleConfig.forEach((moduleDef) => {
-      if (["weather", "mood", "todayThing", "learnedThing", "happyThing", "wantToSay"].includes(moduleDef.id)) return;
-      if (!values[moduleDef.id]) return;
-      appendSentence(moduleDef.label + "：" + values[moduleDef.id]);
-    });
-    if (storyLines.length) sections.push("### 今天的小日记\n" + storyLines.join("\n"));
-    if (recordLines.length) sections.push("### 小记录\n" + recordLines.join("\n"));
-    if (d.freeWrite && d.freeWrite.trim()) {
-      sections.push("### 自由记录\n" + d.freeWrite.trim());
-    }
-    this.diaryContent = sections.join("\n\n").trim();
+    this.diaryContent = composeDiaryContent(this.diaryModules || {}, moduleConfig);
     return this.diaryContent;
   }
   insertTextAtCursor(text) {
@@ -3528,440 +3963,1293 @@ var DailyScoringModal = class extends BaseMobileModal {
     ta.focus();
   }
   insertAttachment(label, ext) {
-    const self = this;
-    const attachModal = new AttachFileModal(
-      self.app,
-      self.plugin,
+    openAttachmentInsertModal({
+      app: this.app,
+      plugin: this.plugin,
       label,
-      self.dateStr,
-      (f) => {
-        let filename = f;
-        if (!filename.includes(".")) filename += "." + ext;
-        self.insertTextAtCursor("\n![[" + filename + "]]\n");
-      }
-    );
-    attachModal.open();
-  }
-  renderCard(item, grid, yesterdayData) {
-    const self = this;
-    const scoreVal = this.scores[item.id] || 0;
-    const isEarned = scoreVal > 0;
-    const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
-    const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-    const isDeductedActive = isDeductItem && scoreVal !== 0;
-    const card = grid.createDiv({
-      cls: "kid-score-card" + (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "")
-    });
-    card.dataset.itemId = item.id;
-    const moreBtn = card.createEl("button", {
-      cls: "kid-score-card-more-btn",
-      text: "\u22EF"
-    });
-    moreBtn.setAttribute("aria-label", "\u8C03\u6574\u5206\u503C");
-    moreBtn.onclick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      self.showCustomValuePopup(item, (v) => {
-        self.scores[item.id] = v;
-        self.refreshCard(card, item);
-        self.updateTotalDisplay();
-      }, false);
-    };
-    card.createDiv({ cls: "card-emoji", text: item.emoji });
-    card.createDiv({ cls: "card-name", text: item.name });
-    if (item.note) {
-      card.createDiv({ cls: "card-note", text: item.note });
-    }
-    const pointsText = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
-    card.createDiv({ cls: "card-points", text: pointsText });
-    if (yesterdayData) {
-      const yScore = yesterdayData.scores[item.id] || 0;
-      const yClass = yScore > 0 ? "was-earned" : yScore < 0 ? "was-negative" : "was-missed";
-      const ySign = yScore > 0 ? "+" : "";
-      card.createDiv({
-        cls: "card-yesterday " + yClass,
-        text: "\u6628 " + ySign + yScore + " \u5206"
-      });
-    } else {
-      card.createDiv({ cls: "card-yesterday was-missed", text: "\u6628 -" });
-    }
-    let pressTimer = null;
-    let isLongPress = false;
-    let hasMoved = false;
-    let startX = 0;
-    let startY = 0;
-    let clickTimer = null;
-    let lastTapAt = 0;
-    const longPressMs = self.getLongPressDuration();
-    const isTouchMode = self.isTouchOptimizedMode();
-    card.addEventListener("pointerdown", (e) => {
-      if (e.target === moreBtn || moreBtn.contains(e.target)) return;
-      isLongPress = false;
-      hasMoved = false;
-      startX = e.clientX;
-      startY = e.clientY;
-      pressTimer = setTimeout(() => {
-        if (!hasMoved) {
-          isLongPress = true;
-          self.triggerHaptic("longpress");
-          self.showCustomValuePopup(item, (v) => {
-            self.scores[item.id] = v;
-            self.refreshCard(card, item);
-            self.updateTotalDisplay();
-          }, false);
-        }
-      }, longPressMs);
-    });
-    card.addEventListener("pointermove", (e) => {
-      if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
-        hasMoved = true;
-        if (pressTimer) clearTimeout(pressTimer);
-      }
-    });
-    card.addEventListener("pointerup", () => {
-      if (pressTimer) clearTimeout(pressTimer);
-      if (!isLongPress && !hasMoved) {
-        if (isTouchMode) {
-          self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0;
-          self.refreshCard(card, item);
-          self.updateTotalDisplay();
-          return;
-        }
-        const now = Date.now();
-        const threshold = self.plugin.getDoubleTapThreshold();
-        if (lastTapAt && now - lastTapAt <= threshold) {
-          if (clickTimer) {
-            clearTimeout(clickTimer);
-            clickTimer = null;
-          }
-          lastTapAt = 0;
-          self.showCustomValuePopup(item, (v) => {
-            self.scores[item.id] = v;
-            self.refreshCard(card, item);
-            self.updateTotalDisplay();
-          }, true);
-          return;
-        }
-        lastTapAt = now;
-        if (clickTimer) {
-          clearTimeout(clickTimer);
-          clickTimer = null;
-        }
-        clickTimer = setTimeout(() => {
-          self.scores[item.id] = self.scores[item.id] === 0 ? item.points : 0;
-          self.refreshCard(card, item);
-          self.updateTotalDisplay();
-          clickTimer = null;
-          lastTapAt = 0;
-        }, threshold + 20);
-      }
-    });
-    card.addEventListener("pointercancel", () => {
-      if (pressTimer) clearTimeout(pressTimer);
-      hasMoved = true;
-      lastTapAt = 0;
-    });
-    card.addEventListener("pointerleave", () => {
-      if (pressTimer) clearTimeout(pressTimer);
-    });
-    card.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
+      ext,
+      dateStr: this.dateStr,
+      onInsert: (text) => this.insertTextAtCursor(text)
     });
   }
-  refreshCard(card, item) {
-    const scoreVal = this.scores[item.id] || 0;
-    const isEarned = scoreVal > 0;
-    const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
-    const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-    const isDeductedActive = isDeductItem && scoreVal !== 0;
-    card.classList.toggle("is-earned", isEarned);
-    card.classList.toggle("is-negative", isNeg);
-    card.classList.toggle("is-deducted-active", isDeductedActive);
-    const pointsEl = card.querySelector(".card-points");
-    if (pointsEl) {
-      pointsEl.textContent = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
-    }
+  renderScoreCard(item, grid, yesterdayData) {
+    return renderScoreCard({
+      item,
+      grid,
+      yesterdayData,
+      getScore: (itemId) => this.scores[itemId] || 0,
+      isTouchMode: this.isTouchOptimizedMode(),
+      longPressMs: this.getLongPressDuration(),
+      getDoubleTapThreshold: () => this.plugin.getDoubleTapThreshold(),
+      triggerHaptic: (style) => this.triggerHaptic(style),
+      onToggleScore: (targetItem) => {
+        this.scores[targetItem.id] = this.scores[targetItem.id] === 0 ? targetItem.points : 0;
+        this.refreshCardByItem(targetItem);
+        this.updateTotalDisplay();
+      },
+      onCustomValue: (targetItem, quickOnly, card) => {
+        this.showCustomValuePopup(
+          targetItem,
+          (v) => {
+            this.scores[targetItem.id] = v;
+            refreshScoreCard(card, targetItem, this.scores[targetItem.id] || 0);
+            this.updateTotalDisplay();
+          },
+          quickOnly
+        );
+      }
+    });
+  }
+  refreshCardByItem(item) {
+    const card = this.contentEl.querySelector('.kid-score-card[data-item-id="' + item.id + '"]');
+    if (!card) return;
+    refreshScoreCard(card, item, this.scores[item.id] || 0);
   }
   showCustomValuePopup(item, callback, quickOnly = false) {
-    const self = this;
-    const openEdit = () => {
-      new EditItemModal(self.app, self.plugin, item, async () => {
-        await self.renderModal();
-      }).open();
-    };
-    new ScoreItemModal(
-      self.app,
-      self.plugin,
+    openScoreItemValueModal({
+      app: this.app,
+      plugin: this.plugin,
       item,
-      self.scores[item.id] || item.points,
+      currentValue: this.scores[item.id] || item.points,
       quickOnly,
-      (val) => callback(val),
-      () => openEdit()
-    ).open();
+      onValue: callback,
+      onRefresh: async () => {
+        await this.renderModal();
+      }
+    });
   }
   showAddItemPopup(category) {
-    const self = this;
-    new AddItemModal(self.app, self.plugin, category, async () => {
-      await self.renderModal();
-    }).open();
+    openAddItemModal(this.app, this.plugin, category, async () => {
+      await this.renderModal();
+    });
   }
   renderCustomItems() {
     const self = this;
     const container = this.customItemsContainer;
     if (!container) return;
-    container.empty();
-    if (this.customItems.length === 0) {
-      container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" });
-      return;
-    }
-    for (let i = 0; i < this.customItems.length; i++) {
-      ((idx) => {
+    renderCustomItemsList({
+      container,
+      customItems: this.customItems,
+      isTouchMode: this.isTouchOptimizedMode(),
+      longPressMs: this.getLongPressDuration(),
+      onQuickAdjust: (idx) => self.showQuickCustomScorePopup(idx),
+      onEdit: (idx) => self.showEditCustomItemPopup(idx),
+      onDelete: (idx) => {
         const ci = self.customItems[idx];
-        const wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
-        const row = wrap.createDiv({ cls: "kid-score-custom-row" });
-        const main = row.createDiv({ cls: "kid-score-custom-main" });
-        main.createSpan({ cls: "custom-emoji", text: ci.emoji });
-        main.createSpan({ cls: "custom-name", text: ci.name });
-        main.createSpan({
-          cls: "custom-points " + (ci.points >= 0 ? "pos" : "neg"),
-          text: (ci.points >= 0 ? "+" : "") + ci.points + " \u5206"
-        });
-        const quick = row.createEl("button", {
-          cls: "custom-row-more-btn",
-          text: "\u8C03\u5206"
-        });
-        quick.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          self.showQuickCustomScorePopup(idx);
-        };
-        const edit = row.createEl("button", { cls: "custom-edit-btn", text: "\u270F\uFE0F" });
-        edit.onclick = (e) => {
-          e.stopPropagation();
-          self.showEditCustomItemPopup(idx);
-        };
-        const del = row.createEl("button", { cls: "custom-delete-btn", text: "\u{1F5D1}" });
-        del.onclick = (e) => {
-          e.stopPropagation();
-          if (!confirm("\u786E\u5B9A\u5220\u9664\u4E34\u65F6\u4E8B\u9879\u300C" + ci.name + "\u300D\u5417\uFF1F")) return;
-          self.customItems.splice(idx, 1);
-          self.renderCustomItems();
-          self.updateTotalDisplay();
-        };
-        if (ci.note) {
-          wrap.createDiv({ cls: "custom-item-note", text: ci.note });
-        }
-        let pressTimer = null;
-        let isLongPress = false;
-        let hasMoved = false;
-        let startX = 0;
-        let startY = 0;
-        let lastTapAt = 0;
-        const longPressMs = self.getLongPressDuration();
-        const isTouchMode = self.isTouchOptimizedMode();
-        row.addEventListener("pointerdown", (e) => {
-          if (e.target === del || del.contains(e.target) || e.target === quick || quick.contains(e.target) || e.target === edit || edit.contains(e.target))
-            return;
-          isLongPress = false;
-          hasMoved = false;
-          startX = e.clientX;
-          startY = e.clientY;
-          pressTimer = setTimeout(() => {
-            if (!hasMoved) {
-              isLongPress = true;
-              self.triggerHaptic("longpress");
-              self.showEditCustomItemPopup(idx);
-            }
-          }, longPressMs);
-        });
-        row.addEventListener("pointermove", (e) => {
-          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
-            hasMoved = true;
-            if (pressTimer) clearTimeout(pressTimer);
-          }
-        });
-        row.addEventListener("pointerup", (e) => {
-          if (pressTimer) clearTimeout(pressTimer);
-          if (e.target === del || del.contains(e.target) || e.target === quick || quick.contains(e.target) || e.target === edit || edit.contains(e.target))
-            return;
-          if (isLongPress || hasMoved) return;
-          if (isTouchMode) {
-            self.showQuickCustomScorePopup(idx);
-            return;
-          }
-          const now = Date.now();
-          const threshold = self.plugin.getDoubleTapThreshold();
-          if (lastTapAt && now - lastTapAt <= threshold) {
-            lastTapAt = 0;
-            self.showQuickCustomScorePopup(idx);
-            return;
-          }
-          lastTapAt = now;
-        });
-        row.addEventListener("pointercancel", () => {
-          if (pressTimer) clearTimeout(pressTimer);
-          hasMoved = true;
-          lastTapAt = 0;
-        });
-        row.addEventListener("contextmenu", (e) => {
-          e.preventDefault();
-        });
-      })(i);
-    }
+        if (!ci) return;
+        if (!confirm("\u786E\u5B9A\u5220\u9664\u4E34\u65F6\u4E8B\u9879\u300C" + ci.name + "\u300D\u5417\uFF1F")) return;
+        self.customItems.splice(idx, 1);
+        self.renderCustomItems();
+        self.updateTotalDisplay();
+      }
+    });
   }
   showAddCustomItemForm() {
-    const self = this;
-    new AddCustomModal(self.app, self.plugin, (emoji, name, points, note) => {
-      self.customItems.push({
-        id: "custom_" + Date.now(),
-        emoji,
-        name,
-        points,
-        note
-      });
-      self.renderCustomItems();
-      self.updateTotalDisplay();
-    }).open();
+    openAddCustomItemModal({
+      app: this.app,
+      plugin: this.plugin,
+      onSubmit: (emoji, name, points, note) => {
+        this.customItems.push({
+          id: "custom_" + Date.now(),
+          emoji,
+          name,
+          points,
+          note
+        });
+        this.renderCustomItems();
+        this.updateTotalDisplay();
+      }
+    });
   }
   showEditCustomItemPopup(idx) {
-    const self = this;
-    const ci = self.customItems[idx];
-    if (!ci) return;
-    new EditCustomModal(self.app, self.plugin, ci, (emoji, name, points, note) => {
-      self.customItems[idx].emoji = emoji;
-      self.customItems[idx].name = name;
-      self.customItems[idx].points = points;
-      self.customItems[idx].note = note;
-      self.renderCustomItems();
-      self.updateTotalDisplay();
-    }).open();
+    openEditCustomItemModal({
+      app: this.app,
+      plugin: this.plugin,
+      customItem: this.customItems[idx],
+      onSubmit: (emoji, name, points, note) => {
+        this.customItems[idx].emoji = emoji;
+        this.customItems[idx].name = name;
+        this.customItems[idx].points = points;
+        this.customItems[idx].note = note;
+        this.renderCustomItems();
+        this.updateTotalDisplay();
+      }
+    });
   }
   showQuickCustomScorePopup(idx) {
-    const self = this;
-    const ci = self.customItems[idx];
-    if (!ci) return;
-    new QuickCustomModal(self.app, self.plugin, ci, (points) => {
-      self.customItems[idx].points = points;
-      self.renderCustomItems();
-      self.updateTotalDisplay();
-    }).open();
+    openQuickCustomAdjustModal({
+      app: this.app,
+      plugin: this.plugin,
+      customItem: this.customItems[idx],
+      onSubmit: (points) => {
+        this.customItems[idx].points = points;
+        this.renderCustomItems();
+        this.updateTotalDisplay();
+      }
+    });
   }
   async showCalendarPicker() {
-    const self = this;
     const allScores = await this.plugin.getAllScores();
-    const recordDates = new Set(allScores.map((s) => s.date));
-    const overlay = document.createElement("div");
-    overlay.className = "kid-score-value-overlay";
-    const popup = document.createElement("div");
-    popup.className = "kid-score-calendar-popup";
-    let viewDate = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
-    const header = popup.createDiv({ cls: "cal-header" });
-    const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25C0" });
-    const monthLabel = header.createEl("span", { cls: "cal-month-label" });
-    const nextMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25B6" });
-    const grid = popup.createDiv({ cls: "cal-grid" });
-    ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"].forEach((d) => {
-      grid.createEl("div", { cls: "cal-weekday", text: d });
-    });
-    const renderMonth = () => {
-      const year = viewDate.getFullYear();
-      const month = viewDate.getMonth();
-      monthLabel.textContent = year + "\u5E74" + (month + 1) + "\u6708";
-      grid.querySelectorAll(".cal-day").forEach((el) => el.remove());
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      const startOffset = firstDay.getDay();
-      const todayStr = formatDate(0);
-      for (let i = 0; i < startOffset; i++) {
-        grid.createEl("div", { cls: "cal-day is-empty" });
-      }
-      for (let d = 1; d <= lastDay.getDate(); d++) {
-        const ds = year + "-" + String(month + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
-        const cell = grid.createEl("button", { cls: "cal-day" });
-        cell.textContent = String(d);
-        if (ds === self.dateStr) cell.addClass("is-selected");
-        if (ds === todayStr) cell.addClass("is-today");
-        if (recordDates.has(ds)) cell.addClass("has-record");
-        cell.onclick = () => {
-          if (ds > todayStr) return;
-          self.dateStr = ds;
-          self.renderModal();
-          removeOverlay();
-        };
-      }
-    };
-    prevMonthBtn.onclick = () => {
-      viewDate.setMonth(viewDate.getMonth() - 1);
-      renderMonth();
-    };
-    nextMonthBtn.onclick = () => {
-      viewDate.setMonth(viewDate.getMonth() + 1);
-      renderMonth();
-    };
-    renderMonth();
-    const cancelBtn = popup.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-    cancelBtn.style.marginTop = "10px";
-    cancelBtn.style.width = "100%";
-    cancelBtn.onclick = () => {
-      removeOverlay();
-    };
-    popup.appendChild(cancelBtn);
-    overlay.appendChild(popup);
-    const removeOverlay = () => {
-      var _a;
-      overlay.remove();
-      window.removeEventListener("popstate", onPopstate);
-      if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
-        history.back();
-      }
-    };
-    const onPopstate = (e) => {
-      var _a;
-      if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
-        overlay.remove();
-        window.removeEventListener("popstate", onPopstate);
-      }
-    };
-    history.pushState({ kidScoreOverlay: true }, "");
-    window.addEventListener("popstate", onPopstate);
-    overlay.addEventListener("mousedown", (e) => {
-      if (e.target === overlay) {
-        e.preventDefault();
-        removeOverlay();
+    openCalendarPicker({
+      currentDate: this.dateStr,
+      recordDates: new Set(allScores.map((s) => s.date)),
+      onSelect: (dateStr) => {
+        this.dateStr = dateStr;
+        this.renderModal();
       }
     });
-    document.body.appendChild(overlay);
   }
   updateTotalDisplay() {
     var _a;
     if (!this.totalDisplay) return;
-    let total = 0;
-    let completed = 0;
-    for (const item of this.plugin.currentUser.items) {
-      const val = this.scores[item.id] || 0;
-      total += val;
-      const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
-      if (isDeduct ? val !== 0 : val > 0) {
-        completed++;
-      }
-    }
-    completed += this.customItems.length;
-    const dailyGoal = ((_a = this.plugin.currentUser.goals) == null ? void 0 : _a.daily) || 1;
-    const pct = Math.min(100, Math.round(completed / dailyGoal * 100));
-    this.totalDisplay.empty();
-    this.totalDisplay.createSpan({ text: "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206  " });
-    const goalWrap = this.totalDisplay.createSpan({ cls: "daily-goal-wrap" });
-    goalWrap.createSpan({ cls: "daily-goal-label", text: "\u4ECA\u65E5\u76EE\u6807 " + completed + "/" + dailyGoal });
-    const barWrap = goalWrap.createSpan({ cls: "daily-goal-bar-wrap" });
-    const bar = barWrap.createSpan({ cls: "daily-goal-bar" });
-    bar.style.width = pct + "%";
-    if (pct >= 100) bar.addClass("is-complete");
+    renderDailyTotalDisplay({
+      element: this.totalDisplay,
+      items: this.plugin.currentUser.items,
+      scores: this.scores,
+      customItems: this.customItems,
+      dailyGoal: ((_a = this.plugin.currentUser.goals) == null ? void 0 : _a.daily) || 1
+    });
   }
 };
 
 // src/settings/settings-tab.ts
-var import_obsidian5 = require("obsidian");
-var KidScoreSettingTab = class extends import_obsidian5.PluginSettingTab {
+var import_obsidian17 = require("obsidian");
+
+// src/settings/category-settings.ts
+var import_obsidian9 = require("obsidian");
+
+// src/settings/category-settings-list.ts
+var import_obsidian8 = require("obsidian");
+function renderCategorySettingsList({
+  plugin,
+  catWrap,
+  bindSettingsInput,
+  refreshItems
+}) {
+  const dragState = {
+    dragging: false,
+    dragIdx: -1,
+    placeholder: null,
+    ghost: null,
+    rows: []
+  };
+  const getDragRowIndex = (y) => {
+    for (let index = 0; index < dragState.rows.length; index++) {
+      const rect = dragState.rows[index].getBoundingClientRect();
+      if (y < rect.top + rect.height / 2) return index;
+    }
+    return dragState.rows.length;
+  };
+  const onDragMove = (clientY) => {
+    var _a;
+    if (!dragState.dragging) return;
+    if (dragState.ghost) dragState.ghost.style.top = clientY - 20 + "px";
+    const targetIdx = getDragRowIndex(clientY);
+    const parent = (_a = dragState.rows[0]) == null ? void 0 : _a.parentElement;
+    if (!parent || !dragState.placeholder) return;
+    if (targetIdx >= dragState.rows.length) parent.appendChild(dragState.placeholder);
+    else parent.insertBefore(dragState.placeholder, dragState.rows[targetIdx]);
+  };
+  const pointerMoveHandler = (e) => {
+    onDragMove(e.clientY);
+  };
+  const pointerCancelHandler = () => {
+    document.removeEventListener("pointermove", pointerMoveHandler);
+    document.removeEventListener("pointerup", pointerUpHandler);
+    document.removeEventListener("pointercancel", pointerCancelHandler);
+    dragState.dragging = false;
+    if (dragState.ghost) {
+      dragState.ghost.remove();
+      dragState.ghost = null;
+    }
+    if (dragState.placeholder) {
+      dragState.placeholder.remove();
+      dragState.placeholder = null;
+    }
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
+    renderCategories();
+  };
+  const onDragEnd = (clientY) => {
+    if (!dragState.dragging) return;
+    dragState.dragging = false;
+    if (dragState.ghost) dragState.ghost.remove();
+    if (dragState.placeholder) dragState.placeholder.remove();
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
+    const targetIdx = getDragRowIndex(clientY);
+    let fromIdx = dragState.dragIdx;
+    if (targetIdx > fromIdx) fromIdx--;
+    const arr = plugin.currentUser.categories;
+    if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+      const moved = arr.splice(fromIdx, 1)[0];
+      arr.splice(targetIdx, 0, moved);
+      (async () => {
+        await plugin.saveSettings();
+        renderCategories();
+        refreshItems();
+      })();
+    } else {
+      renderCategories();
+    }
+  };
+  const pointerUpHandler = (e) => {
+    document.removeEventListener("pointermove", pointerMoveHandler);
+    document.removeEventListener("pointerup", pointerUpHandler);
+    document.removeEventListener("pointercancel", pointerCancelHandler);
+    onDragEnd(e.clientY);
+  };
+  const startDrag = (idx, row, clientY) => {
+    dragState.dragging = true;
+    dragState.dragIdx = idx;
+    dragState.rows = Array.from(
+      catWrap.querySelectorAll(".kid-score-cat-row")
+    );
+    const rect = row.getBoundingClientRect();
+    const ghost = row.cloneNode(true);
+    ghost.className = "kid-score-cat-row settings-drag-ghost";
+    ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;";
+    document.body.appendChild(ghost);
+    dragState.ghost = ghost;
+    const placeholder = document.createElement("div");
+    placeholder.className = "settings-drag-placeholder";
+    placeholder.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
+    if (row.parentElement) row.parentElement.insertBefore(placeholder, row);
+    dragState.placeholder = placeholder;
+    row.style.display = "none";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    document.addEventListener("pointermove", pointerMoveHandler);
+    document.addEventListener("pointerup", pointerUpHandler);
+    document.addEventListener("pointercancel", pointerCancelHandler);
+  };
+  const renderCategories = () => {
+    catWrap.empty();
+    dragState.rows = [];
+    const categories = plugin.currentUser.categories || [];
+    for (let idx = 0; idx < categories.length; idx++) {
+      const row = catWrap.createDiv({ cls: "kid-score-cat-row" });
+      const handle = row.createEl("span", {
+        cls: "settings-drag-handle",
+        text: "\u2630"
+      });
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        startDrag(idx, row, e.clientY);
+      });
+      const input = row.createEl("input", { cls: "settings-name-input" });
+      bindSettingsInput(input);
+      input.value = categories[idx];
+      input.onchange = async () => {
+        const oldName = plugin.currentUser.categories[idx];
+        const newName = input.value.trim();
+        if (!newName) return;
+        plugin.currentUser.categories[idx] = newName;
+        for (const item of plugin.currentUser.items) {
+          if (item.category === oldName) item.category = newName;
+        }
+        await plugin.saveSettings();
+        refreshItems();
+      };
+      const delBtn = row.createEl("button", {
+        cls: "settings-delete-btn",
+        text: "\u{1F5D1}"
+      });
+      delBtn.onclick = async () => {
+        const removedCategory = plugin.currentUser.categories[idx];
+        if (!confirm(
+          "\u786E\u5B9A\u5220\u9664\u5206\u7C7B\u300C" + removedCategory + "\u300D\u5417\uFF1F\u8BE5\u5206\u7C7B\u4E0B\u7684\u9879\u76EE\u5C06\u81EA\u52A8\u5F52\u5165\u7B2C\u4E00\u4E2A\u5206\u7C7B\u3002"
+        )) {
+          return;
+        }
+        try {
+          plugin.currentUser.categories.splice(idx, 1);
+          const fallback = plugin.currentUser.categories[0] || "\u5176\u4ED6";
+          for (const item of plugin.currentUser.items) {
+            if (item.category === removedCategory) item.category = fallback;
+          }
+          await plugin.saveSettings();
+          renderCategories();
+          refreshItems();
+        } catch (error) {
+          new import_obsidian8.Notice(
+            "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+          );
+        }
+      };
+      dragState.rows.push(row);
+    }
+  };
+  renderCategories();
+}
+
+// src/settings/category-settings.ts
+function renderCategorySettings({
+  plugin,
+  containerEl,
+  bindSettingsInput,
+  refreshItems
+}) {
+  const catHeaderWrap = containerEl.createDiv({ cls: "kid-score-section-header" });
+  catHeaderWrap.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
+  catHeaderWrap.createSpan({ cls: "kid-score-section-desc", text: "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A" });
+  const catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
+  const renderCategories = () => renderCategorySettingsList({
+    plugin,
+    catWrap,
+    bindSettingsInput,
+    refreshItems
+  });
+  renderCategories();
+  new import_obsidian9.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
+    (btn) => btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(async () => {
+      plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
+      await plugin.saveSettings();
+      renderCategories();
+      refreshItems();
+    })
+  );
+  new import_obsidian9.Setting(containerEl).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
+    (btn) => btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(async () => {
+      await plugin.saveSettings();
+      renderCategories();
+      refreshItems();
+      new import_obsidian9.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
+    })
+  );
+}
+
+// src/settings/content-sections.ts
+var import_obsidian11 = require("obsidian");
+
+// src/settings/diary-module-settings.ts
+var import_obsidian10 = require("obsidian");
+function renderDiaryModuleSettingsSection({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
+  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F9E9} \u65E5\u8BB0\u6A21\u5757" });
+  header.createSpan({
+    cls: "kid-score-rules-desc",
+    text: "\u53EF\u4EE5\u81EA\u5B9A\u4E49\u663E\u793A\u5728\u6253\u5206\u9875\u7684\u5E38\u7528\u8BB0\u5F55\u6A21\u5757"
+  });
+  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  let isOpen = true;
+  const ensureDiaryModules = () => {
+    if (!Array.isArray(plugin.currentUser.diaryModules) || plugin.currentUser.diaryModules.length === 0) {
+      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+    }
+  };
+  const render = () => {
+    ensureDiaryModules();
+    body.empty();
+    const hint = body.createEl("p", {
+      cls: "kid-score-hint",
+      text: "\u4F60\u53EF\u4EE5\u4FEE\u6539\u6A21\u5757\u540D\u79F0\u548C\u63D0\u793A\u6587\u6848\uFF0C\u4E5F\u53EF\u4EE5\u65B0\u589E\u6216\u5220\u9664\u6A21\u5757\u3002\u5929\u6C14/\u5FC3\u60C5\u4F1A\u4FDD\u7559\u5FEB\u6377 emoji \u529F\u80FD\u3002"
+    });
+    hint.style.marginBottom = "10px";
+    const list = body.createDiv({ cls: "diary-module-settings-list" });
+    plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
+      const row = list.createDiv({ cls: "diary-module-settings-row" });
+      const labelInput = row.createEl("input", {
+        cls: "diary-module-settings-input",
+        type: "text"
+      });
+      labelInput.value = moduleDef.label || "";
+      labelInput.placeholder = "\u6A21\u5757\u540D\u79F0";
+      bindSettingsInput(labelInput);
+      labelInput.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].label = labelInput.value.trim() || moduleDef.label || "\u65B0\u6A21\u5757";
+        await plugin.saveSettings();
+        render();
+      };
+      const placeholderInput = row.createEl("input", {
+        cls: "diary-module-settings-input is-wide",
+        type: "text"
+      });
+      placeholderInput.value = moduleDef.placeholder || "";
+      placeholderInput.placeholder = "\u63D0\u793A\u6587\u6848";
+      bindSettingsInput(placeholderInput);
+      placeholderInput.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
+        await plugin.saveSettings();
+      };
+      const kindSelect = row.createEl("select", {
+        cls: "diary-module-settings-select"
+      });
+      [
+        { value: "quick", label: "\u5355\u884C\u5FEB\u6377" },
+        { value: "multi", label: "\u591A\u884C\u8BB0\u5F55" }
+      ].forEach((optionDef) => {
+        const opt = kindSelect.createEl("option", {
+          text: optionDef.label,
+          value: optionDef.value
+        });
+        if ((moduleDef.kind || "multi") === optionDef.value) opt.selected = true;
+      });
+      kindSelect.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].kind = kindSelect.value;
+        await plugin.saveSettings();
+      };
+      const delBtn = row.createEl("button", {
+        cls: "settings-delete-btn",
+        text: "\u{1F5D1}"
+      });
+      delBtn.onclick = async () => {
+        plugin.currentUser.diaryModules.splice(idx, 1);
+        await plugin.saveSettings();
+        render();
+      };
+    });
+    const actions = body.createDiv({ cls: "kid-score-rules-actions" });
+    const addBtn = actions.createEl("button", {
+      cls: "mod-cta kid-score-rules-save-btn",
+      text: "\uFF0B \u65B0\u589E\u6A21\u5757"
+    });
+    addBtn.onclick = async () => {
+      plugin.currentUser.diaryModules.push({
+        id: "module_" + Date.now(),
+        label: "\u65B0\u6A21\u5757",
+        placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
+        kind: "multi"
+      });
+      await plugin.saveSettings();
+      render();
+    };
+    const resetBtn = actions.createEl("button", {
+      cls: "kid-score-rules-cancel-btn",
+      text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757"
+    });
+    resetBtn.onclick = async () => {
+      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+      await plugin.saveSettings();
+      render();
+      new import_obsidian10.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
+    };
+  };
+  render();
+  header.addEventListener("click", () => {
+    isOpen = !isOpen;
+    toggle.textContent = isOpen ? "\u25BC" : "\u25B6";
+    body.toggleClass("is-hidden", !isOpen);
+  });
+}
+
+// src/settings/content-sections.ts
+function renderContentSettingsSections({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  const settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
+  const settingsRulesToggle = settingsRulesHeader.createEl("span", {
+    cls: "kid-score-rules-toggle",
+    text: "\u25B6"
+  });
+  settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  settingsRulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
+  const settingsRulesEditBtn = settingsRulesHeader.createEl("button", {
+    cls: "kid-score-rules-edit-btn",
+    text: "\u270F\uFE0F"
+  });
+  const settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
+  const settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
+  const settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const settingsRulesTextarea = settingsRulesEdit.createEl("textarea", {
+    cls: "kid-score-rules-textarea"
+  });
+  settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
+  bindSettingsInput(settingsRulesTextarea);
+  settingsRulesTextarea.value = plugin.currentUser.scoringRules || "";
+  const settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
+  const settingsRulesSaveBtn = settingsRulesActRow.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\u4FDD\u5B58\u89C4\u5219"
+  });
+  const settingsRulesCancelBtn = settingsRulesActRow.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u53D6\u6D88"
+  });
+  const renderSettingsRules = () => {
+    settingsRulesView.empty();
+    const text = plugin.currentUser.scoringRules || "";
+    if (text.trim()) {
+      import_obsidian11.MarkdownRenderer.render(plugin.app, text, settingsRulesView, "", plugin);
+    } else {
+      settingsRulesView.createEl("p", {
+        cls: "kid-score-rules-empty",
+        text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
+      });
+    }
+  };
+  renderSettingsRules();
+  let settingsRulesOpen = !!(plugin.currentUser.scoringRules && plugin.currentUser.scoringRules.trim());
+  if (!settingsRulesOpen) {
+    settingsRulesBody.addClass("is-hidden");
+  } else {
+    settingsRulesToggle.textContent = "\u25BC";
+  }
+  settingsRulesHeader.addEventListener("click", (e) => {
+    if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
+    settingsRulesOpen = !settingsRulesOpen;
+    settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
+    settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
+  });
+  let settingsRulesIsEditing = false;
+  settingsRulesEditBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    settingsRulesIsEditing = !settingsRulesIsEditing;
+    if (settingsRulesIsEditing) {
+      settingsRulesOpen = true;
+      settingsRulesToggle.textContent = "\u25BC";
+      settingsRulesBody.removeClass("is-hidden");
+      settingsRulesTextarea.value = plugin.currentUser.scoringRules || "";
+      settingsRulesView.addClass("is-hidden");
+      settingsRulesEdit.removeClass("is-hidden");
+      settingsRulesTextarea.focus();
+    } else {
+      settingsRulesView.removeClass("is-hidden");
+      settingsRulesEdit.addClass("is-hidden");
+    }
+  });
+  settingsRulesSaveBtn.addEventListener("click", async () => {
+    plugin.currentUser.scoringRules = settingsRulesTextarea.value;
+    await plugin.saveSettings();
+    renderSettingsRules();
+    settingsRulesIsEditing = false;
+    settingsRulesView.removeClass("is-hidden");
+    settingsRulesEdit.addClass("is-hidden");
+    new import_obsidian11.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+  });
+  settingsRulesCancelBtn.addEventListener("click", () => {
+    settingsRulesIsEditing = false;
+    settingsRulesView.removeClass("is-hidden");
+    settingsRulesEdit.addClass("is-hidden");
+  });
+  const tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
+  const tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
+  tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
+  tmplHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
+  const tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
+  const tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
+  const tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
+  const tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+  bindSettingsInput(tmplTextarea);
+  tmplTextarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+  tmplTextarea.style.minHeight = "220px";
+  const tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
+  tmplPreviewWrap.style.display = "none";
+  const tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
+  const tmplPreviewBtn = tmplActRow.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "MD\u9884\u89C8"
+  });
+  const tmplSaveBtn = tmplActRow.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\u4FDD\u5B58\u6A21\u677F"
+  });
+  const tmplCancelBtn = tmplActRow.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u53D6\u6D88"
+  });
+  const renderTemplateView = () => {
+    tmplView.empty();
+    const text = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+    import_obsidian11.MarkdownRenderer.render(plugin.app, text, tmplView, "", plugin);
+  };
+  renderTemplateView();
+  let tmplOpen = true;
+  tmplToggle.textContent = "\u25BC";
+  let tmplIsEditing = false;
+  let tmplIsPreview = false;
+  const refreshTemplatePreview = () => {
+    tmplPreviewWrap.empty();
+    import_obsidian11.MarkdownRenderer.render(
+      plugin.app,
+      tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
+      tmplPreviewWrap,
+      "",
+      plugin
+    );
+  };
+  tmplHeader.addEventListener("click", (e) => {
+    if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
+    tmplOpen = !tmplOpen;
+    tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
+    tmplBody.toggleClass("is-hidden", !tmplOpen);
+  });
+  tmplEditBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    tmplIsEditing = !tmplIsEditing;
+    if (tmplIsEditing) {
+      tmplOpen = true;
+      tmplToggle.textContent = "\u25BC";
+      tmplBody.removeClass("is-hidden");
+      tmplTextarea.value = plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+      tmplView.addClass("is-hidden");
+      tmplEdit.removeClass("is-hidden");
+      tmplIsPreview = false;
+      tmplPreviewWrap.style.display = "none";
+      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+      tmplTextarea.focus();
+    } else {
+      tmplView.removeClass("is-hidden");
+      tmplEdit.addClass("is-hidden");
+    }
+  });
+  tmplPreviewBtn.addEventListener("click", () => {
+    tmplIsPreview = !tmplIsPreview;
+    if (tmplIsPreview) {
+      refreshTemplatePreview();
+      tmplPreviewWrap.style.display = "";
+      tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
+    } else {
+      tmplPreviewWrap.style.display = "none";
+      tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+    }
+  });
+  tmplTextarea.addEventListener("input", () => {
+    if (!tmplIsPreview) return;
+    refreshTemplatePreview();
+  });
+  tmplSaveBtn.addEventListener("click", async () => {
+    plugin.currentUser.diaryTemplate = tmplTextarea.value;
+    await plugin.saveSettings();
+    renderTemplateView();
+    tmplIsEditing = false;
+    tmplIsPreview = false;
+    tmplPreviewWrap.style.display = "none";
+    tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+    tmplView.removeClass("is-hidden");
+    tmplEdit.addClass("is-hidden");
+    new import_obsidian11.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
+  });
+  tmplCancelBtn.addEventListener("click", () => {
+    tmplIsEditing = false;
+    tmplIsPreview = false;
+    tmplPreviewWrap.style.display = "none";
+    tmplPreviewBtn.textContent = "MD\u9884\u89C8";
+    tmplView.removeClass("is-hidden");
+    tmplEdit.addClass("is-hidden");
+  });
+  renderDiaryModuleSettingsSection({
+    plugin,
+    containerEl,
+    bindSettingsInput
+  });
+}
+
+// src/settings/goal-settings-section.ts
+var import_obsidian12 = require("obsidian");
+function renderGoalSettingsSection({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  const goalsWrap = containerEl.createDiv({ cls: "kid-score-goals-section" });
+  goalsWrap.createEl("h3", { text: "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807" });
+  goalsWrap.createEl("p", {
+    cls: "kid-score-hint",
+    text: "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
+  });
+  const goalsGrid = goalsWrap.createDiv({ cls: "kid-score-goals-grid" });
+  const goalFields = [
+    { key: "daily", label: "\u6BCF\u65E5\u76EE\u6807" },
+    { key: "weekly", label: "\u6BCF\u5468\u76EE\u6807" },
+    { key: "monthly", label: "\u6BCF\u6708\u76EE\u6807" }
+  ];
+  for (const goalField of goalFields) {
+    const cell = goalsGrid.createDiv({ cls: "kid-score-goal-cell" });
+    cell.createEl("label", { text: goalField.label });
+    const input = cell.createEl("input", { cls: "kid-score-goal-input" });
+    input.type = "number";
+    input.min = "1";
+    input.value = String(plugin.currentUser.goals[goalField.key] || 1);
+    bindSettingsInput(input);
+    input.onchange = async () => {
+      const value = parseInt(input.value, 10);
+      if (Number.isFinite(value) && value > 0) {
+        plugin.currentUser.goals[goalField.key] = value;
+        await plugin.saveSettings();
+        new import_obsidian12.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
+      }
+    };
+  }
+}
+
+// src/settings/import-export-settings.ts
+var import_obsidian13 = require("obsidian");
+function renderImportExportSettings({
+  plugin,
+  containerEl,
+  refresh
+}) {
+  containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
+  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+    btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
+      const data = { categories: plugin.currentUser.categories, items: plugin.currentUser.items };
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "little-milestones-config.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  });
+  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+    btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".json";
+      fileInput.onchange = async () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (Array.isArray(data.items)) plugin.currentUser.items = data.items;
+          if (Array.isArray(data.categories)) plugin.currentUser.categories = data.categories;
+          await plugin.saveSettings();
+          refresh();
+          new import_obsidian13.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
+        } catch (e) {
+          new import_obsidian13.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
+        }
+      };
+      fileInput.click();
+    });
+  });
+}
+
+// src/settings/item-settings.ts
+var import_obsidian15 = require("obsidian");
+
+// src/settings/item-sorting.ts
+function sortItemsByCategories(items, categories) {
+  items.sort((a, b) => {
+    let ai = categories.indexOf(a.category);
+    if (ai === -1) ai = 9999;
+    let bi = categories.indexOf(b.category);
+    if (bi === -1) bi = 9999;
+    return ai - bi;
+  });
+}
+
+// src/settings/item-settings-list.ts
+var import_obsidian14 = require("obsidian");
+function renderItemSettingsList({
+  plugin,
+  itemsWrap,
+  bindSettingsInput,
+  pendingScrollItemId,
+  setPendingScrollItemId
+}) {
+  const dragState = {
+    dragging: false,
+    dragIdx: -1,
+    placeholder: null,
+    ghost: null,
+    rows: []
+  };
+  const getDragRowIndex = (y) => {
+    for (let index = 0; index < dragState.rows.length; index++) {
+      const rect = dragState.rows[index].getBoundingClientRect();
+      if (y < rect.top + rect.height / 2) return index;
+    }
+    return dragState.rows.length;
+  };
+  const onDragMove = (clientY) => {
+    var _a;
+    if (!dragState.dragging) return;
+    if (dragState.ghost) dragState.ghost.style.top = clientY - 20 + "px";
+    const targetIdx = getDragRowIndex(clientY);
+    const parent = (_a = dragState.rows[0]) == null ? void 0 : _a.parentElement;
+    if (!parent || !dragState.placeholder) return;
+    if (targetIdx >= dragState.rows.length) {
+      parent.appendChild(dragState.placeholder);
+    } else {
+      parent.insertBefore(dragState.placeholder, dragState.rows[targetIdx]);
+    }
+  };
+  const pointerMoveHandler = (e) => {
+    onDragMove(e.clientY);
+  };
+  const pointerCancelHandler = () => {
+    document.removeEventListener("pointermove", pointerMoveHandler);
+    document.removeEventListener("pointerup", pointerUpHandler);
+    document.removeEventListener("pointercancel", pointerCancelHandler);
+    dragState.dragging = false;
+    if (dragState.ghost) {
+      dragState.ghost.remove();
+      dragState.ghost = null;
+    }
+    if (dragState.placeholder) {
+      dragState.placeholder.remove();
+      dragState.placeholder = null;
+    }
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
+    renderItems();
+  };
+  const onDragEnd = (clientY) => {
+    if (!dragState.dragging) return;
+    dragState.dragging = false;
+    if (dragState.ghost) dragState.ghost.remove();
+    if (dragState.placeholder) dragState.placeholder.remove();
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
+    const targetIdx = getDragRowIndex(clientY);
+    let fromIdx = dragState.dragIdx;
+    if (targetIdx > fromIdx) fromIdx--;
+    const arr = plugin.currentUser.items;
+    if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+      const moved = arr.splice(fromIdx, 1)[0];
+      arr.splice(targetIdx, 0, moved);
+      (async () => {
+        await plugin.saveSettings();
+        renderItems();
+      })();
+    } else {
+      renderItems();
+    }
+  };
+  const pointerUpHandler = (e) => {
+    document.removeEventListener("pointermove", pointerMoveHandler);
+    document.removeEventListener("pointerup", pointerUpHandler);
+    document.removeEventListener("pointercancel", pointerCancelHandler);
+    onDragEnd(e.clientY);
+  };
+  const autoResize = (textarea) => {
+    textarea.style.height = "auto";
+    textarea.style.height = textarea.scrollHeight + "px";
+  };
+  const startDrag = (idx, wrap, clientY) => {
+    dragState.dragging = true;
+    dragState.dragIdx = idx;
+    dragState.rows = Array.from(
+      itemsWrap.querySelectorAll(".settings-item-wrap")
+    );
+    const rect = wrap.getBoundingClientRect();
+    const ghost = wrap.cloneNode(true);
+    ghost.className = "settings-item-wrap settings-drag-ghost";
+    ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;padding:4px;";
+    document.body.appendChild(ghost);
+    dragState.ghost = ghost;
+    const placeholder = document.createElement("div");
+    placeholder.className = "settings-drag-placeholder";
+    placeholder.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
+    if (wrap.parentElement) wrap.parentElement.insertBefore(placeholder, wrap);
+    dragState.placeholder = placeholder;
+    wrap.style.display = "none";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    document.addEventListener("pointermove", pointerMoveHandler);
+    document.addEventListener("pointerup", pointerUpHandler);
+    document.addEventListener("pointercancel", pointerCancelHandler);
+  };
+  const renderItems = () => {
+    itemsWrap.empty();
+    dragState.rows = [];
+    if (plugin.currentUser.items.length === 0) {
+      itemsWrap.createEl("p", {
+        cls: "kid-score-hint",
+        text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01"
+      });
+      return;
+    }
+    const headerRow = itemsWrap.createDiv({
+      cls: "settings-item-row-v2 header-row"
+    });
+    ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach((header) => {
+      headerRow.createSpan({ text: header, cls: "col-header" });
+    });
+    let lastCategory = null;
+    for (let idx = 0; idx < plugin.currentUser.items.length; idx++) {
+      const item = plugin.currentUser.items[idx];
+      const category = item.category || "\u5176\u4ED6";
+      if (category !== lastCategory) {
+        lastCategory = category;
+        const groupHeader = itemsWrap.createDiv({
+          cls: "settings-cat-group-header"
+        });
+        groupHeader.createSpan({ text: category });
+      }
+      const wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
+      wrap.dataset.itemId = item.id;
+      const row = wrap.createDiv({ cls: "settings-item-row-v2" });
+      row.dataset.idx = String(idx);
+      const handle = row.createEl("span", {
+        cls: "settings-drag-handle",
+        text: "\u2630"
+      });
+      handle.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        startDrag(idx, wrap, e.clientY);
+      });
+      const emojiBtn = row.createEl("button", {
+        cls: "settings-emoji-btn",
+        text: item.emoji
+      });
+      emojiBtn.onclick = () => {
+        showEmojiPicker(async (emoji) => {
+          plugin.currentUser.items[idx].emoji = emoji;
+          await plugin.saveSettings();
+          emojiBtn.textContent = emoji;
+        });
+      };
+      const nameInput = row.createEl("input", { cls: "settings-name-input" });
+      nameInput.type = "text";
+      nameInput.value = item.name;
+      bindSettingsInput(nameInput);
+      nameInput.onchange = async () => {
+        plugin.currentUser.items[idx].name = nameInput.value;
+        await plugin.saveSettings();
+      };
+      const catSelect = row.createEl("select", { cls: "settings-cat-select" });
+      const categories = plugin.currentUser.categories || [];
+      for (const value of categories) {
+        const option = catSelect.createEl("option", {
+          text: value,
+          value
+        });
+        if (item.category === value) option.selected = true;
+      }
+      catSelect.onchange = async () => {
+        plugin.currentUser.items[idx].category = catSelect.value;
+        sortItemsByCategories(
+          plugin.currentUser.items,
+          plugin.currentUser.categories || []
+        );
+        await plugin.saveSettings();
+        renderItems();
+      };
+      const pointsInput = row.createEl("input", {
+        cls: "settings-points-input"
+      });
+      pointsInput.type = "number";
+      pointsInput.value = String(item.points);
+      bindSettingsInput(pointsInput);
+      pointsInput.onchange = async () => {
+        plugin.currentUser.items[idx].points = parseInt(pointsInput.value, 10) || 0;
+        await plugin.saveSettings();
+      };
+      const del = row.createEl("button", {
+        text: "\u{1F5D1}",
+        cls: "settings-delete-btn"
+      });
+      del.onclick = async () => {
+        if (!confirm("\u786E\u5B9A\u5220\u9664\u6253\u5206\u9879\u300C" + item.name + "\u300D\u5417\uFF1F")) return;
+        try {
+          plugin.currentUser.items.splice(idx, 1);
+          await plugin.saveSettings();
+          renderItems();
+        } catch (error) {
+          new import_obsidian14.Notice(
+            "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+          );
+        }
+      };
+      const noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
+      const noteInput = noteRow.createEl("textarea", {
+        cls: "settings-note-input"
+      });
+      noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\uFF0C\u652F\u6301\u591A\u884C";
+      noteInput.value = item.note || "";
+      noteInput.rows = 1;
+      autoResize(noteInput);
+      noteInput.addEventListener("input", () => autoResize(noteInput));
+      noteInput.addEventListener("focus", () => autoResize(noteInput));
+      bindSettingsInput(noteInput);
+      noteInput.addEventListener("change", async () => {
+        plugin.currentUser.items[idx].note = noteInput.value;
+        await plugin.saveSettings();
+      });
+      dragState.rows.push(wrap);
+    }
+    const groupHeaders = Array.from(
+      itemsWrap.querySelectorAll(".settings-cat-group-header")
+    );
+    groupHeaders.forEach((header, hi) => {
+      var _a;
+      const category = ((_a = header.querySelector("span")) == null ? void 0 : _a.textContent) || "";
+      const nextSibling = groupHeaders[hi + 1] || null;
+      const addBtn = document.createElement("button");
+      addBtn.className = "settings-cat-add-btn";
+      addBtn.textContent = "+ \u5728\u300C" + category + "\u300D\u6DFB\u52A0\u9879\u76EE";
+      addBtn.onclick = async () => {
+        try {
+          const newItemId = "item_" + Date.now();
+          plugin.currentUser.items.push({
+            id: newItemId,
+            name: "\u65B0\u9879\u76EE",
+            points: 1,
+            emoji: "\u2B50",
+            category,
+            note: ""
+          });
+          sortItemsByCategories(
+            plugin.currentUser.items,
+            plugin.currentUser.categories || []
+          );
+          await plugin.saveSettings();
+          setPendingScrollItemId(newItemId);
+          renderItems();
+        } catch (error) {
+          new import_obsidian14.Notice(
+            "\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+          );
+        }
+      };
+      if (nextSibling) itemsWrap.insertBefore(addBtn, nextSibling);
+      else itemsWrap.appendChild(addBtn);
+    });
+    if (pendingScrollItemId) {
+      requestAnimationFrame(() => {
+        const newItemEl = itemsWrap.querySelector(
+          '.settings-item-wrap[data-item-id="' + pendingScrollItemId + '"]'
+        );
+        if (newItemEl) {
+          newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
+          newItemEl.addClass("is-new-item");
+          window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
+        }
+        setPendingScrollItemId(null);
+      });
+    }
+  };
+  renderItems();
+}
+
+// src/settings/item-settings.ts
+function renderItemSettings({
+  plugin,
+  containerEl,
+  bindSettingsInput
+}) {
+  let pendingScrollItemId = null;
+  containerEl.createEl("h3", { text: "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406" });
+  containerEl.createEl("p", {
+    cls: "kid-score-hint",
+    text: "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00emoji\u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
+  });
+  const itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
+  const renderItems = () => renderItemSettingsList({
+    plugin,
+    itemsWrap,
+    bindSettingsInput,
+    pendingScrollItemId,
+    setPendingScrollItemId: (itemId) => {
+      pendingScrollItemId = itemId;
+    }
+  });
+  renderItems();
+  new import_obsidian15.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+    (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
+      const defaultCat = plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
+      const newItemId = "item_" + Date.now();
+      plugin.currentUser.items.push({
+        id: newItemId,
+        name: "\u65B0\u9879\u76EE",
+        points: 1,
+        emoji: "\u2B50",
+        category: defaultCat,
+        note: ""
+      });
+      sortItemsByCategories(plugin.currentUser.items, plugin.currentUser.categories || []);
+      await plugin.saveSettings();
+      pendingScrollItemId = newItemId;
+      renderItems();
+    })
+  ).addButton(
+    (btn) => btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(async () => {
+      sortItemsByCategories(plugin.currentUser.items, plugin.currentUser.categories || []);
+      await plugin.saveSettings();
+      renderItems();
+      new import_obsidian15.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
+    })
+  );
+}
+
+// src/settings/user-settings-section.ts
+var import_obsidian16 = require("obsidian");
+function renderUserSettingsSection({
+  app,
+  plugin,
+  containerEl,
+  bindSettingsInput,
+  refresh
+}) {
+  containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
+  containerEl.createEl("p", {
+    cls: "kid-score-hint",
+    text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
+  });
+  const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+  const showUserDeleteConfirm = (user) => {
+    const deleteModal = new class extends import_obsidian16.Modal {
+      onOpen() {
+        this.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
+        this.modalEl.addClass("kid-score-edit-modal");
+        this._kbCleanup = setupModalKeyboard2(this);
+        const content = this.contentEl;
+        content.createDiv({
+          cls: "value-popup-hint",
+          text: "\u5C06\u5220\u9664\u300C" + user.name + "\u300D\u7684\u6240\u6709\u8BBE\u7F6E\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD\u3002"
+        });
+        const promptEl = content.createDiv();
+        promptEl.style.marginBottom = "6px";
+        promptEl.style.fontSize = "0.9em";
+        promptEl.textContent = "\u8BF7\u8F93\u5165\u300E\u786E\u5B9A\u5220\u9664\u300F\u7EE7\u7EED\uFF1A";
+        const confirmInput = content.createEl("input", {
+          type: "text",
+          cls: "custom-form-name-input"
+        });
+        confirmInput.placeholder = "\u786E\u5B9A\u5220\u9664";
+        confirmInput.autocomplete = "off";
+        bindModalInputFocus(confirmInput);
+        const actions = content.createDiv({ cls: "value-popup-actions" });
+        actions.style.marginTop = "12px";
+        const cancelBtn = actions.createEl("button", {
+          cls: "value-popup-cancel",
+          text: "\u53D6\u6D88"
+        });
+        cancelBtn.onclick = () => this.close();
+        const deleteBtn = actions.createEl("button", {
+          cls: "value-popup-confirm",
+          text: "\u5220\u9664"
+        });
+        deleteBtn.style.background = "var(--color-red, #e03131)";
+        deleteBtn.style.color = "#fff";
+        deleteBtn.onclick = async () => {
+          if (confirmInput.value.trim() !== "\u786E\u5B9A\u5220\u9664") {
+            confirmInput.classList.add("is-error");
+            confirmInput.focus();
+            return;
+          }
+          try {
+            const users = plugin.settings.users;
+            const idx = users.findIndex((item) => item.id === user.id);
+            if (idx !== -1 && users.length > 1) {
+              users.splice(idx, 1);
+              plugin.settings.currentUserId = users[Math.max(0, idx - 1)].id;
+              await plugin.saveSettings();
+              this.close();
+              refresh();
+            }
+          } catch (error) {
+            new import_obsidian16.Notice(
+              "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+            );
+          }
+        };
+      }
+      onClose() {
+        if (this._kbCleanup) this._kbCleanup();
+        this.contentEl.empty();
+      }
+    }(app);
+    deleteModal.open();
+  };
+  const renderUserMgr = () => {
+    userMgrWrap.empty();
+    plugin.settings.users.forEach((user) => {
+      const userBtn = userMgrWrap.createEl("button", {
+        cls: "kid-score-user-btn" + (user.id === plugin.settings.currentUserId ? " is-active" : ""),
+        text: user.name
+      });
+      attachPressGesture({
+        element: userBtn,
+        longPressMs: 600,
+        isTouchMode: true,
+        onLongPress: () => {
+          if (plugin.settings.users.length > 1) {
+            showUserDeleteConfirm(user);
+          }
+        },
+        onSingleTap: () => {
+          plugin.settings.currentUserId = user.id;
+          plugin.saveSettings().then(() => refresh());
+        }
+      });
+    });
+    const addUserBtn = userMgrWrap.createEl("button", {
+      cls: "kid-score-user-add-btn",
+      text: "\uFF0B \u6DFB\u52A0\u7528\u6237"
+    });
+    addUserBtn.onclick = async () => {
+      try {
+        const newUser = makeDefaultUser();
+        newUser.name = "\u65B0\u7528\u6237";
+        plugin.settings.users.push(newUser);
+        plugin.settings.currentUserId = newUser.id;
+        await plugin.saveSettings();
+        refresh();
+      } catch (error) {
+        new import_obsidian16.Notice(
+          "\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+        );
+      }
+    };
+  };
+  renderUserMgr();
+  new import_obsidian16.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+    (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
+      const newName = value.trim() || "\u5C0F\u670B\u53CB";
+      const oldName = plugin.currentUser.name;
+      if (newName === oldName) return;
+      if (!confirm("\u786E\u5B9A\u5C06\u7528\u6237\u540D\u4FEE\u6539\u4E3A\u300C" + newName + "\u300D\u5417\uFF1F")) return;
+      try {
+        await plugin.renameUserInFiles(oldName, newName);
+        plugin.currentUser.name = newName;
+        await plugin.saveSettings();
+        renderUserMgr();
+        new import_obsidian16.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
+      } catch (error) {
+        console.error("[Little Milestones] renameUserInFiles error", error);
+        new import_obsidian16.Notice(
+          "\u274C " + (error instanceof Error ? error.message : String(error))
+        );
+      }
+    })
+  );
+  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+  new import_obsidian16.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+    (text) => text.setPlaceholder("Little Milestones/Daily Records").setValue(plugin.currentUser.savePath).onChange(async (value) => {
+      const newPath = value.trim() || "Little Milestones/Daily Records";
+      const oldPath = plugin.currentUser.savePath;
+      if (newPath === oldPath) return;
+      if (!confirm(
+        "\u786E\u5B9A\u5C06\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84\u4FEE\u6539\u4E3A\u300C" + newPath + "\u300D\u5417\uFF1F\n\u5DF2\u6709\u7684\u5386\u53F2\u8BB0\u5F55\u5C06\u81EA\u52A8\u8FC1\u79FB\u5230\u65B0\u8DEF\u5F84\u3002"
+      )) {
+        return;
+      }
+      try {
+        await plugin.migrateSavePath(oldPath, newPath);
+        plugin.currentUser.savePath = newPath;
+        await plugin.saveSettings();
+        new import_obsidian16.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
+      } catch (error) {
+        console.error("[Little Milestones] migrateSavePath error", error);
+        new import_obsidian16.Notice(
+          "\u274C " + (error instanceof Error ? error.message : String(error))
+        );
+      }
+    })
+  );
+  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+}
+
+// src/settings/settings-tab.ts
+var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -3971,7 +5259,6 @@ var KidScoreSettingTab = class extends import_obsidian5.PluginSettingTab {
     const containerEl = this.containerEl;
     containerEl.empty();
     containerEl.addClass("kid-score-settings");
-    let pendingScrollItemId = null;
     const bindSettingsInput = (input) => {
       bindModalInputFocus(input, {
         manualTouchFocus: false,
@@ -3979,956 +5266,582 @@ var KidScoreSettingTab = class extends import_obsidian5.PluginSettingTab {
       });
     };
     containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
-    containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002" });
-    const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
-    const showUserDeleteConfirm = (u) => {
-      const delModal = new class extends import_obsidian5.Modal {
-        onOpen() {
-          const m = this;
-          m.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
-          m.modalEl.addClass("kid-score-edit-modal");
-          this._kbCleanup = setupModalKeyboard(this);
-          const c = m.contentEl;
-          c.createDiv({ cls: "value-popup-hint", text: "\u5C06\u5220\u9664\u300C" + u.name + "\u300D\u7684\u6240\u6709\u8BBE\u7F6E\uFF0C\u5DF2\u4FDD\u5B58\u7684\u8BB0\u5F55\u6587\u4EF6\u4E0D\u53D7\u5F71\u54CD\u3002" });
-          const promptEl = c.createDiv();
-          promptEl.style.marginBottom = "6px";
-          promptEl.style.fontSize = "0.9em";
-          promptEl.textContent = "\u8BF7\u8F93\u5165\u300E\u786E\u5B9A\u5220\u9664\u300F\u7EE7\u7EED\uFF1A";
-          const confirmInput = c.createEl("input", { type: "text", cls: "custom-form-name-input" });
-          confirmInput.placeholder = "\u786E\u5B9A\u5220\u9664";
-          confirmInput.autocomplete = "off";
-          bindModalInputFocus(confirmInput);
-          const acts = c.createDiv({ cls: "value-popup-actions" });
-          acts.style.marginTop = "12px";
-          const cancelBtn = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
-          cancelBtn.onclick = () => {
-            m.close();
-          };
-          const delBtn = acts.createEl("button", { cls: "value-popup-confirm", text: "\u5220\u9664" });
-          delBtn.style.background = "var(--color-red, #e03131)";
-          delBtn.style.color = "#fff";
-          delBtn.onclick = async () => {
-            if (confirmInput.value.trim() !== "\u786E\u5B9A\u5220\u9664") {
-              confirmInput.classList.add("is-error");
-              confirmInput.focus();
-              return;
-            }
-            try {
-              const users = self.plugin.settings.users;
-              const idx = users.findIndex((uu) => uu.id === u.id);
-              if (idx !== -1 && users.length > 1) {
-                users.splice(idx, 1);
-                self.plugin.settings.currentUserId = users[Math.max(0, idx - 1)].id;
-                await self.plugin.saveSettings();
-                m.close();
-                self.display();
-              }
-            } catch (e) {
-              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-            }
-          };
-        }
-        onClose() {
-          if (this._kbCleanup) this._kbCleanup();
-          this.contentEl.empty();
-        }
-      }(self.plugin.app);
-      delModal.open();
-    };
-    const renderUserMgr = () => {
-      userMgrWrap.empty();
-      self.plugin.settings.users.forEach((u) => {
-        const uBtn = userMgrWrap.createEl("button", {
-          cls: "kid-score-user-btn" + (u.id === self.plugin.settings.currentUserId ? " is-active" : ""),
-          text: u.name
-        });
-        let pressTimer = null;
-        let isLongPress = false;
-        let hasMoved = false;
-        let startX = 0;
-        let startY = 0;
-        uBtn.addEventListener("pointerdown", (e) => {
-          isLongPress = false;
-          hasMoved = false;
-          startX = e.clientX;
-          startY = e.clientY;
-          pressTimer = window.setTimeout(() => {
-            if (!hasMoved && self.plugin.settings.users.length > 1) {
-              isLongPress = true;
-              showUserDeleteConfirm(u);
-            }
-          }, 600);
-        });
-        uBtn.addEventListener("pointermove", (e) => {
-          if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
-            hasMoved = true;
-            if (pressTimer) clearTimeout(pressTimer);
-          }
-        });
-        uBtn.addEventListener("pointerup", () => {
-          if (pressTimer) clearTimeout(pressTimer);
-          if (!isLongPress && !hasMoved) {
-            self.plugin.settings.currentUserId = u.id;
-            self.plugin.saveSettings().then(() => {
-              self.display();
-            });
-          }
-        });
-        uBtn.addEventListener("pointercancel", () => {
-          if (pressTimer) clearTimeout(pressTimer);
-        });
-      });
-      const addUBtn = userMgrWrap.createEl("button", { cls: "kid-score-user-add-btn", text: "\uFF0B \u6DFB\u52A0\u7528\u6237" });
-      addUBtn.onclick = async () => {
-        try {
-          const nu = makeDefaultUser();
-          nu.name = "\u65B0\u7528\u6237";
-          self.plugin.settings.users.push(nu);
-          self.plugin.settings.currentUserId = nu.id;
-          await self.plugin.saveSettings();
-          self.display();
-        } catch (e) {
-          new import_obsidian5.Notice("\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-        }
-      };
-    };
-    renderUserMgr();
-    new import_obsidian5.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
-      (t) => t.setPlaceholder("\u738B\u9756\u8FB0").setValue(self.plugin.currentUser.name).onChange(async (v) => {
-        const newName = v.trim() || "\u5C0F\u670B\u53CB";
-        const oldName = self.plugin.currentUser.name;
-        if (newName === oldName) return;
-        if (!confirm("\u786E\u5B9A\u5C06\u7528\u6237\u540D\u4FEE\u6539\u4E3A\u300C" + newName + "\u300D\u5417\uFF1F")) return;
-        try {
-          await self.plugin.renameUserInFiles(oldName, newName);
-          self.plugin.currentUser.name = newName;
-          await self.plugin.saveSettings();
-          renderUserMgr();
-          new import_obsidian5.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
-        } catch (e) {
-          console.error("[Little Milestones] renameUserInFiles error", e);
-          new import_obsidian5.Notice("\u274C " + (e instanceof Error ? e.message : String(e)));
-        }
-      })
-    );
-    bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
-    new import_obsidian5.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
-      (t) => t.setPlaceholder("Little Milestones/Daily Records").setValue(self.plugin.currentUser.savePath).onChange(async (v) => {
-        const newPath = v.trim() || "Little Milestones/Daily Records";
-        const oldPath = self.plugin.currentUser.savePath;
-        if (newPath === oldPath) return;
-        if (!confirm("\u786E\u5B9A\u5C06\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84\u4FEE\u6539\u4E3A\u300C" + newPath + "\u300D\u5417\uFF1F\n\u5DF2\u6709\u7684\u5386\u53F2\u8BB0\u5F55\u5C06\u81EA\u52A8\u8FC1\u79FB\u5230\u65B0\u8DEF\u5F84\u3002")) return;
-        try {
-          await self.plugin.migrateSavePath(oldPath, newPath);
-          self.plugin.currentUser.savePath = newPath;
-          await self.plugin.saveSettings();
-          new import_obsidian5.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
-        } catch (e) {
-          console.error("[Little Milestones] migrateSavePath error", e);
-          new import_obsidian5.Notice("\u274C " + (e instanceof Error ? e.message : String(e)));
-        }
-      })
-    );
-    bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
-    const goalsWrap = containerEl.createDiv({ cls: "kid-score-goals-section" });
-    goalsWrap.createEl("h3", { text: "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807" });
-    goalsWrap.createEl("p", { cls: "kid-score-hint", text: "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09" });
-    const goalsGrid = goalsWrap.createDiv({ cls: "kid-score-goals-grid" });
-    const goalFields = [
-      { key: "daily", label: "\u6BCF\u65E5\u76EE\u6807" },
-      { key: "weekly", label: "\u6BCF\u5468\u76EE\u6807" },
-      { key: "monthly", label: "\u6BCF\u6708\u76EE\u6807" }
-    ];
-    for (const gf of goalFields) {
-      const cell = goalsGrid.createDiv({ cls: "kid-score-goal-cell" });
-      cell.createEl("label", { text: gf.label });
-      const inp = cell.createEl("input", { cls: "kid-score-goal-input" });
-      inp.type = "number";
-      inp.min = "1";
-      inp.value = String(self.plugin.currentUser.goals[gf.key] || 1);
-      bindSettingsInput(inp);
-      inp.onchange = async () => {
-        const n = parseInt(inp.value, 10);
-        if (Number.isFinite(n) && n > 0) {
-          self.plugin.currentUser.goals[gf.key] = n;
-          await self.plugin.saveSettings();
-          new import_obsidian5.Notice("\u2705 " + gf.label + "\u5DF2\u66F4\u65B0\u4E3A " + n);
-        }
-      };
-    }
-    renderRulesAndTemplateSections();
-    const catHeaderWrap = containerEl.createDiv({ cls: "kid-score-section-header" });
-    catHeaderWrap.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
-    catHeaderWrap.createSpan({ cls: "kid-score-section-desc", text: "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A" });
-    const catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
-    const catDrag = {
-      dragging: false,
-      dragIdx: -1,
-      placeholder: null,
-      ghost: null,
-      rows: []
-    };
-    const getCatDragRowIndex = (y) => {
-      for (let r = 0; r < catDrag.rows.length; r++) {
-        const rect = catDrag.rows[r].getBoundingClientRect();
-        if (y < rect.top + rect.height / 2) return r;
-      }
-      return catDrag.rows.length;
-    };
-    const onCatDragMove = (clientY) => {
-      if (!catDrag.dragging) return;
-      if (catDrag.ghost) catDrag.ghost.style.top = clientY - 20 + "px";
-      const targetIdx = getCatDragRowIndex(clientY);
-      const parent = catDrag.rows[0].parentElement;
-      if (!parent || !catDrag.placeholder) return;
-      if (targetIdx >= catDrag.rows.length) {
-        parent.appendChild(catDrag.placeholder);
-      } else {
-        parent.insertBefore(catDrag.placeholder, catDrag.rows[targetIdx]);
-      }
-    };
-    const onCatDragEnd = (clientY) => {
-      if (!catDrag.dragging) return;
-      catDrag.dragging = false;
-      if (catDrag.ghost) catDrag.ghost.remove();
-      if (catDrag.placeholder) catDrag.placeholder.remove();
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
-      const targetIdx = getCatDragRowIndex(clientY);
-      let fromIdx = catDrag.dragIdx;
-      if (targetIdx > fromIdx) fromIdx--;
-      const arr = self.plugin.currentUser.categories;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
-        const moved = arr.splice(fromIdx, 1)[0];
-        arr.splice(targetIdx, 0, moved);
-        (async () => {
-          await self.plugin.saveSettings();
-          renderCategories();
-          renderItems();
-        })();
-      } else {
-        renderCategories();
-      }
-    };
-    const catPointerMoveHandler = (e) => {
-      onCatDragMove(e.clientY);
-    };
-    const catPointerUpHandler = (e) => {
-      document.removeEventListener("pointermove", catPointerMoveHandler);
-      document.removeEventListener("pointerup", catPointerUpHandler);
-      document.removeEventListener("pointercancel", catPointerCancelHandler);
-      onCatDragEnd(e.clientY);
-    };
-    const catPointerCancelHandler = () => {
-      document.removeEventListener("pointermove", catPointerMoveHandler);
-      document.removeEventListener("pointerup", catPointerUpHandler);
-      document.removeEventListener("pointercancel", catPointerCancelHandler);
-      catDrag.dragging = false;
-      if (catDrag.ghost) {
-        catDrag.ghost.remove();
-        catDrag.ghost = null;
-      }
-      if (catDrag.placeholder) {
-        catDrag.placeholder.remove();
-        catDrag.placeholder = null;
-      }
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
-      renderCategories();
-    };
-    const renderCategories = () => {
-      catWrap.empty();
-      catDrag.rows = [];
-      const cats = self.plugin.currentUser.categories || [];
-      for (let ci = 0; ci < cats.length; ci++) {
-        ((idx) => {
-          const row = catWrap.createDiv({ cls: "kid-score-cat-row" });
-          const handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
-          handle.addEventListener("pointerdown", (e) => {
-            e.preventDefault();
-            catDrag.dragging = true;
-            catDrag.dragIdx = idx;
-            catDrag.rows = Array.from(catWrap.querySelectorAll(".kid-score-cat-row"));
-            const rect = row.getBoundingClientRect();
-            const ghost = row.cloneNode(true);
-            ghost.className = "kid-score-cat-row settings-drag-ghost";
-            ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (e.clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;";
-            document.body.appendChild(ghost);
-            catDrag.ghost = ghost;
-            const ph = document.createElement("div");
-            ph.className = "settings-drag-placeholder";
-            ph.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
-            if (row.parentElement) row.parentElement.insertBefore(ph, row);
-            catDrag.placeholder = ph;
-            row.style.display = "none";
-            document.body.style.userSelect = "none";
-            document.body.style.webkitUserSelect = "none";
-            document.addEventListener("pointermove", catPointerMoveHandler);
-            document.addEventListener("pointerup", catPointerUpHandler);
-            document.addEventListener("pointercancel", catPointerCancelHandler);
-          });
-          const input = row.createEl("input", { cls: "settings-name-input" });
-          bindSettingsInput(input);
-          input.value = cats[idx];
-          input.onchange = async () => {
-            const oldName = self.plugin.currentUser.categories[idx];
-            const newName = input.value.trim();
-            if (!newName) return;
-            self.plugin.currentUser.categories[idx] = newName;
-            for (const it of self.plugin.currentUser.items) {
-              if (it.category === oldName) it.category = newName;
-            }
-            await self.plugin.saveSettings();
-            renderItems();
-          };
-          const delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
-          delBtn.onclick = async () => {
-            const removedCat = self.plugin.currentUser.categories[idx];
-            if (!confirm("\u786E\u5B9A\u5220\u9664\u5206\u7C7B\u300C" + removedCat + "\u300D\u5417\uFF1F\u8BE5\u5206\u7C7B\u4E0B\u7684\u9879\u76EE\u5C06\u81EA\u52A8\u5F52\u5165\u7B2C\u4E00\u4E2A\u5206\u7C7B\u3002")) return;
-            try {
-              self.plugin.currentUser.categories.splice(idx, 1);
-              const fallback = self.plugin.currentUser.categories[0] || "\u5176\u4ED6";
-              for (const it of self.plugin.currentUser.items) {
-                if (it.category === removedCat) it.category = fallback;
-              }
-              await self.plugin.saveSettings();
-              renderCategories();
-              renderItems();
-            } catch (e) {
-              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-            }
-          };
-          catDrag.rows.push(row);
-        })(ci);
-      }
-    };
-    renderCategories();
-    new import_obsidian5.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
-      (btn) => btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(async () => {
-        self.plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
-        await self.plugin.saveSettings();
-        renderCategories();
-        renderItems();
-      })
-    );
-    new import_obsidian5.Setting(containerEl).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
-      (btn) => btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(async () => {
-        await self.plugin.saveSettings();
-        renderCategories();
-        renderItems();
-        new import_obsidian5.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
-      })
-    );
-    containerEl.createEl("h3", { text: "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406" });
-    containerEl.createEl("p", { cls: "kid-score-hint", text: "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00emoji\u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002" });
-    const itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
-    const dragState = {
-      dragging: false,
-      dragIdx: -1,
-      placeholder: null,
-      ghost: null,
-      startY: 0,
-      rows: []
-    };
-    const getDragRowIndex = (y) => {
-      for (let r = 0; r < dragState.rows.length; r++) {
-        const rect = dragState.rows[r].getBoundingClientRect();
-        if (y < rect.top + rect.height / 2) return r;
-      }
-      return dragState.rows.length;
-    };
-    const onDragMove = (clientY) => {
-      if (!dragState.dragging) return;
-      if (dragState.ghost) dragState.ghost.style.top = clientY - 20 + "px";
-      const targetIdx = getDragRowIndex(clientY);
-      const parent = dragState.rows[0].parentElement;
-      if (!parent || !dragState.placeholder) return;
-      if (targetIdx >= dragState.rows.length) {
-        parent.appendChild(dragState.placeholder);
-      } else {
-        parent.insertBefore(dragState.placeholder, dragState.rows[targetIdx]);
-      }
-    };
-    const onDragEnd = (clientY) => {
-      if (!dragState.dragging) return;
-      dragState.dragging = false;
-      if (dragState.ghost) dragState.ghost.remove();
-      if (dragState.placeholder) dragState.placeholder.remove();
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
-      const targetIdx = getDragRowIndex(clientY);
-      let fromIdx = dragState.dragIdx;
-      if (targetIdx > fromIdx) fromIdx--;
-      const arr = self.plugin.currentUser.items;
-      if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
-        const moved = arr.splice(fromIdx, 1)[0];
-        arr.splice(targetIdx, 0, moved);
-        (async () => {
-          await self.plugin.saveSettings();
-          renderItems();
-        })();
-      } else {
-        renderItems();
-      }
-    };
-    const pointerMoveHandler = (e) => {
-      onDragMove(e.clientY);
-    };
-    const pointerUpHandler = (e) => {
-      document.removeEventListener("pointermove", pointerMoveHandler);
-      document.removeEventListener("pointerup", pointerUpHandler);
-      document.removeEventListener("pointercancel", pointerCancelHandler);
-      onDragEnd(e.clientY);
-    };
-    const pointerCancelHandler = () => {
-      document.removeEventListener("pointermove", pointerMoveHandler);
-      document.removeEventListener("pointerup", pointerUpHandler);
-      document.removeEventListener("pointercancel", pointerCancelHandler);
-      dragState.dragging = false;
-      if (dragState.ghost) {
-        dragState.ghost.remove();
-        dragState.ghost = null;
-      }
-      if (dragState.placeholder) {
-        dragState.placeholder.remove();
-        dragState.placeholder = null;
-      }
-      document.body.style.userSelect = "";
-      document.body.style.webkitUserSelect = "";
-      renderItems();
-    };
-    const renderItems = () => {
-      itemsWrap.empty();
-      dragState.rows = [];
-      if (self.plugin.currentUser.items.length === 0) {
-        itemsWrap.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01" });
-        return;
-      }
-      const headerRow = itemsWrap.createDiv({ cls: "settings-item-row-v2 header-row" });
-      ["\u2630", "\u8868\u60C5", "\u540D\u79F0", "\u5206\u7C7B", "\u5206\u503C", ""].forEach((h) => {
-        headerRow.createSpan({ text: h, cls: "col-header" });
-      });
-      let lastCat = null;
-      for (let i = 0; i < self.plugin.currentUser.items.length; i++) {
-        ((idx) => {
-          const item = self.plugin.currentUser.items[idx];
-          const thisCat = item.category || "\u5176\u4ED6";
-          if (thisCat !== lastCat) {
-            lastCat = thisCat;
-            const groupHeader = itemsWrap.createDiv({ cls: "settings-cat-group-header" });
-            groupHeader.createSpan({ text: thisCat });
-          }
-          const wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
-          wrap.dataset.itemId = item.id;
-          const row = wrap.createDiv({ cls: "settings-item-row-v2" });
-          row.dataset.idx = String(idx);
-          const handle = row.createEl("span", { cls: "settings-drag-handle", text: "\u2630" });
-          handle.addEventListener("pointerdown", (e) => {
-            e.preventDefault();
-            dragState.dragging = true;
-            dragState.dragIdx = idx;
-            dragState.rows = Array.from(itemsWrap.querySelectorAll(".settings-item-wrap"));
-            dragState.startY = e.clientY;
-            const rect = wrap.getBoundingClientRect();
-            const ghost = wrap.cloneNode(true);
-            ghost.className = "settings-item-wrap settings-drag-ghost";
-            ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (e.clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;padding:4px;";
-            document.body.appendChild(ghost);
-            dragState.ghost = ghost;
-            const ph = document.createElement("div");
-            ph.className = "settings-drag-placeholder";
-            ph.style.cssText = "height:" + rect.height + "px;border:2px dashed var(--interactive-accent);border-radius:8px;margin:2px 0;background:var(--background-secondary);opacity:0.5;";
-            if (wrap.parentElement) wrap.parentElement.insertBefore(ph, wrap);
-            dragState.placeholder = ph;
-            wrap.style.display = "none";
-            document.body.style.userSelect = "none";
-            document.body.style.webkitUserSelect = "none";
-            document.addEventListener("pointermove", pointerMoveHandler);
-            document.addEventListener("pointerup", pointerUpHandler);
-            document.addEventListener("pointercancel", pointerCancelHandler);
-          });
-          const emojiBtn = row.createEl("button", { cls: "settings-emoji-btn", text: item.emoji });
-          emojiBtn.onclick = () => {
-            showEmojiPicker(async (em) => {
-              self.plugin.currentUser.items[idx].emoji = em;
-              await self.plugin.saveSettings();
-              emojiBtn.textContent = em;
-            });
-          };
-          const nameInput = row.createEl("input", { cls: "settings-name-input" });
-          nameInput.type = "text";
-          nameInput.value = item.name;
-          bindSettingsInput(nameInput);
-          nameInput.onchange = async () => {
-            self.plugin.currentUser.items[idx].name = nameInput.value;
-            await self.plugin.saveSettings();
-          };
-          const catSelect = row.createEl("select", { cls: "settings-cat-select" });
-          const cats = self.plugin.currentUser.categories || [];
-          for (const c of cats) {
-            const opt = catSelect.createEl("option", { text: c, value: c });
-            if (item.category === c) opt.selected = true;
-          }
-          catSelect.onchange = async () => {
-            self.plugin.currentUser.items[idx].category = catSelect.value;
-            const cats2 = self.plugin.currentUser.categories || [];
-            self.plugin.currentUser.items.sort((a, b) => {
-              let ai = cats2.indexOf(a.category);
-              if (ai === -1) ai = 9999;
-              let bi = cats2.indexOf(b.category);
-              if (bi === -1) bi = 9999;
-              return ai - bi;
-            });
-            await self.plugin.saveSettings();
-            renderItems();
-          };
-          const pointsInput = row.createEl("input", { cls: "settings-points-input" });
-          pointsInput.type = "number";
-          pointsInput.value = String(item.points);
-          bindSettingsInput(pointsInput);
-          pointsInput.onchange = async () => {
-            self.plugin.currentUser.items[idx].points = parseInt(pointsInput.value) || 0;
-            await self.plugin.saveSettings();
-          };
-          const del = row.createEl("button", { text: "\u{1F5D1}", cls: "settings-delete-btn" });
-          del.onclick = async () => {
-            if (!confirm("\u786E\u5B9A\u5220\u9664\u6253\u5206\u9879\u300C" + item.name + "\u300D\u5417\uFF1F")) return;
-            try {
-              self.plugin.currentUser.items.splice(idx, 1);
-              await self.plugin.saveSettings();
-              renderItems();
-            } catch (e) {
-              new import_obsidian5.Notice("\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-            }
-          };
-          const noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
-          const noteInput = noteRow.createEl("textarea", { cls: "settings-note-input" });
-          noteInput.placeholder = "\u5907\u6CE8\uFF08\u53EF\u9009\uFF09\uFF0C\u652F\u6301\u591A\u884C";
-          noteInput.value = item.note || "";
-          noteInput.rows = 1;
-          const autoResize = (ta) => {
-            ta.style.height = "auto";
-            ta.style.height = ta.scrollHeight + "px";
-          };
-          autoResize(noteInput);
-          noteInput.addEventListener("input", () => autoResize(noteInput));
-          noteInput.addEventListener("focus", () => autoResize(noteInput));
-          bindSettingsInput(noteInput);
-          noteInput.addEventListener("change", async () => {
-            self.plugin.currentUser.items[idx].note = noteInput.value;
-            await self.plugin.saveSettings();
-          });
-          dragState.rows.push(wrap);
-        })(i);
-      }
-      const groupHeaders = Array.from(itemsWrap.querySelectorAll(".settings-cat-group-header"));
-      groupHeaders.forEach((header, hi) => {
-        var _a;
-        const cat = ((_a = header.querySelector("span")) == null ? void 0 : _a.textContent) || "";
-        const nextSibling = groupHeaders[hi + 1] || null;
-        const addBtn = document.createElement("button");
-        addBtn.className = "settings-cat-add-btn";
-        addBtn.textContent = "+ \u5728\u300C" + cat + "\u300D\u6DFB\u52A0\u9879\u76EE";
-        ((c) => {
-          addBtn.onclick = async () => {
-            try {
-              const newItemId = "item_" + Date.now();
-              self.plugin.currentUser.items.push({
-                id: newItemId,
-                name: "\u65B0\u9879\u76EE",
-                points: 1,
-                emoji: "\u2B50",
-                category: c,
-                note: ""
-              });
-              const cats2 = self.plugin.currentUser.categories || [];
-              self.plugin.currentUser.items.sort((a, b) => {
-                let ai = cats2.indexOf(a.category);
-                if (ai === -1) ai = 9999;
-                let bi = cats2.indexOf(b.category);
-                if (bi === -1) bi = 9999;
-                return ai - bi;
-              });
-              await self.plugin.saveSettings();
-              pendingScrollItemId = newItemId;
-              renderItems();
-            } catch (e) {
-              new import_obsidian5.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-            }
-          };
-        })(cat);
-        if (nextSibling) {
-          itemsWrap.insertBefore(addBtn, nextSibling);
-        } else {
-          itemsWrap.appendChild(addBtn);
-        }
-      });
-      if (pendingScrollItemId) {
-        requestAnimationFrame(() => {
-          const newItemEl = itemsWrap.querySelector(
-            '.settings-item-wrap[data-item-id="' + pendingScrollItemId + '"]'
-          );
-          if (newItemEl) {
-            newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
-            newItemEl.addClass("is-new-item");
-            window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
-          }
-          pendingScrollItemId = null;
-        });
-      }
-    };
-    renderItems();
-    new import_obsidian5.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
-      (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
-        const defaultCat = self.plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
-        const newItemId = "item_" + Date.now();
-        self.plugin.currentUser.items.push({
-          id: newItemId,
-          name: "\u65B0\u9879\u76EE",
-          points: 1,
-          emoji: "\u2B50",
-          category: defaultCat,
-          note: ""
-        });
-        const cats = self.plugin.currentUser.categories || [];
-        self.plugin.currentUser.items.sort((a, b) => {
-          let ai = cats.indexOf(a.category);
-          if (ai === -1) ai = 9999;
-          let bi = cats.indexOf(b.category);
-          if (bi === -1) bi = 9999;
-          return ai - bi;
-        });
-        await self.plugin.saveSettings();
-        pendingScrollItemId = newItemId;
-        renderItems();
-      })
-    ).addButton(
-      (btn) => btn.setButtonText("\u{1F4C2} \u6309\u5206\u7C7B\u6392\u5E8F").onClick(async () => {
-        const cats = self.plugin.currentUser.categories || [];
-        self.plugin.currentUser.items.sort((a, b) => {
-          let ai = cats.indexOf(a.category);
-          if (ai === -1) ai = 9999;
-          let bi = cats.indexOf(b.category);
-          if (bi === -1) bi = 9999;
-          return ai - bi;
-        });
-        await self.plugin.saveSettings();
-        renderItems();
-        new import_obsidian5.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
-      })
-    );
-    function renderRulesAndTemplateSections() {
-      const settingsRulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-      const settingsRulesHeader = settingsRulesSection.createDiv({ cls: "kid-score-rules-header" });
-      const settingsRulesToggle = settingsRulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-      settingsRulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-      settingsRulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
-      const settingsRulesEditBtn = settingsRulesHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-      const settingsRulesBody = settingsRulesSection.createDiv({ cls: "kid-score-rules-body" });
-      const settingsRulesView = settingsRulesBody.createDiv({ cls: "kid-score-rules-view" });
-      const settingsRulesEdit = settingsRulesBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-      const settingsRulesTextarea = settingsRulesEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-      settingsRulesTextarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
-      settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-      const settingsRulesActRow = settingsRulesEdit.createDiv({ cls: "kid-score-rules-actions" });
-      const settingsRulesSaveBtn = settingsRulesActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u89C4\u5219" });
-      const settingsRulesCancelBtn = settingsRulesActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
-      const renderSettingsRules = () => {
-        settingsRulesView.empty();
-        const text = self.plugin.currentUser.scoringRules || "";
-        if (text.trim()) {
-          import_obsidian5.MarkdownRenderer.render(self.app, text, settingsRulesView, "", self.plugin);
-        } else {
-          settingsRulesView.createEl("p", { cls: "kid-score-rules-empty", text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219" });
-        }
-      };
-      renderSettingsRules();
-      let settingsRulesOpen = !!(self.plugin.currentUser.scoringRules && self.plugin.currentUser.scoringRules.trim());
-      if (!settingsRulesOpen) {
-        settingsRulesBody.addClass("is-hidden");
-      } else {
-        settingsRulesToggle.textContent = "\u25BC";
-      }
-      settingsRulesHeader.addEventListener("click", (e) => {
-        if (e.target === settingsRulesEditBtn || settingsRulesEditBtn.contains(e.target)) return;
-        settingsRulesOpen = !settingsRulesOpen;
-        settingsRulesToggle.textContent = settingsRulesOpen ? "\u25BC" : "\u25B6";
-        settingsRulesBody.toggleClass("is-hidden", !settingsRulesOpen);
-      });
-      let settingsRulesIsEditing = false;
-      settingsRulesEditBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        settingsRulesIsEditing = !settingsRulesIsEditing;
-        if (settingsRulesIsEditing) {
-          settingsRulesOpen = true;
-          settingsRulesToggle.textContent = "\u25BC";
-          settingsRulesBody.removeClass("is-hidden");
-          settingsRulesTextarea.value = self.plugin.currentUser.scoringRules || "";
-          settingsRulesView.addClass("is-hidden");
-          settingsRulesEdit.removeClass("is-hidden");
-          settingsRulesTextarea.focus();
-        } else {
-          settingsRulesView.removeClass("is-hidden");
-          settingsRulesEdit.addClass("is-hidden");
-        }
-      });
-      settingsRulesSaveBtn.addEventListener("click", async () => {
-        self.plugin.currentUser.scoringRules = settingsRulesTextarea.value;
-        await self.plugin.saveSettings();
-        renderSettingsRules();
-        settingsRulesIsEditing = false;
-        settingsRulesView.removeClass("is-hidden");
-        settingsRulesEdit.addClass("is-hidden");
-        new import_obsidian5.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
-      });
-      settingsRulesCancelBtn.addEventListener("click", () => {
-        settingsRulesIsEditing = false;
-        settingsRulesView.removeClass("is-hidden");
-        settingsRulesEdit.addClass("is-hidden");
-      });
-      const tmplSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-      const tmplHeader = tmplSection.createDiv({ cls: "kid-score-rules-header" });
-      const tmplToggle = tmplHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25B6" });
-      tmplHeader.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4DD} \u65E5\u8BB0\u6A21\u677F" });
-      tmplHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u652F\u6301 Markdown\uFF0C\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875" });
-      const tmplEditBtn = tmplHeader.createEl("button", { cls: "kid-score-rules-edit-btn", text: "\u270F\uFE0F" });
-      const tmplBody = tmplSection.createDiv({ cls: "kid-score-rules-body" });
-      const tmplView = tmplBody.createDiv({ cls: "kid-score-rules-view" });
-      const tmplEdit = tmplBody.createDiv({ cls: "kid-score-rules-edit is-hidden" });
-      const tmplTextarea = tmplEdit.createEl("textarea", { cls: "kid-score-rules-textarea" });
-      tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      tmplTextarea.style.minHeight = "220px";
-      const tmplPreviewWrap = tmplEdit.createDiv({ cls: "diary-preview-wrap diary-preview-settings" });
-      tmplPreviewWrap.style.display = "none";
-      const tmplActRow = tmplEdit.createDiv({ cls: "kid-score-rules-actions" });
-      const tmplPreviewBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "MD\u9884\u89C8" });
-      const tmplSaveBtn = tmplActRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\u4FDD\u5B58\u6A21\u677F" });
-      const tmplCancelBtn = tmplActRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u53D6\u6D88" });
-      const renderTemplateView = () => {
-        tmplView.empty();
-        const text = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-        import_obsidian5.MarkdownRenderer.render(self.app, text, tmplView, "", self.plugin);
-      };
-      renderTemplateView();
-      let tmplOpen = true;
-      tmplToggle.textContent = "\u25BC";
-      let tmplIsEditing = false;
-      let tmplIsPreview = false;
-      const refreshTemplatePreview = () => {
-        tmplPreviewWrap.empty();
-        import_obsidian5.MarkdownRenderer.render(
-          self.app,
-          tmplTextarea.value || "_\u8FD8\u6CA1\u6709\u5185\u5BB9_",
-          tmplPreviewWrap,
-          "",
-          self.plugin
-        );
-      };
-      tmplHeader.addEventListener("click", (e) => {
-        if (e.target === tmplEditBtn || tmplEditBtn.contains(e.target)) return;
-        tmplOpen = !tmplOpen;
-        tmplToggle.textContent = tmplOpen ? "\u25BC" : "\u25B6";
-        tmplBody.toggleClass("is-hidden", !tmplOpen);
-      });
-      tmplEditBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        tmplIsEditing = !tmplIsEditing;
-        if (tmplIsEditing) {
-          tmplOpen = true;
-          tmplToggle.textContent = "\u25BC";
-          tmplBody.removeClass("is-hidden");
-          tmplTextarea.value = self.plugin.currentUser.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-          tmplView.addClass("is-hidden");
-          tmplEdit.removeClass("is-hidden");
-          tmplIsPreview = false;
-          tmplPreviewWrap.style.display = "none";
-          tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-          tmplTextarea.focus();
-        } else {
-          tmplView.removeClass("is-hidden");
-          tmplEdit.addClass("is-hidden");
-        }
-      });
-      tmplPreviewBtn.addEventListener("click", () => {
-        tmplIsPreview = !tmplIsPreview;
-        if (tmplIsPreview) {
-          refreshTemplatePreview();
-          tmplPreviewWrap.style.display = "";
-          tmplPreviewBtn.textContent = "\u5173\u95ED\u9884\u89C8";
-        } else {
-          tmplPreviewWrap.style.display = "none";
-          tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-        }
-      });
-      tmplTextarea.addEventListener("input", () => {
-        if (!tmplIsPreview) return;
-        refreshTemplatePreview();
-      });
-      tmplSaveBtn.addEventListener("click", async () => {
-        self.plugin.currentUser.diaryTemplate = tmplTextarea.value;
-        await self.plugin.saveSettings();
-        renderTemplateView();
-        tmplIsEditing = false;
-        tmplIsPreview = false;
-        tmplPreviewWrap.style.display = "none";
-        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-        tmplView.removeClass("is-hidden");
-        tmplEdit.addClass("is-hidden");
-        new import_obsidian5.Notice("\u2705 \u65E5\u8BB0\u6A21\u677F\u5DF2\u4FDD\u5B58");
-      });
-      tmplCancelBtn.addEventListener("click", () => {
-        tmplIsEditing = false;
-        tmplIsPreview = false;
-        tmplPreviewWrap.style.display = "none";
-        tmplPreviewBtn.textContent = "MD\u9884\u89C8";
-        tmplView.removeClass("is-hidden");
-        tmplEdit.addClass("is-hidden");
-      });
-      const diaryModulesSection = containerEl.createDiv({ cls: "kid-score-rules-section" });
-      const diaryModulesHeader = diaryModulesSection.createDiv({ cls: "kid-score-rules-header" });
-      const diaryModulesToggle = diaryModulesHeader.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
-      diaryModulesHeader.createEl("span", { cls: "kid-score-rules-title", text: "\uD83E\uDDE9 \u65E5\u8BB0\u6A21\u5757" });
-      diaryModulesHeader.createSpan({ cls: "kid-score-rules-desc", text: "\u53EF\u4EE5\u81EA\u5B9A\u4E49\u663E\u793A\u5728\u6253\u5206\u9875\u7684\u5E38\u7528\u8BB0\u5F55\u6A21\u5757" });
-      const diaryModulesBody = diaryModulesSection.createDiv({ cls: "kid-score-rules-body" });
-      let diaryModulesOpen = true;
-      const ensureDiaryModules = () => {
-        if (!Array.isArray(self.plugin.currentUser.diaryModules) || self.plugin.currentUser.diaryModules.length === 0) {
-          self.plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-        }
-      };
-      const renderDiaryModulesSettings = () => {
-        ensureDiaryModules();
-        diaryModulesBody.empty();
-        const hint = diaryModulesBody.createEl("p", { cls: "kid-score-hint", text: "\u4F60\u53EF\u4EE5\u4FEE\u6539\u6A21\u5757\u540D\u79F0\u548C\u63D0\u793A\u6587\u6848\uFF0C\u4E5F\u53EF\u4EE5\u65B0\u589E\u6216\u5220\u9664\u6A21\u5757\u3002\u5929\u6C14/\u5FC3\u60C5\u4F1A\u4FDD\u7559\u5FEB\u6377 emoji \u529F\u80FD\u3002" });
-        hint.style.marginBottom = "10px";
-        const list = diaryModulesBody.createDiv({ cls: "diary-module-settings-list" });
-        self.plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
-          const row = list.createDiv({ cls: "diary-module-settings-row" });
-          const labelInput = row.createEl("input", { cls: "diary-module-settings-input", type: "text" });
-          labelInput.value = moduleDef.label || "";
-          labelInput.placeholder = "\u6A21\u5757\u540D\u79F0";
-          bindSettingsInput(labelInput);
-          labelInput.onchange = async () => {
-            self.plugin.currentUser.diaryModules[idx].label = labelInput.value.trim() || moduleDef.label || "\u65B0\u6A21\u5757";
-            await self.plugin.saveSettings();
-            renderDiaryModulesSettings();
-          };
-          const placeholderInput = row.createEl("input", { cls: "diary-module-settings-input is-wide", type: "text" });
-          placeholderInput.value = moduleDef.placeholder || "";
-          placeholderInput.placeholder = "\u63D0\u793A\u6587\u6848";
-          bindSettingsInput(placeholderInput);
-          placeholderInput.onchange = async () => {
-            self.plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
-            await self.plugin.saveSettings();
-          };
-          const kindSelect = row.createEl("select", { cls: "diary-module-settings-select" });
-          [
-            { value: "quick", label: "\u5355\u884C\u5FEB\u6377" },
-            { value: "multi", label: "\u591A\u884C\u8BB0\u5F55" }
-          ].forEach((optionDef) => {
-            const opt = kindSelect.createEl("option", { text: optionDef.label, value: optionDef.value });
-            if ((moduleDef.kind || "multi") === optionDef.value) opt.selected = true;
-          });
-          kindSelect.onchange = async () => {
-            self.plugin.currentUser.diaryModules[idx].kind = kindSelect.value;
-            await self.plugin.saveSettings();
-          };
-          const delBtn = row.createEl("button", { cls: "settings-delete-btn", text: "\u{1F5D1}" });
-          delBtn.onclick = async () => {
-            self.plugin.currentUser.diaryModules.splice(idx, 1);
-            await self.plugin.saveSettings();
-            renderDiaryModulesSettings();
-          };
-        });
-        const actRow = diaryModulesBody.createDiv({ cls: "kid-score-rules-actions" });
-        const addBtn = actRow.createEl("button", { cls: "mod-cta kid-score-rules-save-btn", text: "\uFF0B \u65B0\u589E\u6A21\u5757" });
-        addBtn.onclick = async () => {
-          self.plugin.currentUser.diaryModules.push({
-            id: "module_" + Date.now(),
-            label: "\u65B0\u6A21\u5757",
-            placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
-            kind: "multi"
-          });
-          await self.plugin.saveSettings();
-          renderDiaryModulesSettings();
-        };
-        const resetBtn = actRow.createEl("button", { cls: "kid-score-rules-cancel-btn", text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757" });
-        resetBtn.onclick = async () => {
-          self.plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-          await self.plugin.saveSettings();
-          renderDiaryModulesSettings();
-        };
-      };
-      renderDiaryModulesSettings();
-      diaryModulesHeader.addEventListener("click", () => {
-        diaryModulesOpen = !diaryModulesOpen;
-        diaryModulesToggle.textContent = diaryModulesOpen ? "\u25BC" : "\u25B6";
-        diaryModulesBody.toggleClass("is-hidden", !diaryModulesOpen);
-      });
-    }
-    containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
-    new import_obsidian5.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
-      btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
-        const data = { categories: self.plugin.currentUser.categories, items: self.plugin.currentUser.items };
-        const json = JSON.stringify(data, null, 2);
-        const blob = new Blob([json], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "little-milestones-config.json";
-        a.click();
-        URL.revokeObjectURL(url);
-      });
+    renderUserSettingsSection({
+      app: self.plugin.app,
+      plugin: self.plugin,
+      containerEl,
+      bindSettingsInput,
+      refresh: () => self.display()
     });
-    new import_obsidian5.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
-      btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
-        const fileInput = document.createElement("input");
-        fileInput.type = "file";
-        fileInput.accept = ".json";
-        fileInput.onchange = async () => {
-          const file = fileInput.files && fileInput.files[0];
-          if (!file) return;
-          try {
-            const text = await file.text();
-            const data = JSON.parse(text);
-            if (Array.isArray(data.items)) self.plugin.currentUser.items = data.items;
-            if (Array.isArray(data.categories)) self.plugin.currentUser.categories = data.categories;
-            await self.plugin.saveSettings();
-            self.display();
-            new import_obsidian5.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
-          } catch (e) {
-            new import_obsidian5.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
-          }
-        };
-        fileInput.click();
-      });
+    renderGoalSettingsSection({
+      plugin: self.plugin,
+      containerEl,
+      bindSettingsInput
+    });
+    renderContentSettingsSections({
+      plugin: self.plugin,
+      containerEl,
+      bindSettingsInput
+    });
+    renderCategorySettings({
+      plugin: self.plugin,
+      containerEl,
+      bindSettingsInput,
+      refreshItems: () => self.display()
+    });
+    renderItemSettings({
+      plugin: self.plugin,
+      containerEl,
+      bindSettingsInput
+    });
+    renderImportExportSettings({
+      plugin: self.plugin,
+      containerEl,
+      refresh: () => self.display()
     });
   }
 };
 
-// src/main.ts
-var KidScorePlugin = class extends import_obsidian6.Plugin {
-  constructor() {
-    super(...arguments);
-    this.settings = DEFAULT_SETTINGS;
+// src/settings/normalize-settings.ts
+function sanitizeDoubleTapThreshold(value, fallback) {
+  const n = parseInt(String(value), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(120, Math.min(600, n));
+}
+function normalizePluginSettings(loaded) {
+  const data = loaded || {};
+  let changed = false;
+  if (data.childName !== void 0 && !data.users) {
+    const user = makeDefaultUser();
+    user.name = data.childName || "\u5C0F\u670B\u53CB";
+    user.savePath = data.savePath || "Little Milestones/Daily Records";
+    user.items = Array.isArray(data.items) ? data.items : [];
+    user.categories = Array.isArray(data.categories) && data.categories.length ? data.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+    user.scoringRules = data.scoringRules || "";
+    user.diaryTemplate = data.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+    user.diaryModules = Array.isArray(data.diaryModules) && data.diaryModules.length ? data.diaryModules : makeDefaultDiaryModules();
+    ensureUserDefaults(user);
+    return {
+      settings: {
+        users: [user],
+        currentUserId: user.id,
+        doubleTapThresholds: { ...DEFAULT_SETTINGS.doubleTapThresholds }
+      },
+      changed: true
+    };
   }
-  async onload() {
-    await this.loadSettings();
-    let changed = false;
-    for (const u of this.settings.users) {
-      if (!u.categories || u.categories.length === 0) {
-        u.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-        changed = true;
-      }
-      for (const it of u.items) {
-        if (!it.category) {
-          it.category = it.points >= 0 ? u.categories[0] : u.categories[1] || u.categories[0];
-          changed = true;
+  const settings = { ...DEFAULT_SETTINGS, ...data };
+  const dt = {
+    ...DEFAULT_SETTINGS.doubleTapThresholds,
+    ...settings.doubleTapThresholds || {}
+  };
+  dt.windows = sanitizeDoubleTapThreshold(
+    dt.windows,
+    DEFAULT_SETTINGS.doubleTapThresholds.windows
+  );
+  dt.mac = sanitizeDoubleTapThreshold(
+    dt.mac,
+    DEFAULT_SETTINGS.doubleTapThresholds.mac
+  );
+  dt.android = sanitizeDoubleTapThreshold(
+    dt.android,
+    DEFAULT_SETTINGS.doubleTapThresholds.android
+  );
+  dt.ios = sanitizeDoubleTapThreshold(
+    dt.ios,
+    DEFAULT_SETTINGS.doubleTapThresholds.ios
+  );
+  dt.fallback = sanitizeDoubleTapThreshold(
+    dt.fallback,
+    DEFAULT_SETTINGS.doubleTapThresholds.fallback
+  );
+  settings.doubleTapThresholds = dt;
+  if (!settings.users || !settings.users.length) {
+    const user = makeDefaultUser();
+    settings.users = [user];
+    settings.currentUserId = user.id;
+    changed = true;
+  } else {
+    for (const user of settings.users) {
+      changed = ensureUserDefaults(user) || changed;
+    }
+    if (!settings.currentUserId || !settings.users.find((user) => user.id === settings.currentUserId)) {
+      settings.currentUserId = settings.users[0].id;
+      changed = true;
+    }
+  }
+  return { settings, changed };
+}
+function ensureUserDefaults(user) {
+  let changed = false;
+  if (!user.id) {
+    user.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+    changed = true;
+  }
+  if (!user.name) {
+    user.name = "\u5C0F\u670B\u53CB";
+    changed = true;
+  }
+  if (!user.savePath || !String(user.savePath).trim()) {
+    user.savePath = "Little Milestones/Daily Records";
+    changed = true;
+  }
+  if (!Array.isArray(user.items)) {
+    user.items = [];
+    changed = true;
+  }
+  if (!Array.isArray(user.categories) || !user.categories.length) {
+    user.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+    changed = true;
+  }
+  if (typeof user.scoringRules !== "string") {
+    user.scoringRules = "";
+    changed = true;
+  }
+  if (!user.diaryTemplate) {
+    user.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
+    changed = true;
+  }
+  if (!Array.isArray(user.diaryModules) || user.diaryModules.length === 0) {
+    user.diaryModules = makeDefaultDiaryModules();
+    changed = true;
+  }
+  if (!user.goals) {
+    user.goals = { daily: 10, weekly: 70, monthly: 300 };
+    changed = true;
+  }
+  for (const item of user.items) {
+    if (!item.category) {
+      item.category = item.points >= 0 ? user.categories[0] : user.categories[1] || user.categories[0];
+      changed = true;
+    }
+  }
+  return changed;
+}
+
+// src/storage/day-data-store.ts
+var import_obsidian18 = require("obsidian");
+
+// src/composers/day-data-composer.ts
+var DayDataComposer = class {
+  constructor(plugin) {
+    this.plugin = plugin;
+  }
+  async compose(dateStr, scores, customItems, diaryContent) {
+    const items = this.plugin.currentUser.items;
+    const childName = this.plugin.currentUser.name;
+    const d = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() - 1);
+    const yesterdayStr = d.toISOString().slice(0, 10);
+    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
+    let total = 0;
+    let earnedCount = 0;
+    let missedCount = 0;
+    let positiveCount = 0;
+    let negativeCount = 0;
+    for (const item of items) {
+      const val = scores[item.id] || 0;
+      total += val;
+      const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
+      if (isDeduct) {
+        if (val !== 0) {
+          earnedCount++;
+          negativeCount++;
+        } else {
+          missedCount++;
+        }
+      } else {
+        if (val > 0) {
+          earnedCount++;
+          positiveCount++;
+        } else {
+          missedCount++;
         }
       }
     }
-    if (changed) await this.saveSettings();
+    let customTotal = 0;
+    for (const ci of customItems) {
+      customTotal += ci.points;
+    }
+    total += customTotal;
+    const allScores = await this.plugin.getAllScores();
+    let cumulativeTotal = 0;
+    let cumulativeDays = 0;
+    for (const s of allScores) {
+      if (s.date !== dateStr) {
+        cumulativeTotal += s.total;
+        cumulativeDays++;
+      }
+    }
+    const grandTotal = cumulativeTotal + total;
+    const grandDays = cumulativeDays + 1;
+    const grandAvg = grandDays > 0 ? Math.round(grandTotal / grandDays * 10) / 10 : 0;
+    let streak = 0;
+    const sortedScores = [...allScores].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    for (const s of sortedScores) {
+      if (s.total > 0) streak++;
+      else break;
+    }
+    if (total > 0) streak++;
+    const diaryText = diaryContent || "";
+    const diaryModules = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const weatherModule = diaryModules.find((moduleDef) => moduleDef.id === "weather");
+    const moodModule = diaryModules.find((moduleDef) => moduleDef.id === "mood");
+    const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
+    const lunchMatch = diaryText.match(/午餐：\s*(.+)/);
+    const dinnerMatch = diaryText.match(/晚餐：\s*(.+)/);
+    const homeCookMatch = diaryText.match(/在家做饭：\s*(.+)/);
+    const exerciseMatch = diaryText.match(/运动项目：\s*(.+)/);
+    const sleepMatch = diaryText.match(/睡眠情况：\s*(.+)/);
+    return {
+      dateStr,
+      childName,
+      scores,
+      customItems,
+      diaryContent,
+      total,
+      earnedCount,
+      missedCount,
+      positiveCount,
+      negativeCount,
+      customTotal,
+      totalItems: items.length,
+      completionRate: items.length > 0 ? Math.round(earnedCount / items.length * 100) : 0,
+      grandTotal,
+      grandDays,
+      grandAvg,
+      streak,
+      hasYesterday: !!yesterdayData,
+      yesterdayData,
+      tags: {
+        weather: weatherModule ? readDiaryLine(diaryText, weatherModule.label) || void 0 : void 0,
+        mood: moodModule ? readDiaryLine(diaryText, moodModule.label) || void 0 : void 0,
+        homeCook: homeCookMatch ? homeCookMatch[1].trim() : void 0,
+        exercise: exerciseMatch ? exerciseMatch[1].trim() : void 0,
+        sleep: sleepMatch ? sleepMatch[1].trim() : void 0,
+        hasDiary: diaryText.trim().length > 0
+      },
+      diet: {
+        breakfast: breakfastMatch ? breakfastMatch[1].trim() : void 0,
+        lunch: lunchMatch ? lunchMatch[1].trim() : void 0,
+        dinner: dinnerMatch ? dinnerMatch[1].trim() : void 0
+      },
+      items,
+      categories: this.plugin.currentUser.categories || []
+    };
+  }
+};
+
+// src/utils/yaml.ts
+function toYamlInline(value) {
+  const safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return '"' + safe + '"';
+}
+
+// src/renderers/report-sections.ts
+function buildFrontmatter(report) {
+  const scoresYaml = report.items.map((item) => "  " + item.id + ": " + (report.scores[item.id] || 0)).join("\n");
+  let customYaml = "";
+  if (report.customItems.length > 0) {
+    customYaml = "\ncustomItems:\n" + report.customItems.map(
+      (item) => "  - " + toYamlInline(item.emoji + "|" + item.name + "|" + item.points)
+    ).join("\n");
+  }
+  return "---\ndate: " + report.dateStr + "\nchild: " + report.childName + "\ntotal: " + report.total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n";
+}
+function buildSummaryCallout(report) {
+  const totalSign = report.total >= 0 ? "+" : "";
+  let summary = "> [!summary] \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n> - \u{1F3C6} \u4ECA\u65E5\u603B\u5206\uFF1A**" + totalSign + report.total + " \u5206**\n";
+  if (report.hasYesterday && report.yesterdayData) {
+    const yTotalSign = report.yesterdayData.total >= 0 ? "+" : "";
+    summary += "> - \u{1F4C5} \u6628\u65E5\u603B\u5206\uFF1A" + yTotalSign + report.yesterdayData.total + " \u5206\n";
+  }
+  const grandSign = report.grandTotal >= 0 ? "+" : "";
+  summary += "> - \u2705 \u5B8C\u6210\u9879\u76EE\uFF1A**" + report.earnedCount + "/" + report.totalItems + " (" + report.completionRate + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + report.positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + report.negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + report.customItems.length + " \u9879 (" + (report.customTotal >= 0 ? "+" : "") + report.customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + report.grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + report.grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + report.grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + report.streak + " \u5929\n";
+  return summary;
+}
+function buildGoalCallout(report) {
+  const dailyGoal = 10;
+  const goalPct = Math.min(
+    100,
+    Math.round(report.earnedCount / dailyGoal * 100)
+  );
+  return "> [!tip] \u{1F3AF} \u4ECA\u65E5\u76EE\u6807\n> \u5B8C\u6210\u9879\u76EE **" + report.earnedCount + "/" + dailyGoal + "** \xB7 " + renderProgressBar(goalPct) + "\n";
+}
+function buildCategoryTables(report) {
+  let content = "";
+  for (const category of report.categories) {
+    const items = report.items.filter((item) => item.category === category);
+    if (items.length > 0) {
+      content += "\n### " + category + "\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryRows(items, report) + "\n";
+    }
+  }
+  const uncategorized = report.items.filter(
+    (item) => !item.category || report.categories.indexOf(item.category) === -1
+  );
+  if (uncategorized.length > 0) {
+    content += "\n### \u5176\u4ED6\n\n| \u9879\u76EE | \u9ED8\u8BA4 | \u5F97\u5206 | \u72B6\u6001 |\n|:---|---:|---:|:---:|\n" + renderCategoryRows(uncategorized, report) + "\n";
+  }
+  return content;
+}
+function buildCustomItemsCallout(customItems) {
+  if (customItems.length === 0) return "";
+  const customTotal = customItems.reduce((sum, item) => sum + item.points, 0);
+  const hasNotes = customItems.some((item) => item.note && item.note.trim());
+  let callout = "\n> [!info] \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF08" + customItems.length + " \u9879\uFF0C" + (customTotal >= 0 ? "+" : "") + customTotal + " \u5206\uFF09\n";
+  if (hasNotes) {
+    callout += "> | \u4E8B\u9879 | \u5F97\u5206 | \u5907\u6CE8 |\n> |:---|---:|:---|\n";
+    for (const item of customItems) {
+      callout += "> | " + item.emoji + " " + item.name + " | " + (item.points >= 0 ? "+" : "") + item.points + " | " + (item.note || "") + " |\n";
+    }
+  } else {
+    callout += "> | \u4E8B\u9879 | \u5F97\u5206 |\n> |:---|---:|\n";
+    for (const item of customItems) {
+      callout += "> | " + item.emoji + " " + item.name + " | " + (item.points >= 0 ? "+" : "") + item.points + " |\n";
+    }
+  }
+  return callout + "\n";
+}
+function renderCategoryRows(items, report) {
+  let rows = "";
+  for (const item of items) {
+    const actual = report.scores[item.id] || 0;
+    const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
+    const status = isDeductItem ? actual !== 0 ? "\u2B55" : "\u{1F535}" : actual > 0 ? "\u2705" : "\u274C";
+    const defaultSign = item.points >= 0 ? "+" : "";
+    const noteMarker = actual !== 0 && actual !== item.points ? " \u{1F4DD}" : "";
+    rows += "| " + item.emoji + " " + item.name + " | " + defaultSign + item.points + " | " + renderScoreCell(actual, isDeductItem) + noteMarker + " | " + status + " |\n";
+    if (report.hasYesterday && report.yesterdayData) {
+      const yVal = report.yesterdayData.scores[item.id] || 0;
+      const ySign = yVal >= 0 ? "+" : "";
+      const yIcon = yVal > 0 ? "\u2705" : yVal < 0 ? "\u274C" : "\u2014";
+      rows += "> [!quote]- \u6628\u65E5\uFF1A" + item.name + " " + ySign + yVal + " \u5206 " + yIcon + "\n";
+    }
+  }
+  return rows;
+}
+function renderProgressBar(pct) {
+  const filled = Math.round(pct / 5);
+  const empty = 20 - filled;
+  return "`" + "\u2588".repeat(filled) + "\u2591".repeat(empty) + " " + pct + "%`";
+}
+function renderScoreCell(actual, isDeduct) {
+  const sign = actual >= 0 ? "+" : "";
+  const color = isDeduct ? "#dc2626" : "#16a34a";
+  return '<span style="color:' + color + ';font-weight:600">' + sign + actual + "</span>";
+}
+
+// src/renderers/report-builder.ts
+var MarkdownReportBuilder = class {
+  build(report) {
+    return buildFrontmatter(report) + "# \u{1F4CB} " + report.dateStr + " " + report.childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n" + buildSummaryCallout(report) + "\n" + buildGoalCallout(report) + "\n---\n" + buildCategoryTables(report) + buildCustomItemsCallout(report.customItems) + "---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (report.diaryContent || "") + "\n";
+  }
+};
+
+// src/storage/day-data-store.ts
+var DayDataStore = class {
+  constructor(plugin) {
+    this.plugin = plugin;
+  }
+  async readDayData(dateStr) {
+    const file = this.plugin.app.vault.getAbstractFileByPath(
+      this.plugin.filePath(dateStr)
+    );
+    if (!(file instanceof import_obsidian18.TFile)) return null;
+    const content = await this.plugin.app.vault.read(file);
+    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (!fmMatch) return null;
+    const fm = fmMatch[1];
+    const totalMatch = fm.match(/total:\s*(-?\d+)/);
+    const total = totalMatch ? parseInt(totalMatch[1], 10) : 0;
+    const scores = {};
+    const scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
+    if (scoreBlock) {
+      for (const line of scoreBlock[1].split("\n")) {
+        const kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
+        if (kvNum) {
+          scores[kvNum[1]] = parseInt(kvNum[2], 10);
+          continue;
+        }
+        const kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
+        if (kvBool) {
+          const itemDef = this.plugin.currentUser.items.find(
+            (item) => item.id === kvBool[1]
+          );
+          scores[kvBool[1]] = kvBool[2] === "true" ? itemDef ? itemDef.points : 1 : 0;
+        }
+      }
+    }
+    const customItems = [];
+    const customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
+    if (customBlock) {
+      const lines = customBlock[1].split("\n");
+      for (const line of lines) {
+        const match = line.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
+        if (match) {
+          customItems.push({
+            id: "custom_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+            emoji: match[1],
+            name: match[2],
+            points: parseInt(match[3], 10)
+          });
+        }
+      }
+    }
+    let diaryContent = "";
+    const diaryHeadingIdx = content.indexOf("## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0");
+    if (diaryHeadingIdx !== -1) {
+      diaryContent = content.slice(diaryHeadingIdx).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+    } else {
+      const diaryIdx = content.indexOf(DIARY_MARKER);
+      if (diaryIdx !== -1) {
+        diaryContent = content.slice(diaryIdx + DIARY_MARKER.length).trim().replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+      }
+    }
+    return {
+      date: dateStr,
+      child: this.plugin.currentUser.name,
+      scores,
+      customItems,
+      total,
+      diaryContent
+    };
+  }
+  async saveDayData(dateStr, scores, customItems, diaryContent) {
+    try {
+      const composer = new DayDataComposer(this.plugin);
+      const builder = new MarkdownReportBuilder();
+      const report = await composer.compose(
+        dateStr,
+        scores,
+        customItems,
+        diaryContent
+      );
+      const fileContent = builder.build(report);
+      const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+      if (!this.plugin.app.vault.getAbstractFileByPath(dirPath)) {
+        await this.plugin.app.vault.createFolder(dirPath);
+      }
+      const filePath = this.plugin.filePath(dateStr);
+      const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
+      if (existing instanceof import_obsidian18.TFile) {
+        await this.plugin.app.vault.modify(existing, fileContent);
+      } else {
+        await this.plugin.app.vault.create(filePath, fileContent);
+      }
+      const totalSign = report.total >= 0 ? "+" : "";
+      const grandSign = report.grandTotal >= 0 ? "+" : "";
+      new import_obsidian18.Notice(
+        "\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal
+      );
+    } catch (error) {
+      console.error("[Little Milestones] saveDayData failed", error);
+      new import_obsidian18.Notice(
+        "\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
+      );
+      throw error;
+    }
+  }
+  async renameUserInFiles(oldName, newName) {
+    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const files = this.plugin.app.vault.getFiles().filter(
+      (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
+    );
+    let errorCount = 0;
+    for (const file of files) {
+      try {
+        const content = await this.plugin.app.vault.read(file);
+        const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const childRe = new RegExp("^child:\\s*" + escapedOldName + "$", "gm");
+        const titleRe = new RegExp(
+          "(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)",
+          "g"
+        );
+        const newContent = content.replace(childRe, "child: " + newName).replace(titleRe, "$1" + newName + "$2");
+        if (newContent !== content) {
+          await this.plugin.app.vault.modify(file, newContent);
+        }
+      } catch (error) {
+        errorCount++;
+        console.error(
+          "[Little Milestones] renameUserInFiles failed for",
+          file.path,
+          error
+        );
+      }
+    }
+    if (errorCount > 0) {
+      throw new Error(
+        "\u7528\u6237\u540D\u540C\u6B65\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u8BF7\u67E5\u770B\u63A7\u5236\u53F0\u65E5\u5FD7"
+      );
+    }
+  }
+  async migrateSavePath(oldPath, newPath) {
+    const oldDir = (0, import_obsidian18.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian18.normalizePath)(newPath);
+    if (oldDir === newDir) return;
+    const files = this.plugin.app.vault.getFiles().filter(
+      (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
+    );
+    if (files.length === 0) return;
+    if (!this.plugin.app.vault.getAbstractFileByPath(newDir)) {
+      await this.plugin.app.vault.createFolder(newDir);
+    }
+    let errorCount = 0;
+    for (const file of files) {
+      try {
+        const newFilePath = (0, import_obsidian18.normalizePath)(newDir + "/" + file.name);
+        const existing = this.plugin.app.vault.getAbstractFileByPath(newFilePath);
+        if (existing instanceof import_obsidian18.TFile) {
+          const oldContent = await this.plugin.app.vault.read(file);
+          await this.plugin.app.vault.modify(existing, oldContent);
+          await this.plugin.app.vault.delete(file, true);
+        } else {
+          await this.plugin.app.vault.rename(file, newFilePath);
+        }
+      } catch (error) {
+        errorCount++;
+        console.error(
+          "[Little Milestones] migrateSavePath failed for",
+          file.path,
+          error
+        );
+      }
+    }
+    if (errorCount > 0) {
+      throw new Error(
+        "\u8DEF\u5F84\u8FC1\u79FB\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u5EFA\u8BAE\u624B\u52A8\u68C0\u67E5\u5E76\u8FC1\u79FB"
+      );
+    }
+  }
+  async getAllScores() {
+    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const files = this.plugin.app.vault.getFiles().filter(
+      (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
+    );
+    const results = [];
+    for (const file of files) {
+      const dateStr = file.basename;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const score = await this.readDayData(dateStr);
+        if (score) results.push(score);
+      }
+    }
+    return results.sort((a, b) => a.date.localeCompare(b.date));
+  }
+};
+
+// src/main.ts
+var KidScorePlugin = class extends import_obsidian19.Plugin {
+  constructor() {
+    super(...arguments);
+    this.settings = DEFAULT_SETTINGS;
+    this.dayDataStore = new DayDataStore(this);
+  }
+  async onload() {
+    await this.loadSettings();
     this.addRibbonIcon("star", "Little Milestones \u{1F331}", () => {
       new DailyScoringModal(this.app, this).open();
     });
@@ -4945,75 +5858,9 @@ var KidScorePlugin = class extends import_obsidian6.Plugin {
     this.addSettingTab(new KidScoreSettingTab(this.app, this));
   }
   async loadSettings() {
-    const loaded = await this.loadData() || {};
-    if (loaded.childName !== void 0 && !loaded.users) {
-      const mu = makeDefaultUser();
-      mu.name = loaded.childName || "\u5C0F\u670B\u53CB";
-      mu.savePath = loaded.savePath || "Little Milestones/Daily Records";
-      mu.items = loaded.items || [];
-      mu.categories = loaded.categories && loaded.categories.length ? loaded.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-      mu.scoringRules = loaded.scoringRules || "";
-      mu.diaryTemplate = loaded.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-      mu.diaryModules = Array.isArray(loaded.diaryModules) && loaded.diaryModules.length ? loaded.diaryModules : makeDefaultDiaryModules();
-      this.settings = {
-        users: [mu],
-        currentUserId: mu.id,
-        doubleTapThresholds: {
-          ...DEFAULT_SETTINGS.doubleTapThresholds
-        }
-      };
-    } else {
-      this.settings = { ...DEFAULT_SETTINGS, ...loaded };
-      const dt = {
-        ...DEFAULT_SETTINGS.doubleTapThresholds,
-        ...this.settings.doubleTapThresholds || {}
-      };
-      dt.windows = this.sanitizeDoubleTapThreshold(
-        dt.windows,
-        DEFAULT_SETTINGS.doubleTapThresholds.windows
-      );
-      dt.mac = this.sanitizeDoubleTapThreshold(
-        dt.mac,
-        DEFAULT_SETTINGS.doubleTapThresholds.mac
-      );
-      dt.android = this.sanitizeDoubleTapThreshold(
-        dt.android,
-        DEFAULT_SETTINGS.doubleTapThresholds.android
-      );
-      dt.ios = this.sanitizeDoubleTapThreshold(
-        dt.ios,
-        DEFAULT_SETTINGS.doubleTapThresholds.ios
-      );
-      dt.fallback = this.sanitizeDoubleTapThreshold(
-        dt.fallback,
-        DEFAULT_SETTINGS.doubleTapThresholds.fallback
-      );
-      this.settings.doubleTapThresholds = dt;
-      if (!this.settings.users || !this.settings.users.length) {
-        const du = makeDefaultUser();
-        this.settings.users = [du];
-        this.settings.currentUserId = du.id;
-      } else {
-        for (const su of this.settings.users) {
-          if (!su.id)
-            su.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-          if (!su.name) su.name = "\u5C0F\u670B\u53CB";
-          if (!su.savePath || !String(su.savePath).trim())
-            su.savePath = "Little Milestones/Daily Records";
-          if (!Array.isArray(su.items)) su.items = [];
-          if (!Array.isArray(su.categories) || !su.categories.length)
-            su.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-          if (typeof su.scoringRules !== "string") su.scoringRules = "";
-          if (!su.diaryTemplate) su.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
-          if (!Array.isArray(su.diaryModules) || su.diaryModules.length === 0) su.diaryModules = makeDefaultDiaryModules();
-          if (!su.goals) su.goals = { daily: 10, weekly: 70, monthly: 300 };
-        }
-        const cuid = this.settings.currentUserId;
-        if (!cuid || !this.settings.users.find((u) => u.id === cuid)) {
-          this.settings.currentUserId = this.settings.users[0].id;
-        }
-      }
-    }
+    const { settings, changed } = normalizePluginSettings(await this.loadData());
+    this.settings = settings;
+    if (changed) await this.saveSettings();
   }
   async saveSettings() {
     await this.saveData(this.settings);
@@ -5046,160 +5893,26 @@ var KidScorePlugin = class extends import_obsidian6.Plugin {
     return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
   }
   filePath(dateStr) {
-    return (0, import_obsidian6.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian19.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
   async readDayData(dateStr) {
-    const file = this.app.vault.getAbstractFileByPath(this.filePath(dateStr));
-    if (!(file instanceof import_obsidian6.TFile)) return null;
-    const content = await this.app.vault.read(file);
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    if (!fmMatch) return null;
-    const fm = fmMatch[1];
-    const totalMatch = fm.match(/total:\s*(-?\d+)/);
-    const total = totalMatch ? parseInt(totalMatch[1]) : 0;
-    const scores = {};
-    const scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
-    if (scoreBlock) {
-      for (const line of scoreBlock[1].split("\n")) {
-        const kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
-        if (kvNum) {
-          scores[kvNum[1]] = parseInt(kvNum[2]);
-          continue;
-        }
-        const kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
-        if (kvBool) {
-          const itemDef = this.currentUser.items.find(
-            (it) => it.id === kvBool[1]
-          );
-          scores[kvBool[1]] = kvBool[2] === "true" ? itemDef ? itemDef.points : 1 : 0;
-        }
-      }
-    }
-    const customItems = [];
-    const customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
-    if (customBlock) {
-      const lines = customBlock[1].split("\n");
-      for (const cl of lines) {
-        const cm = cl.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
-        if (cm) {
-          customItems.push({
-            id: "custom_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-            emoji: cm[1],
-            name: cm[2],
-            points: parseInt(cm[3])
-          });
-        }
-      }
-    }
-    let diaryContent = "";
-    const diaryHeadingIdx = content.indexOf("## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0");
-    if (diaryHeadingIdx !== -1) {
-      diaryContent = content.slice(diaryHeadingIdx).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
-    } else {
-      const diaryIdx = content.indexOf(DIARY_MARKER);
-      if (diaryIdx !== -1) {
-        diaryContent = content.slice(diaryIdx + DIARY_MARKER.length).trim();
-        diaryContent = diaryContent.replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
-      }
-    }
-    return {
-      date: dateStr,
-      child: this.currentUser.name,
-      scores,
-      customItems,
-      total,
-      diaryContent
-    };
+    return this.dayDataStore.readDayData(dateStr);
   }
   async saveDayData(dateStr, scores, customItems, diaryContent) {
-    try {
-      const composer = new DayDataComposer(this);
-      const builder = new MarkdownReportBuilder();
-      const report = await composer.compose(dateStr, scores, customItems, diaryContent);
-      const fileContent = builder.build(report);
-      const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
-      if (!this.app.vault.getAbstractFileByPath(dirPath)) {
-        await this.app.vault.createFolder(dirPath);
-      }
-      const fp = this.filePath(dateStr);
-      const existing = this.app.vault.getAbstractFileByPath(fp);
-      if (existing instanceof import_obsidian6.TFile) {
-        await this.app.vault.modify(existing, fileContent);
-      } else {
-        await this.app.vault.create(fp, fileContent);
-      }
-      const totalSign = report.total >= 0 ? "+" : "";
-      const grandSign = report.grandTotal >= 0 ? "+" : "";
-      new import_obsidian6.Notice("\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal);
-    } catch (e) {
-      console.error("[Little Milestones] saveDayData failed", e);
-      new import_obsidian6.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
-      throw e;
-    }
+    await this.dayDataStore.saveDayData(
+      dateStr,
+      scores,
+      customItems,
+      diaryContent
+    );
   }
   async renameUserInFiles(oldName, newName) {
-    const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
-    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(dirPath + "/") && f.extension === "md");
-    let errorCount = 0;
-    for (const file of files) {
-      try {
-        const content = await this.app.vault.read(file);
-        const childRe = new RegExp("^child:\\s*" + oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "$", "gm");
-        const titleRe = new RegExp("(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)", "g");
-        const newContent = content.replace(childRe, "child: " + newName).replace(titleRe, "$1" + newName + "$2");
-        if (newContent !== content) {
-          await this.app.vault.modify(file, newContent);
-        }
-      } catch (e) {
-        errorCount++;
-        console.error("[Little Milestones] renameUserInFiles failed for", file.path, e);
-      }
-    }
-    if (errorCount > 0) {
-      throw new Error("\u7528\u6237\u540D\u540C\u6B65\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u8BF7\u67E5\u770B\u63A7\u5236\u53F0\u65E5\u5FD7");
-    }
+    await this.dayDataStore.renameUserInFiles(oldName, newName);
   }
   async migrateSavePath(oldPath, newPath) {
-    const oldDir = (0, import_obsidian6.normalizePath)(oldPath);
-    const newDir = (0, import_obsidian6.normalizePath)(newPath);
-    if (oldDir === newDir) return;
-    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(oldDir + "/") && f.extension === "md");
-    if (files.length === 0) return;
-    if (!this.app.vault.getAbstractFileByPath(newDir)) {
-      await this.app.vault.createFolder(newDir);
-    }
-    let errorCount = 0;
-    for (const file of files) {
-      try {
-        const newFilePath = (0, import_obsidian6.normalizePath)(newDir + "/" + file.name);
-        const existing = this.app.vault.getAbstractFileByPath(newFilePath);
-        if (existing instanceof import_obsidian6.TFile) {
-          const oldContent = await this.app.vault.read(file);
-          await this.app.vault.modify(existing, oldContent);
-          await this.app.vault.delete(file, true);
-        } else {
-          await this.app.vault.rename(file, newFilePath);
-        }
-      } catch (e) {
-        errorCount++;
-        console.error("[Little Milestones] migrateSavePath failed for", file.path, e);
-      }
-    }
-    if (errorCount > 0) {
-      throw new Error("\u8DEF\u5F84\u8FC1\u79FB\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u5EFA\u8BAE\u624B\u52A8\u68C0\u67E5\u5E76\u8FC1\u79FB");
-    }
+    await this.dayDataStore.migrateSavePath(oldPath, newPath);
   }
   async getAllScores() {
-    const dirPath = (0, import_obsidian6.normalizePath)(this.currentUser.savePath);
-    const files = this.app.vault.getFiles().filter((f) => f.path.startsWith(dirPath + "/") && f.extension === "md");
-    const results = [];
-    for (const file of files) {
-      const dateStr = file.basename;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        const score = await this.readDayData(dateStr);
-        if (score) results.push(score);
-      }
-    }
-    return results.sort((a, b) => a.date.localeCompare(b.date));
+    return this.dayDataStore.getAllScores();
   }
 };

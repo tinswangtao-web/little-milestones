@@ -21,6 +21,20 @@ export interface UserGoals {
   monthly: number;
 }
 
+export type DiaryModuleKind = "quick" | "multi";
+
+export interface DiaryModuleDefinition {
+  id: string;
+  label: string;
+  placeholder: string;
+  kind: DiaryModuleKind;
+}
+
+export interface DiaryModuleValues {
+  [key: string]: string | undefined;
+  freeWrite?: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -29,6 +43,7 @@ export interface User {
   categories: string[];
   scoringRules: string;
   diaryTemplate: string;
+  diaryModules: DiaryModuleDefinition[];
   goals: UserGoals;
 }
 
@@ -56,18 +71,6 @@ export interface PluginSettings {
 }
 
 export type MobilePlatform = "desktop" | "android" | "ios" | "mobile-other";
-
-export interface DiaryTemplate {
-  name: string;
-  content: string;
-}
-
-export interface DiaryTemplates {
-  default: DiaryTemplate;
-  simple: DiaryTemplate;
-  detailed: DiaryTemplate;
-  creative: DiaryTemplate;
-}
 
 export type StatsPeriod = "week" | "month" | "all";
 

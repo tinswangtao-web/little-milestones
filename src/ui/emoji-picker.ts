@@ -1,5 +1,9 @@
-import { EMOJI_DATA, EMOJI_SEARCH } from "../constants";
 import { getOverlayMount, bindModalInputFocus } from "../utils/dom";
+import {
+  getEmojiCategoryItems,
+  getEmojiCategoryKeys,
+  searchEmojis,
+} from "./emoji-picker-search";
 
 export function showEmojiPicker(
   callback: (emoji: string) => void,
@@ -51,7 +55,7 @@ export function showEmojiPicker(
 
   const catTabs = document.createElement("div");
   catTabs.className = "emoji-fp-tabs";
-  const catKeys = Object.keys(EMOJI_DATA);
+  const catKeys = getEmojiCategoryKeys();
   const gridWrap = document.createElement("div");
   gridWrap.className = "emoji-fp-grid-wrap";
 
@@ -80,34 +84,7 @@ export function showEmojiPicker(
   };
 
   const renderCat = (key: string) => {
-    renderEmojis(EMOJI_DATA[key]);
-  };
-
-  const searchEmojis = (query: string): string[] => {
-    const q = query.toLowerCase();
-    const results: string[] = [];
-    const seen = new Set<string>();
-    for (const em in EMOJI_SEARCH) {
-      if (EMOJI_SEARCH[em].includes(q)) {
-        if (!seen.has(em)) {
-          results.push(em);
-          seen.add(em);
-        }
-      }
-    }
-    if (results.length === 0) {
-      for (const ck of catKeys) {
-        if (ck.toLowerCase().includes(q)) {
-          for (const arrEm of EMOJI_DATA[ck]) {
-            if (!seen.has(arrEm)) {
-              results.push(arrEm);
-              seen.add(arrEm);
-            }
-          }
-        }
-      }
-    }
-    return results;
+    renderEmojis(getEmojiCategoryItems(key));
   };
 
   let searchTimer: ReturnType<typeof setTimeout> | null = null;
@@ -139,7 +116,7 @@ export function showEmojiPicker(
         /^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\u200D]+$/u.test(q);
       if (pureEmoji) return;
       catTabs.style.display = "none";
-      const results = searchEmojis(q);
+      const results = searchEmojis(q, catKeys);
       renderEmojis(results);
     }, 100);
   };

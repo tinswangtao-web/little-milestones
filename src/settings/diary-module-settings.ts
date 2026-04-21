@@ -1,0 +1,136 @@
+import { Notice } from "obsidian";
+import { makeDefaultDiaryModules } from "../constants";
+import type KidScorePlugin from "../main";
+
+interface RenderDiaryModuleSettingsOptions {
+  plugin: KidScorePlugin;
+  containerEl: HTMLElement;
+  bindSettingsInput: (input: HTMLElement | null) => void;
+}
+
+export function renderDiaryModuleSettingsSection({
+  plugin,
+  containerEl,
+  bindSettingsInput,
+}: RenderDiaryModuleSettingsOptions): void {
+  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "▼" });
+  header.createEl("span", { cls: "kid-score-rules-title", text: "🧩 日记模块" });
+  header.createSpan({
+    cls: "kid-score-rules-desc",
+    text: "可以自定义显示在打分页的常用记录模块",
+  });
+  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  let isOpen = true;
+
+  const ensureDiaryModules = () => {
+    if (!Array.isArray(plugin.currentUser.diaryModules) || plugin.currentUser.diaryModules.length === 0) {
+      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+    }
+  };
+
+  const render = () => {
+    ensureDiaryModules();
+    body.empty();
+    const hint = body.createEl("p", {
+      cls: "kid-score-hint",
+      text: "你可以修改模块名称和提示文案，也可以新增或删除模块。天气/心情会保留快捷 emoji 功能。",
+    });
+    hint.style.marginBottom = "10px";
+
+    const list = body.createDiv({ cls: "diary-module-settings-list" });
+    plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
+      const row = list.createDiv({ cls: "diary-module-settings-row" });
+
+      const labelInput = row.createEl("input", {
+        cls: "diary-module-settings-input",
+        type: "text",
+      });
+      labelInput.value = moduleDef.label || "";
+      labelInput.placeholder = "模块名称";
+      bindSettingsInput(labelInput);
+      labelInput.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].label =
+          labelInput.value.trim() || moduleDef.label || "新模块";
+        await plugin.saveSettings();
+        render();
+      };
+
+      const placeholderInput = row.createEl("input", {
+        cls: "diary-module-settings-input is-wide",
+        type: "text",
+      });
+      placeholderInput.value = moduleDef.placeholder || "";
+      placeholderInput.placeholder = "提示文案";
+      bindSettingsInput(placeholderInput);
+      placeholderInput.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
+        await plugin.saveSettings();
+      };
+
+      const kindSelect = row.createEl("select", {
+        cls: "diary-module-settings-select",
+      });
+      [
+        { value: "quick", label: "单行快捷" },
+        { value: "multi", label: "多行记录" },
+      ].forEach((optionDef) => {
+        const opt = kindSelect.createEl("option", {
+          text: optionDef.label,
+          value: optionDef.value,
+        });
+        if ((moduleDef.kind || "multi") === optionDef.value) opt.selected = true;
+      });
+      kindSelect.onchange = async () => {
+        plugin.currentUser.diaryModules[idx].kind = kindSelect.value as "quick" | "multi";
+        await plugin.saveSettings();
+      };
+
+      const delBtn = row.createEl("button", {
+        cls: "settings-delete-btn",
+        text: "🗑",
+      });
+      delBtn.onclick = async () => {
+        plugin.currentUser.diaryModules.splice(idx, 1);
+        await plugin.saveSettings();
+        render();
+      };
+    });
+
+    const actions = body.createDiv({ cls: "kid-score-rules-actions" });
+    const addBtn = actions.createEl("button", {
+      cls: "mod-cta kid-score-rules-save-btn",
+      text: "＋ 新增模块",
+    });
+    addBtn.onclick = async () => {
+      plugin.currentUser.diaryModules.push({
+        id: "module_" + Date.now(),
+        label: "新模块",
+        placeholder: "这里写一点今天的记录",
+        kind: "multi",
+      });
+      await plugin.saveSettings();
+      render();
+    };
+
+    const resetBtn = actions.createEl("button", {
+      cls: "kid-score-rules-cancel-btn",
+      text: "恢复默认模块",
+    });
+    resetBtn.onclick = async () => {
+      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+      await plugin.saveSettings();
+      render();
+      new Notice("✅ 已恢复默认日记模块");
+    };
+  };
+
+  render();
+
+  header.addEventListener("click", () => {
+    isOpen = !isOpen;
+    toggle.textContent = isOpen ? "▼" : "▶";
+    body.toggleClass("is-hidden", !isOpen);
+  });
+}

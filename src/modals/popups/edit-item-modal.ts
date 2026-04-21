@@ -86,6 +86,7 @@ export class EditItemModal extends BaseMobileModal {
     noteRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "备注" }));
     const noteInput = document.createElement("textarea");
     noteInput.className = "custom-form-name-input";
+    noteInput.classList.add("custom-form-note-input");
     noteInput.value = this.item.note || "";
     noteInput.placeholder = "可选，长按时显示在卡片上，支持多行";
     noteInput.autocomplete = "off";
