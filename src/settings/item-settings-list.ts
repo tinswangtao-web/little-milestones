@@ -317,7 +317,30 @@ export function renderItemSettingsList({
           '.settings-item-wrap[data-item-id="' + pendingScrollItemId + '"]'
         );
         if (newItemEl) {
+          // Try scrollIntoView first (works on desktop and some mobile layouts)
           newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
+
+          // Fallback: if Obsidian's settings page uses a separate scroll
+          // container (common on mobile), also scroll that container.
+          const scroller =
+            itemsWrap.closest(".vertical-tab-content") ||
+            itemsWrap.closest(".modal-content") ||
+            itemsWrap.closest(".setting-item") ||
+            itemsWrap.parentElement;
+          if (scroller && scroller !== itemsWrap) {
+            const scrollerEl = scroller as HTMLElement;
+            const itemTop =
+              newItemEl.offsetTop -
+              (itemsWrap.offsetTop - scrollerEl.offsetTop);
+            const desiredScroll = Math.max(
+              0,
+              itemTop -
+                scrollerEl.clientHeight / 2 +
+                newItemEl.clientHeight / 2
+            );
+            scrollerEl.scrollTo({ top: desiredScroll, behavior: "smooth" });
+          }
+
           newItemEl.addClass("is-new-item");
           window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
         }

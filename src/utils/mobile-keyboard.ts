@@ -1,4 +1,5 @@
 import { Modal } from "obsidian";
+import { isIOS, isAndroid } from "./platform";
 
 export type KeyboardCleanup = () => void;
 
@@ -6,9 +7,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const cEl = modal.containerEl;
   const mEl = modal.modalEl;
   const contentEl = modal.contentEl;
-  const ua = (navigator.userAgent || "").toLowerCase();
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
+  const platformIsIOS = isIOS();
+  const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
   let stableViewportHeight = window.visualViewport
     ? window.visualViewport.height
@@ -66,7 +66,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   };
 
   const updateModalLift = (keyboardH: number) => {
-    if (!(isIOS && isEditModal)) {
+    if (!(platformIsIOS && isEditModal)) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
       return;
     }
@@ -88,7 +88,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     cEl.style.bottom = "auto";
     cEl.style.height = vvH + "px";
 
-    if ((isIOS || isAndroid) && window.visualViewport) {
+    if ((platformIsIOS || platformIsAndroid) && window.visualViewport) {
       const keyboardH = getKeyboardHeight();
       updateModalLift(keyboardH);
       if (keyboardH > 80) {
@@ -96,7 +96,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
         mEl.style.maxHeight = Math.max(120, vvH - 24) + "px";
-        if (isIOS && isEditModal) {
+        if (platformIsIOS && isEditModal) {
           mEl.style.height = Math.max(220, vvH - 12) + "px";
         }
         const extraBottom = isEditModal ? 176 : 72;
@@ -124,41 +124,27 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
           focused,
           focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104
         );
-      }, isIOS ? 180 : 60);
+      }, platformIsIOS ? 120 : 60);
     }
   };
 
   const onFocusIn = (e: Event) => {
     const target = e.target as HTMLElement | null;
     if (!target || !contentEl.contains(target)) return;
-    const delays = isIOS ? [120, 380, 760] : [80, 220, 420];
-    delays.forEach((delay) => {
-      setTimeout(() => {
-        applyLayout();
-        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
-      }, delay);
-    });
-    if ((isIOS || isAndroid) && target.tagName === "TEXTAREA") {
-      setTimeout(() => {
-        if (contentEl.scrollHeight > contentEl.clientHeight) {
-          const targetRect = target.getBoundingClientRect();
-          const contentRect = contentEl.getBoundingClientRect();
-          const targetBottom =
-            targetRect.bottom - contentRect.top + contentEl.scrollTop;
-          const containerBottom = contentEl.scrollTop + contentEl.clientHeight;
-          if (targetBottom > containerBottom - 56) {
-            contentEl.scrollTop = targetBottom - contentEl.clientHeight + 128;
-          }
-        }
-      }, isEditModal ? 950 : 850);
-      setTimeout(() => {
-        ensureTargetVisible(target, 208);
-      }, isEditModal ? 1150 : 980);
-    }
+    // Primary: rely on visualViewport resize listener to adjust layout.
+    // Fallback: one quick retry after a short delay for browsers without
+    // reliable visualViewport events.
+    const delay = platformIsIOS ? 120 : 80;
+    setTimeout(() => {
+      applyLayout();
+      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+    }, delay);
   };
 
   const onVVChange = () => {
-    setTimeout(applyLayout, 80);
+    // Debounce slightly: iOS sometimes fires multiple resize events
+    // during keyboard animation.
+    setTimeout(applyLayout, 40);
   };
 
   const onWinResize = () => {

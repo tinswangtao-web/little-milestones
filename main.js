@@ -1158,14 +1158,38 @@ var import_obsidian7 = require("obsidian");
 // src/ui/base-mobile-modal.ts
 var import_obsidian = require("obsidian");
 
+// src/utils/platform.ts
+function getMobilePlatform() {
+  const ua = (navigator.userAgent || "").toLowerCase();
+  if (/android/.test(ua)) return "android";
+  if (/iphone|ipad|ipod/.test(ua)) return "ios";
+  return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
+}
+function getPlatformKey() {
+  const ua = (navigator.userAgent || "").toLowerCase();
+  if (/android/.test(ua)) return "android";
+  if (/iphone|ipad|ipod/.test(ua)) return "ios";
+  if (/macintosh|mac os x/.test(ua)) return "mac";
+  if (/windows/.test(ua)) return "windows";
+  return "fallback";
+}
+function isIOS() {
+  return /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+}
+function isAndroid() {
+  return /android/.test((navigator.userAgent || "").toLowerCase());
+}
+function isTouchDevice() {
+  return "ontouchstart" in window || navigator.maxTouchPoints > 0;
+}
+
 // src/utils/mobile-keyboard.ts
 function setupModalKeyboard(modal) {
   const cEl = modal.containerEl;
   const mEl = modal.modalEl;
   const contentEl = modal.contentEl;
-  const ua = (navigator.userAgent || "").toLowerCase();
-  const isIOS = /iphone|ipad|ipod/.test(ua);
-  const isAndroid = /android/.test(ua);
+  const platformIsIOS = isIOS();
+  const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
   let stableViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   mEl.style.display = "flex";
@@ -1215,7 +1239,7 @@ function setupModalKeyboard(modal) {
     return raw;
   };
   const updateModalLift = (keyboardH) => {
-    if (!(isIOS && isEditModal)) {
+    if (!(platformIsIOS && isEditModal)) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
       return;
     }
@@ -1235,7 +1259,7 @@ function setupModalKeyboard(modal) {
     cEl.style.right = "0";
     cEl.style.bottom = "auto";
     cEl.style.height = vvH + "px";
-    if ((isIOS || isAndroid) && window.visualViewport) {
+    if ((platformIsIOS || platformIsAndroid) && window.visualViewport) {
       const keyboardH = getKeyboardHeight();
       updateModalLift(keyboardH);
       if (keyboardH > 80) {
@@ -1243,7 +1267,7 @@ function setupModalKeyboard(modal) {
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
         mEl.style.maxHeight = Math.max(120, vvH - 24) + "px";
-        if (isIOS && isEditModal) {
+        if (platformIsIOS && isEditModal) {
           mEl.style.height = Math.max(220, vvH - 12) + "px";
         }
         const extraBottom = isEditModal ? 176 : 72;
@@ -1270,38 +1294,20 @@ function setupModalKeyboard(modal) {
           focused,
           focused.tagName === "TEXTAREA" ? 188 : isEditModal ? 148 : 104
         );
-      }, isIOS ? 180 : 60);
+      }, platformIsIOS ? 120 : 60);
     }
   };
   const onFocusIn = (e) => {
     const target = e.target;
     if (!target || !contentEl.contains(target)) return;
-    const delays = isIOS ? [120, 380, 760] : [80, 220, 420];
-    delays.forEach((delay) => {
-      setTimeout(() => {
-        applyLayout();
-        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
-      }, delay);
-    });
-    if ((isIOS || isAndroid) && target.tagName === "TEXTAREA") {
-      setTimeout(() => {
-        if (contentEl.scrollHeight > contentEl.clientHeight) {
-          const targetRect = target.getBoundingClientRect();
-          const contentRect = contentEl.getBoundingClientRect();
-          const targetBottom = targetRect.bottom - contentRect.top + contentEl.scrollTop;
-          const containerBottom = contentEl.scrollTop + contentEl.clientHeight;
-          if (targetBottom > containerBottom - 56) {
-            contentEl.scrollTop = targetBottom - contentEl.clientHeight + 128;
-          }
-        }
-      }, isEditModal ? 950 : 850);
-      setTimeout(() => {
-        ensureTargetVisible(target, 208);
-      }, isEditModal ? 1150 : 980);
-    }
+    const delay = platformIsIOS ? 120 : 80;
+    setTimeout(() => {
+      applyLayout();
+      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+    }, delay);
   };
   const onVVChange = () => {
-    setTimeout(applyLayout, 80);
+    setTimeout(applyLayout, 40);
   };
   const onWinResize = () => {
     setTimeout(applyLayout, 80);
@@ -1446,7 +1452,7 @@ var BaseMobileModal = class extends import_obsidian.Modal {
     this.plugin = plugin;
   }
   onOpen() {
-    this.mobilePlatform = this.detectMobilePlatform();
+    this.mobilePlatform = getMobilePlatform();
     this.modalEl.toggleClass("is-mobile-ios", this.mobilePlatform === "ios");
     this.modalEl.toggleClass(
       "is-mobile-android",
@@ -1470,12 +1476,6 @@ var BaseMobileModal = class extends import_obsidian.Modal {
       this._dragCleanup = null;
     }
     this.contentEl.empty();
-  }
-  detectMobilePlatform() {
-    const ua = (navigator.userAgent || "").toLowerCase();
-    if (/android/.test(ua)) return "android";
-    if (/iphone|ipad|ipod/.test(ua)) return "ios";
-    return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
   }
   getLongPressDuration() {
     if (this.mobilePlatform === "ios") return 560;
@@ -1938,8 +1938,8 @@ function getOverlayMount(containerEl) {
 function bindModalInputFocus(input, options = {}) {
   if (!input) return;
   const inp = input;
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isIOS = /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const isTouch = isTouchDevice();
+  const platformIsIOS = isIOS();
   const {
     manualTouchFocus = true,
     scrollOnIOSFocus = true
@@ -1976,7 +1976,7 @@ function bindModalInputFocus(input, options = {}) {
     });
   }
   const setIOSKeyboardFocusState = (on) => {
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
     const scroller = input.closest(".modal-content");
     if (!modal || !scroller) return;
@@ -2001,7 +2001,7 @@ function bindModalInputFocus(input, options = {}) {
   };
   input.addEventListener("focus", () => {
     if (!scrollOnIOSFocus) return;
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     setIOSKeyboardFocusState(true);
     const scrollWithinModal = () => {
       const scroller = input.closest(".modal-content");
@@ -2027,7 +2027,7 @@ function bindModalInputFocus(input, options = {}) {
     doScroll(650);
   });
   input.addEventListener("blur", () => {
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     setTimeout(() => {
       const active = document.activeElement;
       if (active && active.closest && active.closest(".kid-score-edit-modal, .kid-score-import-modal") === input.closest(".kid-score-edit-modal, .kid-score-import-modal")) {
@@ -5057,6 +5057,16 @@ function renderItemSettingsList({
         );
         if (newItemEl) {
           newItemEl.scrollIntoView({ block: "center", behavior: "smooth" });
+          const scroller = itemsWrap.closest(".vertical-tab-content") || itemsWrap.closest(".modal-content") || itemsWrap.closest(".setting-item") || itemsWrap.parentElement;
+          if (scroller && scroller !== itemsWrap) {
+            const scrollerEl = scroller;
+            const itemTop = newItemEl.offsetTop - (itemsWrap.offsetTop - scrollerEl.offsetTop);
+            const desiredScroll = Math.max(
+              0,
+              itemTop - scrollerEl.clientHeight / 2 + newItemEl.clientHeight / 2
+            );
+            scrollerEl.scrollTo({ top: desiredScroll, behavior: "smooth" });
+          }
           newItemEl.addClass("is-new-item");
           window.setTimeout(() => newItemEl.removeClass("is-new-item"), 1600);
         }
@@ -5337,6 +5347,42 @@ var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
       containerEl,
       refresh: () => self.display()
     });
+    if (isTouchDevice()) {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchMoved = false;
+      const onTouchStart = (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchMoved = false;
+      };
+      const onTouchMove = (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
+          touchMoved = true;
+          const inputs = containerEl.querySelectorAll(
+            'input:not([type="button"]):not([type="submit"]), textarea'
+          );
+          inputs.forEach((inp) => inp.setAttribute("readonly", "readonly"));
+        }
+      };
+      const onTouchEnd = () => {
+        if (touchMoved) {
+          window.setTimeout(() => {
+            const inputs = containerEl.querySelectorAll(
+              'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
+            );
+            inputs.forEach((inp) => inp.removeAttribute("readonly"));
+          }, 120);
+        }
+      };
+      containerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+      containerEl.addEventListener("touchmove", onTouchMove, { passive: true });
+      containerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+    }
   }
 };
 
@@ -5909,12 +5955,7 @@ var KidScorePlugin = class extends import_obsidian20.Plugin {
     return Math.max(120, Math.min(600, n));
   }
   detectPlatformKey() {
-    const ua = (navigator.userAgent || "").toLowerCase();
-    if (/android/.test(ua)) return "android";
-    if (/iphone|ipad|ipod/.test(ua)) return "ios";
-    if (/macintosh|mac os x/.test(ua)) return "mac";
-    if (/windows/.test(ua)) return "windows";
-    return "fallback";
+    return getPlatformKey();
   }
   getDoubleTapThreshold() {
     const defaults = DEFAULT_SETTINGS.doubleTapThresholds;

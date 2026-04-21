@@ -7,6 +7,7 @@ import { renderGoalSettingsSection } from "./goal-settings-section";
 import { renderImportExportSettings } from "./import-export-settings";
 import { renderItemSettings } from "./item-settings";
 import { renderUserSettingsSection } from "./user-settings-section";
+import { isTouchDevice } from "../utils/platform";
 
 export class KidScoreSettingTab extends PluginSettingTab {
   plugin: KidScorePlugin;
@@ -66,5 +67,53 @@ export class KidScoreSettingTab extends PluginSettingTab {
       containerEl,
       refresh: () => self.display(),
     });
+
+    // ── Touch-scroll guard: prevent keyboard pop-up on accidental swipe ──
+    // When the user is scrolling the settings page with a finger, temporarily
+    // set readonly on all text inputs so a sliding touch does not focus them.
+    if (isTouchDevice()) {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchMoved = false;
+
+      const onTouchStart = (e: TouchEvent) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchMoved = false;
+      };
+
+      const onTouchMove = (e: TouchEvent) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const touch = e.touches[0];
+        if (
+          Math.abs(touch.clientX - touchStartX) > 8 ||
+          Math.abs(touch.clientY - touchStartY) > 8
+        ) {
+          touchMoved = true;
+          const inputs = containerEl.querySelectorAll(
+            'input:not([type="button"]):not([type="submit"]), textarea'
+          );
+          inputs.forEach((inp) => inp.setAttribute("readonly", "readonly"));
+        }
+      };
+
+      const onTouchEnd = () => {
+        if (touchMoved) {
+          // Delay removal so the finger lift does not re-trigger focus
+          window.setTimeout(() => {
+            const inputs = containerEl.querySelectorAll(
+              'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
+            );
+            inputs.forEach((inp) => inp.removeAttribute("readonly"));
+          }, 120);
+        }
+      };
+
+      containerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+      containerEl.addEventListener("touchmove", onTouchMove, { passive: true });
+      containerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+    }
   }
 }

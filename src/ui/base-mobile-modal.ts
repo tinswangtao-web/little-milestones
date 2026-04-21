@@ -3,6 +3,7 @@ import type { KeyboardCleanup, DragCleanup } from "../utils/mobile";
 import { setupModalKeyboard, attachModalDragGesture } from "../utils/mobile";
 import type { MobilePlatform } from "../types";
 import type KidScorePlugin from "../main";
+import { getMobilePlatform } from "../utils/platform";
 
 export abstract class BaseMobileModal extends Modal {
   plugin: KidScorePlugin;
@@ -17,7 +18,7 @@ export abstract class BaseMobileModal extends Modal {
   }
 
   onOpen(): void {
-    this.mobilePlatform = this.detectMobilePlatform();
+    this.mobilePlatform = getMobilePlatform();
     this.modalEl.toggleClass("is-mobile-ios", this.mobilePlatform === "ios");
     this.modalEl.toggleClass(
       "is-mobile-android",
@@ -42,15 +43,6 @@ export abstract class BaseMobileModal extends Modal {
       this._dragCleanup = null;
     }
     this.contentEl.empty();
-  }
-
-  detectMobilePlatform(): MobilePlatform {
-    const ua = (navigator.userAgent || "").toLowerCase();
-    if (/android/.test(ua)) return "android";
-    if (/iphone|ipad|ipod/.test(ua)) return "ios";
-    return document.body.classList.contains("is-mobile")
-      ? "mobile-other"
-      : "desktop";
   }
 
   getLongPressDuration(): number {

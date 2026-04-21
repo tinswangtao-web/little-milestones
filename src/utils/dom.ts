@@ -1,3 +1,5 @@
+import { isIOS, isTouchDevice } from "./platform";
+
 export function getOverlayMount(containerEl?: HTMLElement): HTMLElement {
   return document.body.classList.contains("is-mobile")
     ? document.body
@@ -15,8 +17,8 @@ export function bindModalInputFocus(
 ): void {
   if (!input) return;
   const inp = input as HTMLInputElement;
-  const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
-  const isIOS = /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const isTouch = isTouchDevice();
+  const platformIsIOS = isIOS();
   const {
     manualTouchFocus = true,
     scrollOnIOSFocus = true,
@@ -60,7 +62,7 @@ export function bindModalInputFocus(
   }
 
   const setIOSKeyboardFocusState = (on: boolean) => {
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
     const scroller = input.closest(".modal-content") as HTMLElement | null;
     if (!modal || !scroller) return;
@@ -86,7 +88,7 @@ export function bindModalInputFocus(
 
   input.addEventListener("focus", () => {
     if (!scrollOnIOSFocus) return;
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     setIOSKeyboardFocusState(true);
     const scrollWithinModal = () => {
       const scroller = input.closest(".modal-content") as HTMLElement | null;
@@ -113,7 +115,7 @@ export function bindModalInputFocus(
   });
 
   input.addEventListener("blur", () => {
-    if (!isIOS) return;
+    if (!platformIsIOS) return;
     setTimeout(() => {
       const active = document.activeElement as HTMLElement | null;
       if (

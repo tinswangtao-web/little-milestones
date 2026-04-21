@@ -497,8 +497,6 @@
   font-size: 0.78em;
   color: var(--text-muted);
 }
-  color: var(--text-normal);
-}
 
 .kid-score-rules-edit-btn {
   background: none;
