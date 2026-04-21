@@ -1,13 +1,13 @@
 ## Current Task
 - `task`: 2026-04-20-mobile-ux
-- `status`: review-passed-with-notes
+- `status`: awaiting-user-validation
 - `last-actor`: kimi-code
-- `last-commit`: 193c96f (.agents scaffolding) / 226bc86 (mobile UX fix) / 937a838 (STATE + log) / 502bd80 (refactor plugin structure) / 7810df3 (split settings sections) / 7f20e12 (polish mobile diary) / d782694 (tighten collaboration rules)
+- `last-commit`: 193c96f (.agents scaffolding) / 226bc86 (mobile UX fix) / 937a838 (STATE + log) / 502bd80 (refactor plugin structure) / 7810df3 (split settings sections) / 7f20e12 (polish mobile diary) / d782694 (tighten collaboration rules) / d97cb35 (kimi review) / 0a7abd9 (kimi implementation fixes)
 - `active-worktree`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones/.claude/worktrees/sleepy-engelbart-925e6b
 - `write-scope`: none
 - `read-scope`: main.js, styles.css, .agents/**
-- `awaiting`: claude-code
-- `handoff-note`: Mobile UX patch passed Codex review. Kimi-code completed second review of Codex's refactor commits (502bd80..d782694). Key findings: (1) main.js/styles.css may be stale — rebuild required before validation; (2) iOS keyboard timeouts are fragile and likely the root cause of iPhone input issues; (3) settings scroll restoration may target wrong container. See `.agents/reviews/2026-04-21-codex-refactor-review.md`. Next step: rebuild artifacts, then address R2/R3 for iPhone validation.
+- `awaiting`: user
+- `handoff-note`: Kimi-code has implemented the review fixes (commit 0a7abd9). Changes: (1) R2 — replaced fragile iOS keyboard timeout cascade with visualViewport-driven layout + single short fallback; (2) R3 — added fallback scroll targeting for Obsidian's .vertical-tab-content scroll container; (3) R4 — extracted centralized platform detection to utils/platform.ts; (4) R5 — verified overflow-x guard already present in 06-settings.css; (5) R6 — restored touch-scroll readonly guard in settings-tab.ts; (6) R7 — added MODULE_MAP comment to main.ts; (7) Fixed CSS syntax error in 06-settings.css. Build artifacts regenerated. Next step: iPhone real-device validation by user. If issues persist, check whether visualViewport resize fires reliably on iOS 26.4.1.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery
