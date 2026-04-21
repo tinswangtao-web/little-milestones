@@ -7,7 +7,7 @@
 - `write-scope`: none
 - `read-scope`: main.js, styles.css, .agents/**
 - `awaiting`: user
-- `handoff-note`: Codex continued the mobile recovery pass. This round disables drag interception on the main scoring modal (keeps drag only for edit/import popups), restores actual popup lift/drag transform for keyboard avoidance, auto-focuses a newly added settings item name field, removes the diary "fill default template" button and auto-applies the single default template, rewrites diary composition to avoid duplicated "small record" output in 得分页, unifies weather/mood + daily record layout across Mac/iPhone, and expands the free-write toolbar with media plus basic formatting buttons. Rebuilt artifacts and re-synced Vault. Next step: user validates scoring-page scrolling, popup keyboard behavior, diary tab layout, and generated diary output on real devices.
+- `handoff-note`: **Role redefinition per user request**: codex is the sole implementer (writes all code); kimi-code is the reviewer (read-only review, suggestions, UI polish, small fixes only with explicit approval). Codex continued the mobile recovery pass with drag interception fixes, popup keyboard transforms, settings auto-focus, diary template simplification, and toolbar expansion. Rebuilt artifacts and re-synced Vault. Next: user validates on real devices; any further fixes should be assigned to codex for implementation, then kimi reviews.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

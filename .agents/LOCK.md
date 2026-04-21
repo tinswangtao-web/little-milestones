@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: All 5 scoring-page fixes implemented, built, synced, and committed. Lock released by kimi-code.
+- `notes`: Role redefined per user request: codex writes, kimi reviews. Lock free until next task begins.
