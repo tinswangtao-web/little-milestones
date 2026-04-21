@@ -63,6 +63,15 @@ export class EditCustomModal extends BaseMobileModal {
     noteInput.autocomplete = "off";
     bindModalInputFocus(noteInput);
 
+    const autoResize = (ta: HTMLTextAreaElement) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    requestAnimationFrame(() => autoResize(noteInput));
+    setTimeout(() => autoResize(noteInput), 60);
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
+
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "取消" });
     cb.onclick = () => this.close();

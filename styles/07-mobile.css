@@ -48,6 +48,8 @@
     padding: 18px 8px 12px;
     /* Larger tap target */
     -webkit-tap-highlight-color: transparent;
+    /* Allow vertical scroll when touch starts on a card */
+    touch-action: pan-y;
   }
   .kid-score-card-more-btn {
     display: inline-flex;
@@ -621,9 +623,11 @@
 
   /* Date navigation mobile */
   .kid-score-date-nav {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
     gap: 6px;
+    align-items: center;
     margin: 6px 0 10px;
-    flex-wrap: wrap;
   }
   .date-nav-btn {
     width: 40px;
@@ -631,17 +635,21 @@
     border-radius: 50%;
   }
   .date-nav-input {
-    min-width: 120px;
+    min-width: 0;
+    width: 100%;
     height: 40px;
     font-size: 16px; /* prevent iOS zoom */
     border-radius: 8px;
   }
   .date-nav-today {
-    padding: 8px 14px;
-    min-height: 40px;
+    grid-column: 2 / 4;
+    justify-self: center;
+    padding: 6px 14px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     border-radius: 20px;
+    font-size: 0.85em;
   }
   .kid-score-past-banner {
     font-size: 0.8em;
@@ -678,26 +686,6 @@
     height: 40px;
     font-size: 16px;
     border-radius: 8px;
-  }
-
-  .kid-score-date-nav {
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) 40px;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .date-nav-input {
-    grid-column: 2;
-    min-width: 0;
-    width: 100%;
-  }
-
-  .date-nav-today {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-height: 40px;
-    justify-self: stretch;
   }
 
   .kid-score-modal.is-mobile-ios .date-nav-input,

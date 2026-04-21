@@ -132,13 +132,20 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     const target = e.target as HTMLElement | null;
     if (!target || !contentEl.contains(target)) return;
     // Primary: rely on visualViewport resize listener to adjust layout.
-    // Fallback: one quick retry after a short delay for browsers without
-    // reliable visualViewport events.
+    // Fallback 1: quick retry for browsers with slightly delayed resize.
     const delay = platformIsIOS ? 120 : 80;
     setTimeout(() => {
       applyLayout();
       ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
     }, delay);
+    // Fallback 2: longer retry for iOS where visualViewport resize may not
+    // fire reliably (observed on iOS 26.4.1).
+    if (platformIsIOS) {
+      setTimeout(() => {
+        applyLayout();
+        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+      }, 380);
+    }
   };
 
   const onVVChange = () => {

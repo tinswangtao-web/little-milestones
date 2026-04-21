@@ -1305,6 +1305,12 @@ function setupModalKeyboard(modal) {
       applyLayout();
       ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
     }, delay);
+    if (platformIsIOS) {
+      setTimeout(() => {
+        applyLayout();
+        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 188 : 116);
+      }, 380);
+    }
   };
   const onVVChange = () => {
     setTimeout(applyLayout, 40);
@@ -2604,6 +2610,12 @@ var AddCustomModal = class extends BaseMobileModal {
     noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
     noteInput.autocomplete = "off";
     bindModalInputFocus(noteInput);
+    const autoResize = (ta) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
     cb.onclick = () => this.close();
@@ -2672,6 +2684,19 @@ var AddItemModal = class extends BaseMobileModal {
     pp.onclick = () => {
       pi.value = String(parseInt(pi.value || "0") + 1);
     };
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "\u5907\u6CE8" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.placeholder = "\u53EF\u9009\uFF0C\u957F\u6309\u65F6\u663E\u793A\u5728\u5361\u7247\u4E0A\uFF0C\u652F\u6301\u591A\u884C";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+    const autoResize = (ta) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
     cb.onclick = () => this.close();
@@ -2689,7 +2714,7 @@ var AddItemModal = class extends BaseMobileModal {
           points: parseInt(pi.value) || 1,
           emoji: emojiInput.value.trim() || "\u2B50",
           category: this.category,
-          note: ""
+          note: noteInput.value.trim()
         });
         const cats = this.plugin.currentUser.categories || [];
         this.plugin.currentUser.items.sort((a, b) => {
@@ -2807,6 +2832,14 @@ var EditCustomModal = class extends BaseMobileModal {
     noteInput.placeholder = "\u53EF\u9009\uFF0C\u5C06\u663E\u793A\u5728\u6587\u6863\u9875\u4E2D\uFF0C\u652F\u6301\u591A\u884C";
     noteInput.autocomplete = "off";
     bindModalInputFocus(noteInput);
+    const autoResize = (ta) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    requestAnimationFrame(() => autoResize(noteInput));
+    setTimeout(() => autoResize(noteInput), 60);
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "\u53D6\u6D88" });
     cb.onclick = () => this.close();

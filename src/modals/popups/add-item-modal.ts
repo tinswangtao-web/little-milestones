@@ -53,6 +53,21 @@ export class AddItemModal extends BaseMobileModal {
     pm.onclick = () => { pi.value = String(parseInt(pi.value || "0") - 1); };
     pp.onclick = () => { pi.value = String(parseInt(pi.value || "0") + 1); };
 
+    const noteRow = c.createDiv({ cls: "custom-form-row" });
+    noteRow.createSpan({ cls: "custom-form-label", text: "备注" });
+    const noteInput = noteRow.createEl("textarea", { cls: "custom-form-name-input" });
+    noteInput.addClass("custom-form-note-input");
+    noteInput.placeholder = "可选，长按时显示在卡片上，支持多行";
+    noteInput.autocomplete = "off";
+    bindModalInputFocus(noteInput);
+
+    const autoResize = (ta: HTMLTextAreaElement) => {
+      ta.style.height = "auto";
+      ta.style.height = ta.scrollHeight + "px";
+    };
+    noteInput.addEventListener("input", () => autoResize(noteInput));
+    noteInput.addEventListener("focus", () => autoResize(noteInput));
+
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "取消" });
     cb.onclick = () => this.close();
@@ -70,7 +85,7 @@ export class AddItemModal extends BaseMobileModal {
           points: parseInt(pi.value) || 1,
           emoji: emojiInput.value.trim() || "⭐",
           category: this.category,
-          note: "",
+          note: noteInput.value.trim(),
         });
         const cats = this.plugin.currentUser.categories || [];
         this.plugin.currentUser.items.sort((a, b) => {
