@@ -23,6 +23,12 @@ Every time Codex enters this repository, do these steps first:
 - Other AIs are review-only by default and should not edit plugin code unless the user explicitly authorizes that exception in the current thread.
 - If the user grants such an exception, it must be recorded in `.agents/STATE.md` before any non-Codex code edits begin.
 
+## Workspace Rule
+- The primary workspace is the only normal code workspace for this repository.
+- `.claude/worktrees/**` and other git worktrees are not part of the default development flow.
+- External AIs should review directly against the primary workspace.
+- Only use a worktree again if the user explicitly asks for that exception and it is recorded in `.agents/STATE.md`.
+
 ## Shared Page Names
 - `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
 - `打分页`: the main scoring page opened by clicking the star icon in Obsidian's left sidebar.

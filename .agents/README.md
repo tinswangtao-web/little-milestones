@@ -43,12 +43,13 @@ Use these page names consistently across tasks, reviews, logs, and handoffs:
 - `.agents/reviews/*.md`: review results and follow-up status.
 - `.agents/log.md`: append-only event log.
 
-## Multi-Worktree Rule
-- The primary workspace `.agents/` directory is the canonical coordination layer for this repository.
-- If an agent works inside a git worktree such as `.claude/worktrees/...`, it may keep local working notes there during execution, but before handoff it must sync the task state, review result, and log summary back into the primary workspace `.agents/`.
-- `STATE.md` in the primary workspace should always reflect the latest shared truth.
-- When useful, record the active worktree path in `STATE.md` so the next agent can find the correct working directory quickly.
-- Code from a worktree must be synced back into the primary workspace before it is treated as the latest shared implementation.
+## Workspace Rule
+- The primary workspace is the only normal code workspace for this repository.
+- Treat the primary workspace `.agents/` directory as the canonical coordination layer.
+- Do not use `.claude/worktrees/**` or any other git worktree as part of the default implementation flow.
+- `claude-code` and `kimi-code` should review directly against the primary workspace, not through a separate worktree.
+- Existing worktrees may remain on disk as historical leftovers, but they should be treated as inactive unless the user explicitly asks to inspect or reuse them.
+- If the user explicitly requests a one-off worktree workflow, record that exception in `.agents/STATE.md` before using it.
 
 ## Fixed Per-Agent Routine
 Every agent should do these steps first:

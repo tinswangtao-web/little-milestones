@@ -34,11 +34,12 @@ This file is the short operational version of the collaboration protocol. Give i
 - Default code write-scope belongs to `codex`.
 - Default `claude-code` / `kimi-code` write-scope is `.agents/reviews/**` only.
 
-## Multi-Worktree Rule
-- Treat the primary workspace `.agents/` directory as canonical.
-- If you work in a sub-worktree such as `.claude/worktrees/...`, sync task state, review output, and log summary back to the primary workspace before handoff.
-- If the active task is happening in a sub-worktree, record that path in the primary workspace `STATE.md`.
-- If you changed code in a sub-worktree, sync it back to the primary workspace before anyone treats it as the latest shared implementation.
+## Workspace Rule
+- The primary workspace is the only normal code workspace for this repository.
+- Do not use `.claude/worktrees/**` or any other git worktree as part of the default implementation flow.
+- Review directly against the primary workspace.
+- Existing worktrees should be treated as inactive historical leftovers unless the user explicitly asks to inspect or reuse them.
+- If the user explicitly wants a one-off worktree workflow, record that exception in `.agents/STATE.md` first.
 
 ## Required Updates After Work
 - Update `.agents/STATE.md`.
@@ -118,10 +119,9 @@ Rules:
 - Update `STATE.md`, `LOCK.md`, task card, and `log.md` after work
 - Treat Vault sync as a separate explicit step
 - Only the primary workspace may sync to the Vault
-- Do not sync directly from a worktree to the Vault
+- Worktrees are not part of the normal workflow here
 - Prefer source files over generated artifacts
 - If you must hand-edit `main.js` or generated output, record why
-- Sync task state back to the primary workspace `.agents/` before handoff if you worked inside a git worktree
 - Use commit prefix `[claude]`
 - Your normal writable area is `.agents/reviews/**` plus explicitly approved docs-only files.
 
@@ -145,9 +145,8 @@ Rules:
 - Record review findings in `.agents/reviews/`
 - Treat Vault sync as a separate explicit step
 - Only the primary workspace may sync to the Vault
-- Do not sync directly from a worktree to the Vault
+- Worktrees are not part of the normal workflow here
 - Prefer source files over generated artifacts
 - If you must hand-edit `main.js` or generated output, record why
-- Sync task state back to the primary workspace `.agents/` before handoff if you worked inside a git worktree
 - Use commit prefix `[kimi]`
 - Your normal writable area is `.agents/reviews/**` plus explicitly approved docs-only files.

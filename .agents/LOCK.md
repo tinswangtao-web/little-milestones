@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Lock released after codex updated the collaboration protocol to codex-write / external-review mode.
+- `notes`: Lock released after codex simplified the workspace policy and marked legacy worktrees as inactive by default.
