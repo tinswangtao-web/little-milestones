@@ -1135,7 +1135,7 @@ function makeDefaultDiaryModules() {
 function makeDefaultUser() {
   return {
     id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-    name: "\u5C0F\u670B\u53CB",
+    name: "\u672A\u547D\u540D",
     savePath: "Little Milestones/Daily Records",
     items: [],
     categories: ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"],
@@ -5303,9 +5303,9 @@ function renderUserSettingsSection({
     };
   };
   renderUserMgr();
-  new import_obsidian16.Setting(containerEl).setName("\u5C0F\u670B\u53CB\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+  new import_obsidian16.Setting(containerEl).setName("\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
     (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
-      const newName = value.trim() || "\u5C0F\u670B\u53CB";
+      const newName = value.trim() || "\u672A\u547D\u540D";
       const oldName = plugin.currentUser.name;
       if (newName === oldName) return;
       if (!confirm("\u786E\u5B9A\u5C06\u7528\u6237\u540D\u4FEE\u6539\u4E3A\u300C" + newName + "\u300D\u5417\uFF1F")) return;
@@ -5369,7 +5369,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
         scrollOnIOSFocus: false
       });
     };
-    containerEl.createEl("h2", { text: "\u{1F31F} \u5C0F\u670B\u53CB\u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
+    containerEl.createEl("h2", { text: "\u{1F31F} \u6BCF\u65E5\u8BB0\u5F55\u8BBE\u7F6E" });
     renderUserSettingsSection({
       app: self.plugin.app,
       plugin: self.plugin,
@@ -5491,7 +5491,7 @@ function normalizePluginSettings(loaded) {
   let changed = false;
   if (data.childName !== void 0 && !data.users) {
     const user = makeDefaultUser();
-    user.name = data.childName || "\u5C0F\u670B\u53CB";
+    user.name = data.childName || "\u672A\u547D\u540D";
     user.savePath = data.savePath || "Little Milestones/Daily Records";
     user.items = Array.isArray(data.items) ? data.items : [];
     user.categories = Array.isArray(data.categories) && data.categories.length ? data.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
@@ -5558,7 +5558,7 @@ function ensureUserDefaults(user) {
     changed = true;
   }
   if (!user.name) {
-    user.name = "\u5C0F\u670B\u53CB";
+    user.name = "\u672A\u547D\u540D";
     changed = true;
   }
   if (!user.savePath || !String(user.savePath).trim()) {

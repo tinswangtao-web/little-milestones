@@ -31,7 +31,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
       });
     };
 
-    containerEl.createEl("h2", { text: "🌟 小朋友每日记录设置" });
+    containerEl.createEl("h2", { text: "🌟 每日记录设置" });
     renderUserSettingsSection({
       app: self.plugin.app,
       plugin: self.plugin,

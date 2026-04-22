@@ -79,7 +79,7 @@ export function makeDefaultDiaryModules(): DiaryModuleDefinition[] {
 export function makeDefaultUser(): User {
   return {
     id: "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-    name: "小朋友",
+    name: "未命名",
     savePath: "Little Milestones/Daily Records",
     items: [],
     categories: ["加分项", "减分项"],

@@ -149,14 +149,14 @@ export function renderUserSettingsSection({
   renderUserMgr();
 
   new Setting(containerEl)
-    .setName("小朋友姓名")
+    .setName("姓名")
     .setDesc("当前用户的显示名字")
     .addText((text) =>
       text
         .setPlaceholder("王靖辰")
         .setValue(plugin.currentUser.name)
         .onChange(async (value) => {
-          const newName = value.trim() || "小朋友";
+          const newName = value.trim() || "未命名";
           const oldName = plugin.currentUser.name;
           if (newName === oldName) return;
           if (!confirm("确定将用户名修改为「" + newName + "」吗？")) return;

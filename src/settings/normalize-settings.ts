@@ -38,7 +38,7 @@ export function normalizePluginSettings(
 
   if (data.childName !== undefined && !data.users) {
     const user = makeDefaultUser();
-    user.name = data.childName || "小朋友";
+    user.name = data.childName || "未命名";
     user.savePath = data.savePath || "Little Milestones/Daily Records";
     user.items = Array.isArray(data.items) ? data.items : [];
     user.categories =
@@ -121,7 +121,7 @@ function ensureUserDefaults(user: User): boolean {
     changed = true;
   }
   if (!user.name) {
-    user.name = "小朋友";
+    user.name = "未命名";
     changed = true;
   }
   if (!user.savePath || !String(user.savePath).trim()) {
