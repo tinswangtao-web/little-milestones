@@ -1728,8 +1728,9 @@ function renderItemCompletion(statsBody, items, filtered) {
   statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
   const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
   const doneCounts = precomputeDoneCounts(items, filtered);
+  const sortedFiltered = filtered.slice().sort((a, b) => a.date.localeCompare(b.date));
   for (const item of items) {
-    const itemHistory = filtered.slice().sort((a, b) => a.date.localeCompare(b.date)).map((day) => day.scores[item.id] || 0);
+    const itemHistory = sortedFiltered.map((day) => day.scores[item.id] || 0);
     const count = doneCounts.get(item.id) || 0;
     const rate = Math.round(count / filtered.length * 100);
     const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
@@ -6058,19 +6059,23 @@ var DayDataStore = class {
     let errorCount = 0;
     for (const file of files) {
       try {
-        const content = await this.plugin.app.vault.read(file);
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const childRe = new RegExp(
-          `^child:\\s*(?:"|'|)?` + escapedOldName + `(?:"|'|)?$`,
-          "gm"
+        const bodyTitleRe = new RegExp(
+          "^(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)$",
+          "m"
         );
-        const titleRe = new RegExp(
-          "(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)",
-          "g"
-        );
-        const newContent = content.replace(childRe, "child: " + newName).replace(titleRe, "$1" + newName + "$2");
-        if (newContent !== content) {
-          await this.plugin.app.vault.modify(file, newContent);
+        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter) => {
+          if ((frontmatter == null ? void 0 : frontmatter.child) === oldName) {
+            frontmatter.child = newName;
+          }
+        });
+        const content = await this.plugin.app.vault.read(file);
+        const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+        const updatedBody = body.replace(bodyTitleRe, "$1" + newName + "$2");
+        if (updatedBody !== body) {
+          const frontmatterMatch = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+          const prefix = frontmatterMatch ? frontmatterMatch[0] : "";
+          await this.plugin.app.vault.modify(file, prefix + updatedBody);
         }
       } catch (error) {
         errorCount++;
@@ -6227,7 +6232,7 @@ var DayDataStore = class {
     }
     const diaryIdx = body.indexOf(DIARY_MARKER);
     if (diaryIdx !== -1) {
-      return body.slice(diaryIdx + DIARY_MARKER.length).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+      return body.slice(diaryIdx + DIARY_MARKER.length).replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "").trim();
     }
     return "";
   }

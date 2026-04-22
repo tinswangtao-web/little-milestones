@@ -110,21 +110,24 @@ export class DayDataStore {
 
     for (const file of files) {
       try {
-        const content = await this.plugin.app.vault.read(file);
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const childRe = new RegExp(
-          "^child:\\s*(?:\"|'|)?" + escapedOldName + "(?:\"|'|)?$",
-          "gm"
+        const bodyTitleRe = new RegExp(
+          "^(# 📋 \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(的每日记录)$",
+          "m"
         );
-        const titleRe = new RegExp(
-          "(# 📋 \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(的每日记录)",
-          "g"
-        );
-        const newContent = content
-          .replace(childRe, "child: " + newName)
-          .replace(titleRe, "$1" + newName + "$2");
-        if (newContent !== content) {
-          await this.plugin.app.vault.modify(file, newContent);
+        await this.plugin.app.fileManager.processFrontMatter(file, (frontmatter) => {
+          if (frontmatter?.child === oldName) {
+            frontmatter.child = newName;
+          }
+        });
+
+        const content = await this.plugin.app.vault.read(file);
+        const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+        const updatedBody = body.replace(bodyTitleRe, "$1" + newName + "$2");
+        if (updatedBody !== body) {
+          const frontmatterMatch = content.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/);
+          const prefix = frontmatterMatch ? frontmatterMatch[0] : "";
+          await this.plugin.app.vault.modify(file, prefix + updatedBody);
         }
       } catch (error) {
         errorCount++;
@@ -334,7 +337,7 @@ export class DayDataStore {
     if (diaryIdx !== -1) {
       return body
         .slice(diaryIdx + DIARY_MARKER.length)
-        .replace(/^##\s*📝\s*今日日记\s*\n?/, "")
+        .replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "")
         .trim();
     }
 

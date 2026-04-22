@@ -186,12 +186,12 @@ function renderItemCompletion(
   statsBody.createEl("h3", { text: "各项目完成率", cls: "stats-section-title" });
   const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
   const doneCounts = precomputeDoneCounts(items, filtered);
+  const sortedFiltered = filtered
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   for (const item of items) {
-    const itemHistory = filtered
-      .slice()
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map((day) => day.scores[item.id] || 0);
+    const itemHistory = sortedFiltered.map((day) => day.scores[item.id] || 0);
     const count = doneCounts.get(item.id) || 0;
     const rate = Math.round((count / filtered.length) * 100);
     const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
