@@ -2,6 +2,21 @@ import type KidScorePlugin from "../../main";
 import type { DayData, ScoreItem, StatsPeriod } from "../../types";
 import { countPositiveDateStreak, getStartOfWeekString } from "../../utils/date";
 
+function precomputeDoneCounts(
+  items: ScoreItem[],
+  filtered: DayData[]
+): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const day of filtered) {
+    for (const item of items) {
+      if (isItemDone(item, day.scores[item.id])) {
+        map.set(item.id, (map.get(item.id) || 0) + 1);
+      }
+    }
+  }
+  return map;
+}
+
 export function renderStatsPanel(
   statsBody: HTMLElement,
   plugin: KidScorePlugin,
@@ -136,6 +151,7 @@ function renderCategoryCompletion(
   categories: string[],
   filtered: DayData[]
 ): void {
+  const doneCounts = precomputeDoneCounts(items, filtered);
   const categoryStats: Record<string, { total: number; completed: number }> = {};
   categories.forEach((category) => {
     categoryStats[category] = { total: 0, completed: 0 };
@@ -145,10 +161,7 @@ function renderCategoryCompletion(
     const category = item.category || "其他";
     if (!categoryStats[category]) categoryStats[category] = { total: 0, completed: 0 };
     categoryStats[category].total++;
-    const count = filtered.filter((day) =>
-      day.scores[item.id] !== undefined && isItemDone(item, day.scores[item.id])
-    ).length;
-    categoryStats[category].completed += count;
+    categoryStats[category].completed += doneCounts.get(item.id) || 0;
   }
 
   statsBody.createEl("h3", { text: "分类完成率", cls: "stats-section-title" });
@@ -172,15 +185,14 @@ function renderItemCompletion(
 ): void {
   statsBody.createEl("h3", { text: "各项目完成率", cls: "stats-section-title" });
   const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const doneCounts = precomputeDoneCounts(items, filtered);
 
   for (const item of items) {
     const itemHistory = filtered
       .slice()
       .sort((a, b) => a.date.localeCompare(b.date))
       .map((day) => day.scores[item.id] || 0);
-    const count = filtered.filter((day) =>
-      day.scores[item.id] !== undefined && isItemDone(item, day.scores[item.id])
-    ).length;
+    const count = doneCounts.get(item.id) || 0;
     const rate = Math.round((count / filtered.length) * 100);
     const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
     const row = rowWrap.createDiv({ cls: "completion-row" });

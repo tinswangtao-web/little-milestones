@@ -9,7 +9,17 @@ import { compareDateStrings, isValidDateString } from "../utils/date";
 type FrontmatterData = Record<string, unknown>;
 
 export class DayDataStore {
+  private _allScoresCache: {
+    data: DayData[];
+    path: string;
+    timestamp: number;
+  } | null = null;
+
   constructor(private plugin: KidScorePlugin) {}
+
+  private invalidateCache(): void {
+    this._allScoresCache = null;
+  }
 
   async readDayData(dateStr: string): Promise<DayData | null> {
     const file = this.plugin.app.vault.getAbstractFileByPath(
@@ -65,6 +75,8 @@ export class DayDataStore {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
 
+      this.invalidateCache();
+
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
       new Notice(
@@ -100,7 +112,10 @@ export class DayDataStore {
       try {
         const content = await this.plugin.app.vault.read(file);
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const childRe = new RegExp("^child:\\s*" + escapedOldName + "$", "gm");
+        const childRe = new RegExp(
+          "^child:\\s*(?:\"|'|)?" + escapedOldName + "(?:\"|'|)?$",
+          "gm"
+        );
         const titleRe = new RegExp(
           "(# 📋 \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(的每日记录)",
           "g"
@@ -169,6 +184,8 @@ export class DayDataStore {
       }
     }
 
+    this.invalidateCache();
+
     if (errorCount > 0) {
       throw new Error(
         "路径迁移失败 " + errorCount + " 个文件，建议手动检查并迁移"
@@ -178,6 +195,16 @@ export class DayDataStore {
 
   async getAllScores(): Promise<DayData[]> {
     const dirPath = normalizePath(this.plugin.currentUser.savePath);
+
+    const cached = this._allScoresCache;
+    if (
+      cached &&
+      cached.path === dirPath &&
+      Date.now() - cached.timestamp < 5000
+    ) {
+      return cached.data;
+    }
+
     const files = this.plugin.app.vault
       .getFiles()
       .filter(
@@ -193,7 +220,9 @@ export class DayDataStore {
       }
     }
 
-    return results.sort((a, b) => compareDateStrings(a.date, b.date));
+    const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
+    this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
+    return sorted;
   }
 
   private readFrontmatterFromCache(file: TFile): FrontmatterData | null {
@@ -206,7 +235,7 @@ export class DayDataStore {
   }
 
   private readFrontmatterFromContent(content: string): FrontmatterData | null {
-    const match = content.match(/^---\n([\s\S]*?)\n---\n?/);
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
     if (!match) return null;
     try {
       const parsed = parseYaml(match[1]);
@@ -295,7 +324,7 @@ export class DayDataStore {
   }
 
   private extractDiaryContent(content: string): string {
-    const body = content.replace(/^---\n[\s\S]*?\n---\n?/, "");
+    const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
     if (diaryHeadingMatch?.index !== undefined) {
       return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();

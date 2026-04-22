@@ -14,7 +14,8 @@ export class ScoreItemModal extends BaseMobileModal {
     private initialValue: number,
     private quickOnly: boolean,
     private onConfirm: (val: number) => void,
-    private onEdit?: () => void
+    private onEdit?: () => void,
+    private onDelete?: () => void
   ) {
     super(app, plugin);
   }
@@ -71,6 +72,7 @@ export class ScoreItemModal extends BaseMobileModal {
         if (idx !== -1) {
           this.plugin.currentUser.items.splice(idx, 1);
           await this.plugin.saveSettings();
+          this.onDelete?.();
         }
       };
     }

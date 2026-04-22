@@ -1593,6 +1593,17 @@ function countPositiveDateStreak(records, anchorDate) {
 }
 
 // src/modals/panels/stats-panel.ts
+function precomputeDoneCounts(items, filtered) {
+  const map = /* @__PURE__ */ new Map();
+  for (const day of filtered) {
+    for (const item of items) {
+      if (isItemDone(item, day.scores[item.id])) {
+        map.set(item.id, (map.get(item.id) || 0) + 1);
+      }
+    }
+  }
+  return map;
+}
 function renderStatsPanel(statsBody, plugin, allScores, period) {
   statsBody.empty();
   const filtered = filterScores(period, allScores);
@@ -1689,6 +1700,7 @@ function calcCompleted(items, day) {
   return completed;
 }
 function renderCategoryCompletion(statsBody, items, categories, filtered) {
+  const doneCounts = precomputeDoneCounts(items, filtered);
   const categoryStats = {};
   categories.forEach((category) => {
     categoryStats[category] = { total: 0, completed: 0 };
@@ -1697,10 +1709,7 @@ function renderCategoryCompletion(statsBody, items, categories, filtered) {
     const category = item.category || "\u5176\u4ED6";
     if (!categoryStats[category]) categoryStats[category] = { total: 0, completed: 0 };
     categoryStats[category].total++;
-    const count = filtered.filter(
-      (day) => day.scores[item.id] !== void 0 && isItemDone(item, day.scores[item.id])
-    ).length;
-    categoryStats[category].completed += count;
+    categoryStats[category].completed += doneCounts.get(item.id) || 0;
   }
   statsBody.createEl("h3", { text: "\u5206\u7C7B\u5B8C\u6210\u7387", cls: "stats-section-title" });
   const list = statsBody.createDiv({ cls: "kid-score-item-completion" });
@@ -1718,11 +1727,10 @@ function renderCategoryCompletion(statsBody, items, categories, filtered) {
 function renderItemCompletion(statsBody, items, filtered) {
   statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
   const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const doneCounts = precomputeDoneCounts(items, filtered);
   for (const item of items) {
     const itemHistory = filtered.slice().sort((a, b) => a.date.localeCompare(b.date)).map((day) => day.scores[item.id] || 0);
-    const count = filtered.filter(
-      (day) => day.scores[item.id] !== void 0 && isItemDone(item, day.scores[item.id])
-    ).length;
+    const count = doneCounts.get(item.id) || 0;
     const rate = Math.round(count / filtered.length * 100);
     const rowWrap = itemList.createDiv({ cls: "completion-row-wrap" });
     const row = rowWrap.createDiv({ cls: "completion-row" });
@@ -3194,13 +3202,14 @@ var QuickCustomModal = class extends BaseMobileModal {
 
 // src/modals/popups/score-item-modal.ts
 var ScoreItemModal = class extends BaseMobileModal {
-  constructor(app, plugin, item, initialValue, quickOnly, onConfirm, onEdit) {
+  constructor(app, plugin, item, initialValue, quickOnly, onConfirm, onEdit, onDelete) {
     super(app, plugin);
     this.item = item;
     this.initialValue = initialValue;
     this.quickOnly = quickOnly;
     this.onConfirm = onConfirm;
     this.onEdit = onEdit;
+    this.onDelete = onDelete;
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
@@ -3244,12 +3253,14 @@ var ScoreItemModal = class extends BaseMobileModal {
       };
       const delBtn = delRow.createEl("button", { cls: "value-popup-del-btn", text: "\u{1F5D1} \u5220\u9664\u6B64\u6253\u5206\u9879" });
       delBtn.onclick = async () => {
+        var _a;
         if (!confirm("\u786E\u5B9A\u5220\u9664\u6253\u5206\u9879\u300C" + this.item.name + "\u300D\u5417\uFF1F")) return;
         this.close();
         const idx = this.plugin.currentUser.items.findIndex((it) => it.id === this.item.id);
         if (idx !== -1) {
           this.plugin.currentUser.items.splice(idx, 1);
           await this.plugin.saveSettings();
+          (_a = this.onDelete) == null ? void 0 : _a.call(this);
         }
       };
     }
@@ -3264,7 +3275,18 @@ function openScoreItemValueModal(options) {
       await onRefresh();
     }).open();
   };
-  new ScoreItemModal(app, plugin, item, currentValue, quickOnly, onValue, openEdit).open();
+  new ScoreItemModal(
+    app,
+    plugin,
+    item,
+    currentValue,
+    quickOnly,
+    onValue,
+    openEdit,
+    () => {
+      void onRefresh();
+    }
+  ).open();
 }
 function openAddItemModal(app, plugin, category, onRefresh) {
   new AddItemModal(app, plugin, category, async () => {
@@ -4879,6 +4901,10 @@ function parseImportedConfig(data) {
     throw new Error("\u5BFC\u5165\u6587\u4EF6\u5185\u5BB9\u4E0D\u662F\u6709\u6548\u5BF9\u8C61");
   }
   const raw = data;
+  const schemaVersion = Number(raw.schemaVersion);
+  if (raw.schemaVersion !== void 0 && (!Number.isFinite(schemaVersion) || schemaVersion < 1)) {
+    throw new Error("\u5BFC\u5165\u6587\u4EF6 schemaVersion \u65E0\u6548");
+  }
   if (!Array.isArray(raw.categories) || !raw.categories.every((v) => typeof v === "string")) {
     throw new Error("categories \u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u6570\u7EC4");
   }
@@ -4886,8 +4912,26 @@ function parseImportedConfig(data) {
     throw new Error("items \u5FC5\u987B\u662F\u6570\u7EC4");
   }
   const items = raw.items.map((item, index) => parseImportedItem(item, index));
+  const categories = raw.categories.map((category) => category.trim()).filter(Boolean);
+  const seenIds = /* @__PURE__ */ new Set();
+  for (const item of items) {
+    if (seenIds.has(item.id)) {
+      throw new Error('\u5BFC\u5165\u5931\u8D25\uFF1A\u5B58\u5728\u91CD\u590D\u7684\u6253\u5206\u9879 id "' + item.id + '"');
+    }
+    seenIds.add(item.id);
+    if (!Number.isInteger(item.points)) {
+      throw new Error(
+        "\u5BFC\u5165\u5931\u8D25\uFF1A\u300C" + item.name + "\u300D\u7684\u5206\u503C\u5FC5\u987B\u662F\u6574\u6570\uFF08\u5F53\u524D\u4E3A " + item.points + "\uFF09"
+      );
+    }
+    if (item.category && !categories.includes(item.category)) {
+      throw new Error(
+        "\u5BFC\u5165\u5931\u8D25\uFF1A\u300C" + item.name + '\u300D\u7684\u5206\u7C7B "' + item.category + '" \u4E0D\u5728\u73B0\u6709\u5206\u7C7B\u5217\u8868\u4E2D'
+      );
+    }
+  }
   return {
-    categories: raw.categories.map((category) => category.trim()).filter(Boolean),
+    categories,
     items
   };
 }
@@ -5946,6 +5990,10 @@ var MarkdownReportBuilder = class {
 var DayDataStore = class {
   constructor(plugin) {
     this.plugin = plugin;
+    this._allScoresCache = null;
+  }
+  invalidateCache() {
+    this._allScoresCache = null;
   }
   async readDayData(dateStr) {
     const file = this.plugin.app.vault.getAbstractFileByPath(
@@ -5988,6 +6036,7 @@ var DayDataStore = class {
       } else {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
+      this.invalidateCache();
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
       new import_obsidian19.Notice(
@@ -6011,7 +6060,10 @@ var DayDataStore = class {
       try {
         const content = await this.plugin.app.vault.read(file);
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const childRe = new RegExp("^child:\\s*" + escapedOldName + "$", "gm");
+        const childRe = new RegExp(
+          `^child:\\s*(?:"|'|)?` + escapedOldName + `(?:"|'|)?$`,
+          "gm"
+        );
         const titleRe = new RegExp(
           "(# \u{1F4CB} \\d{4}-\\d{2}-\\d{2} )" + escapedOldName + "(\u7684\u6BCF\u65E5\u8BB0\u5F55)",
           "g"
@@ -6067,6 +6119,7 @@ var DayDataStore = class {
         );
       }
     }
+    this.invalidateCache();
     if (errorCount > 0) {
       throw new Error(
         "\u8DEF\u5F84\u8FC1\u79FB\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u5EFA\u8BAE\u624B\u52A8\u68C0\u67E5\u5E76\u8FC1\u79FB"
@@ -6075,6 +6128,10 @@ var DayDataStore = class {
   }
   async getAllScores() {
     const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
+    const cached = this._allScoresCache;
+    if (cached && cached.path === dirPath && Date.now() - cached.timestamp < 5e3) {
+      return cached.data;
+    }
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -6086,7 +6143,9 @@ var DayDataStore = class {
         if (score) results.push(score);
       }
     }
-    return results.sort((a, b) => compareDateStrings(a.date, b.date));
+    const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
+    this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
+    return sorted;
   }
   readFrontmatterFromCache(file) {
     var _a;
@@ -6096,7 +6155,7 @@ var DayDataStore = class {
     return rest;
   }
   readFrontmatterFromContent(content) {
-    const match = content.match(/^---\n([\s\S]*?)\n---\n?/);
+    const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
     if (!match) return null;
     try {
       const parsed = (0, import_obsidian19.parseYaml)(match[1]);
@@ -6161,7 +6220,7 @@ var DayDataStore = class {
     return scoreTotal + customTotal;
   }
   extractDiaryContent(content) {
-    const body = content.replace(/^---\n[\s\S]*?\n---\n?/, "");
+    const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
     if ((diaryHeadingMatch == null ? void 0 : diaryHeadingMatch.index) !== void 0) {
       return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();

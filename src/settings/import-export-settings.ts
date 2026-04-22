@@ -76,6 +76,13 @@ function parseImportedConfig(data: unknown): {
   }
 
   const raw = data as Record<string, unknown>;
+  const schemaVersion = Number(raw.schemaVersion);
+  if (
+    raw.schemaVersion !== undefined &&
+    (!Number.isFinite(schemaVersion) || schemaVersion < 1)
+  ) {
+    throw new Error("导入文件 schemaVersion 无效");
+  }
   if (!Array.isArray(raw.categories) || !raw.categories.every((v) => typeof v === "string")) {
     throw new Error("categories 必须是字符串数组");
   }
@@ -84,8 +91,38 @@ function parseImportedConfig(data: unknown): {
   }
 
   const items = raw.items.map((item, index) => parseImportedItem(item, index));
+  const categories = raw.categories.map((category) => category.trim()).filter(Boolean);
+
+  const seenIds = new Set<string>();
+  for (const item of items) {
+    if (seenIds.has(item.id)) {
+      throw new Error('导入失败：存在重复的打分项 id "' + item.id + '"');
+    }
+    seenIds.add(item.id);
+
+    if (!Number.isInteger(item.points)) {
+      throw new Error(
+        '导入失败：「' +
+          item.name +
+          "」的分值必须是整数（当前为 " +
+          item.points +
+          "）"
+      );
+    }
+
+    if (item.category && !categories.includes(item.category)) {
+      throw new Error(
+        '导入失败：「' +
+          item.name +
+          '」的分类 "' +
+          item.category +
+          '" 不在现有分类列表中'
+      );
+    }
+  }
+
   return {
-    categories: raw.categories.map((category) => category.trim()).filter(Boolean),
+    categories,
     items,
   };
 }

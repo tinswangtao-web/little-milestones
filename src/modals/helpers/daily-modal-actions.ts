@@ -24,7 +24,18 @@ export function openScoreItemValueModal(options: {
       await onRefresh();
     }).open();
   };
-  new ScoreItemModal(app, plugin, item, currentValue, quickOnly, onValue, openEdit).open();
+  new ScoreItemModal(
+    app,
+    plugin,
+    item,
+    currentValue,
+    quickOnly,
+    onValue,
+    openEdit,
+    () => {
+      void onRefresh();
+    }
+  ).open();
 }
 
 export function openAddItemModal(
