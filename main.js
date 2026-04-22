@@ -5050,6 +5050,7 @@ function renderItemSettingsList({
   pendingScrollItemId,
   setPendingScrollItemId
 }) {
+  const useInlineCategoryPicker = isIOS();
   const getScrollContainer = () => itemsWrap.closest(".vertical-tab-content") || itemsWrap.closest(".modal-content") || itemsWrap.parentElement;
   const dragState = {
     dragging: false,
@@ -5215,17 +5216,10 @@ function renderItemSettingsList({
         plugin.currentUser.items[idx].name = nameInput.value;
         await plugin.saveSettings();
       };
-      const catSelect = row.createEl("select", { cls: "settings-cat-select" });
       const categories = plugin.currentUser.categories || [];
-      for (const value of categories) {
-        const option = catSelect.createEl("option", {
-          text: value,
-          value
-        });
-        if (item.category === value) option.selected = true;
-      }
-      catSelect.onchange = async () => {
-        plugin.currentUser.items[idx].category = catSelect.value;
+      const applyCategoryChange = async (nextCategory) => {
+        if (!nextCategory || nextCategory === plugin.currentUser.items[idx].category) return;
+        plugin.currentUser.items[idx].category = nextCategory;
         sortItemsByCategories(
           plugin.currentUser.items,
           plugin.currentUser.categories || []
@@ -5233,6 +5227,39 @@ function renderItemSettingsList({
         await plugin.saveSettings();
         renderItems();
       };
+      if (useInlineCategoryPicker) {
+        const catTrigger = row.createEl("button", {
+          cls: "settings-cat-trigger",
+          text: item.category || categories[0] || "\u672A\u5206\u7C7B"
+        });
+        catTrigger.type = "button";
+        const catMenu = wrap.createDiv({ cls: "settings-cat-options" });
+        categories.forEach((value) => {
+          const optionBtn = catMenu.createEl("button", {
+            cls: "settings-cat-option" + ((item.category || categories[0] || "\u672A\u5206\u7C7B") === value ? " is-selected" : ""),
+            text: value
+          });
+          optionBtn.type = "button";
+          optionBtn.onclick = async () => {
+            await applyCategoryChange(value);
+          };
+        });
+        catTrigger.onclick = () => {
+          catMenu.classList.toggle("is-open");
+        };
+      } else {
+        const catSelect = row.createEl("select", { cls: "settings-cat-select" });
+        for (const value of categories) {
+          const option = catSelect.createEl("option", {
+            text: value,
+            value
+          });
+          if (item.category === value) option.selected = true;
+        }
+        catSelect.onchange = async () => {
+          await applyCategoryChange(catSelect.value);
+        };
+      }
       const pointsInput = row.createEl("input", {
         cls: "settings-points-input"
       });

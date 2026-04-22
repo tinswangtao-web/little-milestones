@@ -826,6 +826,12 @@
     min-height: 40px;
   }
 
+  .settings-item-row-v2 .settings-cat-trigger {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    min-height: 40px;
+  }
+
   .settings-item-row-v2 .settings-points-input {
     grid-column: 4;
     grid-row: 2;
@@ -837,6 +843,7 @@
   .settings-name-input,
   .settings-points-input,
   .settings-cat-select,
+  .settings-cat-trigger,
   .settings-note-input {
     min-height: 38px;
     height: auto;
@@ -862,6 +869,11 @@
     padding: 8px 0 0;
     margin-bottom: 0;
     border-bottom: none;
+  }
+
+  .settings-cat-options {
+    padding: 8px 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .settings-note-input {

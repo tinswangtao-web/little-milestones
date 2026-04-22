@@ -1,6 +1,7 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../main";
 import { showEmojiPicker } from "../ui/emoji-picker";
+import { isIOS } from "../utils/platform";
 import { sortItemsByCategories } from "./item-sorting";
 
 interface RenderItemSettingsListOptions {
@@ -18,6 +19,7 @@ export function renderItemSettingsList({
   pendingScrollItemId,
   setPendingScrollItemId,
 }: RenderItemSettingsListOptions): void {
+  const useInlineCategoryPicker = isIOS();
   const getScrollContainer = () =>
     (itemsWrap.closest(".vertical-tab-content") ||
       itemsWrap.closest(".modal-content") ||
@@ -214,17 +216,10 @@ export function renderItemSettingsList({
         await plugin.saveSettings();
       };
 
-      const catSelect = row.createEl("select", { cls: "settings-cat-select" });
       const categories = plugin.currentUser.categories || [];
-      for (const value of categories) {
-        const option = catSelect.createEl("option", {
-          text: value,
-          value,
-        });
-        if (item.category === value) option.selected = true;
-      }
-      catSelect.onchange = async () => {
-        plugin.currentUser.items[idx].category = catSelect.value;
+      const applyCategoryChange = async (nextCategory: string) => {
+        if (!nextCategory || nextCategory === plugin.currentUser.items[idx].category) return;
+        plugin.currentUser.items[idx].category = nextCategory;
         sortItemsByCategories(
           plugin.currentUser.items,
           plugin.currentUser.categories || []
@@ -232,6 +227,44 @@ export function renderItemSettingsList({
         await plugin.saveSettings();
         renderItems();
       };
+
+      if (useInlineCategoryPicker) {
+        const catTrigger = row.createEl("button", {
+          cls: "settings-cat-trigger",
+          text: item.category || categories[0] || "未分类",
+        });
+        catTrigger.type = "button";
+
+        const catMenu = wrap.createDiv({ cls: "settings-cat-options" });
+        categories.forEach((value) => {
+          const optionBtn = catMenu.createEl("button", {
+            cls:
+              "settings-cat-option" +
+              ((item.category || categories[0] || "未分类") === value ? " is-selected" : ""),
+            text: value,
+          });
+          optionBtn.type = "button";
+          optionBtn.onclick = async () => {
+            await applyCategoryChange(value);
+          };
+        });
+
+        catTrigger.onclick = () => {
+          catMenu.classList.toggle("is-open");
+        };
+      } else {
+        const catSelect = row.createEl("select", { cls: "settings-cat-select" });
+        for (const value of categories) {
+          const option = catSelect.createEl("option", {
+            text: value,
+            value,
+          });
+          if (item.category === value) option.selected = true;
+        }
+        catSelect.onchange = async () => {
+          await applyCategoryChange(catSelect.value);
+        };
+      }
 
       const pointsInput = row.createEl("input", {
         cls: "settings-points-input",

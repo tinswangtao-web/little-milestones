@@ -1899,6 +1899,7 @@ textarea.custom-form-name-input {
 .settings-name-input,
 .settings-points-input,
 .settings-cat-select,
+.settings-cat-trigger,
 .settings-note-input {
   height: 32px;
   padding: 0 8px;
@@ -1922,13 +1923,56 @@ textarea.custom-form-name-input {
   padding: 0 4px;
   cursor: pointer;
 }
+
+.settings-cat-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-cat-trigger::after {
+  content: "▾";
+  color: var(--text-muted);
+  font-size: 0.9em;
+  flex: 0 0 auto;
+}
 /* Focus ring shared */
 .settings-name-input:focus,
 .settings-points-input:focus,
 .settings-cat-select:focus,
+.settings-cat-trigger:focus,
 .settings-note-input:focus {
   border-color: var(--interactive-accent);
   outline: none;
+}
+
+.settings-cat-options {
+  display: none;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+  padding: 8px 0 0 28px;
+}
+
+.settings-cat-options.is-open {
+  display: grid;
+}
+
+.settings-cat-option {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.settings-cat-option.is-selected {
+  border-color: var(--interactive-accent);
+  background: color-mix(in srgb, var(--interactive-accent) 12%, var(--background-secondary));
 }
 /* Score column: center the number */
 .settings-points-input { text-align: center; }
@@ -3419,6 +3463,12 @@ textarea.custom-form-name-input {
     min-height: 40px;
   }
 
+  .settings-item-row-v2 .settings-cat-trigger {
+    grid-column: 2 / 4;
+    grid-row: 2;
+    min-height: 40px;
+  }
+
   .settings-item-row-v2 .settings-points-input {
     grid-column: 4;
     grid-row: 2;
@@ -3430,6 +3480,7 @@ textarea.custom-form-name-input {
   .settings-name-input,
   .settings-points-input,
   .settings-cat-select,
+  .settings-cat-trigger,
   .settings-note-input {
     min-height: 38px;
     height: auto;
@@ -3455,6 +3506,11 @@ textarea.custom-form-name-input {
     padding: 8px 0 0;
     margin-bottom: 0;
     border-bottom: none;
+  }
+
+  .settings-cat-options {
+    padding: 8px 0 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .settings-note-input {
