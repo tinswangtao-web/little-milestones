@@ -4002,6 +4002,7 @@ function renderScorePanel({
 var DailyScoringModal = class extends BaseMobileModal {
   constructor(app, plugin, initialDate) {
     super(app, plugin);
+    this.isRendering = false;
     this.scores = {};
     this.customItems = [];
     this.diaryContent = "";
@@ -4022,120 +4023,126 @@ var DailyScoringModal = class extends BaseMobileModal {
     return this.mobilePlatform !== "desktop";
   }
   async renderModal() {
+    if (this.isRendering) return;
+    this.isRendering = true;
     const self = this;
-    const contentEl = this.contentEl;
-    contentEl.empty();
-    contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
-    this.scores = {};
-    this.customItems = [];
-    this.diaryContent = "";
-    this.diaryModules = {};
-    this.diaryControls = null;
-    const state = await loadDailyModalState(this.plugin, this.dateStr);
-    const yesterdayData = state.yesterdayData;
-    this.scores = state.scores;
-    this.customItems = state.customItems;
-    this.diaryContent = state.diaryContent;
-    this.diaryModules = state.diaryModules;
-    renderDailyHeader({
-      containerEl: contentEl,
-      plugin: this.plugin,
-      dateStr: this.dateStr,
-      allScores: state.allScores,
-      onPrevDay: () => {
-        self.dateStr = shiftDateString(self.dateStr, -1);
-        self.renderModal();
-      },
-      onNextDay: () => {
-        self.dateStr = shiftDateString(self.dateStr, 1);
-        self.renderModal();
-      },
-      onCalendar: () => self.showCalendarPicker(),
-      onGoToday: () => {
-        self.dateStr = formatDate(0);
-        self.renderModal();
-      },
-      onSwitchUser: async (userId) => {
-        self.plugin.settings.currentUserId = userId;
-        await self.plugin.saveSettings();
-        await self.renderModal();
-      }
-    });
-    const { scorePanel, diaryPanel } = renderMainTabs({
-      containerEl: contentEl,
-      onShowScore: () => {
-        self.syncDiaryContent();
-        self.activeTab = "score";
-        contentEl.scrollTop = 0;
-      },
-      onShowDiary: () => {
-        self.activeTab = "diary";
-        contentEl.scrollTop = 0;
-      }
-    });
-    const renderedScorePanel = renderScorePanel({
-      app: this.app,
-      component: this,
-      plugin: this.plugin,
-      scorePanel,
-      yesterdayData,
-      isTouchOptimizedMode: this.isTouchOptimizedMode(),
-      renderScoreCard: (item, grid, previousDay) => this.renderScoreCard(item, grid, previousDay),
-      renderCustomItems: () => this.renderCustomItems(),
-      onAddItem: (category) => self.showAddItemPopup(category),
-      onAddCustom: () => self.showAddCustomItemForm(),
-      onSetTotalDisplay: (element) => {
-        this.totalDisplay = element;
-      },
-      onAfterRulesSaved: () => this.updateTotalDisplay()
-    });
-    this.customItemsContainer = (renderedScorePanel == null ? void 0 : renderedScorePanel.customItemsContainer) || null;
-    this.updateTotalDisplay();
-    this.diaryControls = buildDiaryPanel({
-      app: this.app,
-      plugin: this.plugin,
-      component: this,
-      panel: diaryPanel,
-      diaryContent: this.diaryContent,
-      diaryModules: this.diaryModules,
-      setDiaryTextarea: (textarea) => {
-        this.diaryTextarea = textarea;
-      },
-      updateDiaryContent: (content) => {
-        this.diaryContent = content;
-      },
-      updateDiaryModules: (values) => {
-        this.diaryModules = values;
-      },
-      composeDiaryContent: () => this.syncDiaryContent(),
-      insertAttachment: (label, ext) => this.insertAttachment(label, ext),
-      insertDiaryText: (text) => this.insertTextAtCursor(text),
-      wrapDiarySelection: (prefix, suffix, placeholder) => this.wrapDiarySelection(prefix, suffix, placeholder)
-    });
-    renderBottomActions({
-      containerEl: contentEl,
-      onPreview: () => {
-        var _a;
-        (_a = this.diaryControls) == null ? void 0 : _a.togglePreview();
-      },
-      onSave: async () => {
-        self.syncDiaryContent();
-        try {
-          await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
-          self.close();
-        } catch (e) {
-          new import_obsidian7.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+    try {
+      const contentEl = this.contentEl;
+      contentEl.empty();
+      contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+      this.scores = {};
+      this.customItems = [];
+      this.diaryContent = "";
+      this.diaryModules = {};
+      this.diaryControls = null;
+      const state = await loadDailyModalState(this.plugin, this.dateStr);
+      const yesterdayData = state.yesterdayData;
+      this.scores = state.scores;
+      this.customItems = state.customItems;
+      this.diaryContent = state.diaryContent;
+      this.diaryModules = state.diaryModules;
+      renderDailyHeader({
+        containerEl: contentEl,
+        plugin: this.plugin,
+        dateStr: this.dateStr,
+        allScores: state.allScores,
+        onPrevDay: () => {
+          self.dateStr = shiftDateString(self.dateStr, -1);
+          self.renderModal();
+        },
+        onNextDay: () => {
+          self.dateStr = shiftDateString(self.dateStr, 1);
+          self.renderModal();
+        },
+        onCalendar: () => self.showCalendarPicker(),
+        onGoToday: () => {
+          self.dateStr = formatDate(0);
+          self.renderModal();
+        },
+        onSwitchUser: async (userId) => {
+          self.plugin.settings.currentUserId = userId;
+          await self.plugin.saveSettings();
+          await self.renderModal();
         }
-      },
-      onStats: () => {
-        self.close();
-        new StatsModal(self.app, self.plugin).open();
-      },
-      bindDiaryActions: (buttons) => {
-        var _a;
-        return (_a = this.diaryControls) == null ? void 0 : _a.bindActionButtons(buttons);
-      }
-    });
+      });
+      const { scorePanel, diaryPanel } = renderMainTabs({
+        containerEl: contentEl,
+        onShowScore: () => {
+          self.syncDiaryContent();
+          self.activeTab = "score";
+          contentEl.scrollTop = 0;
+        },
+        onShowDiary: () => {
+          self.activeTab = "diary";
+          contentEl.scrollTop = 0;
+        }
+      });
+      const renderedScorePanel = renderScorePanel({
+        app: this.app,
+        component: this,
+        plugin: this.plugin,
+        scorePanel,
+        yesterdayData,
+        isTouchOptimizedMode: this.isTouchOptimizedMode(),
+        renderScoreCard: (item, grid, previousDay) => this.renderScoreCard(item, grid, previousDay),
+        renderCustomItems: () => this.renderCustomItems(),
+        onAddItem: (category) => self.showAddItemPopup(category),
+        onAddCustom: () => self.showAddCustomItemForm(),
+        onSetTotalDisplay: (element) => {
+          this.totalDisplay = element;
+        },
+        onAfterRulesSaved: () => this.updateTotalDisplay()
+      });
+      this.customItemsContainer = (renderedScorePanel == null ? void 0 : renderedScorePanel.customItemsContainer) || null;
+      this.updateTotalDisplay();
+      this.diaryControls = buildDiaryPanel({
+        app: this.app,
+        plugin: this.plugin,
+        component: this,
+        panel: diaryPanel,
+        diaryContent: this.diaryContent,
+        diaryModules: this.diaryModules,
+        setDiaryTextarea: (textarea) => {
+          this.diaryTextarea = textarea;
+        },
+        updateDiaryContent: (content) => {
+          this.diaryContent = content;
+        },
+        updateDiaryModules: (values) => {
+          this.diaryModules = values;
+        },
+        composeDiaryContent: () => this.syncDiaryContent(),
+        insertAttachment: (label, ext) => this.insertAttachment(label, ext),
+        insertDiaryText: (text) => this.insertTextAtCursor(text),
+        wrapDiarySelection: (prefix, suffix, placeholder) => this.wrapDiarySelection(prefix, suffix, placeholder)
+      });
+      renderBottomActions({
+        containerEl: contentEl,
+        onPreview: () => {
+          var _a;
+          (_a = this.diaryControls) == null ? void 0 : _a.togglePreview();
+        },
+        onSave: async () => {
+          self.syncDiaryContent();
+          try {
+            await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            self.close();
+          } catch (e) {
+            new import_obsidian7.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+          }
+        },
+        onStats: () => {
+          self.close();
+          new StatsModal(self.app, self.plugin).open();
+        },
+        bindDiaryActions: (buttons) => {
+          var _a;
+          return (_a = this.diaryControls) == null ? void 0 : _a.bindActionButtons(buttons);
+        }
+      });
+    } finally {
+      this.isRendering = false;
+    }
   }
   syncDiaryContent() {
     const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
@@ -6091,6 +6098,7 @@ var DayDataStore = class {
         "\u7528\u6237\u540D\u540C\u6B65\u5931\u8D25 " + errorCount + " \u4E2A\u6587\u4EF6\uFF0C\u8BF7\u67E5\u770B\u63A7\u5236\u53F0\u65E5\u5FD7"
       );
     }
+    this.invalidateCache();
   }
   async migrateSavePath(oldPath, newPath) {
     const oldDir = (0, import_obsidian19.normalizePath)(oldPath);

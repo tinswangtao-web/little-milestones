@@ -37,6 +37,7 @@ import { renderScorePanel } from "./panels/score-panel";
 import { composeDiaryContent } from "../diary/modules";
 
 export class DailyScoringModal extends BaseMobileModal {
+  private isRendering = false;
   scores: Record<string, number> = {};
   customItems: CustomScoreItem[] = [];
   diaryContent = "";
@@ -64,123 +65,129 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   async renderModal() {
+    if (this.isRendering) return;
+    this.isRendering = true;
     const self = this;
-    const contentEl = this.contentEl;
-    contentEl.empty();
-    contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+    try {
+      const contentEl = this.contentEl;
+      contentEl.empty();
+      contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
 
-    this.scores = {};
-    this.customItems = [];
-    this.diaryContent = "";
-    this.diaryModules = {};
-    this.diaryControls = null;
+      this.scores = {};
+      this.customItems = [];
+      this.diaryContent = "";
+      this.diaryModules = {};
+      this.diaryControls = null;
 
-    const state = await loadDailyModalState(this.plugin, this.dateStr);
-    const yesterdayData = state.yesterdayData;
-    this.scores = state.scores;
-    this.customItems = state.customItems;
-    this.diaryContent = state.diaryContent;
-    this.diaryModules = state.diaryModules;
+      const state = await loadDailyModalState(this.plugin, this.dateStr);
+      const yesterdayData = state.yesterdayData;
+      this.scores = state.scores;
+      this.customItems = state.customItems;
+      this.diaryContent = state.diaryContent;
+      this.diaryModules = state.diaryModules;
 
-    renderDailyHeader({
-      containerEl: contentEl,
-      plugin: this.plugin,
-      dateStr: this.dateStr,
-      allScores: state.allScores,
-      onPrevDay: () => {
-        self.dateStr = shiftDateString(self.dateStr, -1);
-        self.renderModal();
-      },
-      onNextDay: () => {
-        self.dateStr = shiftDateString(self.dateStr, 1);
-        self.renderModal();
-      },
-      onCalendar: () => self.showCalendarPicker(),
-      onGoToday: () => {
-        self.dateStr = formatDate(0);
-        self.renderModal();
-      },
-      onSwitchUser: async (userId) => {
-        self.plugin.settings.currentUserId = userId;
-        await self.plugin.saveSettings();
-        await self.renderModal();
-      },
-    });
+      renderDailyHeader({
+        containerEl: contentEl,
+        plugin: this.plugin,
+        dateStr: this.dateStr,
+        allScores: state.allScores,
+        onPrevDay: () => {
+          self.dateStr = shiftDateString(self.dateStr, -1);
+          self.renderModal();
+        },
+        onNextDay: () => {
+          self.dateStr = shiftDateString(self.dateStr, 1);
+          self.renderModal();
+        },
+        onCalendar: () => self.showCalendarPicker(),
+        onGoToday: () => {
+          self.dateStr = formatDate(0);
+          self.renderModal();
+        },
+        onSwitchUser: async (userId) => {
+          self.plugin.settings.currentUserId = userId;
+          await self.plugin.saveSettings();
+          await self.renderModal();
+        },
+      });
 
-    const { scorePanel, diaryPanel } = renderMainTabs({
-      containerEl: contentEl,
-      onShowScore: () => {
-        self.syncDiaryContent();
-        self.activeTab = "score";
-        contentEl.scrollTop = 0;
-      },
-      onShowDiary: () => {
-        self.activeTab = "diary";
-        contentEl.scrollTop = 0;
-      },
-    });
+      const { scorePanel, diaryPanel } = renderMainTabs({
+        containerEl: contentEl,
+        onShowScore: () => {
+          self.syncDiaryContent();
+          self.activeTab = "score";
+          contentEl.scrollTop = 0;
+        },
+        onShowDiary: () => {
+          self.activeTab = "diary";
+          contentEl.scrollTop = 0;
+        },
+      });
 
-    const renderedScorePanel = renderScorePanel({
-      app: this.app as App,
-      component: this as unknown as Component,
-      plugin: this.plugin,
-      scorePanel,
-      yesterdayData,
-      isTouchOptimizedMode: this.isTouchOptimizedMode(),
-      renderScoreCard: (item, grid, previousDay) => this.renderScoreCard(item, grid, previousDay),
-      renderCustomItems: () => this.renderCustomItems(),
-      onAddItem: (category) => self.showAddItemPopup(category),
-      onAddCustom: () => self.showAddCustomItemForm(),
-      onSetTotalDisplay: (element) => {
-        this.totalDisplay = element;
-      },
-      onAfterRulesSaved: () => this.updateTotalDisplay(),
-    });
-    this.customItemsContainer = renderedScorePanel?.customItemsContainer || null;
-    this.updateTotalDisplay();
+      const renderedScorePanel = renderScorePanel({
+        app: this.app as App,
+        component: this as unknown as Component,
+        plugin: this.plugin,
+        scorePanel,
+        yesterdayData,
+        isTouchOptimizedMode: this.isTouchOptimizedMode(),
+        renderScoreCard: (item, grid, previousDay) => this.renderScoreCard(item, grid, previousDay),
+        renderCustomItems: () => this.renderCustomItems(),
+        onAddItem: (category) => self.showAddItemPopup(category),
+        onAddCustom: () => self.showAddCustomItemForm(),
+        onSetTotalDisplay: (element) => {
+          this.totalDisplay = element;
+        },
+        onAfterRulesSaved: () => this.updateTotalDisplay(),
+      });
+      this.customItemsContainer = renderedScorePanel?.customItemsContainer || null;
+      this.updateTotalDisplay();
 
-    this.diaryControls = buildDiaryPanel({
-      app: this.app,
-      plugin: this.plugin,
-      component: this as unknown as Component,
-      panel: diaryPanel,
-      diaryContent: this.diaryContent,
-      diaryModules: this.diaryModules,
-      setDiaryTextarea: (textarea) => {
-        this.diaryTextarea = textarea;
-      },
-      updateDiaryContent: (content) => {
-        this.diaryContent = content;
-      },
-      updateDiaryModules: (values) => {
-        this.diaryModules = values;
-      },
-      composeDiaryContent: () => this.syncDiaryContent(),
-      insertAttachment: (label, ext) => this.insertAttachment(label, ext),
-      insertDiaryText: (text) => this.insertTextAtCursor(text),
-      wrapDiarySelection: (prefix, suffix, placeholder) =>
-        this.wrapDiarySelection(prefix, suffix, placeholder),
-    });
-    renderBottomActions({
-      containerEl: contentEl,
-      onPreview: () => {
-        this.diaryControls?.togglePreview();
-      },
-      onSave: async () => {
-        self.syncDiaryContent();
-        try {
-          await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+      this.diaryControls = buildDiaryPanel({
+        app: this.app,
+        plugin: this.plugin,
+        component: this as unknown as Component,
+        panel: diaryPanel,
+        diaryContent: this.diaryContent,
+        diaryModules: this.diaryModules,
+        setDiaryTextarea: (textarea) => {
+          this.diaryTextarea = textarea;
+        },
+        updateDiaryContent: (content) => {
+          this.diaryContent = content;
+        },
+        updateDiaryModules: (values) => {
+          this.diaryModules = values;
+        },
+        composeDiaryContent: () => this.syncDiaryContent(),
+        insertAttachment: (label, ext) => this.insertAttachment(label, ext),
+        insertDiaryText: (text) => this.insertTextAtCursor(text),
+        wrapDiarySelection: (prefix, suffix, placeholder) =>
+          this.wrapDiarySelection(prefix, suffix, placeholder),
+      });
+      renderBottomActions({
+        containerEl: contentEl,
+        onPreview: () => {
+          this.diaryControls?.togglePreview();
+        },
+        onSave: async () => {
+          self.syncDiaryContent();
+          try {
+            await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            self.close();
+          } catch (e) {
+            new Notice("❌ 保存失败：" + (e instanceof Error ? e.message : String(e)));
+          }
+        },
+        onStats: () => {
           self.close();
-        } catch (e) {
-          new Notice("❌ 保存失败：" + (e instanceof Error ? e.message : String(e)));
-        }
-      },
-      onStats: () => {
-        self.close();
-        new StatsModal(self.app, self.plugin).open();
-      },
-      bindDiaryActions: (buttons) => this.diaryControls?.bindActionButtons(buttons),
-    });
+          new StatsModal(self.app, self.plugin).open();
+        },
+        bindDiaryActions: (buttons) => this.diaryControls?.bindActionButtons(buttons),
+      });
+    } finally {
+      this.isRendering = false;
+    }
   }
 
   syncDiaryContent() {

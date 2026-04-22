@@ -8,7 +8,7 @@
 - `write-scope`: none
 - `read-scope`: src/**, main.js, styles.css, .agents/**
 - `awaiting`: user
-- `handoff-note`: Codex has applied one additional small follow-up patch per user request: (1) `extractDiaryContent()` now strips the diary heading with CRLF-safe matching in the `DIARY_MARKER` branch too, (2) `renderItemCompletion()` now sorts `filtered` once outside the item loop and reuses the sorted array, and (3) `renameUserInFiles()` now updates `frontmatter.child` via `app.fileManager.processFrontMatter()` while keeping title replacement scoped to the body. Rebuilt artifacts were re-synced to Vault with hash verification. Next: user validates the three requested scenarios; other AIs may review but should remain read-only.
+- `handoff-note`: Codex applied exactly the prerelease items requested in this round: `DailyScoringModal.renderModal()` already contains the `isRendering` guard, `DayDataStore.renameUserInFiles()` already invalidates cache after rename, and the only new code change just made was enlarging `.settings-drag-handle` tap area on mobile (`min-width/min-height: 36px` plus centered flex). Item 4 was intentionally not changed. Rebuilt artifacts were re-synced to Vault with hash verification.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

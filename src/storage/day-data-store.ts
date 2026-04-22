@@ -144,6 +144,8 @@ export class DayDataStore {
         "用户名同步失败 " + errorCount + " 个文件，请查看控制台日志"
       );
     }
+
+    this.invalidateCache();
   }
 
   async migrateSavePath(oldPath: string, newPath: string): Promise<void> {

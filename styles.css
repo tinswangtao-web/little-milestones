@@ -3431,6 +3431,11 @@ textarea.custom-form-name-input {
   }
   .settings-drag-handle {
     font-size: 1em;
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .kid-score-cat-row {
     gap: 6px;
