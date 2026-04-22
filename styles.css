@@ -3608,6 +3608,9 @@ textarea.custom-form-name-input {
   }
   .date-nav-display {
     min-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* Emoji picker extra-small */

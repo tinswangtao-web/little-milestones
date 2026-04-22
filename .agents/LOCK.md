@@ -2,6 +2,6 @@
 - `owner`: none
 - `since`: -
 - `scope`: none
-- `reason`: lock released after first kimi mobile-ux review fix pass, rebuild, and Vault sync
+- `reason`: lock released after second kimi mobile-ux follow-up pass, rebuild, and Vault sync
 - `expires-at`: -
-- `notes`: Primary workspace only. First review pass addressed C1-C3 plus a narrow set of H1-H5 follow-ups.
+- `notes`: Primary workspace only. This pass addressed emoji picker keyboard interference, safer keyboard cleanup restoration, and extra-small date-nav overflow polish.

@@ -9,6 +9,14 @@ export function showEmojiPicker(
   callback: (emoji: string) => void,
   container?: HTMLElement
 ): void {
+  const activeInput = document.activeElement as HTMLElement | null;
+  if (
+    activeInput &&
+    /^(INPUT|TEXTAREA|SELECT)$/.test(activeInput.tagName)
+  ) {
+    activeInput.blur();
+  }
+
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
 

@@ -1197,6 +1197,41 @@ function setupModalKeyboard(modal) {
   const cEl = modal.containerEl;
   const mEl = modal.modalEl;
   const contentEl = modal.contentEl;
+  const previousContainerStyles = {
+    position: cEl.style.position,
+    top: cEl.style.top,
+    left: cEl.style.left,
+    right: cEl.style.right,
+    bottom: cEl.style.bottom,
+    height: cEl.style.height
+  };
+  const previousModalStyles = {
+    maxHeight: mEl.style.maxHeight,
+    height: mEl.style.height,
+    display: mEl.style.display,
+    flexDirection: mEl.style.flexDirection,
+    overflow: mEl.style.overflow,
+    transform: mEl.style.transform,
+    transition: mEl.style.transition,
+    alignSelf: mEl.style.alignSelf,
+    marginTop: mEl.style.marginTop,
+    marginBottom: mEl.style.marginBottom,
+    keyboardOffset: mEl.style.getPropertyValue("--keyboard-modal-offset"),
+    manualOffset: mEl.style.getPropertyValue("--manual-modal-offset"),
+    datasetManualOffset: mEl.dataset.manualModalOffset || ""
+  };
+  const previousContentStyles = {
+    flex: contentEl.style.flex,
+    minHeight: contentEl.style.minHeight,
+    overflowY: contentEl.style.overflowY,
+    position: contentEl.style.position,
+    width: contentEl.style.width,
+    paddingBottom: contentEl.style.paddingBottom,
+    scrollPaddingBottom: contentEl.style.scrollPaddingBottom,
+    overscrollBehavior: contentEl.style["overscrollBehavior"] || "",
+    touchAction: contentEl.style["touchAction"] || "",
+    webkitOverflowScrolling: contentEl.style["webkitOverflowScrolling"] || ""
+  };
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
@@ -1356,35 +1391,47 @@ function setupModalKeyboard(modal) {
     mEl.removeEventListener("focusin", onFocusIn);
     mEl.removeEventListener("kid-score:manual-drag-start", onManualDragStart);
     mEl.removeEventListener("kid-score:manual-drag-end", onManualDragEnd);
-    cEl.style.position = "";
-    cEl.style.top = "";
-    cEl.style.left = "";
-    cEl.style.right = "";
-    cEl.style.bottom = "";
-    cEl.style.height = "";
-    mEl.style.maxHeight = "";
-    mEl.style.height = "";
-    mEl.style.display = "";
-    mEl.style.flexDirection = "";
-    mEl.style.overflow = "";
-    mEl.style.transform = "";
-    mEl.style.removeProperty("--keyboard-modal-offset");
-    mEl.style.removeProperty("--manual-modal-offset");
-    delete mEl.dataset.manualModalOffset;
-    mEl.style.transition = "";
-    mEl.style.alignSelf = "";
-    mEl.style.marginTop = "";
-    mEl.style.marginBottom = "";
-    contentEl.style.flex = "";
-    contentEl.style.minHeight = "";
-    contentEl.style.overflowY = "";
-    contentEl.style.position = "";
-    contentEl.style.width = "";
-    contentEl.style.paddingBottom = "";
-    contentEl.style.scrollPaddingBottom = "";
-    contentEl.style["overscrollBehavior"] = "";
-    contentEl.style["touchAction"] = "";
-    contentEl.style["webkitOverflowScrolling"] = "";
+    cEl.style.position = previousContainerStyles.position;
+    cEl.style.top = previousContainerStyles.top;
+    cEl.style.left = previousContainerStyles.left;
+    cEl.style.right = previousContainerStyles.right;
+    cEl.style.bottom = previousContainerStyles.bottom;
+    cEl.style.height = previousContainerStyles.height;
+    mEl.style.maxHeight = previousModalStyles.maxHeight;
+    mEl.style.height = previousModalStyles.height;
+    mEl.style.display = previousModalStyles.display;
+    mEl.style.flexDirection = previousModalStyles.flexDirection;
+    mEl.style.overflow = previousModalStyles.overflow;
+    mEl.style.transform = previousModalStyles.transform;
+    if (previousModalStyles.keyboardOffset) {
+      mEl.style.setProperty("--keyboard-modal-offset", previousModalStyles.keyboardOffset);
+    } else {
+      mEl.style.removeProperty("--keyboard-modal-offset");
+    }
+    if (previousModalStyles.manualOffset) {
+      mEl.style.setProperty("--manual-modal-offset", previousModalStyles.manualOffset);
+    } else {
+      mEl.style.removeProperty("--manual-modal-offset");
+    }
+    if (previousModalStyles.datasetManualOffset) {
+      mEl.dataset.manualModalOffset = previousModalStyles.datasetManualOffset;
+    } else {
+      delete mEl.dataset.manualModalOffset;
+    }
+    mEl.style.transition = previousModalStyles.transition;
+    mEl.style.alignSelf = previousModalStyles.alignSelf;
+    mEl.style.marginTop = previousModalStyles.marginTop;
+    mEl.style.marginBottom = previousModalStyles.marginBottom;
+    contentEl.style.flex = previousContentStyles.flex;
+    contentEl.style.minHeight = previousContentStyles.minHeight;
+    contentEl.style.overflowY = previousContentStyles.overflowY;
+    contentEl.style.position = previousContentStyles.position;
+    contentEl.style.width = previousContentStyles.width;
+    contentEl.style.paddingBottom = previousContentStyles.paddingBottom;
+    contentEl.style.scrollPaddingBottom = previousContentStyles.scrollPaddingBottom;
+    contentEl.style["overscrollBehavior"] = previousContentStyles.overscrollBehavior;
+    contentEl.style["touchAction"] = previousContentStyles.touchAction;
+    contentEl.style["webkitOverflowScrolling"] = previousContentStyles.webkitOverflowScrolling;
   };
 }
 
@@ -2178,6 +2225,10 @@ function searchEmojis(query, categoryKeys) {
 
 // src/ui/emoji-picker.ts
 function showEmojiPicker(callback, container) {
+  const activeInput = document.activeElement;
+  if (activeInput && /^(INPUT|TEXTAREA|SELECT)$/.test(activeInput.tagName)) {
+    activeInput.blur();
+  }
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
   const popup = document.createElement("div");
