@@ -8,9 +8,10 @@
 - `read-scope`: main.js, styles.css, .agents/**
 - `awaiting`: user
 - `handoff-note`: **Role redefinition per user request**: codex is the sole implementer (writes all code); kimi-code is the reviewer (read-only review, suggestions, UI polish, small fixes only with explicit approval). Codex followed up on iPhone UX again: keyboard avoidance now aligns edit-card bottom to the visual viewport edge instead of using a rough lift, manual card drag now keeps full top/bottom reach without fixed snap points, settings item-list rerenders preserve scroll position on add/delete, and rebuilt artifacts were re-synced to Vault with hash verification. Next: user validates on real devices; any further fixes should be assigned to codex for implementation, then kimi reviews.
+- `handoff-note`: **Role redefinition per user request**: codex is the sole implementation agent for this plugin. `claude-code` and `kimi-code` are review-only by default and may suggest fixes, but they should not edit plugin code unless the user explicitly authorizes that exception and the exception is recorded here first. Codex followed up on iPhone UX again: keyboard avoidance now aligns edit-card bottom to the visual viewport edge instead of using a rough lift, manual card drag now keeps full top/bottom reach without fixed snap points, settings item-list rerenders preserve scroll position on add/delete, and rebuilt artifacts were re-synced to Vault with hash verification. Next: user validates on real devices; any further fixes should be assigned to codex for implementation, then other AIs may review.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery
 - `status`: queued
-- `owner`: claude-code
-- `handoff-note`: Do not start until the current mobile-ux task is explicitly closed or paused.
+- `owner`: codex
+- `handoff-note`: Do not start until the current mobile-ux task is explicitly closed or paused. If review is desired, other AIs should stay read-only and provide review notes only.

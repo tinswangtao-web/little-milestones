@@ -2,6 +2,12 @@
 
 This repository uses a file-based handoff protocol so `claude-code`, `codex`, and `kimi-code` can collaborate safely through shared files.
 
+## Role Decision
+- `codex` is the only default implementation agent for this plugin.
+- `claude-code` and `kimi-code` are review-only by default: they may inspect code, validate behavior, and suggest fixes.
+- `claude-code` or `kimi-code` may edit plugin code only if the user explicitly asks for that exception in the current thread.
+- If such an exception is granted, it must be written into `.agents/STATE.md` before any non-codex code edits begin.
+
 ## Goals
 - Keep one shared source of truth for task state.
 - Avoid silent overwrite conflicts.
@@ -18,11 +24,11 @@ This repository uses a file-based handoff protocol so `claude-code`, `codex`, an
 - Every meaningful action updates `.agents/STATE.md` and appends one line to `.agents/log.md`.
 
 ## Agent Roles
-- `claude-code`: implementation, planning, vault sync, larger feature work.
-- `codex`: review, bug/risk detection, edge-case analysis, integration checks.
-- `kimi-code`: second review, UI/detail polish, IDE-side verification, small fixes.
+- `codex`: sole implementer, integration owner, vault sync owner, final code decision maker.
+- `claude-code`: review, validation, planning suggestions, risk spotting, architecture feedback.
+- `kimi-code`: second review, UI/detail polish suggestions, IDE-side verification, small patch proposals in review form.
 
-Roles can rotate. The active responsibility for each task must be written down explicitly.
+Roles do not rotate by default in this repository. If the user wants another agent to write code, that exception must be explicit and must be recorded in `.agents/STATE.md` before implementation starts.
 
 ## Shared Page Names
 Use these page names consistently across tasks, reviews, logs, and handoffs:
@@ -68,6 +74,8 @@ Before finishing a turn:
 - If your work is read-only, you do not need the lock.
 - Release the lock when handing off, pausing, or finishing.
 - If a lock becomes stale, do not override it silently. Record the situation in `STATE.md` and `log.md`.
+- `claude-code` and `kimi-code` should normally not take a code write lock for plugin source files because implementation ownership belongs to `codex`.
+- Review-only work from `claude-code` and `kimi-code` should stay read-only and write only to `.agents/reviews/**` unless the user explicitly authorizes a coding exception.
 
 ## Scope Rules
 - `write-scope` must be specific. Examples:
@@ -76,6 +84,8 @@ Before finishing a turn:
   - `.agents/**`
 - `read-scope` is optional but recommended when review or investigation is broad.
 - No two agents should hold overlapping `write-scope` at the same time.
+- By default, plugin code write-scope belongs only to `codex`.
+- `claude-code` and `kimi-code` should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
 
 ## Source Of Truth For Code
 This project currently has an unusual state:
@@ -126,6 +136,10 @@ Use a visible agent prefix:
 - `[claude] ...`
 - `[codex] ...`
 - `[kimi] ...`
+
+Default expectation in this repository:
+- plugin code commits should normally use `[codex]`
+- `[claude]` and `[kimi]` commits should normally be limited to reviews, notes, or other explicitly authorized exceptions
 
 ## Review Expectations
 Each review should clearly state:

@@ -18,6 +18,11 @@ Every time Codex enters this repository, do these steps first:
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
 - Review, validation, and documentation may run in parallel if they are read-only or have a separate `write-scope`.
 
+## Ownership Rule
+- Codex is the sole default implementation agent for this plugin.
+- Other AIs are review-only by default and should not edit plugin code unless the user explicitly authorizes that exception in the current thread.
+- If the user grants such an exception, it must be recorded in `.agents/STATE.md` before any non-Codex code edits begin.
+
 ## Shared Page Names
 - `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
 - `打分页`: the main scoring page opened by clicking the star icon in Obsidian's left sidebar.
@@ -48,6 +53,10 @@ After Codex finishes a turn:
 
 ## Commit Prefix
 - Use `[codex]` in commit messages for Codex-authored commits.
+
+## External Agent Expectation
+- Treat `claude-code` and `kimi-code` feedback as review input by default.
+- Codex should be the one who turns approved review suggestions into actual plugin code changes unless the user explicitly chooses another arrangement.
 
 ## First Read
 Codex should treat `.agents/AGENT_RULES.md` as the concise operator guide and `.agents/README.md` as the full protocol.
