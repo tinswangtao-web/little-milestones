@@ -26,6 +26,7 @@ export function bindModalInputFocus(
   let touchStartX = 0;
   let touchStartY = 0;
   let touchMoved = false;
+  const touchMoveThreshold = 18;
 
   if (inp.tagName === "INPUT" && inp.type === "number") {
     inp.setAttribute("inputmode", "numeric");
@@ -48,8 +49,8 @@ export function bindModalInputFocus(
       const touch = e.touches[0];
       if (!touch) return;
       if (
-        Math.abs(touch.clientX - touchStartX) > 8 ||
-        Math.abs(touch.clientY - touchStartY) > 8
+        Math.abs(touch.clientX - touchStartX) > touchMoveThreshold ||
+        Math.abs(touch.clientY - touchStartY) > touchMoveThreshold
       ) {
         touchMoved = true;
       }
@@ -72,6 +73,9 @@ export function bindModalInputFocus(
       const forceScroll = () => {
         const scrollerRect = scroller.getBoundingClientRect();
         const inputRect = target.getBoundingClientRect();
+        const visibleTop = scrollerRect.top + 12;
+        const visibleBottom = scrollerRect.bottom - Math.max(48, scroller.clientHeight * 0.18);
+        if (inputRect.top >= visibleTop && inputRect.bottom <= visibleBottom) return;
         const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
         const desiredTop = Math.max(
           0,
@@ -79,10 +83,8 @@ export function bindModalInputFocus(
         );
         scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
       };
-      setTimeout(forceScroll, 80);
-      setTimeout(forceScroll, 260);
-      setTimeout(forceScroll, 520);
-      setTimeout(forceScroll, 860);
+      setTimeout(forceScroll, 120);
+      setTimeout(forceScroll, 360);
     }
   };
 
@@ -98,6 +100,9 @@ export function bindModalInputFocus(
       }
       const scrollerRect = scroller.getBoundingClientRect();
       const inputRect = input.getBoundingClientRect();
+      const visibleTop = scrollerRect.top + 12;
+      const visibleBottom = scrollerRect.bottom - Math.max(52, scroller.clientHeight * 0.16);
+      if (inputRect.top >= visibleTop && inputRect.bottom <= visibleBottom) return;
       const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
       const desiredTop = Math.max(
         0,
@@ -110,8 +115,8 @@ export function bindModalInputFocus(
         scrollWithinModal();
       }, delay);
     };
-    doScroll(400);
-    doScroll(650);
+    doScroll(120);
+    doScroll(360);
   });
 
   input.addEventListener("blur", () => {

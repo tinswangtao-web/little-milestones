@@ -103,8 +103,8 @@ export class KidScoreSettingTab extends PluginSettingTab {
         if (!e.touches || e.touches.length !== 1) return;
         const touch = e.touches[0];
         if (
-          Math.abs(touch.clientX - touchStartX) > 8 ||
-          Math.abs(touch.clientY - touchStartY) > 8
+          Math.abs(touch.clientX - touchStartX) > 18 ||
+          Math.abs(touch.clientY - touchStartY) > 18
         ) {
           touchMoved = true;
           const inputs = containerEl.querySelectorAll(
@@ -119,7 +119,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
           // Delay removal so the finger lift does not re-trigger focus
           this.touchGuardReleaseTimer = window.setTimeout(
             releaseReadonlyInputs,
-            120
+            40
           );
         }
       };

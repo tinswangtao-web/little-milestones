@@ -61,7 +61,7 @@ export function createDiaryModuleField({
     : card.createEl("input", { cls: "diary-module-input", type: "text" });
   input.placeholder = moduleDef.placeholder || "";
   input.value = diaryModules[moduleDef.id] || "";
-  bindModalInputFocus(input, { scrollOnIOSFocus: false });
+  bindModalInputFocus(input);
   input.addEventListener("input", () => {
     diaryModules[moduleDef.id] = input.value.trim();
     updateDiaryModules(diaryModules);
@@ -97,7 +97,7 @@ export function createDiaryQuickGroup({
   valueInput.placeholder = moduleDef.placeholder || "";
   valueInput.value = diaryModules[moduleDef.id] || "";
   valueInput.rows = 1;
-  bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
+  bindModalInputFocus(valueInput);
   valueInput.addEventListener("input", () => {
     diaryModules[moduleDef.id] = valueInput.value.trim();
     updateDiaryModules(diaryModules);
@@ -144,7 +144,7 @@ export function createDiaryQuickGroup({
         ? "也可以自己写心情，比如 有点紧张"
         : "也可以自己补充一句";
   textInput.rows = 2;
-  bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+  bindModalInputFocus(textInput);
   attachAutoResize(textInput, 72);
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",

@@ -21,9 +21,9 @@ export class ScoreItemModal extends BaseMobileModal {
   }
 
   onOpen(): void {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     if (this.item.note) {
       c.createEl("div", { cls: "value-popup-note", text: this.item.note });

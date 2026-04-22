@@ -18,9 +18,9 @@ export class EditCustomModal extends BaseMobileModal {
   }
 
   onOpen(): void {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("✏️ 编辑临时事项");
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
 

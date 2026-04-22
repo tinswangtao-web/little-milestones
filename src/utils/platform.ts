@@ -3,7 +3,9 @@ import type { MobilePlatform } from "../types";
 export function getMobilePlatform(): MobilePlatform {
   const ua = (navigator.userAgent || "").toLowerCase();
   if (/android/.test(ua)) return "android";
-  if (/iphone|ipad|ipod/.test(ua)) return "ios";
+  if (/iphone|ipad|ipod/.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/.test(ua))) {
+    return "ios";
+  }
   return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
 }
 
@@ -17,7 +19,8 @@ export function getPlatformKey(): string {
 }
 
 export function isIOS(): boolean {
-  return /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const ua = (navigator.userAgent || "").toLowerCase();
+  return /iphone|ipad|ipod/.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/.test(ua));
 }
 
 export function isAndroid(): boolean {

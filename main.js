@@ -1168,7 +1168,9 @@ var import_obsidian = require("obsidian");
 function getMobilePlatform() {
   const ua = (navigator.userAgent || "").toLowerCase();
   if (/android/.test(ua)) return "android";
-  if (/iphone|ipad|ipod/.test(ua)) return "ios";
+  if (/iphone|ipad|ipod/.test(ua) || navigator.maxTouchPoints > 1 && /macintosh/.test(ua)) {
+    return "ios";
+  }
   return document.body.classList.contains("is-mobile") ? "mobile-other" : "desktop";
 }
 function getPlatformKey() {
@@ -1180,7 +1182,8 @@ function getPlatformKey() {
   return "fallback";
 }
 function isIOS() {
-  return /iphone|ipad|ipod/.test((navigator.userAgent || "").toLowerCase());
+  const ua = (navigator.userAgent || "").toLowerCase();
+  return /iphone|ipad|ipod/.test(ua) || navigator.maxTouchPoints > 1 && /macintosh/.test(ua);
 }
 function isAndroid() {
   return /android/.test((navigator.userAgent || "").toLowerCase());
@@ -1449,7 +1452,7 @@ function attachModalDragGesture(modal) {
     modalEl.classList.remove("is-dragging-position");
     modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-end"));
   };
-  modalEl.addEventListener("touchstart", onTouchStart, { passive: true });
+  modalEl.addEventListener("touchstart", onTouchStart, { passive: false });
   modalEl.addEventListener("touchmove", onTouchMove, { passive: false });
   modalEl.addEventListener("touchend", onTouchEnd, { passive: true });
   modalEl.addEventListener("touchcancel", onTouchEnd, { passive: true });
@@ -2045,6 +2048,7 @@ function bindModalInputFocus(input, options = {}) {
   let touchStartX = 0;
   let touchStartY = 0;
   let touchMoved = false;
+  const touchMoveThreshold = 18;
   if (inp.tagName === "INPUT" && inp.type === "number") {
     inp.setAttribute("inputmode", "numeric");
   }
@@ -2063,7 +2067,7 @@ function bindModalInputFocus(input, options = {}) {
     input.addEventListener("touchmove", (e) => {
       const touch = e.touches[0];
       if (!touch) return;
-      if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
+      if (Math.abs(touch.clientX - touchStartX) > touchMoveThreshold || Math.abs(touch.clientY - touchStartY) > touchMoveThreshold) {
         touchMoved = true;
       }
     }, { passive: true });
@@ -2084,6 +2088,9 @@ function bindModalInputFocus(input, options = {}) {
       const forceScroll = () => {
         const scrollerRect = scroller.getBoundingClientRect();
         const inputRect = target.getBoundingClientRect();
+        const visibleTop = scrollerRect.top + 12;
+        const visibleBottom = scrollerRect.bottom - Math.max(48, scroller.clientHeight * 0.18);
+        if (inputRect.top >= visibleTop && inputRect.bottom <= visibleBottom) return;
         const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
         const desiredTop = Math.max(
           0,
@@ -2091,10 +2098,8 @@ function bindModalInputFocus(input, options = {}) {
         );
         scroller.scrollTo({ top: desiredTop, behavior: "smooth" });
       };
-      setTimeout(forceScroll, 80);
-      setTimeout(forceScroll, 260);
-      setTimeout(forceScroll, 520);
-      setTimeout(forceScroll, 860);
+      setTimeout(forceScroll, 120);
+      setTimeout(forceScroll, 360);
     }
   };
   input.addEventListener("focus", () => {
@@ -2109,6 +2114,9 @@ function bindModalInputFocus(input, options = {}) {
       }
       const scrollerRect = scroller.getBoundingClientRect();
       const inputRect = input.getBoundingClientRect();
+      const visibleTop = scrollerRect.top + 12;
+      const visibleBottom = scrollerRect.bottom - Math.max(52, scroller.clientHeight * 0.16);
+      if (inputRect.top >= visibleTop && inputRect.bottom <= visibleBottom) return;
       const inputTop = inputRect.top - scrollerRect.top + scroller.scrollTop;
       const desiredTop = Math.max(
         0,
@@ -2121,8 +2129,8 @@ function bindModalInputFocus(input, options = {}) {
         scrollWithinModal();
       }, delay);
     };
-    doScroll(400);
-    doScroll(650);
+    doScroll(120);
+    doScroll(360);
   });
   input.addEventListener("blur", () => {
     if (!platformIsIOS) return;
@@ -2362,7 +2370,7 @@ function createDiaryModuleField({
   const input = isMultiline ? card.createEl("textarea", { cls: "diary-module-input is-multiline" }) : card.createEl("input", { cls: "diary-module-input", type: "text" });
   input.placeholder = moduleDef.placeholder || "";
   input.value = diaryModules[moduleDef.id] || "";
-  bindModalInputFocus(input, { scrollOnIOSFocus: false });
+  bindModalInputFocus(input);
   input.addEventListener("input", () => {
     diaryModules[moduleDef.id] = input.value.trim();
     updateDiaryModules(diaryModules);
@@ -2397,7 +2405,7 @@ function createDiaryQuickGroup({
   valueInput.placeholder = moduleDef.placeholder || "";
   valueInput.value = diaryModules[moduleDef.id] || "";
   valueInput.rows = 1;
-  bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
+  bindModalInputFocus(valueInput);
   valueInput.addEventListener("input", () => {
     diaryModules[moduleDef.id] = valueInput.value.trim();
     updateDiaryModules(diaryModules);
@@ -2436,7 +2444,7 @@ function createDiaryQuickGroup({
   });
   textInput.placeholder = moduleDef.id === "weather" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5929\u6C14\uFF0C\u6BD4\u5982 \u9634\u5929\u6709\u98CE" : moduleDef.id === "mood" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5FC3\u60C5\uFF0C\u6BD4\u5982 \u6709\u70B9\u7D27\u5F20" : "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u8865\u5145\u4E00\u53E5";
   textInput.rows = 2;
-  bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+  bindModalInputFocus(textInput);
   attachAutoResize(textInput, 72);
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
@@ -2718,9 +2726,9 @@ var AddCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879");
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
     c.createEl("div", { cls: "value-popup-hint", text: "\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0" });
@@ -2801,9 +2809,9 @@ var AddItemModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u2795 \u65B0\u589E\u6253\u5206\u9879 \xB7 " + this.category);
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
     const emojiRow = c.createDiv({ cls: "custom-form-row" });
@@ -2943,9 +2951,9 @@ var EditCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879");
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
     const emojiRow = c.createDiv({ cls: "custom-form-row" });
@@ -3170,9 +3178,9 @@ var QuickCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     if (this.item.note) {
       c.createEl("div", { cls: "value-popup-note", text: this.item.note });
@@ -3214,9 +3222,9 @@ var ScoreItemModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     if (this.item.note) {
       c.createEl("div", { cls: "value-popup-note", text: this.item.note });
@@ -4012,7 +4020,7 @@ var DailyScoringModal = class extends BaseMobileModal {
     this.diaryModules = {};
     this.diaryControls = null;
     this.activeTab = "score";
-    this.enableKeyboardAdjustment = false;
+    this.enableKeyboardAdjustment = true;
     this.dateStr = initialDate || formatDate(0);
   }
   onOpen() {
@@ -5590,7 +5598,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
       const onTouchMove = (e) => {
         if (!e.touches || e.touches.length !== 1) return;
         const touch = e.touches[0];
-        if (Math.abs(touch.clientX - touchStartX) > 8 || Math.abs(touch.clientY - touchStartY) > 8) {
+        if (Math.abs(touch.clientX - touchStartX) > 18 || Math.abs(touch.clientY - touchStartY) > 18) {
           touchMoved = true;
           const inputs = containerEl.querySelectorAll(
             'input:not([type="button"]):not([type="submit"]), textarea'
@@ -5602,7 +5610,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
         if (touchMoved) {
           this.touchGuardReleaseTimer = window.setTimeout(
             releaseReadonlyInputs,
-            120
+            40
           );
         }
       };

@@ -78,7 +78,7 @@ export function attachModalDragGesture(modal: Modal): DragCleanup | null {
     modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-end"));
   };
 
-  modalEl.addEventListener("touchstart", onTouchStart, { passive: true });
+  modalEl.addEventListener("touchstart", onTouchStart, { passive: false });
   modalEl.addEventListener("touchmove", onTouchMove, { passive: false });
   modalEl.addEventListener("touchend", onTouchEnd, { passive: true });
   modalEl.addEventListener("touchcancel", onTouchEnd, { passive: true });

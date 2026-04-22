@@ -48,7 +48,7 @@ export class DailyScoringModal extends BaseMobileModal {
   diaryModules: DiaryModuleValues = {};
   diaryControls: DiaryPanelControls | null = null;
   activeTab: "score" | "diary" = "score";
-  protected enableKeyboardAdjustment = false;
+  protected enableKeyboardAdjustment = true;
 
   constructor(app: App, plugin: KidScorePlugin, initialDate?: string) {
     super(app, plugin);

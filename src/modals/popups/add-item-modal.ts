@@ -17,9 +17,9 @@ export class AddItemModal extends BaseMobileModal {
   }
 
   onOpen(): void {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("➕ 新增打分项 · " + this.category);
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
 

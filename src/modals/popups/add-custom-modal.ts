@@ -16,9 +16,9 @@ export class AddCustomModal extends BaseMobileModal {
   }
 
   onOpen(): void {
+    this.modalEl.addClass("kid-score-edit-modal");
     super.onOpen();
     this.titleEl.setText("📌 添加临时事项");
-    this.modalEl.addClass("kid-score-edit-modal");
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
     c.createEl("div", { cls: "value-popup-hint", text: "可填写备注，记录本次加/扣分原因" });
