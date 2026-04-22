@@ -1263,6 +1263,12 @@ textarea.custom-form-name-input {
 
 .diary-quick-text-input {
   min-width: 0;
+  min-height: 72px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .diary-quick-emoji-row {
@@ -1291,6 +1297,11 @@ textarea.custom-form-name-input {
   grid-template-columns: 52px minmax(0, 1fr);
   gap: 8px;
   align-items: stretch;
+}
+
+.diary-quick-picker-btn {
+  align-self: start;
+  min-height: 72px;
 }
 
 .diary-quick-add-btn {
@@ -1326,6 +1337,9 @@ textarea.custom-form-name-input {
   resize: vertical;
   box-sizing: border-box;
   transition: border-color 0.15s;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .diary-textarea:focus {
@@ -2510,7 +2524,7 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-main {
   display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  grid-template-columns: 88px minmax(180px, 220px) minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   min-width: 0;
@@ -2531,6 +2545,10 @@ textarea.custom-form-name-input {
   display: grid;
   gap: 6px;
   min-width: 0;
+}
+
+.diary-module-settings-field.is-emoji {
+  align-self: start;
 }
 
 .diary-module-settings-field-label {
@@ -2555,6 +2573,22 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-input.is-wide {
   min-width: 0;
+}
+
+.diary-module-settings-textarea {
+  min-height: 78px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diary-module-settings-emoji-btn {
+  width: 100%;
+  min-height: 78px;
+  border-radius: 12px;
+  font-size: 1.5em;
 }
 
 /* ─── 移动端适配 ─────────────────────────────────────────────────────────────── */
@@ -3090,6 +3124,10 @@ textarea.custom-form-name-input {
     min-height: 52px;
   }
 
+  .diary-quick-text-input {
+    min-height: 76px;
+  }
+
   .diary-quick-emoji-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -3116,6 +3154,10 @@ textarea.custom-form-name-input {
     min-width: 0;
     padding-left: 8px;
     padding-right: 8px;
+  }
+
+  .diary-quick-picker-btn {
+    min-height: 76px;
   }
 
   .diary-textarea {
@@ -3427,8 +3469,13 @@ textarea.custom-form-name-input {
   }
 
   .diary-module-settings-select,
-  .diary-module-settings-actions .settings-delete-btn {
+  .diary-module-settings-actions .settings-delete-btn,
+  .diary-module-settings-emoji-btn {
     min-height: 40px;
+  }
+
+  .diary-module-settings-textarea {
+    min-height: 88px;
   }
 
   /* Stats cards mobile */

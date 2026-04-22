@@ -25,6 +25,7 @@ export type DiaryModuleKind = "quick" | "multi";
 
 export interface DiaryModuleDefinition {
   id: string;
+  emoji?: string;
   label: string;
   placeholder: string;
   kind: DiaryModuleKind;

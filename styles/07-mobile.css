@@ -531,6 +531,10 @@
     min-height: 52px;
   }
 
+  .diary-quick-text-input {
+    min-height: 76px;
+  }
+
   .diary-quick-emoji-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -557,6 +561,10 @@
     min-width: 0;
     padding-left: 8px;
     padding-right: 8px;
+  }
+
+  .diary-quick-picker-btn {
+    min-height: 76px;
   }
 
   .diary-textarea {
@@ -868,8 +876,13 @@
   }
 
   .diary-module-settings-select,
-  .diary-module-settings-actions .settings-delete-btn {
+  .diary-module-settings-actions .settings-delete-btn,
+  .diary-module-settings-emoji-btn {
     min-height: 40px;
+  }
+
+  .diary-module-settings-textarea {
+    min-height: 88px;
   }
 
   /* Stats cards mobile */

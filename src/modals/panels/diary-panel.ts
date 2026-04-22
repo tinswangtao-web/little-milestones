@@ -68,6 +68,17 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   let charCount: HTMLElement | null = null;
   let inlinePreviewBtn: HTMLButtonElement | null = null;
 
+  const attachAutoResize = (textarea: HTMLTextAreaElement, minHeight = 220) => {
+    const resize = () => {
+      textarea.style.height = "auto";
+      textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
+    };
+    requestAnimationFrame(resize);
+    setTimeout(resize, 60);
+    textarea.addEventListener("input", resize);
+    textarea.addEventListener("focus", resize);
+  };
+
   const updateCharCount = () => {
     if (charCount) charCount.textContent = (currentDiaryContent || "").length + " 字";
   };
@@ -221,6 +232,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   bindModalInputFocus(diaryTextarea);
   diaryTextarea.value = diaryModules.freeWrite || "";
   diaryTextarea.rows = 12;
+  attachAutoResize(diaryTextarea, 220);
   diaryTextarea.oninput = () => {
     diaryModules.freeWrite = diaryTextarea!.value;
     updateDiaryModules(diaryModules);

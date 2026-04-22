@@ -51,7 +51,10 @@ export function createDiaryModuleField({
   syncAndRefresh,
 }: CreateDiaryModuleFieldOptions): void {
   const card = moduleGrid.createDiv({ cls: "diary-module-card" });
-  card.createSpan({ cls: "diary-module-label", text: moduleDef.label });
+  card.createSpan({
+    cls: "diary-module-label",
+    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" "),
+  });
   const isMultiline = moduleDef.kind !== "quick";
   const input = isMultiline
     ? card.createEl("textarea", { cls: "diary-module-input is-multiline" })
@@ -84,7 +87,10 @@ export function createDiaryQuickGroup({
   let customEmoji = defaults[0].e;
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
   const header = group.createDiv({ cls: "diary-quick-header" });
-  header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
+  header.createSpan({
+    cls: "diary-quick-label",
+    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" "),
+  });
   const valueInput = group.createEl("textarea", {
     cls: "diary-quick-value-input",
   });
@@ -128,9 +134,8 @@ export function createDiaryQuickGroup({
     }, panel);
   };
 
-  const textInput = customRow.createEl("input", {
+  const textInput = customRow.createEl("textarea", {
     cls: "diary-quick-text-input",
-    type: "text",
   });
   textInput.placeholder =
     moduleDef.id === "weather"
@@ -138,7 +143,9 @@ export function createDiaryQuickGroup({
       : moduleDef.id === "mood"
         ? "也可以自己写心情，比如 有点紧张"
         : "也可以自己补充一句";
+  textInput.rows = 2;
   bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+  attachAutoResize(textInput, 72);
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
     text: "添加",

@@ -1090,36 +1090,42 @@ function makeDefaultDiaryModules() {
   return [
     {
       id: "weather",
+      emoji: "\u2600\uFE0F",
       label: "\u4ECA\u5929\u5929\u6C14",
       placeholder: "\u9009\u4E00\u4E2A\u5929\u6C14\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199",
       kind: "quick"
     },
     {
       id: "mood",
+      emoji: "\u{1F60A}",
       label: "\u4ECA\u5929\u5FC3\u60C5",
       placeholder: "\u9009\u4E00\u4E2A\u5FC3\u60C5\uFF0C\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199",
       kind: "quick"
     },
     {
       id: "todayThing",
+      emoji: "\u{1F4DD}",
       label: "\u4ECA\u5929\u6211\u505A\u4E86...",
       placeholder: "\u4F8B\u5982\uFF1A\u6211\u4E0A\u4E86\u6570\u5B66\u8BFE\uFF0C\u8FD8\u753B\u4E86\u753B",
       kind: "multi"
     },
     {
       id: "learnedThing",
+      emoji: "\u{1F331}",
       label: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86...",
       placeholder: "\u4F8B\u5982\uFF1A\u6211\u5B66\u4F1A\u4E86\u5199\u201C\u6625\u201D\u5B57",
       kind: "multi"
     },
     {
       id: "happyThing",
+      emoji: "\u{1F389}",
       label: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F...",
       placeholder: "\u4F8B\u5982\uFF1A\u4E0B\u8BFE\u540E\u6211\u548C\u540C\u5B66\u4E00\u8D77\u73A9",
       kind: "multi"
     },
     {
       id: "wantToSay",
+      emoji: "\u{1F4AD}",
       label: "\u6211\u8FD8\u60F3\u8BF4...",
       placeholder: "\u53EF\u4EE5\u5199\u60F3\u5BF9\u7238\u7238\u5988\u5988\u6216\u81EA\u5DF1\u8BF4\u7684\u8BDD",
       kind: "multi"
@@ -2272,7 +2278,10 @@ function createDiaryModuleField({
   syncAndRefresh
 }) {
   const card = moduleGrid.createDiv({ cls: "diary-module-card" });
-  card.createSpan({ cls: "diary-module-label", text: moduleDef.label });
+  card.createSpan({
+    cls: "diary-module-label",
+    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" ")
+  });
   const isMultiline = moduleDef.kind !== "quick";
   const input = isMultiline ? card.createEl("textarea", { cls: "diary-module-input is-multiline" }) : card.createEl("input", { cls: "diary-module-input", type: "text" });
   input.placeholder = moduleDef.placeholder || "";
@@ -2302,7 +2311,10 @@ function createDiaryQuickGroup({
   let customEmoji = defaults[0].e;
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
   const header = group.createDiv({ cls: "diary-quick-header" });
-  header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
+  header.createSpan({
+    cls: "diary-quick-label",
+    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" ")
+  });
   const valueInput = group.createEl("textarea", {
     cls: "diary-quick-value-input"
   });
@@ -2343,12 +2355,13 @@ function createDiaryQuickGroup({
       emojiBtn.textContent = emoji;
     }, panel);
   };
-  const textInput = customRow.createEl("input", {
-    cls: "diary-quick-text-input",
-    type: "text"
+  const textInput = customRow.createEl("textarea", {
+    cls: "diary-quick-text-input"
   });
   textInput.placeholder = moduleDef.id === "weather" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5929\u6C14\uFF0C\u6BD4\u5982 \u9634\u5929\u6709\u98CE" : moduleDef.id === "mood" ? "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u5199\u5FC3\u60C5\uFF0C\u6BD4\u5982 \u6709\u70B9\u7D27\u5F20" : "\u4E5F\u53EF\u4EE5\u81EA\u5DF1\u8865\u5145\u4E00\u53E5";
+  textInput.rows = 2;
   bindModalInputFocus(textInput, { scrollOnIOSFocus: false });
+  attachAutoResize(textInput, 72);
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
     text: "\u6DFB\u52A0"
@@ -2429,6 +2442,16 @@ function buildDiaryPanel(options) {
   let textareaWrap = null;
   let charCount = null;
   let inlinePreviewBtn = null;
+  const attachAutoResize2 = (textarea, minHeight = 220) => {
+    const resize = () => {
+      textarea.style.height = "auto";
+      textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
+    };
+    requestAnimationFrame(resize);
+    setTimeout(resize, 60);
+    textarea.addEventListener("input", resize);
+    textarea.addEventListener("focus", resize);
+  };
   const updateCharCount = () => {
     if (charCount) charCount.textContent = (currentDiaryContent || "").length + " \u5B57";
   };
@@ -2571,6 +2594,7 @@ function buildDiaryPanel(options) {
   bindModalInputFocus(diaryTextarea);
   diaryTextarea.value = diaryModules.freeWrite || "";
   diaryTextarea.rows = 12;
+  attachAutoResize2(diaryTextarea, 220);
   diaryTextarea.oninput = () => {
     diaryModules.freeWrite = diaryTextarea.value;
     updateDiaryModules(diaryModules);
@@ -4424,6 +4448,16 @@ function renderDiaryModuleSettingsSection({
   containerEl,
   bindSettingsInput
 }) {
+  const autoResize = (textarea, minHeight = 72) => {
+    const resize = () => {
+      textarea.style.height = "auto";
+      textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
+    };
+    requestAnimationFrame(resize);
+    setTimeout(resize, 60);
+    textarea.addEventListener("input", resize);
+    textarea.addEventListener("focus", resize);
+  };
   const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
   const header = section.createDiv({ cls: "kid-score-rules-header" });
   const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
@@ -4453,6 +4487,23 @@ function renderDiaryModuleSettingsSection({
       const main = row.createDiv({ cls: "diary-module-settings-main" });
       const meta = row.createDiv({ cls: "diary-module-settings-meta" });
       const actions2 = row.createDiv({ cls: "diary-module-settings-actions" });
+      const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
+      emojiField.createEl("label", {
+        cls: "diary-module-settings-field-label",
+        text: "\u6A21\u5757\u56FE\u6807"
+      });
+      const emojiBtn = emojiField.createEl("button", {
+        cls: "settings-emoji-btn diary-module-settings-emoji-btn",
+        text: moduleDef.emoji || "\u{1F4DD}"
+      });
+      emojiBtn.type = "button";
+      emojiBtn.onclick = () => {
+        showEmojiPicker(async (emoji) => {
+          plugin.currentUser.diaryModules[idx].emoji = emoji;
+          await plugin.saveSettings();
+          emojiBtn.textContent = emoji;
+        }, containerEl);
+      };
       const labelField = main.createDiv({ cls: "diary-module-settings-field" });
       labelField.createEl("label", {
         cls: "diary-module-settings-field-label",
@@ -4477,12 +4528,13 @@ function renderDiaryModuleSettingsSection({
         cls: "diary-module-settings-field-label",
         text: "\u63D0\u793A\u6587\u6848"
       });
-      const placeholderInput = placeholderField.createEl("input", {
-        cls: "diary-module-settings-input is-wide",
-        type: "text"
+      const placeholderInput = placeholderField.createEl("textarea", {
+        cls: "diary-module-settings-input is-wide diary-module-settings-textarea"
       });
       placeholderInput.value = moduleDef.placeholder || "";
       placeholderInput.placeholder = "\u63D0\u793A\u6587\u6848";
+      placeholderInput.rows = 2;
+      autoResize(placeholderInput, 78);
       bindSettingsInput(placeholderInput);
       placeholderInput.onchange = async () => {
         plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
@@ -4528,6 +4580,7 @@ function renderDiaryModuleSettingsSection({
     addBtn.onclick = async () => {
       plugin.currentUser.diaryModules.push({
         id: "module_" + Date.now(),
+        emoji: "\u{1F4DD}",
         label: "\u65B0\u6A21\u5757",
         placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
         kind: "multi"
@@ -5499,6 +5552,7 @@ function normalizePluginSettings(loaded) {
 }
 function ensureUserDefaults(user) {
   let changed = false;
+  const defaultDiaryModules = makeDefaultDiaryModules();
   if (!user.id) {
     user.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
     changed = true;
@@ -5528,8 +5582,18 @@ function ensureUserDefaults(user) {
     changed = true;
   }
   if (!Array.isArray(user.diaryModules) || user.diaryModules.length === 0) {
-    user.diaryModules = makeDefaultDiaryModules();
+    user.diaryModules = defaultDiaryModules;
     changed = true;
+  } else {
+    user.diaryModules = user.diaryModules.map((moduleDef, index) => {
+      const fallback = defaultDiaryModules[index];
+      const next = {
+        ...moduleDef,
+        emoji: typeof moduleDef.emoji === "string" && moduleDef.emoji.trim() ? moduleDef.emoji : (fallback == null ? void 0 : fallback.emoji) || "\u{1F4DD}"
+      };
+      if (next.emoji !== moduleDef.emoji) changed = true;
+      return next;
+    });
   }
   if (!user.goals) {
     user.goals = { daily: 10, weekly: 70, monthly: 300 };

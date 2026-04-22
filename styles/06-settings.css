@@ -734,7 +734,7 @@
 
 .diary-module-settings-main {
   display: grid;
-  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  grid-template-columns: 88px minmax(180px, 220px) minmax(0, 1fr);
   gap: 10px;
   align-items: start;
   min-width: 0;
@@ -755,6 +755,10 @@
   display: grid;
   gap: 6px;
   min-width: 0;
+}
+
+.diary-module-settings-field.is-emoji {
+  align-self: start;
 }
 
 .diary-module-settings-field-label {
@@ -779,4 +783,20 @@
 
 .diary-module-settings-input.is-wide {
   min-width: 0;
+}
+
+.diary-module-settings-textarea {
+  min-height: 78px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diary-module-settings-emoji-btn {
+  width: 100%;
+  min-height: 78px;
+  border-radius: 12px;
+  font-size: 1.5em;
 }

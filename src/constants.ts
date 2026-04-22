@@ -33,36 +33,42 @@ export function makeDefaultDiaryModules(): DiaryModuleDefinition[] {
   return [
     {
       id: "weather",
+      emoji: "☀️",
       label: "今天天气",
       placeholder: "选一个天气，也可以自己写",
       kind: "quick",
     },
     {
       id: "mood",
+      emoji: "😊",
       label: "今天心情",
       placeholder: "选一个心情，也可以自己写",
       kind: "quick",
     },
     {
       id: "todayThing",
+      emoji: "📝",
       label: "今天我做了...",
       placeholder: "例如：我上了数学课，还画了画",
       kind: "multi",
     },
     {
       id: "learnedThing",
+      emoji: "🌱",
       label: "今天我学会了...",
       placeholder: "例如：我学会了写“春”字",
       kind: "multi",
     },
     {
       id: "happyThing",
+      emoji: "🎉",
       label: "今天最开心的是...",
       placeholder: "例如：下课后我和同学一起玩",
       kind: "multi",
     },
     {
       id: "wantToSay",
+      emoji: "💭",
       label: "我还想说...",
       placeholder: "可以写想对爸爸妈妈或自己说的话",
       kind: "multi",

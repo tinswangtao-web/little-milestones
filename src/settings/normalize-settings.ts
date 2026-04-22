@@ -113,6 +113,7 @@ export function normalizePluginSettings(
 
 function ensureUserDefaults(user: User): boolean {
   let changed = false;
+  const defaultDiaryModules = makeDefaultDiaryModules();
 
   if (!user.id) {
     user.id =
@@ -144,8 +145,21 @@ function ensureUserDefaults(user: User): boolean {
     changed = true;
   }
   if (!Array.isArray(user.diaryModules) || user.diaryModules.length === 0) {
-    user.diaryModules = makeDefaultDiaryModules();
+    user.diaryModules = defaultDiaryModules;
     changed = true;
+  } else {
+    user.diaryModules = user.diaryModules.map((moduleDef, index) => {
+      const fallback = defaultDiaryModules[index];
+      const next = {
+        ...moduleDef,
+        emoji:
+          typeof moduleDef.emoji === "string" && moduleDef.emoji.trim()
+            ? moduleDef.emoji
+            : fallback?.emoji || "📝",
+      };
+      if (next.emoji !== moduleDef.emoji) changed = true;
+      return next;
+    });
   }
   if (!user.goals) {
     user.goals = { daily: 10, weekly: 70, monthly: 300 };
