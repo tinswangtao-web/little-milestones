@@ -32,6 +32,7 @@
 - 2026-04-22 12:50 [codex] completed tiny follow-up patch only: added isRendering guard in DailyScoringModal.renderModal(), invalidated cache after renameUserInFiles(), rebuilt artifacts, synced to Vault, verified manifest/main/styles hashes
 - 2026-04-22 13:05 [codex] handled prerelease follow-up request narrowly: confirmed renderModal guard and rename cache invalidation were already in place, added only the requested mobile drag-handle hit-area sizing in styles/07-mobile.css, rebuilt artifacts, synced to Vault, verified manifest/main/styles hashes
 - 2026-04-22 13:20 [codex] cleaned duplicate STATE write-scope entry and prepared the prerelease follow-up fixes for commit without staging unrelated .DS_Store noise
+- 2026-04-22 13:35 [codex] removed tracked/untracked .DS_Store leftovers and obsolete kimi prerelease review file, then updated .agents state for a clean repository handoff
 
 - 2026-04-22 10:35 [kimi] completed post-fix targeted review per user request; filed `.agents/reviews/2026-04-22-kimi-postfix-review.md`; focused on 5 areas: (1) CRLF compatibility — 2 regex locations in day-data-store.ts still hardcode \n, (2) renameUserInFiles — still regex-based with YAML quote / title format fragility, (3) performance — getAllScores still no cache, stats panel still O(n×m), (4) import validation — missing duplicate-id / integer-points / category-validity checks, (5) regression — streak/week/month/childName/goals/customItems schema all confirmed fixed; recommended top-5 priority fixes for codex.
 
