@@ -1,4 +1,4 @@
-import { formatDate } from "../../utils/date";
+import { formatDate, parseDateString } from "../../utils/date";
 
 interface OpenCalendarPickerOptions {
   currentDate: string;
@@ -16,7 +16,7 @@ export function openCalendarPicker({
   const popup = document.createElement("div");
   popup.className = "kid-score-calendar-popup";
 
-  let viewDate = new Date(currentDate + "T00:00:00");
+  let viewDate = parseDateString(currentDate);
 
   const header = popup.createDiv({ cls: "cal-header" });
   const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "◀" });

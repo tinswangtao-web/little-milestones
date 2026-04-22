@@ -49,6 +49,7 @@ export interface User {
 }
 
 export interface DayData {
+  schemaVersion?: number;
   date: string;
   child: string;
   total: number;
@@ -83,6 +84,7 @@ export interface DayReport {
   scores: Record<string, number>;
   customItems: CustomScoreItem[];
   diaryContent: string;
+  goals: UserGoals;
 
   total: number;
   earnedCount: number;

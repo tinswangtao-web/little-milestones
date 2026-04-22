@@ -2,6 +2,7 @@ import { makeDefaultDiaryModules } from "../../constants";
 import { parseDiaryModules } from "../../diary/modules";
 import type { CustomScoreItem, DayData, DiaryModuleValues } from "../../types";
 import type KidScorePlugin from "../../main";
+import { shiftDateString } from "../../utils/date";
 
 export interface DailyModalStateSnapshot {
   yesterdayData: DayData | null;
@@ -16,9 +17,7 @@ export async function loadDailyModalState(
   plugin: KidScorePlugin,
   dateStr: string
 ): Promise<DailyModalStateSnapshot> {
-  const yesterday = new Date(dateStr + "T00:00:00");
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const yesterdayStr = shiftDateString(dateStr, -1);
 
   const existingToday = await plugin.readDayData(dateStr);
   const yesterdayData = await plugin.readDayData(yesterdayStr);

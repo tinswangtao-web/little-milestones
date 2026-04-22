@@ -1,7 +1,7 @@
 import { Notice, Component } from "obsidian";
 import type { App } from "obsidian";
 import { BaseMobileModal } from "../ui/base-mobile-modal";
-import { formatDate } from "../utils/date";
+import { formatDate, shiftDateString } from "../utils/date";
 import { makeDefaultDiaryModules } from "../constants";
 import type {
   ScoreItem,
@@ -88,15 +88,11 @@ export class DailyScoringModal extends BaseMobileModal {
       dateStr: this.dateStr,
       allScores: state.allScores,
       onPrevDay: () => {
-        const d = new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() - 1);
-        self.dateStr = d.toISOString().slice(0, 10);
+        self.dateStr = shiftDateString(self.dateStr, -1);
         self.renderModal();
       },
       onNextDay: () => {
-        const d = new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() + 1);
-        self.dateStr = d.toISOString().slice(0, 10);
+        self.dateStr = shiftDateString(self.dateStr, 1);
         self.renderModal();
       },
       onCalendar: () => self.showCalendarPicker(),

@@ -2,6 +2,7 @@ import type { DayData, DayReport, ScoreItem, CustomScoreItem } from "../types";
 import type KidScorePlugin from "../main";
 import { makeDefaultDiaryModules } from "../constants";
 import { readDiaryLine } from "../diary/modules";
+import { countPositiveDateStreak, shiftDateString } from "../utils/date";
 
 export class DayDataComposer {
   constructor(private plugin: KidScorePlugin) {}
@@ -15,9 +16,7 @@ export class DayDataComposer {
     const items = this.plugin.currentUser.items;
     const childName = this.plugin.currentUser.name;
 
-    const d = new Date(dateStr + "T00:00:00");
-    d.setDate(d.getDate() - 1);
-    const yesterdayStr = d.toISOString().slice(0, 10);
+    const yesterdayStr = shiftDateString(dateStr, -1);
     const yesterdayData = await this.plugin.readDayData(yesterdayStr);
 
     let total = 0;
@@ -65,15 +64,13 @@ export class DayDataComposer {
     const grandDays = cumulativeDays + 1;
     const grandAvg = grandDays > 0 ? Math.round((grandTotal / grandDays) * 10) / 10 : 0;
 
-    let streak = 0;
-    const sortedScores = [...allScores].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    const streak = countPositiveDateStreak(
+      [
+        ...allScores.filter((score) => score.date !== dateStr),
+        { date: dateStr, total },
+      ],
+      dateStr
     );
-    for (const s of sortedScores) {
-      if (s.total > 0) streak++;
-      else break;
-    }
-    if (total > 0) streak++;
 
     const diaryText = diaryContent || "";
     const diaryModules =
@@ -96,6 +93,7 @@ export class DayDataComposer {
       scores,
       customItems,
       diaryContent,
+      goals: this.plugin.currentUser.goals,
       total,
       earnedCount,
       missedCount,

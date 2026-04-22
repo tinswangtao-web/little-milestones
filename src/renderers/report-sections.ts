@@ -1,40 +1,30 @@
+import { stringifyYaml } from "obsidian";
 import type { CustomScoreItem, DayReport, ScoreItem } from "../types";
-import { toYamlInline } from "../utils/yaml";
 
 export function buildFrontmatter(report: DayReport): string {
-  const scoresYaml = report.items
-    .map((item) => "  " + item.id + ": " + (report.scores[item.id] || 0))
-    .join("\n");
+  const scoresYaml = Object.fromEntries(
+    report.items.map((item) => [item.id, report.scores[item.id] || 0])
+  );
 
-  let customYaml = "";
+  const frontmatter: Record<string, unknown> = {
+    schemaVersion: 2,
+    date: report.dateStr,
+    child: report.childName,
+    total: report.total,
+    scores: scoresYaml,
+  };
+
   if (report.customItems.length > 0) {
-    customYaml =
-      "\ncustomItems:\n" +
-      report.customItems
-        .map(
-          (item) =>
-            "  - " + toYamlInline(item.emoji + "|" + item.name + "|" + item.points)
-        )
-        .join("\n");
+    frontmatter.customItems = report.customItems.map((item) => ({
+      id: item.id,
+      emoji: item.emoji,
+      name: item.name,
+      points: item.points,
+      ...(item.note && item.note.trim() ? { note: item.note.trim() } : {}),
+    }));
   }
 
-  return (
-    "---\n" +
-    "date: " +
-    report.dateStr +
-    "\n" +
-    "child: " +
-    report.childName +
-    "\n" +
-    "total: " +
-    report.total +
-    "\n" +
-    "scores:\n" +
-    scoresYaml +
-    customYaml +
-    "\n" +
-    "---\n\n"
-  );
+  return "---\n" + stringifyYaml(frontmatter).trimEnd() + "\n---\n\n";
 }
 
 export function buildSummaryCallout(report: DayReport): string {
@@ -84,7 +74,7 @@ export function buildSummaryCallout(report: DayReport): string {
 }
 
 export function buildGoalCallout(report: DayReport): string {
-  const dailyGoal = 10;
+  const dailyGoal = report.goals.daily || 10;
   const goalPct = Math.min(
     100,
     Math.round((report.earnedCount / dailyGoal) * 100)

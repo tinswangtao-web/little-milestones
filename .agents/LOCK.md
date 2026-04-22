@@ -1,7 +1,7 @@
 ## Write Lock
 - `owner`: none
-- `since`: none
+- `since`: -
 - `scope`: none
-- `reason`: none
-- `expires-at`: none
-- `notes`: Lock released after codex removed hardcoded '小朋友' wording and re-synced Vault.
+- `reason`: lock released after ChatGPT data-layer safety pass
+- `expires-at`: -
+- `notes`: Primary workspace only. Future review-only turns from other AIs should stay read-only unless the user explicitly authorizes a coding exception.

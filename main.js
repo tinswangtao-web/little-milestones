@@ -22,7 +22,7 @@ __export(main_exports, {
   default: () => KidScorePlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian19 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 
 // src/data/emoji-data.ts
 var EMOJI_DATA = {
@@ -1512,10 +1512,84 @@ var BaseMobileModal = class extends import_obsidian.Modal {
 };
 
 // src/utils/date.ts
-function formatDate(offset = 0) {
-  const d = /* @__PURE__ */ new Date();
+var DAY_MS = 24 * 60 * 60 * 1e3;
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+function formatLocalDate(date) {
+  return date.getFullYear() + "-" + pad2(date.getMonth() + 1) + "-" + pad2(date.getDate());
+}
+function parseDateString(dateStr) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!match) throw new Error("Invalid date string: " + dateStr);
+  return new Date(
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+    0,
+    0,
+    0,
+    0
+  );
+}
+function isValidDateString(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+function formatDate(offset = 0, baseDate = /* @__PURE__ */ new Date()) {
+  const d = new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
   d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
+  return formatLocalDate(d);
+}
+function shiftDateString(dateStr, offset) {
+  const date = parseDateString(dateStr);
+  date.setDate(date.getDate() + offset);
+  return formatLocalDate(date);
+}
+function compareDateStrings(a, b) {
+  return a.localeCompare(b);
+}
+function getStartOfWeekString(baseDate = /* @__PURE__ */ new Date()) {
+  const date = new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+    0,
+    0,
+    0,
+    0
+  );
+  const weekdayIndex = (date.getDay() + 6) % 7;
+  date.setDate(date.getDate() - weekdayIndex);
+  return formatLocalDate(date);
+}
+function countPositiveDateStreak(records, anchorDate) {
+  if (!records.length && !anchorDate) return 0;
+  const totalsByDate = /* @__PURE__ */ new Map();
+  for (const record of records) {
+    if (isValidDateString(record.date)) {
+      totalsByDate.set(record.date, record.total);
+    }
+  }
+  const currentDate = anchorDate || (() => {
+    const sortedDates = Array.from(totalsByDate.keys()).sort(compareDateStrings);
+    return sortedDates[sortedDates.length - 1];
+  })();
+  if (!currentDate) return 0;
+  let streak = 0;
+  let cursor = currentDate;
+  while ((totalsByDate.get(cursor) || 0) > 0) {
+    streak++;
+    cursor = shiftDateString(cursor, -1);
+  }
+  return streak;
 }
 
 // src/modals/panels/stats-panel.ts
@@ -1561,9 +1635,8 @@ function renderStatsPanel(statsBody, plugin, allScores, period) {
 function filterScores(period, scores) {
   const today = /* @__PURE__ */ new Date();
   if (period === "week") {
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() + 1);
-    return scores.filter((score) => score.date >= weekStart.toISOString().slice(0, 10));
+    const weekStart = getStartOfWeekString(today);
+    return scores.filter((score) => score.date >= weekStart);
   }
   if (period === "month") {
     const monthStart = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, "0") + "-01";
@@ -1714,13 +1787,7 @@ function isItemDone(item, val) {
   return isDeduct ? val !== 0 : val > 0;
 }
 function countPositiveStreak(filtered) {
-  let streak = 0;
-  const sortedScores = filtered.slice().sort((a, b) => +new Date(b.date) - +new Date(a.date));
-  for (const score of sortedScores) {
-    if (score.total > 0) streak++;
-    else break;
-  }
-  return streak;
+  return countPositiveDateStreak(filtered);
 }
 function drawBarChart(canvas, data) {
   const ctx = canvas.getContext("2d");
@@ -1872,7 +1939,7 @@ function openCalendarPicker({
   overlay.className = "kid-score-value-overlay";
   const popup = document.createElement("div");
   popup.className = "kid-score-calendar-popup";
-  let viewDate = /* @__PURE__ */ new Date(currentDate + "T00:00:00");
+  let viewDate = parseDateString(currentDate);
   const header = popup.createDiv({ cls: "cal-header" });
   const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25C0" });
   const monthLabel = header.createEl("span", { cls: "cal-month-label" });
@@ -3282,9 +3349,7 @@ function composeDiaryContent(values, moduleConfig) {
 
 // src/modals/helpers/daily-modal-state.ts
 async function loadDailyModalState(plugin, dateStr) {
-  const yesterday = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toISOString().slice(0, 10);
+  const yesterdayStr = shiftDateString(dateStr, -1);
   const existingToday = await plugin.readDayData(dateStr);
   const yesterdayData = await plugin.readDayData(yesterdayStr);
   const allScores = await plugin.getAllScores();
@@ -3955,15 +4020,11 @@ var DailyScoringModal = class extends BaseMobileModal {
       dateStr: this.dateStr,
       allScores: state.allScores,
       onPrevDay: () => {
-        const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() - 1);
-        self.dateStr = d.toISOString().slice(0, 10);
+        self.dateStr = shiftDateString(self.dateStr, -1);
         self.renderModal();
       },
       onNextDay: () => {
-        const d = /* @__PURE__ */ new Date(self.dateStr + "T00:00:00");
-        d.setDate(d.getDate() + 1);
-        self.dateStr = d.toISOString().slice(0, 10);
+        self.dateStr = shiftDateString(self.dateStr, 1);
         self.renderModal();
       },
       onCalendar: () => self.showCalendarPicker(),
@@ -4771,7 +4832,11 @@ function renderImportExportSettings({
   containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
   new import_obsidian13.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
     btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
-      const data = { categories: plugin.currentUser.categories, items: plugin.currentUser.items };
+      const data = {
+        schemaVersion: 1,
+        categories: plugin.currentUser.categories,
+        items: plugin.currentUser.items
+      };
       const json = JSON.stringify(data, null, 2);
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -4793,18 +4858,62 @@ function renderImportExportSettings({
         try {
           const text = await file.text();
           const data = JSON.parse(text);
-          if (Array.isArray(data.items)) plugin.currentUser.items = data.items;
-          if (Array.isArray(data.categories)) plugin.currentUser.categories = data.categories;
+          const parsed = parseImportedConfig(data);
+          plugin.currentUser.items = parsed.items;
+          plugin.currentUser.categories = parsed.categories;
           await plugin.saveSettings();
           refresh();
           new import_obsidian13.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
         } catch (e) {
-          new import_obsidian13.Notice("\u274C JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25");
+          new import_obsidian13.Notice(
+            "\u274C " + (e instanceof Error ? e.message : "JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25")
+          );
         }
       };
       fileInput.click();
     });
   });
+}
+function parseImportedConfig(data) {
+  if (!data || typeof data !== "object") {
+    throw new Error("\u5BFC\u5165\u6587\u4EF6\u5185\u5BB9\u4E0D\u662F\u6709\u6548\u5BF9\u8C61");
+  }
+  const raw = data;
+  if (!Array.isArray(raw.categories) || !raw.categories.every((v) => typeof v === "string")) {
+    throw new Error("categories \u5FC5\u987B\u662F\u5B57\u7B26\u4E32\u6570\u7EC4");
+  }
+  if (!Array.isArray(raw.items)) {
+    throw new Error("items \u5FC5\u987B\u662F\u6570\u7EC4");
+  }
+  const items = raw.items.map((item, index) => parseImportedItem(item, index));
+  return {
+    categories: raw.categories.map((category) => category.trim()).filter(Boolean),
+    items
+  };
+}
+function parseImportedItem(item, index) {
+  if (!item || typeof item !== "object") {
+    throw new Error("\u7B2C " + (index + 1) + " \u4E2A\u6253\u5206\u9879\u4E0D\u662F\u6709\u6548\u5BF9\u8C61");
+  }
+  const raw = item;
+  const id = typeof raw.id === "string" && raw.id.trim() ? raw.id.trim() : null;
+  const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : null;
+  const emoji = typeof raw.emoji === "string" ? raw.emoji : "";
+  const category = typeof raw.category === "string" ? raw.category : "";
+  const points = Number(raw.points);
+  if (!id) throw new Error("\u7B2C " + (index + 1) + " \u4E2A\u6253\u5206\u9879\u7F3A\u5C11 id");
+  if (!name) throw new Error("\u7B2C " + (index + 1) + " \u4E2A\u6253\u5206\u9879\u7F3A\u5C11\u540D\u79F0");
+  if (!Number.isFinite(points)) {
+    throw new Error("\u7B2C " + (index + 1) + " \u4E2A\u6253\u5206\u9879 points \u975E\u6CD5");
+  }
+  return {
+    id,
+    name,
+    emoji,
+    points,
+    category,
+    ...typeof raw.note === "string" && raw.note.trim() ? { note: raw.note.trim() } : {}
+  };
 }
 
 // src/settings/item-settings.ts
@@ -5609,7 +5718,7 @@ function ensureUserDefaults(user) {
 }
 
 // src/storage/day-data-store.ts
-var import_obsidian18 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 
 // src/composers/day-data-composer.ts
 var DayDataComposer = class {
@@ -5619,9 +5728,7 @@ var DayDataComposer = class {
   async compose(dateStr, scores, customItems, diaryContent) {
     const items = this.plugin.currentUser.items;
     const childName = this.plugin.currentUser.name;
-    const d = /* @__PURE__ */ new Date(dateStr + "T00:00:00");
-    d.setDate(d.getDate() - 1);
-    const yesterdayStr = d.toISOString().slice(0, 10);
+    const yesterdayStr = shiftDateString(dateStr, -1);
     const yesterdayData = await this.plugin.readDayData(yesterdayStr);
     let total = 0;
     let earnedCount = 0;
@@ -5665,15 +5772,13 @@ var DayDataComposer = class {
     const grandTotal = cumulativeTotal + total;
     const grandDays = cumulativeDays + 1;
     const grandAvg = grandDays > 0 ? Math.round(grandTotal / grandDays * 10) / 10 : 0;
-    let streak = 0;
-    const sortedScores = [...allScores].sort(
-      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    const streak = countPositiveDateStreak(
+      [
+        ...allScores.filter((score) => score.date !== dateStr),
+        { date: dateStr, total }
+      ],
+      dateStr
     );
-    for (const s of sortedScores) {
-      if (s.total > 0) streak++;
-      else break;
-    }
-    if (total > 0) streak++;
     const diaryText = diaryContent || "";
     const diaryModules = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
     const weatherModule = diaryModules.find((moduleDef) => moduleDef.id === "weather");
@@ -5690,6 +5795,7 @@ var DayDataComposer = class {
       scores,
       customItems,
       diaryContent,
+      goals: this.plugin.currentUser.goals,
       total,
       earnedCount,
       missedCount,
@@ -5723,22 +5829,29 @@ var DayDataComposer = class {
   }
 };
 
-// src/utils/yaml.ts
-function toYamlInline(value) {
-  const safe = String(value == null ? "" : value).replace(/\r\n/g, "\n").replace(/\r/g, "\n").replace(/\n/g, "\\n").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return '"' + safe + '"';
-}
-
 // src/renderers/report-sections.ts
+var import_obsidian18 = require("obsidian");
 function buildFrontmatter(report) {
-  const scoresYaml = report.items.map((item) => "  " + item.id + ": " + (report.scores[item.id] || 0)).join("\n");
-  let customYaml = "";
+  const scoresYaml = Object.fromEntries(
+    report.items.map((item) => [item.id, report.scores[item.id] || 0])
+  );
+  const frontmatter = {
+    schemaVersion: 2,
+    date: report.dateStr,
+    child: report.childName,
+    total: report.total,
+    scores: scoresYaml
+  };
   if (report.customItems.length > 0) {
-    customYaml = "\ncustomItems:\n" + report.customItems.map(
-      (item) => "  - " + toYamlInline(item.emoji + "|" + item.name + "|" + item.points)
-    ).join("\n");
+    frontmatter.customItems = report.customItems.map((item) => ({
+      id: item.id,
+      emoji: item.emoji,
+      name: item.name,
+      points: item.points,
+      ...item.note && item.note.trim() ? { note: item.note.trim() } : {}
+    }));
   }
-  return "---\ndate: " + report.dateStr + "\nchild: " + report.childName + "\ntotal: " + report.total + "\nscores:\n" + scoresYaml + customYaml + "\n---\n\n";
+  return "---\n" + (0, import_obsidian18.stringifyYaml)(frontmatter).trimEnd() + "\n---\n\n";
 }
 function buildSummaryCallout(report) {
   const totalSign = report.total >= 0 ? "+" : "";
@@ -5752,7 +5865,7 @@ function buildSummaryCallout(report) {
   return summary;
 }
 function buildGoalCallout(report) {
-  const dailyGoal = 10;
+  const dailyGoal = report.goals.daily || 10;
   const goalPct = Math.min(
     100,
     Math.round(report.earnedCount / dailyGoal * 100)
@@ -5838,60 +5951,18 @@ var DayDataStore = class {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
-    if (!(file instanceof import_obsidian18.TFile)) return null;
+    if (!(file instanceof import_obsidian19.TFile)) return null;
     const content = await this.plugin.app.vault.read(file);
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    if (!fmMatch) return null;
-    const fm = fmMatch[1];
-    const totalMatch = fm.match(/total:\s*(-?\d+)/);
-    const total = totalMatch ? parseInt(totalMatch[1], 10) : 0;
-    const scores = {};
-    const scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
-    if (scoreBlock) {
-      for (const line of scoreBlock[1].split("\n")) {
-        const kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
-        if (kvNum) {
-          scores[kvNum[1]] = parseInt(kvNum[2], 10);
-          continue;
-        }
-        const kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
-        if (kvBool) {
-          const itemDef = this.plugin.currentUser.items.find(
-            (item) => item.id === kvBool[1]
-          );
-          scores[kvBool[1]] = kvBool[2] === "true" ? itemDef ? itemDef.points : 1 : 0;
-        }
-      }
-    }
-    const customItems = [];
-    const customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
-    if (customBlock) {
-      const lines = customBlock[1].split("\n");
-      for (const line of lines) {
-        const match = line.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
-        if (match) {
-          customItems.push({
-            id: "custom_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
-            emoji: match[1],
-            name: match[2],
-            points: parseInt(match[3], 10)
-          });
-        }
-      }
-    }
-    let diaryContent = "";
-    const diaryHeadingIdx = content.indexOf("## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0");
-    if (diaryHeadingIdx !== -1) {
-      diaryContent = content.slice(diaryHeadingIdx).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
-    } else {
-      const diaryIdx = content.indexOf(DIARY_MARKER);
-      if (diaryIdx !== -1) {
-        diaryContent = content.slice(diaryIdx + DIARY_MARKER.length).trim().replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
-      }
-    }
+    const frontmatter = this.readFrontmatterFromCache(file) || this.readFrontmatterFromContent(content);
+    if (!frontmatter) return null;
+    const scores = this.normalizeScores(frontmatter.scores);
+    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
+    const total = this.readTotal(frontmatter.total, scores, customItems);
+    const diaryContent = this.extractDiaryContent(content);
     return {
+      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
       date: dateStr,
-      child: this.plugin.currentUser.name,
+      child: this.readChildName(frontmatter.child),
       scores,
       customItems,
       total,
@@ -5909,32 +5980,29 @@ var DayDataStore = class {
         diaryContent
       );
       const fileContent = builder.build(report);
-      const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
-      if (!this.plugin.app.vault.getAbstractFileByPath(dirPath)) {
-        await this.plugin.app.vault.createFolder(dirPath);
-      }
+      await this.ensureFolder(this.plugin.currentUser.savePath);
       const filePath = this.plugin.filePath(dateStr);
       const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
-      if (existing instanceof import_obsidian18.TFile) {
+      if (existing instanceof import_obsidian19.TFile) {
         await this.plugin.app.vault.modify(existing, fileContent);
       } else {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
-      new import_obsidian18.Notice(
+      new import_obsidian19.Notice(
         "\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal
       );
     } catch (error) {
       console.error("[Little Milestones] saveDayData failed", error);
-      new import_obsidian18.Notice(
+      new import_obsidian19.Notice(
         "\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
       );
       throw error;
     }
   }
   async renameUserInFiles(oldName, newName) {
-    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -5968,28 +6036,28 @@ var DayDataStore = class {
     }
   }
   async migrateSavePath(oldPath, newPath) {
-    const oldDir = (0, import_obsidian18.normalizePath)(oldPath);
-    const newDir = (0, import_obsidian18.normalizePath)(newPath);
+    const oldDir = (0, import_obsidian19.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian19.normalizePath)(newPath);
     if (oldDir === newDir) return;
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
     );
     if (files.length === 0) return;
-    if (!this.plugin.app.vault.getAbstractFileByPath(newDir)) {
-      await this.plugin.app.vault.createFolder(newDir);
+    const conflicts = files.map((file) => (0, import_obsidian19.normalizePath)(newDir + "/" + file.name)).filter((targetPath) => {
+      const existing = this.plugin.app.vault.getAbstractFileByPath(targetPath);
+      return existing instanceof import_obsidian19.TFile;
+    });
+    if (conflicts.length > 0) {
+      throw new Error(
+        "\u65B0\u8DEF\u5F84\u4E2D\u5DF2\u5B58\u5728\u540C\u540D\u6587\u4EF6\uFF0C\u5DF2\u505C\u6B62\u81EA\u52A8\u8FC1\u79FB\uFF1A\n" + conflicts.join("\n")
+      );
     }
+    await this.ensureFolder(newDir);
     let errorCount = 0;
     for (const file of files) {
       try {
-        const newFilePath = (0, import_obsidian18.normalizePath)(newDir + "/" + file.name);
-        const existing = this.plugin.app.vault.getAbstractFileByPath(newFilePath);
-        if (existing instanceof import_obsidian18.TFile) {
-          const oldContent = await this.plugin.app.vault.read(file);
-          await this.plugin.app.vault.modify(existing, oldContent);
-          await this.plugin.app.vault.delete(file, true);
-        } else {
-          await this.plugin.app.vault.rename(file, newFilePath);
-        }
+        const newFilePath = (0, import_obsidian19.normalizePath)(newDir + "/" + file.name);
+        await this.plugin.app.vault.rename(file, newFilePath);
       } catch (error) {
         errorCount++;
         console.error(
@@ -6006,24 +6074,133 @@ var DayDataStore = class {
     }
   }
   async getAllScores() {
-    const dirPath = (0, import_obsidian18.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian19.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
     const results = [];
     for (const file of files) {
       const dateStr = file.basename;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      if (isValidDateString(dateStr)) {
         const score = await this.readDayData(dateStr);
         if (score) results.push(score);
       }
     }
-    return results.sort((a, b) => a.date.localeCompare(b.date));
+    return results.sort((a, b) => compareDateStrings(a.date, b.date));
+  }
+  readFrontmatterFromCache(file) {
+    var _a;
+    const cached = (_a = this.plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.frontmatter;
+    if (!cached || typeof cached !== "object") return null;
+    const { position, ...rest } = cached;
+    return rest;
+  }
+  readFrontmatterFromContent(content) {
+    const match = content.match(/^---\n([\s\S]*?)\n---\n?/);
+    if (!match) return null;
+    try {
+      const parsed = (0, import_obsidian19.parseYaml)(match[1]);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch (error) {
+      console.error("[Little Milestones] parse frontmatter failed", error);
+      return null;
+    }
+  }
+  normalizeScores(rawScores) {
+    const scores = {};
+    if (!rawScores || typeof rawScores !== "object") return scores;
+    for (const [itemId, rawValue] of Object.entries(rawScores)) {
+      if (typeof rawValue === "number" && Number.isFinite(rawValue)) {
+        scores[itemId] = rawValue;
+        continue;
+      }
+      if (typeof rawValue === "boolean") {
+        const itemDef = this.plugin.currentUser.items.find((item) => item.id === itemId);
+        scores[itemId] = rawValue ? itemDef ? itemDef.points : 1 : 0;
+      }
+    }
+    return scores;
+  }
+  normalizeCustomItems(rawCustomItems, dateStr) {
+    if (!Array.isArray(rawCustomItems)) return [];
+    return rawCustomItems.map((entry, index) => this.normalizeCustomItem(entry, dateStr, index)).filter((entry) => !!entry);
+  }
+  normalizeCustomItem(rawItem, dateStr, index) {
+    if (typeof rawItem === "string") {
+      const parts = rawItem.split("|");
+      if (parts.length < 3) return null;
+      const emoji2 = parts[0].trim();
+      const points2 = Number(parts[parts.length - 1]);
+      const name2 = parts.slice(1, -1).join("|").trim();
+      if (!name2 || !Number.isFinite(points2)) return null;
+      return {
+        id: "custom_" + dateStr.replace(/-/g, "") + "_" + index,
+        emoji: emoji2,
+        name: name2,
+        points: points2
+      };
+    }
+    if (!rawItem || typeof rawItem !== "object") return null;
+    const item = rawItem;
+    const name = this.readNonEmptyString(item.name);
+    const emoji = this.readNonEmptyString(item.emoji) || "";
+    const points = Number(item.points);
+    if (!name || !Number.isFinite(points)) return null;
+    return {
+      id: this.readNonEmptyString(item.id) || "custom_" + dateStr.replace(/-/g, "") + "_" + index,
+      name,
+      emoji,
+      points,
+      ...this.readNonEmptyString(item.note) ? { note: String(item.note).trim() } : {}
+    };
+  }
+  readTotal(rawTotal, scores, customItems) {
+    if (typeof rawTotal === "number" && Number.isFinite(rawTotal)) return rawTotal;
+    const scoreTotal = Object.values(scores).reduce((sum, value) => sum + value, 0);
+    const customTotal = customItems.reduce((sum, item) => sum + item.points, 0);
+    return scoreTotal + customTotal;
+  }
+  extractDiaryContent(content) {
+    const body = content.replace(/^---\n[\s\S]*?\n---\n?/, "");
+    const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
+    if ((diaryHeadingMatch == null ? void 0 : diaryHeadingMatch.index) !== void 0) {
+      return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();
+    }
+    const diaryIdx = body.indexOf(DIARY_MARKER);
+    if (diaryIdx !== -1) {
+      return body.slice(diaryIdx + DIARY_MARKER.length).replace(/^##\s*📝\s*今日日记\s*\n?/, "").trim();
+    }
+    return "";
+  }
+  readSchemaVersion(rawSchemaVersion) {
+    const version = Number(rawSchemaVersion);
+    return Number.isFinite(version) ? version : void 0;
+  }
+  readChildName(rawChild) {
+    return this.readNonEmptyString(rawChild) || this.plugin.currentUser.name;
+  }
+  readNonEmptyString(value) {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+  async ensureFolder(dirPath) {
+    const normalized = (0, import_obsidian19.normalizePath)(dirPath);
+    if (!normalized || normalized === "/") return;
+    if (this.plugin.app.vault.getAbstractFileByPath(normalized)) return;
+    const segments = normalized.split("/").filter(Boolean);
+    let currentPath = "";
+    for (const segment of segments) {
+      currentPath = currentPath ? currentPath + "/" + segment : segment;
+      if (!this.plugin.app.vault.getAbstractFileByPath(currentPath)) {
+        await this.plugin.app.vault.createFolder(currentPath);
+      }
+    }
   }
 };
 
 // src/main.ts
-var KidScorePlugin = class extends import_obsidian19.Plugin {
+var KidScorePlugin = class extends import_obsidian20.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -6077,7 +6254,7 @@ var KidScorePlugin = class extends import_obsidian19.Plugin {
     return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
   }
   filePath(dateStr) {
-    return (0, import_obsidian19.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian20.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
   async readDayData(dateStr) {
     return this.dayDataStore.readDayData(dateStr);

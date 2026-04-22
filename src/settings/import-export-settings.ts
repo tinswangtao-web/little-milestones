@@ -1,5 +1,6 @@
 import { Notice, Setting } from "obsidian";
 import type KidScorePlugin from "../main";
+import type { ScoreItem } from "../types";
 
 interface RenderImportExportSettingsOptions {
   plugin: KidScorePlugin;
@@ -19,7 +20,11 @@ export function renderImportExportSettings({
     .setDesc("将所有分类和打分项导出为 JSON 文件")
     .addButton((btn) => {
       btn.setButtonText("📤 导出").onClick(() => {
-        const data = { categories: plugin.currentUser.categories, items: plugin.currentUser.items };
+        const data = {
+          schemaVersion: 1,
+          categories: plugin.currentUser.categories,
+          items: plugin.currentUser.items,
+        };
         const json = JSON.stringify(data, null, 2);
         const blob = new Blob([json], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -45,16 +50,72 @@ export function renderImportExportSettings({
           try {
             const text = await file.text();
             const data = JSON.parse(text);
-            if (Array.isArray(data.items)) plugin.currentUser.items = data.items;
-            if (Array.isArray(data.categories)) plugin.currentUser.categories = data.categories;
+            const parsed = parseImportedConfig(data);
+            plugin.currentUser.items = parsed.items;
+            plugin.currentUser.categories = parsed.categories;
             await plugin.saveSettings();
             refresh();
             new Notice("✅ 配置导入成功");
           } catch (e) {
-            new Notice("❌ JSON 格式有误，导入失败");
+            new Notice(
+              "❌ " + (e instanceof Error ? e.message : "JSON 格式有误，导入失败")
+            );
           }
         };
         fileInput.click();
       });
     });
+}
+
+function parseImportedConfig(data: unknown): {
+  categories: string[];
+  items: ScoreItem[];
+} {
+  if (!data || typeof data !== "object") {
+    throw new Error("导入文件内容不是有效对象");
+  }
+
+  const raw = data as Record<string, unknown>;
+  if (!Array.isArray(raw.categories) || !raw.categories.every((v) => typeof v === "string")) {
+    throw new Error("categories 必须是字符串数组");
+  }
+  if (!Array.isArray(raw.items)) {
+    throw new Error("items 必须是数组");
+  }
+
+  const items = raw.items.map((item, index) => parseImportedItem(item, index));
+  return {
+    categories: raw.categories.map((category) => category.trim()).filter(Boolean),
+    items,
+  };
+}
+
+function parseImportedItem(item: unknown, index: number): ScoreItem {
+  if (!item || typeof item !== "object") {
+    throw new Error("第 " + (index + 1) + " 个打分项不是有效对象");
+  }
+
+  const raw = item as Record<string, unknown>;
+  const id = typeof raw.id === "string" && raw.id.trim() ? raw.id.trim() : null;
+  const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : null;
+  const emoji = typeof raw.emoji === "string" ? raw.emoji : "";
+  const category = typeof raw.category === "string" ? raw.category : "";
+  const points = Number(raw.points);
+
+  if (!id) throw new Error("第 " + (index + 1) + " 个打分项缺少 id");
+  if (!name) throw new Error("第 " + (index + 1) + " 个打分项缺少名称");
+  if (!Number.isFinite(points)) {
+    throw new Error("第 " + (index + 1) + " 个打分项 points 非法");
+  }
+
+  return {
+    id,
+    name,
+    emoji,
+    points,
+    category,
+    ...(typeof raw.note === "string" && raw.note.trim()
+      ? { note: raw.note.trim() }
+      : {}),
+  };
 }

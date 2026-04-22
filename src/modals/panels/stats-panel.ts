@@ -1,5 +1,6 @@
 import type KidScorePlugin from "../../main";
 import type { DayData, ScoreItem, StatsPeriod } from "../../types";
+import { countPositiveDateStreak, getStartOfWeekString } from "../../utils/date";
 
 export function renderStatsPanel(
   statsBody: HTMLElement,
@@ -55,9 +56,8 @@ export function renderStatsPanel(
 export function filterScores(period: StatsPeriod, scores: DayData[]): DayData[] {
   const today = new Date();
   if (period === "week") {
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() + 1);
-    return scores.filter((score) => score.date >= weekStart.toISOString().slice(0, 10));
+    const weekStart = getStartOfWeekString(today);
+    return scores.filter((score) => score.date >= weekStart);
   }
   if (period === "month") {
     const monthStart =
@@ -253,15 +253,7 @@ function isItemDone(item: ScoreItem, val: number): boolean {
 }
 
 function countPositiveStreak(filtered: DayData[]): number {
-  let streak = 0;
-  const sortedScores = filtered
-    .slice()
-    .sort((a, b) => +new Date(b.date) - +new Date(a.date));
-  for (const score of sortedScores) {
-    if (score.total > 0) streak++;
-    else break;
-  }
-  return streak;
+  return countPositiveDateStreak(filtered);
 }
 
 function drawBarChart(canvas: HTMLCanvasElement, data: DayData[]): void {

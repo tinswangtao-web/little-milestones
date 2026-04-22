@@ -1,9 +1,12 @@
-import { Notice, TFile, normalizePath } from "obsidian";
+import { Notice, TFile, normalizePath, parseYaml } from "obsidian";
 import type { CustomScoreItem, DayData } from "../types";
 import type KidScorePlugin from "../main";
 import { DIARY_MARKER } from "../constants";
 import { DayDataComposer } from "../composers/day-data-composer";
 import { MarkdownReportBuilder } from "../renderers/report-builder";
+import { compareDateStrings, isValidDateString } from "../utils/date";
+
+type FrontmatterData = Record<string, unknown>;
 
 export class DayDataStore {
   constructor(private plugin: KidScorePlugin) {}
@@ -15,75 +18,19 @@ export class DayDataStore {
     if (!(file instanceof TFile)) return null;
 
     const content = await this.plugin.app.vault.read(file);
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
-    if (!fmMatch) return null;
-    const fm = fmMatch[1];
+    const frontmatter =
+      this.readFrontmatterFromCache(file) || this.readFrontmatterFromContent(content);
+    if (!frontmatter) return null;
 
-    const totalMatch = fm.match(/total:\s*(-?\d+)/);
-    const total = totalMatch ? parseInt(totalMatch[1], 10) : 0;
-
-    const scores: Record<string, number> = {};
-    const scoreBlock = fm.match(/scores:\s*\n([\s\S]*?)(?=\n\w|$)/);
-    if (scoreBlock) {
-      for (const line of scoreBlock[1].split("\n")) {
-        const kvNum = line.match(/\s+(item_\d+):\s*(-?\d+)/);
-        if (kvNum) {
-          scores[kvNum[1]] = parseInt(kvNum[2], 10);
-          continue;
-        }
-        const kvBool = line.match(/\s+(item_\d+):\s*(true|false)/);
-        if (kvBool) {
-          const itemDef = this.plugin.currentUser.items.find(
-            (item) => item.id === kvBool[1]
-          );
-          scores[kvBool[1]] =
-            kvBool[2] === "true" ? (itemDef ? itemDef.points : 1) : 0;
-        }
-      }
-    }
-
-    const customItems: CustomScoreItem[] = [];
-    const customBlock = fm.match(/customItems:\s*\n((?:\s+-\s*"[^"]*"\n?)*)/);
-    if (customBlock) {
-      const lines = customBlock[1].split("\n");
-      for (const line of lines) {
-        const match = line.match(/-\s*"(.+?)\|(.+?)\|(-?\d+)"/);
-        if (match) {
-          customItems.push({
-            id:
-              "custom_" +
-              Date.now() +
-              "_" +
-              Math.random().toString(36).slice(2, 6),
-            emoji: match[1],
-            name: match[2],
-            points: parseInt(match[3], 10),
-          });
-        }
-      }
-    }
-
-    let diaryContent = "";
-    const diaryHeadingIdx = content.indexOf("## 📝 今日日记");
-    if (diaryHeadingIdx !== -1) {
-      diaryContent = content
-        .slice(diaryHeadingIdx)
-        .replace(/^##\s*📝\s*今日日记\s*\n?/, "")
-        .trim();
-    } else {
-      const diaryIdx = content.indexOf(DIARY_MARKER);
-      if (diaryIdx !== -1) {
-        diaryContent = content
-          .slice(diaryIdx + DIARY_MARKER.length)
-          .trim()
-          .replace(/^##\s*📝\s*今日日记\s*\n?/, "")
-          .trim();
-      }
-    }
+    const scores = this.normalizeScores(frontmatter.scores);
+    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
+    const total = this.readTotal(frontmatter.total, scores, customItems);
+    const diaryContent = this.extractDiaryContent(content);
 
     return {
+      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
       date: dateStr,
-      child: this.plugin.currentUser.name,
+      child: this.readChildName(frontmatter.child),
       scores,
       customItems,
       total,
@@ -108,10 +55,7 @@ export class DayDataStore {
       );
       const fileContent = builder.build(report);
 
-      const dirPath = normalizePath(this.plugin.currentUser.savePath);
-      if (!this.plugin.app.vault.getAbstractFileByPath(dirPath)) {
-        await this.plugin.app.vault.createFolder(dirPath);
-      }
+      await this.ensureFolder(this.plugin.currentUser.savePath);
 
       const filePath = this.plugin.filePath(dateStr);
       const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
@@ -196,22 +140,25 @@ export class DayDataStore {
       );
     if (files.length === 0) return;
 
-    if (!this.plugin.app.vault.getAbstractFileByPath(newDir)) {
-      await this.plugin.app.vault.createFolder(newDir);
+    const conflicts = files
+      .map((file) => normalizePath(newDir + "/" + file.name))
+      .filter((targetPath) => {
+        const existing = this.plugin.app.vault.getAbstractFileByPath(targetPath);
+        return existing instanceof TFile;
+      });
+    if (conflicts.length > 0) {
+      throw new Error(
+        "新路径中已存在同名文件，已停止自动迁移：\n" + conflicts.join("\n")
+      );
     }
+
+    await this.ensureFolder(newDir);
 
     let errorCount = 0;
     for (const file of files) {
       try {
         const newFilePath = normalizePath(newDir + "/" + file.name);
-        const existing = this.plugin.app.vault.getAbstractFileByPath(newFilePath);
-        if (existing instanceof TFile) {
-          const oldContent = await this.plugin.app.vault.read(file);
-          await this.plugin.app.vault.modify(existing, oldContent);
-          await this.plugin.app.vault.delete(file, true);
-        } else {
-          await this.plugin.app.vault.rename(file, newFilePath);
-        }
+        await this.plugin.app.vault.rename(file, newFilePath);
       } catch (error) {
         errorCount++;
         console.error(
@@ -240,12 +187,158 @@ export class DayDataStore {
 
     for (const file of files) {
       const dateStr = file.basename;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      if (isValidDateString(dateStr)) {
         const score = await this.readDayData(dateStr);
         if (score) results.push(score);
       }
     }
 
-    return results.sort((a, b) => a.date.localeCompare(b.date));
+    return results.sort((a, b) => compareDateStrings(a.date, b.date));
+  }
+
+  private readFrontmatterFromCache(file: TFile): FrontmatterData | null {
+    const cached = this.plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+    if (!cached || typeof cached !== "object") return null;
+    const { position, ...rest } = cached as FrontmatterData & {
+      position?: unknown;
+    };
+    return rest;
+  }
+
+  private readFrontmatterFromContent(content: string): FrontmatterData | null {
+    const match = content.match(/^---\n([\s\S]*?)\n---\n?/);
+    if (!match) return null;
+    try {
+      const parsed = parseYaml(match[1]);
+      return parsed && typeof parsed === "object"
+        ? (parsed as FrontmatterData)
+        : null;
+    } catch (error) {
+      console.error("[Little Milestones] parse frontmatter failed", error);
+      return null;
+    }
+  }
+
+  private normalizeScores(rawScores: unknown): Record<string, number> {
+    const scores: Record<string, number> = {};
+    if (!rawScores || typeof rawScores !== "object") return scores;
+
+    for (const [itemId, rawValue] of Object.entries(rawScores as FrontmatterData)) {
+      if (typeof rawValue === "number" && Number.isFinite(rawValue)) {
+        scores[itemId] = rawValue;
+        continue;
+      }
+      if (typeof rawValue === "boolean") {
+        const itemDef = this.plugin.currentUser.items.find((item) => item.id === itemId);
+        scores[itemId] = rawValue ? (itemDef ? itemDef.points : 1) : 0;
+      }
+    }
+
+    return scores;
+  }
+
+  private normalizeCustomItems(rawCustomItems: unknown, dateStr: string): CustomScoreItem[] {
+    if (!Array.isArray(rawCustomItems)) return [];
+
+    return rawCustomItems
+      .map((entry, index) => this.normalizeCustomItem(entry, dateStr, index))
+      .filter((entry): entry is CustomScoreItem => !!entry);
+  }
+
+  private normalizeCustomItem(
+    rawItem: unknown,
+    dateStr: string,
+    index: number
+  ): CustomScoreItem | null {
+    if (typeof rawItem === "string") {
+      const parts = rawItem.split("|");
+      if (parts.length < 3) return null;
+      const emoji = parts[0].trim();
+      const points = Number(parts[parts.length - 1]);
+      const name = parts.slice(1, -1).join("|").trim();
+      if (!name || !Number.isFinite(points)) return null;
+      return {
+        id: "custom_" + dateStr.replace(/-/g, "") + "_" + index,
+        emoji,
+        name,
+        points,
+      };
+    }
+
+    if (!rawItem || typeof rawItem !== "object") return null;
+    const item = rawItem as FrontmatterData;
+    const name = this.readNonEmptyString(item.name);
+    const emoji = this.readNonEmptyString(item.emoji) || "";
+    const points = Number(item.points);
+    if (!name || !Number.isFinite(points)) return null;
+
+    return {
+      id:
+        this.readNonEmptyString(item.id) ||
+        "custom_" + dateStr.replace(/-/g, "") + "_" + index,
+      name,
+      emoji,
+      points,
+      ...(this.readNonEmptyString(item.note) ? { note: String(item.note).trim() } : {}),
+    };
+  }
+
+  private readTotal(
+    rawTotal: unknown,
+    scores: Record<string, number>,
+    customItems: CustomScoreItem[]
+  ): number {
+    if (typeof rawTotal === "number" && Number.isFinite(rawTotal)) return rawTotal;
+    const scoreTotal = Object.values(scores).reduce((sum, value) => sum + value, 0);
+    const customTotal = customItems.reduce((sum, item) => sum + item.points, 0);
+    return scoreTotal + customTotal;
+  }
+
+  private extractDiaryContent(content: string): string {
+    const body = content.replace(/^---\n[\s\S]*?\n---\n?/, "");
+    const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
+    if (diaryHeadingMatch?.index !== undefined) {
+      return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();
+    }
+
+    const diaryIdx = body.indexOf(DIARY_MARKER);
+    if (diaryIdx !== -1) {
+      return body
+        .slice(diaryIdx + DIARY_MARKER.length)
+        .replace(/^##\s*📝\s*今日日记\s*\n?/, "")
+        .trim();
+    }
+
+    return "";
+  }
+
+  private readSchemaVersion(rawSchemaVersion: unknown): number | undefined {
+    const version = Number(rawSchemaVersion);
+    return Number.isFinite(version) ? version : undefined;
+  }
+
+  private readChildName(rawChild: unknown): string {
+    return this.readNonEmptyString(rawChild) || this.plugin.currentUser.name;
+  }
+
+  private readNonEmptyString(value: unknown): string | null {
+    if (typeof value !== "string") return null;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : null;
+  }
+
+  private async ensureFolder(dirPath: string): Promise<void> {
+    const normalized = normalizePath(dirPath);
+    if (!normalized || normalized === "/") return;
+    if (this.plugin.app.vault.getAbstractFileByPath(normalized)) return;
+
+    const segments = normalized.split("/").filter(Boolean);
+    let currentPath = "";
+    for (const segment of segments) {
+      currentPath = currentPath ? currentPath + "/" + segment : segment;
+      if (!this.plugin.app.vault.getAbstractFileByPath(currentPath)) {
+        await this.plugin.app.vault.createFolder(currentPath);
+      }
+    }
   }
 }
