@@ -177,12 +177,15 @@
   color: var(--text-normal);
   font-size: 0.92em;
   box-sizing: border-box;
+  overflow-y: hidden;
 }
 
 .diary-module-input.is-multiline {
-  min-height: 88px;
+  min-height: 104px;
   resize: vertical;
   line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .diary-quick-row {
@@ -226,6 +229,19 @@
   box-sizing: border-box;
 }
 
+.diary-quick-value-input {
+  min-height: 54px;
+  line-height: 1.5;
+  resize: vertical;
+  overflow-y: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.diary-quick-text-input {
+  min-width: 0;
+}
+
 .diary-quick-emoji-row {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -249,9 +265,13 @@
 
 .diary-quick-custom-row {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) 88px;
+  grid-template-columns: 52px minmax(0, 1fr);
   gap: 8px;
-  align-items: center;
+  align-items: stretch;
+}
+
+.diary-quick-add-btn {
+  grid-column: 1 / -1;
 }
 
 .diary-quick-btn:hover {

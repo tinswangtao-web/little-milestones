@@ -527,6 +527,10 @@
     box-sizing: border-box;
   }
 
+  .diary-quick-value-input {
+    min-height: 52px;
+  }
+
   .diary-quick-emoji-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -542,9 +546,9 @@
 
   .diary-quick-custom-row {
     display: grid;
-    grid-template-columns: 52px minmax(0, 1fr) 72px;
+    grid-template-columns: 52px minmax(0, 1fr);
     gap: 8px;
-    align-items: center;
+    align-items: stretch;
   }
 
   .diary-quick-picker-btn,

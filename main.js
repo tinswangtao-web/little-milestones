@@ -2253,6 +2253,16 @@ function showEmojiPicker(callback, container) {
 }
 
 // src/modals/panels/diary-panel-fields.ts
+function attachAutoResize(input, minHeight = 88) {
+  const resize = () => {
+    input.style.height = "auto";
+    input.style.height = Math.max(minHeight, input.scrollHeight) + "px";
+  };
+  requestAnimationFrame(resize);
+  setTimeout(resize, 60);
+  input.addEventListener("input", resize);
+  input.addEventListener("focus", resize);
+}
 function createDiaryModuleField({
   moduleGrid,
   moduleDef,
@@ -2273,6 +2283,9 @@ function createDiaryModuleField({
     updateDiaryModules(diaryModules);
     syncAndRefresh();
   });
+  if (input instanceof HTMLTextAreaElement) {
+    attachAutoResize(input, 104);
+  }
   moduleFields.push({ key: moduleDef.id, input });
 }
 function createDiaryQuickGroup({
@@ -2290,18 +2303,19 @@ function createDiaryQuickGroup({
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
   const header = group.createDiv({ cls: "diary-quick-header" });
   header.createSpan({ cls: "diary-quick-label", text: moduleDef.label });
-  const valueInput = group.createEl("input", {
-    cls: "diary-quick-value-input",
-    type: "text"
+  const valueInput = group.createEl("textarea", {
+    cls: "diary-quick-value-input"
   });
   valueInput.placeholder = moduleDef.placeholder || "";
   valueInput.value = diaryModules[moduleDef.id] || "";
+  valueInput.rows = 1;
   bindModalInputFocus(valueInput, { scrollOnIOSFocus: false });
   valueInput.addEventListener("input", () => {
     diaryModules[moduleDef.id] = valueInput.value.trim();
     updateDiaryModules(diaryModules);
     syncAndRefresh();
   });
+  attachAutoResize(valueInput, 54);
   moduleFields.push({ key: moduleDef.id, input: valueInput });
   const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
   defaults.forEach((entry) => {
