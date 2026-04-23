@@ -7,7 +7,7 @@ import { renderGoalSettingsSection } from "./goal-settings-section";
 import { renderImportExportSettings } from "./import-export-settings";
 import { renderItemSettings } from "./item-settings";
 import { renderUserSettingsSection } from "./user-settings-section";
-import { isTouchDevice } from "../utils/platform";
+import { getMobilePlatform, isTouchDevice } from "../utils/platform";
 
 export class KidScoreSettingTab extends PluginSettingTab {
   plugin: KidScorePlugin;
@@ -75,7 +75,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
     // ── Touch-scroll guard: prevent keyboard pop-up on accidental swipe ──
     // When the user is scrolling the settings page with a finger, temporarily
     // set readonly on all text inputs so a sliding touch does not focus them.
-    if (isTouchDevice()) {
+    if (isTouchDevice() && getMobilePlatform() !== "desktop") {
       let touchStartX = 0;
       let touchStartY = 0;
       let touchMoved = false;
@@ -116,11 +116,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
 
       const onTouchEnd = () => {
         if (touchMoved) {
-          // Delay removal so the finger lift does not re-trigger focus
-          this.touchGuardReleaseTimer = window.setTimeout(
-            releaseReadonlyInputs,
-            40
-          );
+          this.touchGuardReleaseTimer = window.setTimeout(releaseReadonlyInputs, 16);
         }
       };
 

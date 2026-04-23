@@ -1305,6 +1305,7 @@ function setupModalKeyboard(modal) {
   const applyLayout = () => {
     const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     const vvTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+    const compactViewport = vvH < 520;
     cEl.style.position = "fixed";
     cEl.style.top = vvTop + "px";
     cEl.style.left = "0";
@@ -1318,9 +1319,10 @@ function setupModalKeyboard(modal) {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
-        mEl.style.maxHeight = Math.max(220, vvH - 12) + "px";
+        const keyboardMaxHeight = Math.max(compactViewport ? 180 : 220, vvH - (compactViewport ? 8 : 12));
+        mEl.style.maxHeight = keyboardMaxHeight + "px";
         if (platformIsIOS && isEditModal) {
-          mEl.style.height = Math.max(220, vvH - 12) + "px";
+          mEl.style.height = keyboardMaxHeight + "px";
         }
         const extraBottom = isEditModal ? 28 : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
@@ -1329,13 +1331,13 @@ function setupModalKeyboard(modal) {
         mEl.style.alignSelf = "";
         mEl.style.marginTop = "";
         mEl.style.marginBottom = "";
-        mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+        mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
         mEl.style.height = "";
         contentEl.style.paddingBottom = "";
         contentEl.style.scrollPaddingBottom = "";
       }
     } else {
-      mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+      mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
       mEl.style.height = "";
       updateModalLift(0);
     }
@@ -2086,7 +2088,7 @@ function getOverlayMount(containerEl) {
 function bindModalInputFocus(input, options = {}) {
   if (!input) return;
   const inp = input;
-  const isTouch = isTouchDevice();
+  const isTouch = isTouchDevice() && getMobilePlatform() !== "desktop";
   const platformIsIOS = isIOS();
   const {
     manualTouchFocus = true,
@@ -4634,9 +4636,10 @@ function renderDiaryModuleSettingsSection({
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
       const row = list.createDiv({ cls: "diary-module-settings-row" });
-      const main = row.createDiv({ cls: "diary-module-settings-main" });
-      const meta = row.createDiv({ cls: "diary-module-settings-meta" });
-      const actions2 = row.createDiv({ cls: "diary-module-settings-actions" });
+      const top = row.createDiv({ cls: "diary-module-settings-top" });
+      const main = top.createDiv({ cls: "diary-module-settings-main" });
+      const meta = top.createDiv({ cls: "diary-module-settings-meta" });
+      const actions2 = top.createDiv({ cls: "diary-module-settings-actions" });
       const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
       emojiField.createEl("label", {
         cls: "diary-module-settings-field-label",
@@ -4671,8 +4674,8 @@ function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
         render();
       };
-      const placeholderField = main.createDiv({
-        cls: "diary-module-settings-field is-wide"
+      const placeholderField = row.createDiv({
+        cls: "diary-module-settings-field is-wide is-full-row"
       });
       placeholderField.createEl("label", {
         cls: "diary-module-settings-field-label",
@@ -5651,7 +5654,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
       refresh: () => self.display()
     });
     this.detachTouchScrollGuard();
-    if (isTouchDevice()) {
+    if (isTouchDevice() && getMobilePlatform() !== "desktop") {
       let touchStartX = 0;
       let touchStartY = 0;
       let touchMoved = false;
@@ -5686,10 +5689,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
       };
       const onTouchEnd = () => {
         if (touchMoved) {
-          this.touchGuardReleaseTimer = window.setTimeout(
-            releaseReadonlyInputs,
-            40
-          );
+          this.touchGuardReleaseTimer = window.setTimeout(releaseReadonlyInputs, 16);
         }
       };
       const onTouchCancel = () => {

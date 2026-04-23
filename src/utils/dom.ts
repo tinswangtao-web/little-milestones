@@ -1,4 +1,4 @@
-import { isIOS, isTouchDevice } from "./platform";
+import { getMobilePlatform, isIOS, isTouchDevice } from "./platform";
 
 export function getOverlayMount(containerEl?: HTMLElement): HTMLElement {
   return document.body.classList.contains("is-mobile")
@@ -17,7 +17,7 @@ export function bindModalInputFocus(
 ): void {
   if (!input) return;
   const inp = input as HTMLInputElement;
-  const isTouch = isTouchDevice();
+  const isTouch = isTouchDevice() && getMobilePlatform() !== "desktop";
   const platformIsIOS = isIOS();
   const {
     manualTouchFocus = true,

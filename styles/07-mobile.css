@@ -882,9 +882,13 @@
   }
 
   .diary-module-settings-row {
-    grid-template-columns: 1fr;
     gap: 10px;
     padding: 10px;
+  }
+
+  .diary-module-settings-top {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .diary-module-settings-main {

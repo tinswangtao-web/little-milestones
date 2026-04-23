@@ -134,6 +134,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const applyLayout = () => {
     const vvH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     const vvTop = window.visualViewport ? window.visualViewport.offsetTop : 0;
+    const compactViewport = vvH < 520;
     cEl.style.position = "fixed";
     cEl.style.top = vvTop + "px";
     cEl.style.left = "0";
@@ -148,9 +149,10 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
-        mEl.style.maxHeight = Math.max(220, vvH - 12) + "px";
+        const keyboardMaxHeight = Math.max(compactViewport ? 180 : 220, vvH - (compactViewport ? 8 : 12));
+        mEl.style.maxHeight = keyboardMaxHeight + "px";
         if (platformIsIOS && isEditModal) {
-          mEl.style.height = Math.max(220, vvH - 12) + "px";
+          mEl.style.height = keyboardMaxHeight + "px";
         }
         const extraBottom = isEditModal ? 28 : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
@@ -159,13 +161,13 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.alignSelf = "";
         mEl.style.marginTop = "";
         mEl.style.marginBottom = "";
-        mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+        mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
         mEl.style.height = "";
         contentEl.style.paddingBottom = "";
         contentEl.style.scrollPaddingBottom = "";
       }
     } else {
-      mEl.style.maxHeight = Math.max(120, vvH - 32) + "px";
+      mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
       mEl.style.height = "";
       updateModalLift(0);
     }

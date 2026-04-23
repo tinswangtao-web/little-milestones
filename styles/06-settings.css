@@ -767,7 +767,6 @@
 
 .diary-module-settings-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px 44px;
   gap: 12px;
   align-items: start;
   padding: 12px;
@@ -776,9 +775,16 @@
   background: color-mix(in srgb, var(--background-secondary) 84%, transparent);
 }
 
+.diary-module-settings-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 156px 44px;
+  gap: 12px;
+  align-items: start;
+}
+
 .diary-module-settings-main {
   display: grid;
-  grid-template-columns: 88px minmax(180px, 220px) minmax(0, 1fr);
+  grid-template-columns: 88px minmax(220px, 280px);
   gap: 10px;
   align-items: start;
   min-width: 0;
@@ -803,6 +809,10 @@
 
 .diary-module-settings-field.is-emoji {
   align-self: start;
+}
+
+.diary-module-settings-field.is-full-row {
+  width: 100%;
 }
 
 .diary-module-settings-field-label {
@@ -835,7 +845,8 @@
   resize: vertical;
   overflow-y: hidden;
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .diary-module-settings-emoji-btn {

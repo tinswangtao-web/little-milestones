@@ -54,9 +54,10 @@ export function renderDiaryModuleSettingsSection({
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
       const row = list.createDiv({ cls: "diary-module-settings-row" });
-      const main = row.createDiv({ cls: "diary-module-settings-main" });
-      const meta = row.createDiv({ cls: "diary-module-settings-meta" });
-      const actions = row.createDiv({ cls: "diary-module-settings-actions" });
+      const top = row.createDiv({ cls: "diary-module-settings-top" });
+      const main = top.createDiv({ cls: "diary-module-settings-main" });
+      const meta = top.createDiv({ cls: "diary-module-settings-meta" });
+      const actions = top.createDiv({ cls: "diary-module-settings-actions" });
 
       const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
       emojiField.createEl("label", {
@@ -95,8 +96,8 @@ export function renderDiaryModuleSettingsSection({
         render();
       };
 
-      const placeholderField = main.createDiv({
-        cls: "diary-module-settings-field is-wide",
+      const placeholderField = row.createDiv({
+        cls: "diary-module-settings-field is-wide is-full-row",
       });
       placeholderField.createEl("label", {
         cls: "diary-module-settings-field-label",

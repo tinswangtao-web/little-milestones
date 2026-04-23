@@ -2557,7 +2557,6 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px 44px;
   gap: 12px;
   align-items: start;
   padding: 12px;
@@ -2566,9 +2565,16 @@ textarea.custom-form-name-input {
   background: color-mix(in srgb, var(--background-secondary) 84%, transparent);
 }
 
+.diary-module-settings-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 156px 44px;
+  gap: 12px;
+  align-items: start;
+}
+
 .diary-module-settings-main {
   display: grid;
-  grid-template-columns: 88px minmax(180px, 220px) minmax(0, 1fr);
+  grid-template-columns: 88px minmax(220px, 280px);
   gap: 10px;
   align-items: start;
   min-width: 0;
@@ -2593,6 +2599,10 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-field.is-emoji {
   align-self: start;
+}
+
+.diary-module-settings-field.is-full-row {
+  width: 100%;
 }
 
 .diary-module-settings-field-label {
@@ -2625,7 +2635,8 @@ textarea.custom-form-name-input {
   resize: vertical;
   overflow-y: hidden;
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .diary-module-settings-emoji-btn {
@@ -3519,9 +3530,13 @@ textarea.custom-form-name-input {
   }
 
   .diary-module-settings-row {
-    grid-template-columns: 1fr;
     gap: 10px;
     padding: 10px;
+  }
+
+  .diary-module-settings-top {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
 
   .diary-module-settings-main {
