@@ -1,7 +1,7 @@
 ## Write Lock
-- `owner`: none
-- `since`: -
-- `scope`: none
-- `reason`: lock released after desktop diary-module fix plus touch-platform follow-up, rebuild, and Vault sync
-- `expires-at`: -
-- `notes`: Primary workspace only. This pass repaired the desktop diary-module settings layout and restricted touch guards to true mobile platforms.
+- `owner`: codex
+- `since`: 2026-04-23 01:40
+- `scope`: .agents/**
+- `reason`: track kimi mobile UX review file in git and update collaboration records
+- `expires-at`: 2026-04-23 02:00
+- `notes`: Primary workspace only. Documentation/protocol update only; no plugin code changes in this turn.

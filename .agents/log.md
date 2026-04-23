@@ -38,6 +38,7 @@
 - 2026-04-23 00:55 [codex] implemented settings-page mobile follow-up from kimi review: replaced iOS category select with an inline category menu in 打分项目管理, rebuilt artifacts, synced to Vault, verified manifest/main/styles hashes
 - 2026-04-23 01:10 [codex] fixed the desktop diary-module settings layout by moving the prompt field onto its own full-width row, rebuilt artifacts, synced to Vault, verified manifest/main/styles hashes
 - 2026-04-23 01:25 [codex] limited touch-guard/input touch logic to true mobile platforms and tightened compact-viewport keyboard modal bounds, rebuilt artifacts, synced to Vault, verified manifest/main/styles hashes
+- 2026-04-23 01:40 [codex] added `.agents/reviews/2026-04-22-kimi-mobile-ux-review.md` to git tracking and updated .agents state so future mobile-ux passes can reference a stable committed review baseline
 
 - 2026-04-22 10:35 [kimi] completed post-fix targeted review per user request; filed `.agents/reviews/2026-04-22-kimi-postfix-review.md`; focused on 5 areas: (1) CRLF compatibility — 2 regex locations in day-data-store.ts still hardcode \n, (2) renameUserInFiles — still regex-based with YAML quote / title format fragility, (3) performance — getAllScores still no cache, stats panel still O(n×m), (4) import validation — missing duplicate-id / integer-points / category-validity checks, (5) regression — streak/week/month/childName/goals/customItems schema all confirmed fixed; recommended top-5 priority fixes for codex.
 
