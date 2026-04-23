@@ -1235,6 +1235,7 @@ function setupModalKeyboard(modal) {
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  const requiresFullKeyboardHeight = !!mEl.querySelector(".kid-score-custom-form");
   let stableViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   let isManualAdjusting = false;
   mEl.style.display = "flex";
@@ -1285,6 +1286,10 @@ function setupModalKeyboard(modal) {
     }
     return raw;
   };
+  const hasFocusedModalField = () => {
+    const active = document.activeElement;
+    return !!(active && contentEl.contains(active) && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
+  };
   const updateModalLift = (keyboardH) => {
     var _a, _b;
     if (!(platformIsIOS && isEditModal)) {
@@ -1296,7 +1301,7 @@ function setupModalKeyboard(modal) {
       return;
     }
     if (isManualAdjusting) return;
-    const desiredBottom = (((_a = window.visualViewport) == null ? void 0 : _a.offsetTop) || 0) + (((_b = window.visualViewport) == null ? void 0 : _b.height) || window.innerHeight) - 8;
+    const desiredBottom = (((_a = window.visualViewport) == null ? void 0 : _a.offsetTop) || 0) + (((_b = window.visualViewport) == null ? void 0 : _b.height) || window.innerHeight) - (isEditModal ? 24 : 8);
     const currentRect = mEl.getBoundingClientRect();
     const currentKeyboardOffset = readKeyboardOffset();
     const nextKeyboardOffset = currentKeyboardOffset + (desiredBottom - currentRect.bottom);
@@ -1314,15 +1319,18 @@ function setupModalKeyboard(modal) {
     cEl.style.height = vvH + "px";
     if ((platformIsIOS || platformIsAndroid) && window.visualViewport) {
       const keyboardH = getKeyboardHeight();
-      updateModalLift(keyboardH);
-      if (keyboardH > 80) {
+      const forceKeyboardMode = platformIsIOS && isEditModal && hasFocusedModalField();
+      const effectiveKeyboardH = forceKeyboardMode ? Math.max(keyboardH, 81) : keyboardH;
+      if (effectiveKeyboardH > 80) {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
         const keyboardMaxHeight = Math.max(compactViewport ? 180 : 220, vvH - (compactViewport ? 8 : 12));
         mEl.style.maxHeight = keyboardMaxHeight + "px";
-        if (platformIsIOS && isEditModal) {
+        if (platformIsIOS && isEditModal && requiresFullKeyboardHeight) {
           mEl.style.height = keyboardMaxHeight + "px";
+        } else {
+          mEl.style.height = "";
         }
         const extraBottom = isEditModal ? 28 : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
@@ -1336,6 +1344,7 @@ function setupModalKeyboard(modal) {
         contentEl.style.paddingBottom = "";
         contentEl.style.scrollPaddingBottom = "";
       }
+      updateModalLift(effectiveKeyboardH);
     } else {
       mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
       mEl.style.height = "";
@@ -1469,7 +1478,8 @@ function attachModalDragGesture(modal) {
     const viewportBottom = viewportTop + (((_b = window.visualViewport) == null ? void 0 : _b.height) || window.innerHeight);
     const baseTop = rect.top - currentOffset;
     const baseBottom = rect.bottom - currentOffset;
-    minOffset = viewportTop + 8 - baseTop;
+    const overshootTop = Math.min(Math.max(rect.height * 0.35, 120), 260);
+    minOffset = viewportTop + 8 - baseTop - overshootTop;
     maxOffset = viewportBottom - 8 - baseBottom;
     if (minOffset > maxOffset) {
       const middle = (minOffset + maxOffset) / 2;
@@ -2551,6 +2561,107 @@ function ensureDefaultDiaryTemplate({
   syncAndRefresh();
 }
 
+// src/modals/panels/desktop-diary-panel.ts
+function renderDesktopDiaryPanelLayout(panel) {
+  panel.addClass("desktop-diary-panel");
+  const topSplit = panel.createDiv({ cls: "diary-desktop-top" });
+  const moduleSection = topSplit.createDiv({
+    cls: "diary-module-section diary-module-section-desktop"
+  });
+  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
+  moduleSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
+  });
+  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
+  const quickSection = topSplit.createDiv({
+    cls: "diary-module-section diary-quick-section diary-quick-section-desktop"
+  });
+  quickSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F324}\uFE0F \u4ECA\u5929\u5929\u6C14\u548C\u5FC3\u60C5" });
+  quickSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u5FEB\u901F\u9009\u4E00\u9009\uFF0C\u518D\u8865\u4E00\u53E5\u81EA\u5DF1\u7684\u8BDD\u3002"
+  });
+  const quickRow = quickSection.createDiv({ cls: "diary-quick-row diary-quick-row-desktop" });
+  const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap diary-textarea-wrap-desktop" });
+  const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
+  freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+  const inlinePreviewBtn = freewriteHeader.createEl("button", {
+    cls: "diary-tool-btn diary-inline-preview-btn",
+    text: "\u67E5\u770B\u9884\u89C8"
+  });
+  textareaWrap.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
+  });
+  const toolbar = textareaWrap.createDiv({
+    cls: "diary-toolbar diary-freewrite-toolbar diary-freewrite-toolbar-desktop"
+  });
+  const previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
+  previewWrap.style.display = "none";
+  const charCount = panel.createDiv({ cls: "diary-char-count" });
+  return {
+    moduleSection,
+    moduleGrid,
+    quickRow,
+    textareaWrap,
+    toolbar,
+    previewWrap,
+    charCount,
+    inlinePreviewBtn
+  };
+}
+
+// src/modals/panels/mobile-diary-panel.ts
+function renderMobileDiaryPanelLayout(panel) {
+  panel.addClass("mobile-diary-panel");
+  const quickSection = panel.createDiv({
+    cls: "diary-module-section diary-quick-section diary-quick-section-mobile"
+  });
+  quickSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F324}\uFE0F \u4ECA\u5929\u5929\u6C14\u548C\u5FC3\u60C5" });
+  quickSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u70B9\u4E00\u4E2A\u6700\u63A5\u8FD1\u7684\uFF0C\u518D\u8865\u4E00\u53E5\u66F4\u5177\u4F53\u7684\u8BDD\u3002"
+  });
+  const quickRow = quickSection.createDiv({ cls: "diary-quick-row diary-quick-row-mobile" });
+  const moduleSection = panel.createDiv({
+    cls: "diary-module-section diary-module-section-mobile"
+  });
+  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
+  moduleSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
+  });
+  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid diary-module-grid-mobile" });
+  const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap diary-textarea-wrap-mobile" });
+  const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
+  freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
+  const inlinePreviewBtn = freewriteHeader.createEl("button", {
+    cls: "diary-tool-btn diary-inline-preview-btn",
+    text: "\u67E5\u770B\u9884\u89C8"
+  });
+  textareaWrap.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
+  });
+  const toolbar = textareaWrap.createDiv({
+    cls: "diary-toolbar diary-freewrite-toolbar diary-freewrite-toolbar-mobile"
+  });
+  const previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
+  previewWrap.style.display = "none";
+  const charCount = panel.createDiv({ cls: "diary-char-count" });
+  return {
+    moduleSection,
+    moduleGrid,
+    quickRow,
+    textareaWrap,
+    toolbar,
+    previewWrap,
+    charCount,
+    inlinePreviewBtn
+  };
+}
+
 // src/modals/panels/diary-panel.ts
 function buildDiaryPanel(options) {
   const {
@@ -2565,20 +2676,17 @@ function buildDiaryPanel(options) {
     composeDiaryContent: composeDiaryContent2,
     insertAttachment,
     insertDiaryText,
-    wrapDiarySelection
+    wrapDiarySelection,
+    isTouchLayout
   } = options;
   const diaryModules = options.diaryModules;
   let currentDiaryContent = diaryContent;
   const moduleFields = [];
   const moduleConfig = plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length ? plugin.currentUser.diaryModules : makeDefaultDiaryModules();
   let isPreview = false;
-  let previewWrap = null;
   let previewButtonBinder = (_active) => {
   };
   let diaryTextarea = null;
-  let textareaWrap = null;
-  let charCount = null;
-  let inlinePreviewBtn = null;
   const attachAutoResize2 = (textarea, minHeight = 220) => {
     const resize = () => {
       textarea.style.height = "auto";
@@ -2606,7 +2714,6 @@ function buildDiaryPanel(options) {
       target.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
     });
   };
-  let toolbar = null;
   const createToolButton = (text, onClick, extraCls = "") => {
     if (!toolbar) return null;
     const btn = toolbar.createEl("button", {
@@ -2638,13 +2745,16 @@ function buildDiaryPanel(options) {
     }
     previewButtonBinder(isPreview);
   };
-  const moduleSection = panel.createDiv({ cls: "diary-module-section" });
-  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
-  moduleSection.createEl("p", {
-    cls: "diary-module-hint",
-    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
-  });
-  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
+  const layout = isTouchLayout ? renderMobileDiaryPanelLayout(panel) : renderDesktopDiaryPanelLayout(panel);
+  const {
+    moduleGrid,
+    quickRow,
+    textareaWrap,
+    toolbar,
+    previewWrap,
+    charCount,
+    inlinePreviewBtn
+  } = layout;
   const weatherModule = moduleConfig.find((moduleDef) => moduleDef.id === "weather");
   const moodModule = moduleConfig.find((moduleDef) => moduleDef.id === "mood");
   moduleConfig.filter((moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood").forEach(
@@ -2657,7 +2767,6 @@ function buildDiaryPanel(options) {
       syncAndRefresh
     })
   );
-  const quickRow = panel.createDiv({ cls: "diary-quick-row" });
   const weatherEmojis = [
     { e: "\u2600\uFE0F", l: "\u6674" },
     { e: "\u26C5", l: "\u591A\u4E91" },
@@ -2694,19 +2803,7 @@ function buildDiaryPanel(options) {
     syncAndRefresh,
     panel
   });
-  textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
-  const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
-  freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
-  inlinePreviewBtn = freewriteHeader.createEl("button", {
-    cls: "diary-tool-btn diary-inline-preview-btn",
-    text: "\u67E5\u770B\u9884\u89C8"
-  });
   inlinePreviewBtn.onclick = () => togglePreview();
-  textareaWrap.createEl("p", {
-    cls: "diary-module-hint",
-    text: "\u8FD9\u91CC\u53EF\u4EE5\u5199\u957F\u4E00\u70B9\uFF0C\u60F3\u5230\u4EC0\u4E48\u5C31\u5199\u4EC0\u4E48\u3002"
-  });
-  toolbar = textareaWrap.createDiv({ cls: "diary-toolbar diary-freewrite-toolbar" });
   [
     { t: "\u{1F5BC}\uFE0F \u56FE\u7247", e: "png" },
     { t: "\u{1F3AC} \u89C6\u9891", e: "mp4" },
@@ -2714,16 +2811,6 @@ function buildDiaryPanel(options) {
   ].forEach((asset) => {
     createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
   });
-  createToolButton("B \u52A0\u7C97", () => wrapDiarySelection("**", "**", "\u91CD\u70B9\u5185\u5BB9"), "is-format");
-  createToolButton("I \u659C\u4F53", () => wrapDiarySelection("*", "*", "\u60F3\u6CD5"), "is-format");
-  createToolButton("H \u6807\u9898", () => insertDiaryText("\n### \u5C0F\u6807\u9898\n"), "is-format");
-  createToolButton("\u2022 \u5217\u8868", () => insertDiaryText("\n- "), "is-format");
-  createToolButton("\u275D \u5F15\u7528", () => insertDiaryText("\n> "), "is-format");
-  createToolButton(
-    "\u2194\uFE0E \u5C45\u4E2D",
-    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "\u5199\u5728\u4E2D\u95F4\u7684\u8BDD"),
-    "is-format"
-  );
   diaryTextarea = textareaWrap.createEl("textarea", {
     cls: "diary-textarea",
     placeholder: "\u4F8B\u5982\uFF1A\u4ECA\u5929\u653E\u5B66\u540E\uFF0C\u6211\u548C\u5988\u5988\u4E00\u8D77\u53BB\u4E86\u516C\u56ED..."
@@ -2746,9 +2833,6 @@ function buildDiaryPanel(options) {
     updateDiaryModules,
     syncAndRefresh
   });
-  previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
-  previewWrap.style.display = "none";
-  charCount = panel.createDiv({ cls: "diary-char-count" });
   updateDiaryContent(currentDiaryContent);
   updateCharCount();
   return {
@@ -3491,6 +3575,106 @@ function renderDailyTotalDisplay({
 
 // src/modals/panels/modal-chrome.ts
 var import_obsidian5 = require("obsidian");
+
+// src/modals/panels/desktop-modal-chrome.ts
+function renderDesktopDailyHeaderLayout(containerEl, title) {
+  const header = containerEl.createDiv({ cls: "kid-score-header kid-score-header-desktop" });
+  header.createEl("h2", { text: title });
+  const dateNav = header.createDiv({ cls: "kid-score-date-nav kid-score-date-nav-desktop" });
+  const userSwitcher = containerEl.createDiv({
+    cls: "kid-score-user-switcher kid-score-user-switcher-desktop"
+  });
+  return { header, dateNav, userSwitcher };
+}
+function renderDesktopBottomActionsLayout(containerEl) {
+  const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-desktop" });
+  const previewBtn = actions.createEl("button", {
+    text: "\u67E5\u770B\u9884\u89C8",
+    cls: "kid-score-preview-btn"
+  });
+  const saveBtn = actions.createEl("button", {
+    text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
+    cls: "mod-cta kid-score-save-btn"
+  });
+  const statsBtn = actions.createEl("button", {
+    text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
+    cls: "kid-score-stats-btn"
+  });
+  return { actions, previewBtn, saveBtn, statsBtn };
+}
+
+// src/modals/panels/mobile-modal-chrome.ts
+function renderMobileDailyHeaderLayout(containerEl, title) {
+  const header = containerEl.createDiv({ cls: "kid-score-header kid-score-header-mobile" });
+  header.createEl("h2", { text: title });
+  const dateNav = header.createDiv({ cls: "kid-score-date-nav kid-score-date-nav-mobile" });
+  const userSwitcher = containerEl.createDiv({
+    cls: "kid-score-user-switcher kid-score-user-switcher-mobile"
+  });
+  return { header, dateNav, userSwitcher };
+}
+function renderMobileBottomActionsLayout(containerEl) {
+  const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-mobile" });
+  const previewBtn = actions.createEl("button", {
+    text: "\u67E5\u770B\u9884\u89C8",
+    cls: "kid-score-preview-btn"
+  });
+  const saveBtn = actions.createEl("button", {
+    text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
+    cls: "mod-cta kid-score-save-btn"
+  });
+  const statsBtn = actions.createEl("button", {
+    text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
+    cls: "kid-score-stats-btn"
+  });
+  return { actions, previewBtn, saveBtn, statsBtn };
+}
+
+// src/modals/panels/desktop-tabs.ts
+function renderDesktopMainTabsLayout(containerEl) {
+  const tabs = containerEl.createDiv({
+    cls: "kid-score-main-tabs kid-score-main-tabs-desktop"
+  });
+  const scoreTab = tabs.createEl("button", {
+    text: "\u2B50 \u6253\u5206",
+    cls: "kid-score-main-tab kid-score-main-tab-desktop is-active"
+  });
+  const diaryTab = tabs.createEl("button", {
+    text: "\u{1F4DD} \u65E5\u8BB0",
+    cls: "kid-score-main-tab kid-score-main-tab-desktop"
+  });
+  const scorePanel = containerEl.createDiv({
+    cls: "kid-score-tab-panel kid-score-tab-panel-desktop"
+  });
+  const diaryPanel = containerEl.createDiv({
+    cls: "kid-score-tab-panel kid-score-tab-panel-desktop is-hidden"
+  });
+  return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
+}
+
+// src/modals/panels/mobile-tabs.ts
+function renderMobileMainTabsLayout(containerEl) {
+  const tabs = containerEl.createDiv({
+    cls: "kid-score-main-tabs kid-score-main-tabs-mobile"
+  });
+  const scoreTab = tabs.createEl("button", {
+    text: "\u2B50 \u6253\u5206",
+    cls: "kid-score-main-tab kid-score-main-tab-mobile is-active"
+  });
+  const diaryTab = tabs.createEl("button", {
+    text: "\u{1F4DD} \u65E5\u8BB0",
+    cls: "kid-score-main-tab kid-score-main-tab-mobile"
+  });
+  const scorePanel = containerEl.createDiv({
+    cls: "kid-score-tab-panel kid-score-tab-panel-mobile"
+  });
+  const diaryPanel = containerEl.createDiv({
+    cls: "kid-score-tab-panel kid-score-tab-panel-mobile is-hidden"
+  });
+  return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
+}
+
+// src/modals/panels/modal-chrome.ts
 function renderDailyHeader({
   containerEl,
   plugin,
@@ -3500,11 +3684,11 @@ function renderDailyHeader({
   onNextDay,
   onCalendar,
   onGoToday,
-  onSwitchUser
+  onSwitchUser,
+  isTouchLayout
 }) {
-  const header = containerEl.createDiv({ cls: "kid-score-header" });
-  header.createEl("h2", { text: plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55" });
-  const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
+  const layout = isTouchLayout ? renderMobileDailyHeaderLayout(containerEl, plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55") : renderDesktopDailyHeaderLayout(containerEl, plugin.currentUser.name + " \u7684\u6BCF\u65E5\u8BB0\u5F55");
+  const { dateNav, userSwitcher } = layout;
   const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "\u25C0" });
   prevBtn.onclick = onPrevDay;
   dateNav.createEl("button", {
@@ -3543,10 +3727,9 @@ function renderDailyHeader({
     cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
     cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
   }
-  const userSwitcher = containerEl.createDiv({ cls: "kid-score-user-switcher" });
   plugin.settings.users.forEach((u) => {
     const uBtn = userSwitcher.createEl("button", {
-      cls: "kid-score-user-btn" + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
+      cls: "kid-score-user-btn " + (isTouchLayout ? "kid-score-user-btn-mobile" : "kid-score-user-btn-desktop") + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
       text: u.name
     });
     if (plugin.settings.users.length > 1) {
@@ -3563,19 +3746,10 @@ function renderDailyHeader({
 function renderMainTabs({
   containerEl,
   onShowScore,
-  onShowDiary
+  onShowDiary,
+  isTouchLayout
 }) {
-  const mainTabs = containerEl.createDiv({ cls: "kid-score-main-tabs" });
-  const scoreTab = mainTabs.createEl("button", {
-    text: "\u2B50 \u6253\u5206",
-    cls: "kid-score-main-tab is-active"
-  });
-  const diaryTab = mainTabs.createEl("button", {
-    text: "\u{1F4DD} \u65E5\u8BB0",
-    cls: "kid-score-main-tab"
-  });
-  const scorePanel = containerEl.createDiv({ cls: "kid-score-tab-panel" });
-  const diaryPanel = containerEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
+  const { scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout ? renderMobileMainTabsLayout(containerEl) : renderDesktopMainTabsLayout(containerEl);
   scoreTab.onclick = () => {
     scoreTab.addClass("is-active");
     diaryTab.removeClass("is-active");
@@ -3597,25 +3771,14 @@ function renderBottomActions({
   onPreview,
   onSave,
   onStats,
+  isTouchLayout,
   bindDiaryActions
 }) {
-  const actions = containerEl.createDiv({ cls: "kid-score-actions" });
-  const previewBtn = actions.createEl("button", {
-    text: "\u67E5\u770B\u9884\u89C8",
-    cls: "kid-score-preview-btn"
-  });
-  const saveBtn = actions.createEl("button", {
-    text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
-    cls: "mod-cta kid-score-save-btn"
-  });
-  const statsBtn = actions.createEl("button", {
-    text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
-    cls: "kid-score-stats-btn"
-  });
+  const { actions, previewBtn, saveBtn, statsBtn } = isTouchLayout ? renderMobileBottomActionsLayout(containerEl) : renderDesktopBottomActionsLayout(containerEl);
   bindDiaryActions({ previewBtn, saveBtn, statsBtn, actions });
   previewBtn.onclick = onPreview;
   saveBtn.onclick = () => void onSave();
-  statsBtn.onclick = onStats;
+  if (statsBtn) statsBtn.onclick = onStats;
 }
 
 // src/modals/helpers/press-gesture.ts
@@ -3705,6 +3868,132 @@ function attachPressGesture({
   });
 }
 
+// src/modals/panels/desktop-score-sections.ts
+function renderDesktopScoreCategoryLayout(container, withHeader) {
+  const section = container.createDiv({
+    cls: "kid-score-category-section kid-score-category-section-desktop"
+  });
+  let header = null;
+  let titleHost = section;
+  let addButtonHost = null;
+  if (withHeader) {
+    header = section.createDiv({
+      cls: "kid-score-cat-header kid-score-cat-header-desktop"
+    });
+    titleHost = header.createDiv({
+      cls: "kid-score-cat-title-host kid-score-cat-title-host-desktop"
+    });
+    addButtonHost = header.createDiv({
+      cls: "kid-score-cat-action-host kid-score-cat-action-host-desktop"
+    });
+  }
+  const grid = section.createDiv({
+    cls: "kid-score-grid kid-score-grid-desktop"
+  });
+  return { section, header, titleHost, addButtonHost, grid };
+}
+function renderDesktopCustomItemRowLayout(container) {
+  const wrap = container.createDiv({
+    cls: "kid-score-custom-wrap kid-score-custom-wrap-desktop"
+  });
+  const row = wrap.createDiv({
+    cls: "kid-score-custom-row kid-score-custom-row-desktop"
+  });
+  const main = row.createDiv({
+    cls: "kid-score-custom-main kid-score-custom-main-desktop"
+  });
+  return { wrap, row, main };
+}
+
+// src/modals/panels/mobile-score-sections.ts
+function renderMobileScoreCategoryLayout(container, withHeader) {
+  const section = container.createDiv({
+    cls: "kid-score-category-section kid-score-category-section-mobile"
+  });
+  let header = null;
+  let titleHost = section;
+  let addButtonHost = null;
+  if (withHeader) {
+    header = section.createDiv({
+      cls: "kid-score-cat-header kid-score-cat-header-mobile"
+    });
+    titleHost = header.createDiv({
+      cls: "kid-score-cat-title-host kid-score-cat-title-host-mobile"
+    });
+    addButtonHost = header.createDiv({
+      cls: "kid-score-cat-action-host kid-score-cat-action-host-mobile"
+    });
+  }
+  const grid = section.createDiv({
+    cls: "kid-score-grid kid-score-grid-mobile"
+  });
+  return { section, header, titleHost, addButtonHost, grid };
+}
+function renderMobileCustomItemRowLayout(container) {
+  const wrap = container.createDiv({
+    cls: "kid-score-custom-wrap kid-score-custom-wrap-mobile"
+  });
+  const row = wrap.createDiv({
+    cls: "kid-score-custom-row kid-score-custom-row-mobile"
+  });
+  const main = row.createDiv({
+    cls: "kid-score-custom-main kid-score-custom-main-mobile"
+  });
+  return { wrap, row, main };
+}
+
+// src/modals/panels/desktop-score-card.ts
+function renderDesktopScoreCardLayout(grid, cardClassName) {
+  const card = grid.createDiv({
+    cls: `kid-score-card kid-score-card-desktop ${cardClassName}`.trim()
+  });
+  const content = card.createDiv({
+    cls: "kid-score-card-content kid-score-card-content-desktop"
+  });
+  const emoji = content.createDiv({
+    cls: "card-emoji card-emoji-desktop"
+  });
+  const name = content.createDiv({
+    cls: "card-name card-name-desktop"
+  });
+  const noteHost = content.createDiv({
+    cls: "card-note-host card-note-host-desktop"
+  });
+  const points = content.createDiv({
+    cls: "card-points card-points-desktop"
+  });
+  const yesterday = content.createDiv({
+    cls: "card-yesterday card-yesterday-desktop"
+  });
+  return { card, content, emoji, name, noteHost, points, yesterday };
+}
+
+// src/modals/panels/mobile-score-card.ts
+function renderMobileScoreCardLayout(grid, cardClassName) {
+  const card = grid.createDiv({
+    cls: `kid-score-card kid-score-card-mobile ${cardClassName}`.trim()
+  });
+  const content = card.createDiv({
+    cls: "kid-score-card-content kid-score-card-content-mobile"
+  });
+  const emoji = content.createDiv({
+    cls: "card-emoji card-emoji-mobile"
+  });
+  const name = content.createDiv({
+    cls: "card-name card-name-mobile"
+  });
+  const noteHost = content.createDiv({
+    cls: "card-note-host card-note-host-mobile"
+  });
+  const points = content.createDiv({
+    cls: "card-points card-points-mobile"
+  });
+  const yesterday = content.createDiv({
+    cls: "card-yesterday card-yesterday-mobile"
+  });
+  return { card, content, emoji, name, noteHost, points, yesterday };
+}
+
 // src/modals/panels/score-items-panel.ts
 function renderScoreCard({
   item,
@@ -3723,9 +4012,9 @@ function renderScoreCard({
   const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
   const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
-  const card = grid.createDiv({
-    cls: "kid-score-card" + (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "")
-  });
+  const cardClassName = (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "");
+  const layout = isTouchMode ? renderMobileScoreCardLayout(grid, cardClassName) : renderDesktopScoreCardLayout(grid, cardClassName);
+  const { card, emoji, name, noteHost, points, yesterday } = layout;
   card.dataset.itemId = item.id;
   const moreBtn = card.createEl("button", {
     cls: "kid-score-card-more-btn",
@@ -3737,23 +4026,22 @@ function renderScoreCard({
     e.stopPropagation();
     onCustomValue(item, false, card);
   };
-  card.createDiv({ cls: "card-emoji", text: item.emoji });
-  card.createDiv({ cls: "card-name", text: item.name });
+  emoji.setText(item.emoji);
+  name.setText(item.name);
   if (item.note) {
-    card.createDiv({ cls: "card-note", text: item.note });
+    noteHost.createDiv({ cls: "card-note", text: item.note });
   }
   const pointsText = scoreVal !== 0 ? (scoreVal >= 0 ? "+" : "") + scoreVal + " \u5206" + (scoreVal !== item.points ? " \u{1F4DD}" : "") : (item.points >= 0 ? "+" : "") + item.points + " \u5206";
-  card.createDiv({ cls: "card-points", text: pointsText });
+  points.setText(pointsText);
   if (yesterdayData) {
     const yScore = yesterdayData.scores[item.id] || 0;
     const yClass = yScore > 0 ? "was-earned" : yScore < 0 ? "was-negative" : "was-missed";
     const ySign = yScore > 0 ? "+" : "";
-    card.createDiv({
-      cls: "card-yesterday " + yClass,
-      text: "\u6628 " + ySign + yScore + " \u5206"
-    });
+    yesterday.className = "card-yesterday " + yClass;
+    yesterday.textContent = "\u6628 " + ySign + yScore + " \u5206";
   } else {
-    card.createDiv({ cls: "card-yesterday was-missed", text: "\u6628 -" });
+    yesterday.className = "card-yesterday was-missed";
+    yesterday.textContent = "\u6628 -";
   }
   attachPressGesture({
     element: card,
@@ -3804,9 +4092,8 @@ function renderCustomItemsList({
   for (let i = 0; i < customItems.length; i++) {
     ((idx) => {
       const ci = customItems[idx];
-      const wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
-      const row = wrap.createDiv({ cls: "kid-score-custom-row" });
-      const main = row.createDiv({ cls: "kid-score-custom-main" });
+      const layout = isTouchMode ? renderMobileCustomItemRowLayout(container) : renderDesktopCustomItemRowLayout(container);
+      const { wrap, row, main } = layout;
       main.createSpan({ cls: "custom-emoji", text: ci.emoji });
       main.createSpan({ cls: "custom-name", text: ci.name });
       main.createSpan({
@@ -3856,27 +4143,79 @@ function renderCustomItemsList({
 
 // src/modals/panels/rules-section.ts
 var import_obsidian6 = require("obsidian");
+
+// src/modals/panels/desktop-rules-section.ts
+function renderDesktopRulesSectionLayout(container) {
+  const section = container.createDiv({
+    cls: "kid-score-rules-section kid-score-rules-section-desktop"
+  });
+  const header = section.createDiv({
+    cls: "kid-score-rules-header kid-score-rules-header-desktop"
+  });
+  const titleHost = header.createDiv({
+    cls: "kid-score-rules-title-host kid-score-rules-title-host-desktop"
+  });
+  const actionHost = header.createDiv({
+    cls: "kid-score-rules-action-host kid-score-rules-action-host-desktop"
+  });
+  const body = section.createDiv({
+    cls: "kid-score-rules-body kid-score-rules-body-desktop"
+  });
+  const view = body.createDiv({
+    cls: "kid-score-rules-view kid-score-rules-view-desktop"
+  });
+  const edit = body.createDiv({
+    cls: "kid-score-rules-edit kid-score-rules-edit-desktop is-hidden"
+  });
+  return { section, header, titleHost, actionHost, body, view, edit };
+}
+
+// src/modals/panels/mobile-rules-section.ts
+function renderMobileRulesSectionLayout(container) {
+  const section = container.createDiv({
+    cls: "kid-score-rules-section kid-score-rules-section-mobile"
+  });
+  const header = section.createDiv({
+    cls: "kid-score-rules-header kid-score-rules-header-mobile"
+  });
+  const titleHost = header.createDiv({
+    cls: "kid-score-rules-title-host kid-score-rules-title-host-mobile"
+  });
+  const actionHost = header.createDiv({
+    cls: "kid-score-rules-action-host kid-score-rules-action-host-mobile"
+  });
+  const body = section.createDiv({
+    cls: "kid-score-rules-body kid-score-rules-body-mobile"
+  });
+  const view = body.createDiv({
+    cls: "kid-score-rules-view kid-score-rules-view-mobile"
+  });
+  const edit = body.createDiv({
+    cls: "kid-score-rules-edit kid-score-rules-edit-mobile is-hidden"
+  });
+  return { section, header, titleHost, actionHost, body, view, edit };
+}
+
+// src/modals/panels/rules-section.ts
 function renderRulesSection({
   app,
   component,
   plugin,
   container,
-  onAfterRulesSaved
+  onAfterRulesSaved,
+  isTouchLayout
 }) {
-  const section = container.createDiv({ cls: "kid-score-rules-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
-  const toggle = header.createEl("span", {
+  const layout = isTouchLayout ? renderMobileRulesSectionLayout(container) : renderDesktopRulesSectionLayout(container);
+  const { section, header, titleHost, actionHost, body, view, edit } = layout;
+  const toggle = titleHost.createEl("span", {
     cls: "kid-score-rules-toggle",
     text: "\u25B6"
   });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
-  const editBtn = header.createEl("button", {
+  titleHost.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  const editBtn = actionHost.createEl("button", {
     cls: "kid-score-rules-edit-btn",
     text: "\u270F\uFE0F"
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
-  const view = body.createDiv({ cls: "kid-score-rules-view" });
-  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
   const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
   bindModalInputFocus(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";
@@ -3954,6 +4293,7 @@ function renderScoreCategorySections({
   plugin,
   container,
   yesterdayData,
+  isTouchLayout,
   renderScoreCard: renderScoreCard2,
   onAddItem
 }) {
@@ -3965,16 +4305,18 @@ function renderScoreCategorySections({
     if (catRendered) {
       container.createEl("hr", { cls: "kid-score-divider" });
     }
-    const header = container.createDiv({ cls: "kid-score-cat-header" });
-    header.createEl("h3", { text: category, cls: "kid-score-section-title" });
-    const addItemBtn = header.createEl("button", {
+    const layout = isTouchLayout ? renderMobileScoreCategoryLayout(container, true) : renderDesktopScoreCategoryLayout(container, true);
+    layout.titleHost.createEl("h3", {
+      text: category,
+      cls: "kid-score-section-title"
+    });
+    const addItemBtn = (layout.addButtonHost || layout.titleHost).createEl("button", {
       text: "+",
       cls: "kid-score-add-item-btn"
     });
     addItemBtn.onclick = () => onAddItem(category);
-    const grid = container.createDiv({ cls: "kid-score-grid" });
     for (const item of items) {
-      renderScoreCard2(item, grid, yesterdayData);
+      renderScoreCard2(item, layout.grid, yesterdayData);
     }
     catRendered = true;
   }
@@ -3985,14 +4327,82 @@ function renderScoreCategorySections({
     if (catRendered) {
       container.createEl("hr", { cls: "kid-score-divider" });
     }
-    container.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
-    const grid = container.createDiv({ cls: "kid-score-grid" });
+    const layout = isTouchLayout ? renderMobileScoreCategoryLayout(container, false) : renderDesktopScoreCategoryLayout(container, false);
+    layout.titleHost.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
     for (const item of uncategorized) {
-      renderScoreCard2(item, grid, yesterdayData);
+      renderScoreCard2(item, layout.grid, yesterdayData);
     }
     catRendered = true;
   }
   return catRendered;
+}
+
+// src/modals/panels/desktop-score-panel.ts
+function renderDesktopScorePanelLayout(scorePanel) {
+  const itemsContainer = scorePanel.createDiv({
+    cls: "kid-score-items kid-score-items-desktop"
+  });
+  const metaBar = itemsContainer.createDiv({
+    cls: "kid-score-meta-bar kid-score-meta-bar-desktop"
+  });
+  const hint = metaBar.createDiv({
+    cls: "kid-score-hint kid-score-hint-desktop"
+  });
+  const totalDisplay = metaBar.createDiv({
+    cls: "kid-score-total-display kid-score-total-display-desktop"
+  });
+  const sections = itemsContainer.createDiv({
+    cls: "kid-score-sections kid-score-sections-desktop"
+  });
+  const customSection = sections.createDiv({
+    cls: "kid-score-custom-section kid-score-custom-section-desktop"
+  });
+  const customItemsContainer = customSection.createDiv({
+    cls: "kid-score-custom-items"
+  });
+  return {
+    itemsContainer,
+    metaBar,
+    hint,
+    totalDisplay,
+    sections,
+    customSection,
+    customItemsContainer
+  };
+}
+
+// src/modals/panels/mobile-score-panel.ts
+function renderMobileScorePanelLayout(scorePanel) {
+  const itemsContainer = scorePanel.createDiv({
+    cls: "kid-score-items kid-score-items-mobile"
+  });
+  const metaBar = itemsContainer.createDiv({
+    cls: "kid-score-meta-bar kid-score-meta-bar-mobile"
+  });
+  const totalDisplay = metaBar.createDiv({
+    cls: "kid-score-total-display kid-score-total-display-mobile"
+  });
+  const hint = metaBar.createDiv({
+    cls: "kid-score-hint kid-score-hint-mobile"
+  });
+  const sections = itemsContainer.createDiv({
+    cls: "kid-score-sections kid-score-sections-mobile"
+  });
+  const customSection = sections.createDiv({
+    cls: "kid-score-custom-section kid-score-custom-section-mobile"
+  });
+  const customItemsContainer = customSection.createDiv({
+    cls: "kid-score-custom-items"
+  });
+  return {
+    itemsContainer,
+    metaBar,
+    hint,
+    totalDisplay,
+    sections,
+    customSection,
+    customItemsContainer
+  };
 }
 
 // src/modals/panels/score-panel.ts
@@ -4022,7 +4432,8 @@ function renderScorePanel({
     component,
     plugin,
     container: scorePanel,
-    onAfterRulesSaved
+    onAfterRulesSaved,
+    isTouchLayout: isTouchOptimizedMode
   });
   if (yesterdayData) {
     const ySign = yesterdayData.total >= 0 ? "+" : "";
@@ -4031,32 +4442,36 @@ function renderScorePanel({
       text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayData.date + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206"
     });
   }
-  const itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
-  itemsContainer.createDiv({
-    cls: "kid-score-hint",
-    text: isTouchOptimizedMode ? "\u{1F4A1} \u70B9\u4E00\u4E0B\u8BB0\u5206\uFF0C\u957F\u6309\u6216\u70B9\u53F3\u4E0A\u89D2\u6309\u94AE\u8C03\u6574\u5206\u503C" : "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \xB7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C"
-  });
-  const totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
-  onSetTotalDisplay(totalDisplay);
+  const layout = isTouchOptimizedMode ? renderMobileScorePanelLayout(scorePanel) : renderDesktopScorePanelLayout(scorePanel);
+  layout.hint.setText(
+    isTouchOptimizedMode ? "\u{1F4A1} \u70B9\u4E00\u4E0B\u8BB0\u5206\uFF0C\u957F\u6309\u6216\u70B9\u53F3\u4E0A\u89D2\u6309\u94AE\u8C03\u6574\u5206\u503C" : "\u{1F4A1} \u4E0B\u65B9\u6253\u5206\u9879\uFF1A\u70B9\u51FB\u6253\u5206 \xB7 \u957F\u6309\u81EA\u5B9A\u4E49\u5206\u503C"
+  );
+  onSetTotalDisplay(layout.totalDisplay);
   const catRendered = renderScoreCategorySections({
     plugin,
-    container: itemsContainer,
+    container: layout.sections,
     yesterdayData,
+    isTouchLayout: isTouchOptimizedMode,
     renderScoreCard: renderScoreCard2,
     onAddItem
   });
   if (catRendered) {
-    itemsContainer.createEl("hr", { cls: "kid-score-divider" });
+    layout.sections.createEl("hr", { cls: "kid-score-divider" });
   }
-  itemsContainer.createEl("h3", { text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879", cls: "kid-score-section-title" });
-  const customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
+  layout.customSection.createEl("h3", {
+    text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879",
+    cls: "kid-score-section-title"
+  });
   renderCustomItems();
-  const addCustomBtn = itemsContainer.createEl("button", {
+  const addCustomBtn = layout.customSection.createEl("button", {
     text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
     cls: "kid-score-add-custom-btn"
   });
   addCustomBtn.onclick = () => onAddCustom();
-  return { totalDisplay, customItemsContainer };
+  return {
+    totalDisplay: layout.totalDisplay,
+    customItemsContainer: layout.customItemsContainer
+  };
 }
 
 // src/modals/daily-scoring-modal.ts
@@ -4124,10 +4539,12 @@ var DailyScoringModal = class extends BaseMobileModal {
           self.plugin.settings.currentUserId = userId;
           await self.plugin.saveSettings();
           await self.renderModal();
-        }
+        },
+        isTouchLayout: this.isTouchOptimizedMode()
       });
       const { scorePanel, diaryPanel } = renderMainTabs({
         containerEl: contentEl,
+        isTouchLayout: this.isTouchOptimizedMode(),
         onShowScore: () => {
           self.syncDiaryContent();
           self.activeTab = "score";
@@ -4175,7 +4592,8 @@ var DailyScoringModal = class extends BaseMobileModal {
         composeDiaryContent: () => this.syncDiaryContent(),
         insertAttachment: (label, ext) => this.insertAttachment(label, ext),
         insertDiaryText: (text) => this.insertTextAtCursor(text),
-        wrapDiarySelection: (prefix, suffix, placeholder) => this.wrapDiarySelection(prefix, suffix, placeholder)
+        wrapDiarySelection: (prefix, suffix, placeholder) => this.wrapDiarySelection(prefix, suffix, placeholder),
+        isTouchLayout: this.isTouchOptimizedMode()
       });
       renderBottomActions({
         containerEl: contentEl,
@@ -4196,6 +4614,7 @@ var DailyScoringModal = class extends BaseMobileModal {
           self.close();
           new StatsModal(self.app, self.plugin).open();
         },
+        isTouchLayout: this.isTouchOptimizedMode(),
         bindDiaryActions: (buttons) => {
           var _a;
           return (_a = this.diaryControls) == null ? void 0 : _a.bindActionButtons(buttons);

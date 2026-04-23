@@ -9,6 +9,8 @@ import {
   createDiaryQuickGroup,
   ensureDefaultDiaryTemplate,
 } from "./diary-panel-fields";
+import { renderDesktopDiaryPanelLayout } from "./desktop-diary-panel";
+import { renderMobileDiaryPanelLayout } from "./mobile-diary-panel";
 
 export interface DiaryPanelControls {
   togglePreview(): void;
@@ -34,6 +36,7 @@ interface DiaryPanelBuilderOptions {
   insertAttachment: (label: string, ext: string) => void;
   insertDiaryText: (text: string) => void;
   wrapDiarySelection: (prefix: string, suffix?: string, placeholder?: string) => void;
+  isTouchLayout: boolean;
 }
 
 export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelControls {
@@ -50,6 +53,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     insertAttachment,
     insertDiaryText,
     wrapDiarySelection,
+    isTouchLayout,
   } = options;
 
   const diaryModules = options.diaryModules;
@@ -61,12 +65,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
       : makeDefaultDiaryModules();
 
   let isPreview = false;
-  let previewWrap: HTMLElement | null = null;
   let previewButtonBinder = (_active: boolean) => {};
   let diaryTextarea: HTMLTextAreaElement | null = null;
-  let textareaWrap: HTMLElement | null = null;
-  let charCount: HTMLElement | null = null;
-  let inlinePreviewBtn: HTMLButtonElement | null = null;
 
   const attachAutoResize = (textarea: HTMLTextAreaElement, minHeight = 220) => {
     const resize = () => {
@@ -99,7 +99,6 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     });
   };
 
-  let toolbar: HTMLElement | null = null;
   const createToolButton = (text: string, onClick: () => void, extraCls = "") => {
     if (!toolbar) return null;
     const btn = toolbar.createEl("button", {
@@ -133,14 +132,18 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     previewButtonBinder(isPreview);
   };
 
-  const moduleSection = panel.createDiv({ cls: "diary-module-section" });
-  moduleSection.createEl("h4", { cls: "diary-module-title", text: "🧩 每天小记录" });
-  moduleSection.createEl("p", {
-    cls: "diary-module-hint",
-    text: "先选天气和心情，再用短短的句子记一记今天。",
-  });
-
-  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
+  const layout = isTouchLayout
+    ? renderMobileDiaryPanelLayout(panel)
+    : renderDesktopDiaryPanelLayout(panel);
+  const {
+    moduleGrid,
+    quickRow,
+    textareaWrap,
+    toolbar,
+    previewWrap,
+    charCount,
+    inlinePreviewBtn,
+  } = layout;
   const weatherModule = moduleConfig.find((moduleDef) => moduleDef.id === "weather");
   const moodModule = moduleConfig.find((moduleDef) => moduleDef.id === "mood");
   moduleConfig
@@ -156,7 +159,6 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
       })
     );
 
-  const quickRow = panel.createDiv({ cls: "diary-quick-row" });
   const weatherEmojis = [
     { e: "☀️", l: "晴" },
     { e: "⛅", l: "多云" },
@@ -195,19 +197,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     panel,
   });
 
-  textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap" });
-  const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
-  freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "✍️ 自由记录" });
-  inlinePreviewBtn = freewriteHeader.createEl("button", {
-    cls: "diary-tool-btn diary-inline-preview-btn",
-    text: "查看预览",
-  });
   inlinePreviewBtn.onclick = () => togglePreview();
-  textareaWrap.createEl("p", {
-    cls: "diary-module-hint",
-    text: "这里可以写长一点，想到什么就写什么。",
-  });
-  toolbar = textareaWrap.createDiv({ cls: "diary-toolbar diary-freewrite-toolbar" });
   [
     { t: "🖼️ 图片", e: "png" },
     { t: "🎬 视频", e: "mp4" },
@@ -215,16 +205,6 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   ].forEach((asset) => {
     createToolButton(asset.t, () => insertAttachment(asset.t.split(" ")[1], asset.e), "is-media");
   });
-  createToolButton("B 加粗", () => wrapDiarySelection("**", "**", "重点内容"), "is-format");
-  createToolButton("I 斜体", () => wrapDiarySelection("*", "*", "想法"), "is-format");
-  createToolButton("H 标题", () => insertDiaryText("\n### 小标题\n"), "is-format");
-  createToolButton("• 列表", () => insertDiaryText("\n- "), "is-format");
-  createToolButton("❝ 引用", () => insertDiaryText("\n> "), "is-format");
-  createToolButton(
-    "↔︎ 居中",
-    () => wrapDiarySelection('<div align="center">\n', "\n</div>", "写在中间的话"),
-    "is-format"
-  );
   diaryTextarea = textareaWrap.createEl("textarea", {
     cls: "diary-textarea",
     placeholder: "例如：今天放学后，我和妈妈一起去了公园...",
@@ -249,9 +229,6 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     syncAndRefresh,
   });
 
-  previewWrap = panel.createDiv({ cls: "diary-preview-wrap" });
-  previewWrap.style.display = "none";
-  charCount = panel.createDiv({ cls: "diary-char-count" });
   updateDiaryContent(currentDiaryContent);
   updateCharCount();
 

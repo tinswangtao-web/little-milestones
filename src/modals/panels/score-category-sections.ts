@@ -1,10 +1,13 @@
 import type { DayData, ScoreItem } from "../../types";
 import type KidScorePlugin from "../../main";
+import { renderDesktopScoreCategoryLayout } from "./desktop-score-sections";
+import { renderMobileScoreCategoryLayout } from "./mobile-score-sections";
 
 interface RenderScoreCategorySectionsOptions {
   plugin: KidScorePlugin;
   container: HTMLElement;
   yesterdayData: DayData | null;
+  isTouchLayout: boolean;
   renderScoreCard: (item: ScoreItem, grid: HTMLElement, yesterdayData: DayData | null) => void;
   onAddItem: (category: string) => void;
 }
@@ -13,6 +16,7 @@ export function renderScoreCategorySections({
   plugin,
   container,
   yesterdayData,
+  isTouchLayout,
   renderScoreCard,
   onAddItem,
 }: RenderScoreCategorySectionsOptions): boolean {
@@ -25,16 +29,20 @@ export function renderScoreCategorySections({
     if (catRendered) {
       container.createEl("hr", { cls: "kid-score-divider" });
     }
-    const header = container.createDiv({ cls: "kid-score-cat-header" });
-    header.createEl("h3", { text: category, cls: "kid-score-section-title" });
-    const addItemBtn = header.createEl("button", {
+    const layout = isTouchLayout
+      ? renderMobileScoreCategoryLayout(container, true)
+      : renderDesktopScoreCategoryLayout(container, true);
+    layout.titleHost.createEl("h3", {
+      text: category,
+      cls: "kid-score-section-title",
+    });
+    const addItemBtn = (layout.addButtonHost || layout.titleHost).createEl("button", {
       text: "+",
       cls: "kid-score-add-item-btn",
     });
     addItemBtn.onclick = () => onAddItem(category);
-    const grid = container.createDiv({ cls: "kid-score-grid" });
     for (const item of items) {
-      renderScoreCard(item, grid, yesterdayData);
+      renderScoreCard(item, layout.grid, yesterdayData);
     }
     catRendered = true;
   }
@@ -46,10 +54,12 @@ export function renderScoreCategorySections({
     if (catRendered) {
       container.createEl("hr", { cls: "kid-score-divider" });
     }
-    container.createEl("h3", { text: "其他", cls: "kid-score-section-title" });
-    const grid = container.createDiv({ cls: "kid-score-grid" });
+    const layout = isTouchLayout
+      ? renderMobileScoreCategoryLayout(container, false)
+      : renderDesktopScoreCategoryLayout(container, false);
+    layout.titleHost.createEl("h3", { text: "其他", cls: "kid-score-section-title" });
     for (const item of uncategorized) {
-      renderScoreCard(item, grid, yesterdayData);
+      renderScoreCard(item, layout.grid, yesterdayData);
     }
     catRendered = true;
   }

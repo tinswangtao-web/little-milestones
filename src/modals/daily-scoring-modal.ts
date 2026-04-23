@@ -109,10 +109,12 @@ export class DailyScoringModal extends BaseMobileModal {
           await self.plugin.saveSettings();
           await self.renderModal();
         },
+        isTouchLayout: this.isTouchOptimizedMode(),
       });
 
       const { scorePanel, diaryPanel } = renderMainTabs({
         containerEl: contentEl,
+        isTouchLayout: this.isTouchOptimizedMode(),
         onShowScore: () => {
           self.syncDiaryContent();
           self.activeTab = "score";
@@ -164,6 +166,7 @@ export class DailyScoringModal extends BaseMobileModal {
         insertDiaryText: (text) => this.insertTextAtCursor(text),
         wrapDiarySelection: (prefix, suffix, placeholder) =>
           this.wrapDiarySelection(prefix, suffix, placeholder),
+        isTouchLayout: this.isTouchOptimizedMode(),
       });
       renderBottomActions({
         containerEl: contentEl,
@@ -183,6 +186,7 @@ export class DailyScoringModal extends BaseMobileModal {
           self.close();
           new StatsModal(self.app, self.plugin).open();
         },
+        isTouchLayout: this.isTouchOptimizedMode(),
         bindDiaryActions: (buttons) => this.diaryControls?.bindActionButtons(buttons),
       });
     } finally {

@@ -1,6 +1,8 @@
 import { MarkdownRenderer, Notice, type App, type Component } from "obsidian";
 import { bindModalInputFocus } from "../../utils/dom";
 import type KidScorePlugin from "../../main";
+import { renderDesktopRulesSectionLayout } from "./desktop-rules-section";
+import { renderMobileRulesSectionLayout } from "./mobile-rules-section";
 
 interface RenderRulesSectionOptions {
   app: App;
@@ -8,6 +10,7 @@ interface RenderRulesSectionOptions {
   plugin: KidScorePlugin;
   container: HTMLElement;
   onAfterRulesSaved: () => void;
+  isTouchLayout: boolean;
 }
 
 export function renderRulesSection({
@@ -16,21 +19,21 @@ export function renderRulesSection({
   plugin,
   container,
   onAfterRulesSaved,
+  isTouchLayout,
 }: RenderRulesSectionOptions): HTMLElement {
-  const section = container.createDiv({ cls: "kid-score-rules-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
-  const toggle = header.createEl("span", {
+  const layout = isTouchLayout
+    ? renderMobileRulesSectionLayout(container)
+    : renderDesktopRulesSectionLayout(container);
+  const { section, header, titleHost, actionHost, body, view, edit } = layout;
+  const toggle = titleHost.createEl("span", {
     cls: "kid-score-rules-toggle",
     text: "▶",
   });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "📋 打分规则" });
-  const editBtn = header.createEl("button", {
+  titleHost.createEl("span", { cls: "kid-score-rules-title", text: "📋 打分规则" });
+  const editBtn = actionHost.createEl("button", {
     cls: "kid-score-rules-edit-btn",
     text: "✏️",
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
-  const view = body.createDiv({ cls: "kid-score-rules-view" });
-  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
   const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
   bindModalInputFocus(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";

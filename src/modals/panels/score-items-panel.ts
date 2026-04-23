@@ -1,5 +1,9 @@
 import type { CustomScoreItem, DayData, ScoreItem } from "../../types";
 import { attachPressGesture } from "../helpers/press-gesture";
+import { renderDesktopCustomItemRowLayout } from "./desktop-score-sections";
+import { renderMobileCustomItemRowLayout } from "./mobile-score-sections";
+import { renderDesktopScoreCardLayout } from "./desktop-score-card";
+import { renderMobileScoreCardLayout } from "./mobile-score-card";
 
 interface RenderScoreCardOptions {
   item: ScoreItem;
@@ -41,13 +45,14 @@ export function renderScoreCard({
   const isNeg = scoreVal < 0 || (scoreVal === 0 && item.points < 0);
   const isDeductItem = item.category === "减分" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
-  const card = grid.createDiv({
-    cls:
-      "kid-score-card" +
-      (isEarned ? " is-earned" : "") +
-      (isNeg ? " is-negative" : "") +
-      (isDeductedActive ? " is-deducted-active" : ""),
-  });
+  const cardClassName =
+    (isEarned ? " is-earned" : "") +
+    (isNeg ? " is-negative" : "") +
+    (isDeductedActive ? " is-deducted-active" : "");
+  const layout = isTouchMode
+    ? renderMobileScoreCardLayout(grid, cardClassName)
+    : renderDesktopScoreCardLayout(grid, cardClassName);
+  const { card, emoji, name, noteHost, points, yesterday } = layout;
   card.dataset.itemId = item.id;
   const moreBtn = card.createEl("button", {
     cls: "kid-score-card-more-btn",
@@ -59,10 +64,10 @@ export function renderScoreCard({
     e.stopPropagation();
     onCustomValue(item, false, card);
   };
-  card.createDiv({ cls: "card-emoji", text: item.emoji });
-  card.createDiv({ cls: "card-name", text: item.name });
+  emoji.setText(item.emoji);
+  name.setText(item.name);
   if (item.note) {
-    card.createDiv({ cls: "card-note", text: item.note });
+    noteHost.createDiv({ cls: "card-note", text: item.note });
   }
   const pointsText =
     scoreVal !== 0
@@ -71,17 +76,16 @@ export function renderScoreCard({
         " 分" +
         (scoreVal !== item.points ? " 📝" : "")
       : (item.points >= 0 ? "+" : "") + item.points + " 分";
-  card.createDiv({ cls: "card-points", text: pointsText });
+  points.setText(pointsText);
   if (yesterdayData) {
     const yScore = yesterdayData.scores[item.id] || 0;
     const yClass = yScore > 0 ? "was-earned" : yScore < 0 ? "was-negative" : "was-missed";
     const ySign = yScore > 0 ? "+" : "";
-    card.createDiv({
-      cls: "card-yesterday " + yClass,
-      text: "昨 " + ySign + yScore + " 分",
-    });
+    yesterday.className = "card-yesterday " + yClass;
+    yesterday.textContent = "昨 " + ySign + yScore + " 分";
   } else {
-    card.createDiv({ cls: "card-yesterday was-missed", text: "昨 -" });
+    yesterday.className = "card-yesterday was-missed";
+    yesterday.textContent = "昨 -";
   }
 
   attachPressGesture({
@@ -144,9 +148,10 @@ export function renderCustomItemsList({
   for (let i = 0; i < customItems.length; i++) {
     ((idx) => {
       const ci = customItems[idx];
-      const wrap = container.createDiv({ cls: "kid-score-custom-wrap" });
-      const row = wrap.createDiv({ cls: "kid-score-custom-row" });
-      const main = row.createDiv({ cls: "kid-score-custom-main" });
+      const layout = isTouchMode
+        ? renderMobileCustomItemRowLayout(container)
+        : renderDesktopCustomItemRowLayout(container);
+      const { wrap, row, main } = layout;
       main.createSpan({ cls: "custom-emoji", text: ci.emoji });
       main.createSpan({ cls: "custom-name", text: ci.name });
       main.createSpan({

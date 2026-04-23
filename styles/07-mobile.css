@@ -46,6 +46,11 @@
     gap: 8px !important;
   }
 
+  .kid-score-grid-mobile {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
   .kid-score-card {
     min-height: 80px;
     padding: 18px 8px 12px;
@@ -53,6 +58,10 @@
     -webkit-tap-highlight-color: transparent;
     /* Allow vertical scroll when touch starts on a card */
     touch-action: pan-y;
+  }
+
+  .kid-score-card-content-mobile {
+    gap: 2px;
   }
   .kid-score-card-more-btn {
     display: inline-flex;
@@ -115,6 +124,34 @@
     font-size: 0.8em;
     line-height: 1.4;
     border-radius: 10px;
+  }
+
+  .kid-score-meta-bar-mobile {
+    gap: 8px;
+  }
+
+  .kid-score-cat-header-mobile {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .kid-score-cat-title-host-mobile,
+  .kid-score-cat-action-host-mobile {
+    width: 100%;
+  }
+
+  .kid-score-cat-action-host-mobile {
+    justify-content: flex-end;
+  }
+
+  .kid-score-total-display-mobile {
+    order: 1;
+  }
+
+  .kid-score-hint-mobile {
+    order: 2;
+    text-align: center;
   }
 
   .completion-name { flex: 0 0 80px; font-size: 0.8em; }
@@ -355,6 +392,20 @@
     row-gap: 4px;
   }
 
+  .kid-score-custom-row-mobile {
+    gap: 6px;
+    padding: 10px;
+    min-height: 48px;
+    border-radius: 8px;
+    align-items: flex-start;
+  }
+
+  .kid-score-custom-main-mobile {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
   .custom-name {
     font-size: 0.85em;
     flex: 1 1 100%;
@@ -427,6 +478,9 @@
     border-radius: 999px;
     line-height: 1.35;
   }
+  .kid-score-user-btn-mobile {
+    flex-shrink: 0;
+  }
   .kid-score-user-add-btn {
     flex-shrink: 0;
     padding: 10px 12px;
@@ -447,6 +501,12 @@
     overflow: hidden;
   }
 
+  .kid-score-main-tabs-mobile {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+
   .kid-score-daily-modal {
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
@@ -459,6 +519,10 @@
     align-items: center !important;
     justify-content: center !important;
     line-height: 1.5 !important;
+  }
+
+  .kid-score-main-tab-mobile {
+    min-height: 48px !important;
   }
 
   /* Diary mobile */
@@ -495,6 +559,17 @@
     gap: 10px;
     overflow: visible;
     padding-bottom: 0;
+  }
+
+  .mobile-diary-panel .diary-quick-section,
+  .mobile-diary-panel .diary-module-section,
+  .mobile-diary-panel .diary-textarea-wrap {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .mobile-diary-panel .diary-quick-section {
+    margin-bottom: 12px;
   }
 
   .diary-module-grid {

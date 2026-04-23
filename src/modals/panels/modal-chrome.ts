@@ -1,6 +1,10 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../../main";
 import { formatDate } from "../../utils/date";
+import { renderDesktopBottomActionsLayout, renderDesktopDailyHeaderLayout } from "./desktop-modal-chrome";
+import { renderMobileBottomActionsLayout, renderMobileDailyHeaderLayout } from "./mobile-modal-chrome";
+import { renderDesktopMainTabsLayout } from "./desktop-tabs";
+import { renderMobileMainTabsLayout } from "./mobile-tabs";
 
 interface RenderDailyHeaderOptions {
   containerEl: HTMLElement;
@@ -12,12 +16,14 @@ interface RenderDailyHeaderOptions {
   onCalendar: () => void;
   onGoToday: () => void;
   onSwitchUser: (userId: string) => Promise<void>;
+  isTouchLayout: boolean;
 }
 
 interface RenderTabsOptions {
   containerEl: HTMLElement;
   onShowScore: () => void;
   onShowDiary: () => void;
+  isTouchLayout: boolean;
 }
 
 interface RenderBottomActionsOptions {
@@ -25,6 +31,7 @@ interface RenderBottomActionsOptions {
   onPreview: () => void;
   onSave: () => Promise<void>;
   onStats: () => void;
+  isTouchLayout: boolean;
   bindDiaryActions: (buttons: {
     previewBtn: HTMLButtonElement;
     saveBtn: HTMLButtonElement;
@@ -43,10 +50,12 @@ export function renderDailyHeader({
   onCalendar,
   onGoToday,
   onSwitchUser,
+  isTouchLayout,
 }: RenderDailyHeaderOptions) {
-  const header = containerEl.createDiv({ cls: "kid-score-header" });
-  header.createEl("h2", { text: plugin.currentUser.name + " 的每日记录" });
-  const dateNav = header.createDiv({ cls: "kid-score-date-nav" });
+  const layout = isTouchLayout
+    ? renderMobileDailyHeaderLayout(containerEl, plugin.currentUser.name + " 的每日记录")
+    : renderDesktopDailyHeaderLayout(containerEl, plugin.currentUser.name + " 的每日记录");
+  const { dateNav, userSwitcher } = layout;
   const prevBtn = dateNav.createEl("button", { cls: "date-nav-btn", text: "◀" });
   prevBtn.onclick = onPrevDay;
   dateNav.createEl("button", {
@@ -87,10 +96,12 @@ export function renderDailyHeader({
     cumDiv.createSpan({ cls: "cumulative-days", text: "共 " + cumulativeDays + " 天" });
   }
 
-  const userSwitcher = containerEl.createDiv({ cls: "kid-score-user-switcher" });
   plugin.settings.users.forEach((u) => {
     const uBtn = userSwitcher.createEl("button", {
-      cls: "kid-score-user-btn" + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
+      cls:
+        "kid-score-user-btn " +
+        (isTouchLayout ? "kid-score-user-btn-mobile" : "kid-score-user-btn-desktop") +
+        (u.id === plugin.settings.currentUserId ? " is-active" : ""),
       text: u.name,
     });
     if (plugin.settings.users.length > 1) {
@@ -109,18 +120,11 @@ export function renderMainTabs({
   containerEl,
   onShowScore,
   onShowDiary,
+  isTouchLayout,
 }: RenderTabsOptions) {
-  const mainTabs = containerEl.createDiv({ cls: "kid-score-main-tabs" });
-  const scoreTab = mainTabs.createEl("button", {
-    text: "⭐ 打分",
-    cls: "kid-score-main-tab is-active",
-  });
-  const diaryTab = mainTabs.createEl("button", {
-    text: "📝 日记",
-    cls: "kid-score-main-tab",
-  });
-  const scorePanel = containerEl.createDiv({ cls: "kid-score-tab-panel" });
-  const diaryPanel = containerEl.createDiv({ cls: "kid-score-tab-panel is-hidden" });
+  const { scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout
+    ? renderMobileMainTabsLayout(containerEl)
+    : renderDesktopMainTabsLayout(containerEl);
 
   scoreTab.onclick = () => {
     scoreTab.addClass("is-active");
@@ -145,24 +149,15 @@ export function renderBottomActions({
   onPreview,
   onSave,
   onStats,
+  isTouchLayout,
   bindDiaryActions,
 }: RenderBottomActionsOptions) {
-  const actions = containerEl.createDiv({ cls: "kid-score-actions" });
-  const previewBtn = actions.createEl("button", {
-    text: "查看预览",
-    cls: "kid-score-preview-btn",
-  });
-  const saveBtn = actions.createEl("button", {
-    text: "💾 保存记录",
-    cls: "mod-cta kid-score-save-btn",
-  });
-  const statsBtn = actions.createEl("button", {
-    text: "📊 查看统计",
-    cls: "kid-score-stats-btn",
-  });
+  const { actions, previewBtn, saveBtn, statsBtn } = isTouchLayout
+    ? renderMobileBottomActionsLayout(containerEl)
+    : renderDesktopBottomActionsLayout(containerEl);
 
   bindDiaryActions({ previewBtn, saveBtn, statsBtn, actions });
   previewBtn.onclick = onPreview;
   saveBtn.onclick = () => void onSave();
-  statsBtn.onclick = onStats;
+  if (statsBtn) statsBtn.onclick = onStats;
 }

@@ -1,7 +1,7 @@
 ## Write Lock
 - `owner`: none
-- `since`: -
+- `since`: —
 - `scope`: none
-- `reason`: lock released after tracking the kimi mobile UX review file in git
-- `expires-at`: -
-- `notes`: Primary workspace only. Documentation/protocol update only; no plugin code changes in this turn.
+- `reason`: waiting for user direction after the seventh source-only split step for the scoring-page remaining UI shells
+- `expires-at`: —
+- `notes`: Lock released after separating the remaining main-tab and rules-section shells into desktop/mobile layout helpers without syncing the architecture work to the Vault.

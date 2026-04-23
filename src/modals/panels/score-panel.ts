@@ -3,6 +3,8 @@ import type { DayData, ScoreItem } from "../../types";
 import type KidScorePlugin from "../../main";
 import { renderRulesSection } from "./rules-section";
 import { renderScoreCategorySections } from "./score-category-sections";
+import { renderDesktopScorePanelLayout } from "./desktop-score-panel";
+import { renderMobileScorePanelLayout } from "./mobile-score-panel";
 
 interface RenderScorePanelOptions {
   app: App;
@@ -47,6 +49,7 @@ export function renderScorePanel({
     plugin,
     container: scorePanel,
     onAfterRulesSaved,
+    isTouchLayout: isTouchOptimizedMode,
   });
 
   if (yesterdayData) {
@@ -57,35 +60,41 @@ export function renderScorePanel({
     });
   }
 
-  const itemsContainer = scorePanel.createDiv({ cls: "kid-score-items" });
-  itemsContainer.createDiv({
-    cls: "kid-score-hint",
-    text: isTouchOptimizedMode
+  const layout = isTouchOptimizedMode
+    ? renderMobileScorePanelLayout(scorePanel)
+    : renderDesktopScorePanelLayout(scorePanel);
+  layout.hint.setText(
+    isTouchOptimizedMode
       ? "💡 点一下记分，长按或点右上角按钮调整分值"
-      : "💡 下方打分项：点击打分 · 长按自定义分值",
-  });
-  const totalDisplay = scorePanel.createDiv({ cls: "kid-score-total-display" });
-  onSetTotalDisplay(totalDisplay);
+      : "💡 下方打分项：点击打分 · 长按自定义分值"
+  );
+  onSetTotalDisplay(layout.totalDisplay);
 
   const catRendered = renderScoreCategorySections({
     plugin,
-    container: itemsContainer,
+    container: layout.sections,
     yesterdayData,
+    isTouchLayout: isTouchOptimizedMode,
     renderScoreCard,
     onAddItem,
   });
 
   if (catRendered) {
-    itemsContainer.createEl("hr", { cls: "kid-score-divider" });
+    layout.sections.createEl("hr", { cls: "kid-score-divider" });
   }
-  itemsContainer.createEl("h3", { text: "📌 临时事项", cls: "kid-score-section-title" });
-  const customItemsContainer = itemsContainer.createDiv({ cls: "kid-score-custom-items" });
+  layout.customSection.createEl("h3", {
+    text: "📌 临时事项",
+    cls: "kid-score-section-title",
+  });
   renderCustomItems();
-  const addCustomBtn = itemsContainer.createEl("button", {
+  const addCustomBtn = layout.customSection.createEl("button", {
     text: "＋ 添加临时加减分",
     cls: "kid-score-add-custom-btn",
   });
   addCustomBtn.onclick = () => onAddCustom();
 
-  return { totalDisplay, customItemsContainer };
+  return {
+    totalDisplay: layout.totalDisplay,
+    customItemsContainer: layout.customItemsContainer,
+  };
 }

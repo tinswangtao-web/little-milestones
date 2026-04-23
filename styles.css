@@ -43,6 +43,19 @@ button,
   font-size: 1.3em;
 }
 
+.kid-score-header-desktop {
+  display: grid;
+  gap: 6px;
+}
+
+.kid-score-user-switcher-desktop {
+  margin-top: 8px;
+}
+
+.kid-score-user-btn-desktop {
+  padding: 8px 12px;
+}
+
 .kid-score-date {
   color: var(--text-muted);
   font-size: 0.9em;
@@ -95,6 +108,103 @@ button,
   font-size: 0.82em;
   margin: 0 0 12px;
   text-align: center;
+}
+
+.kid-score-meta-bar {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 12px;
+}
+
+.kid-score-meta-bar-desktop {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+  align-items: center;
+}
+
+.kid-score-meta-bar-mobile {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.kid-score-hint-desktop {
+  margin: 0;
+  text-align: left;
+}
+
+.kid-score-hint-mobile {
+  margin: 0;
+}
+
+.kid-score-total-display-desktop,
+.kid-score-total-display-mobile {
+  margin: 0;
+}
+
+.kid-score-sections {
+  display: flex;
+  flex-direction: column;
+}
+
+.kid-score-category-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.kid-score-custom-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.kid-score-cat-header-desktop {
+  justify-content: space-between;
+}
+
+.kid-score-cat-title-host,
+.kid-score-cat-action-host {
+  display: flex;
+  align-items: center;
+}
+
+.kid-score-cat-action-host-desktop {
+  justify-content: flex-end;
+}
+
+.kid-score-main-tabs-desktop {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+
+.kid-score-main-tab-desktop {
+  min-height: 42px;
+}
+
+.kid-score-tab-panel-desktop {
+  display: block;
+}
+
+.kid-score-rules-header-desktop {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kid-score-rules-title-host,
+.kid-score-rules-action-host {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kid-score-grid-desktop {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+
+.kid-score-custom-row-desktop {
+  align-items: center;
+}
+
+.kid-score-custom-main-desktop {
+  align-items: center;
 }
 
 .kid-score-cat-header {
@@ -173,6 +283,24 @@ button,
   text-align: center;
   touch-action: manipulation;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.kid-score-card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.kid-score-card-content-desktop {
+  gap: 2px;
+}
+
+.card-note-host {
+  width: 100%;
+  min-width: 0;
 }
 
 .kid-score-card-more-btn {
@@ -328,6 +456,10 @@ button,
   display: flex;
   gap: 10px;
   justify-content: center;
+}
+
+.kid-score-actions-desktop {
+  align-items: center;
 }
 
 .kid-score-save-btn {
@@ -1168,6 +1300,13 @@ textarea.custom-form-name-input {
   line-height: 1.5;
 }
 
+.diary-desktop-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 14px;
+  align-items: start;
+}
+
 .diary-module-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -1216,6 +1355,28 @@ textarea.custom-form-name-input {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.diary-quick-section {
+  display: grid;
+  align-content: start;
+}
+
+.diary-quick-section .diary-quick-row {
+  margin-bottom: 0;
+}
+
+.desktop-diary-panel .diary-module-grid {
+  margin-bottom: 0;
+}
+
+.desktop-diary-panel .diary-quick-row {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.desktop-diary-panel .diary-textarea-wrap {
+  margin-top: 2px;
 }
 
 .diary-quick-group {
@@ -2694,6 +2855,11 @@ textarea.custom-form-name-input {
     gap: 8px !important;
   }
 
+  .kid-score-grid-mobile {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
   .kid-score-card {
     min-height: 80px;
     padding: 18px 8px 12px;
@@ -2701,6 +2867,10 @@ textarea.custom-form-name-input {
     -webkit-tap-highlight-color: transparent;
     /* Allow vertical scroll when touch starts on a card */
     touch-action: pan-y;
+  }
+
+  .kid-score-card-content-mobile {
+    gap: 2px;
   }
   .kid-score-card-more-btn {
     display: inline-flex;
@@ -2763,6 +2933,34 @@ textarea.custom-form-name-input {
     font-size: 0.8em;
     line-height: 1.4;
     border-radius: 10px;
+  }
+
+  .kid-score-meta-bar-mobile {
+    gap: 8px;
+  }
+
+  .kid-score-cat-header-mobile {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .kid-score-cat-title-host-mobile,
+  .kid-score-cat-action-host-mobile {
+    width: 100%;
+  }
+
+  .kid-score-cat-action-host-mobile {
+    justify-content: flex-end;
+  }
+
+  .kid-score-total-display-mobile {
+    order: 1;
+  }
+
+  .kid-score-hint-mobile {
+    order: 2;
+    text-align: center;
   }
 
   .completion-name { flex: 0 0 80px; font-size: 0.8em; }
@@ -3003,6 +3201,20 @@ textarea.custom-form-name-input {
     row-gap: 4px;
   }
 
+  .kid-score-custom-row-mobile {
+    gap: 6px;
+    padding: 10px;
+    min-height: 48px;
+    border-radius: 8px;
+    align-items: flex-start;
+  }
+
+  .kid-score-custom-main-mobile {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
   .custom-name {
     font-size: 0.85em;
     flex: 1 1 100%;
@@ -3075,6 +3287,9 @@ textarea.custom-form-name-input {
     border-radius: 999px;
     line-height: 1.35;
   }
+  .kid-score-user-btn-mobile {
+    flex-shrink: 0;
+  }
   .kid-score-user-add-btn {
     flex-shrink: 0;
     padding: 10px 12px;
@@ -3095,6 +3310,12 @@ textarea.custom-form-name-input {
     overflow: hidden;
   }
 
+  .kid-score-main-tabs-mobile {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+
   .kid-score-daily-modal {
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
@@ -3107,6 +3328,10 @@ textarea.custom-form-name-input {
     align-items: center !important;
     justify-content: center !important;
     line-height: 1.5 !important;
+  }
+
+  .kid-score-main-tab-mobile {
+    min-height: 48px !important;
   }
 
   /* Diary mobile */
@@ -3143,6 +3368,17 @@ textarea.custom-form-name-input {
     gap: 10px;
     overflow: visible;
     padding-bottom: 0;
+  }
+
+  .mobile-diary-panel .diary-quick-section,
+  .mobile-diary-panel .diary-module-section,
+  .mobile-diary-panel .diary-textarea-wrap {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .mobile-diary-panel .diary-quick-section {
+    margin-bottom: 12px;
   }
 
   .diary-module-grid {

@@ -48,6 +48,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  const requiresFullKeyboardHeight = !!mEl.querySelector(".kid-score-custom-form");
   let stableViewportHeight = window.visualViewport
     ? window.visualViewport.height
     : window.innerHeight;
@@ -110,6 +111,15 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     return raw;
   };
 
+  const hasFocusedModalField = () => {
+    const active = document.activeElement as HTMLElement | null;
+    return !!(
+      active &&
+      contentEl.contains(active) &&
+      /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)
+    );
+  };
+
   const updateModalLift = (keyboardH: number) => {
     if (!(platformIsIOS && isEditModal)) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
@@ -124,7 +134,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
 
     const desiredBottom = (window.visualViewport?.offsetTop || 0) +
       (window.visualViewport?.height || window.innerHeight) -
-      8;
+      (isEditModal ? 24 : 8);
     const currentRect = mEl.getBoundingClientRect();
     const currentKeyboardOffset = readKeyboardOffset();
     const nextKeyboardOffset = currentKeyboardOffset + (desiredBottom - currentRect.bottom);
@@ -144,15 +154,18 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
 
     if ((platformIsIOS || platformIsAndroid) && window.visualViewport) {
       const keyboardH = getKeyboardHeight();
-      updateModalLift(keyboardH);
-      if (keyboardH > 80) {
+      const forceKeyboardMode = platformIsIOS && isEditModal && hasFocusedModalField();
+      const effectiveKeyboardH = forceKeyboardMode ? Math.max(keyboardH, 81) : keyboardH;
+      if (effectiveKeyboardH > 80) {
         mEl.style.alignSelf = "flex-start";
         mEl.style.marginTop = "max(12px, env(safe-area-inset-top, 0px))";
         mEl.style.marginBottom = "auto";
         const keyboardMaxHeight = Math.max(compactViewport ? 180 : 220, vvH - (compactViewport ? 8 : 12));
         mEl.style.maxHeight = keyboardMaxHeight + "px";
-        if (platformIsIOS && isEditModal) {
+        if (platformIsIOS && isEditModal && requiresFullKeyboardHeight) {
           mEl.style.height = keyboardMaxHeight + "px";
+        } else {
+          mEl.style.height = "";
         }
         const extraBottom = isEditModal ? 28 : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
@@ -166,6 +179,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         contentEl.style.paddingBottom = "";
         contentEl.style.scrollPaddingBottom = "";
       }
+      updateModalLift(effectiveKeyboardH);
     } else {
       mEl.style.maxHeight = Math.max(compactViewport ? 108 : 120, vvH - (compactViewport ? 20 : 32)) + "px";
       mEl.style.height = "";

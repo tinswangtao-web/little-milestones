@@ -42,7 +42,8 @@ export function attachModalDragGesture(modal: Modal): DragCleanup | null {
     const viewportBottom = viewportTop + (window.visualViewport?.height || window.innerHeight);
     const baseTop = rect.top - currentOffset;
     const baseBottom = rect.bottom - currentOffset;
-    minOffset = viewportTop + 8 - baseTop;
+    const overshootTop = Math.min(Math.max(rect.height * 0.35, 120), 260);
+    minOffset = viewportTop + 8 - baseTop - overshootTop;
     maxOffset = viewportBottom - 8 - baseBottom;
     if (minOffset > maxOffset) {
       const middle = (minOffset + maxOffset) / 2;
