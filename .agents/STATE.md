@@ -8,7 +8,7 @@
 - `write-scope`: src/settings/category-settings.ts, src/settings/import-export-settings.ts, src/settings/settings-shell-layout.ts, src/settings/desktop-settings-shells.ts, src/settings/mobile-settings-shells.ts, src/settings/content-sections.ts, src/settings/settings-tab.ts, styles/06-settings.css, styles/07-mobile.css, main.js, styles.css, .agents/**
 - `read-scope`: src/**, styles/**, main.js, styles.css, .agents/**
 - `awaiting`: user
-- `handoff-note`: Codex synced the settings-page desktop/mobile shell split to the Vault from the primary workspace. The Vault copies of manifest.json, main.js, and styles.css match the workspace hashes, so the Obsidian runtime now includes commit 4873840 plus the synced generated artifacts.
+- `handoff-note`: Codex tightened the desktop settings-page diary-module icon control so it matches the nearby input height better, rebuilt styles.css, and synced the runtime files to the Vault with hash verification. Awaiting user visual check in Obsidian.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

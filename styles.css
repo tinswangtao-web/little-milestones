@@ -2790,7 +2790,7 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-main {
   display: grid;
-  grid-template-columns: 88px minmax(220px, 280px);
+  grid-template-columns: 68px minmax(220px, 280px);
   gap: 10px;
   align-items: start;
   min-width: 0;
@@ -2857,9 +2857,10 @@ textarea.custom-form-name-input {
 
 .diary-module-settings-emoji-btn {
   width: 100%;
-  min-height: 78px;
-  border-radius: 12px;
-  font-size: 1.5em;
+  min-height: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 1.2em;
 }
 
 /* ─── 移动端适配 ─────────────────────────────────────────────────────────────── */
