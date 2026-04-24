@@ -2,6 +2,6 @@
 - `owner`: none
 - `since`: —
 - `scope`: none
-- `reason`: waiting for user direction after extending the settings shell split to the item-management section
+- `reason`: waiting for user validation after report status icon update
 - `expires-at`: —
-- `notes`: Lock released after wrapping the settings item-management section in desktop/mobile shell helpers without syncing the settings architecture work to the Vault.
+- `notes`: Lock released after updating 得分页 status icons, rebuilding, syncing to Vault, and verifying runtime file hashes.

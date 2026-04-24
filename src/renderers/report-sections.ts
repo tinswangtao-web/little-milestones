@@ -169,13 +169,7 @@ function renderCategoryRows(items: ScoreItem[], report: DayReport): string {
   for (const item of items) {
     const actual = report.scores[item.id] || 0;
     const isDeductItem = item.category === "减分" || item.points < 0;
-    const status = isDeductItem
-      ? actual !== 0
-        ? "⭕"
-        : "🔵"
-      : actual > 0
-        ? "✅"
-        : "❌";
+    const status = renderScoreStatusIcon(actual);
     const defaultSign = item.points >= 0 ? "+" : "";
     const noteMarker = actual !== 0 && actual !== item.points ? " 📝" : "";
     rows +=
@@ -196,11 +190,17 @@ function renderCategoryRows(items: ScoreItem[], report: DayReport): string {
     if (report.hasYesterday && report.yesterdayData) {
       const yVal = report.yesterdayData.scores[item.id] || 0;
       const ySign = yVal >= 0 ? "+" : "";
-      const yIcon = yVal > 0 ? "✅" : yVal < 0 ? "❌" : "—";
+      const yIcon = renderScoreStatusIcon(yVal);
       rows += "> [!quote]- 昨日：" + item.name + " " + ySign + yVal + " 分 " + yIcon + "\n";
     }
   }
   return rows;
+}
+
+function renderScoreStatusIcon(score: number): string {
+  if (score > 0) return "✅";
+  if (score < 0) return "🔴";
+  return "🔵";
 }
 
 function renderProgressBar(pct: number): string {

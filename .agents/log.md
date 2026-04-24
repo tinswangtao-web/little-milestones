@@ -58,6 +58,7 @@
 - 2026-04-24 00:05 [codex] committed the source-only settings-page desktop/mobile shell split as 4873840 without syncing to Vault
 - 2026-04-24 09:28 [codex] synced the settings-page desktop/mobile shell split to the Vault from the primary workspace and verified `manifest.json`, `main.js`, and `styles.css` hashes match the workspace copies
 - 2026-04-24 09:39 [codex] tightened the desktop diary-module icon picker size in settings, rebuilt artifacts, synced to Vault, and verified `manifest.json`, `main.js`, and `styles.css` hashes match
+- 2026-04-24 09:45 [codex] updated generated report status icons to use score-sign semantics (zero 🔵, positive ✅, negative 🔴), rebuilt artifacts, synced to Vault, and verified runtime hashes
 
 - 2026-04-22 10:35 [kimi] completed post-fix targeted review per user request; filed `.agents/reviews/2026-04-22-kimi-postfix-review.md`; focused on 5 areas: (1) CRLF compatibility — 2 regex locations in day-data-store.ts still hardcode \n, (2) renameUserInFiles — still regex-based with YAML quote / title format fragility, (3) performance — getAllScores still no cache, stats panel still O(n×m), (4) import validation — missing duplicate-id / integer-points / category-validity checks, (5) regression — streak/week/month/childName/goals/customItems schema all confirmed fixed; recommended top-5 priority fixes for codex.
 

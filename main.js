@@ -6615,18 +6615,23 @@ function renderCategoryRows(items, report) {
   for (const item of items) {
     const actual = report.scores[item.id] || 0;
     const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-    const status = isDeductItem ? actual !== 0 ? "\u2B55" : "\u{1F535}" : actual > 0 ? "\u2705" : "\u274C";
+    const status = renderScoreStatusIcon(actual);
     const defaultSign = item.points >= 0 ? "+" : "";
     const noteMarker = actual !== 0 && actual !== item.points ? " \u{1F4DD}" : "";
     rows += "| " + item.emoji + " " + item.name + " | " + defaultSign + item.points + " | " + renderScoreCell(actual, isDeductItem) + noteMarker + " | " + status + " |\n";
     if (report.hasYesterday && report.yesterdayData) {
       const yVal = report.yesterdayData.scores[item.id] || 0;
       const ySign = yVal >= 0 ? "+" : "";
-      const yIcon = yVal > 0 ? "\u2705" : yVal < 0 ? "\u274C" : "\u2014";
+      const yIcon = renderScoreStatusIcon(yVal);
       rows += "> [!quote]- \u6628\u65E5\uFF1A" + item.name + " " + ySign + yVal + " \u5206 " + yIcon + "\n";
     }
   }
   return rows;
+}
+function renderScoreStatusIcon(score) {
+  if (score > 0) return "\u2705";
+  if (score < 0) return "\u{1F534}";
+  return "\u{1F535}";
 }
 function renderProgressBar(pct) {
   const filled = Math.round(pct / 5);
