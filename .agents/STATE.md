@@ -5,10 +5,10 @@
 - `last-commit`: 193c96f (.agents scaffolding) / 226bc86 (mobile UX fix) / 937a838 (STATE + log) / 502bd80 (refactor plugin structure) / 7810df3 (split settings sections) / 7f20e12 (polish mobile diary) / d782694 (tighten collaboration rules) / d97cb35 (kimi review) / 0a7abd9 (kimi implementation fixes) / 670d08e (kimi scoring-page fixes) / 9a17ded (settings touch-guard fix) / ccb8d2e (date-nav simplification) / a20879e (mobile diary and keyboard refinement) / 11a442d (diary field wrapping) / 0d24441 (diary module editors) / ae5a304 (remove xiaopengyou copy) / 09c80d9 (chatgpt data-safety pass) / a4c1c08 (kimi post-review fixes) / a5cac65 (prerelease follow-up patch) / 2717787 (repo cleanup) / 136dba3 (first kimi mobile-ux pass) / babca2d (mobile polish pass) / 99032ec (mobile settings category picker) / 4873840 (settings desktop/mobile shell split)
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none (old claude worktree removed on 2026-04-22)
-- `write-scope`: src/renderers/report-sections.ts, main.js, .agents/**
+- `write-scope`: styles/07-mobile.css, styles.css, .agents/**
 - `read-scope`: src/**, styles/**, main.js, styles.css, .agents/**
 - `awaiting`: user
-- `handoff-note`: Codex updated 得分页 status icons so zero scores render as 🔵, positive scores render as ✅, and negative scores render as 🔴. Runtime files were rebuilt, synced to Vault, and hash-verified.
+- `handoff-note`: Codex fixed the mobile 打分页 calendar picker overflow by giving the popup a wider safe mobile width and tighter day-cell sizing. Runtime files were rebuilt, synced to Vault, and hash-verified.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

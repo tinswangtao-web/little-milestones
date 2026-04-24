@@ -2,6 +2,6 @@
 - `owner`: none
 - `since`: —
 - `scope`: none
-- `reason`: waiting for user validation after report status icon update
+- `reason`: waiting for user validation after mobile calendar picker overflow fix
 - `expires-at`: —
-- `notes`: Lock released after updating 得分页 status icons, rebuilding, syncing to Vault, and verifying runtime file hashes.
+- `notes`: Lock released after resizing the mobile calendar picker, rebuilding styles.css, syncing to Vault, and verifying runtime hashes.
