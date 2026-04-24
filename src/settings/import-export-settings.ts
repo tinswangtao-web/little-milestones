@@ -1,6 +1,9 @@
 import { Notice, Setting } from "obsidian";
 import type KidScorePlugin from "../main";
 import type { ScoreItem } from "../types";
+import { getMobilePlatform } from "../utils/platform";
+import { renderDesktopSettingsSectionShell } from "./desktop-settings-shells";
+import { renderMobileSettingsSectionShell } from "./mobile-settings-shells";
 
 interface RenderImportExportSettingsOptions {
   plugin: KidScorePlugin;
@@ -13,9 +16,20 @@ export function renderImportExportSettings({
   containerEl,
   refresh,
 }: RenderImportExportSettingsOptions) {
-  containerEl.createEl("h3", { text: "📦 导出 / 导入配置" });
+  const isTouchLayout = getMobilePlatform() !== "desktop";
+  const shell = isTouchLayout
+    ? renderMobileSettingsSectionShell(
+        containerEl,
+        "kid-score-import-export-section",
+        "📦 导出 / 导入配置"
+      )
+    : renderDesktopSettingsSectionShell(
+        containerEl,
+        "kid-score-import-export-section",
+        "📦 导出 / 导入配置"
+      );
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("导出打分项配置")
     .setDesc("将所有分类和打分项导出为 JSON 文件")
     .addButton((btn) => {
@@ -36,7 +50,7 @@ export function renderImportExportSettings({
       });
     });
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("导入打分项配置")
     .setDesc("从 JSON 文件导入分类和打分项（将覆盖现有配置）")
     .addButton((btn) => {

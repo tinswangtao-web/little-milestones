@@ -246,6 +246,14 @@
     min-height: 44px;
   }
 
+  .kid-score-settings-actions-mobile .setting-item {
+    padding: 10px 0;
+  }
+
+  .kid-score-settings-actions-mobile .setting-item-control {
+    width: 100%;
+  }
+
   .kid-score-goals-grid {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -267,6 +275,10 @@
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 12px;
+  }
+
+  .settings-item-wrap-mobile {
+    margin-bottom: 10px;
   }
 
   /* Popup — centered, safe from edges */
@@ -946,6 +958,12 @@
     border-bottom: none;
   }
 
+  .settings-item-note-row-mobile {
+    padding: 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
   .settings-cat-options {
     padding: 8px 0 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -957,6 +975,11 @@
   }
 
   .diary-module-settings-row {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .diary-module-settings-row-mobile {
     gap: 10px;
     padding: 10px;
   }

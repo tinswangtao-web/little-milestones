@@ -1,8 +1,10 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../main";
 import { showEmojiPicker } from "../ui/emoji-picker";
-import { isIOS } from "../utils/platform";
+import { getMobilePlatform, isIOS } from "../utils/platform";
 import { sortItemsByCategories } from "./item-sorting";
+import { renderDesktopItemSettingsRowLayout } from "./desktop-settings-sections";
+import { renderMobileItemSettingsRowLayout } from "./mobile-settings-sections";
 
 interface RenderItemSettingsListOptions {
   plugin: KidScorePlugin;
@@ -20,6 +22,7 @@ export function renderItemSettingsList({
   setPendingScrollItemId,
 }: RenderItemSettingsListOptions): void {
   const useInlineCategoryPicker = isIOS();
+  const isTouchLayout = getMobilePlatform() !== "desktop";
   const getScrollContainer = () =>
     (itemsWrap.closest(".vertical-tab-content") ||
       itemsWrap.closest(".modal-content") ||
@@ -181,9 +184,11 @@ export function renderItemSettingsList({
         groupHeader.createSpan({ text: category });
       }
 
-      const wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
+      const layout = isTouchLayout
+        ? renderMobileItemSettingsRowLayout(itemsWrap)
+        : renderDesktopItemSettingsRowLayout(itemsWrap);
+      const { wrap, row, noteRow } = layout;
       wrap.dataset.itemId = item.id;
-      const row = wrap.createDiv({ cls: "settings-item-row-v2" });
       row.dataset.idx = String(idx);
 
       const handle = row.createEl("span", {
@@ -295,7 +300,6 @@ export function renderItemSettingsList({
         }
       };
 
-      const noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
       const noteInput = noteRow.createEl("textarea", {
         cls: "settings-note-input",
       });

@@ -2,27 +2,39 @@ import { Notice, Setting } from "obsidian";
 import type KidScorePlugin from "../main";
 import { sortItemsByCategories } from "./item-sorting";
 import { renderItemSettingsList } from "./item-settings-list";
+import { renderDesktopSettingsSectionShell } from "./desktop-settings-shells";
+import { renderMobileSettingsSectionShell } from "./mobile-settings-shells";
 
 interface RenderItemSettingsOptions {
   plugin: KidScorePlugin;
   containerEl: HTMLElement;
   bindSettingsInput: (input: HTMLElement | null) => void;
+  isTouchLayout: boolean;
 }
 
 export function renderItemSettings({
   plugin,
   containerEl,
   bindSettingsInput,
+  isTouchLayout,
 }: RenderItemSettingsOptions) {
   let pendingScrollItemId: string | null = null;
 
-  containerEl.createEl("h3", { text: "📝 打分项目管理" });
-  containerEl.createEl("p", {
-    cls: "kid-score-hint",
-    text: "点击表情按钮打开emoji选择器。按住 ☰ 拖动排序。",
-  });
+  const shell = isTouchLayout
+    ? renderMobileSettingsSectionShell(
+        containerEl,
+        "kid-score-item-management-section",
+        "📝 打分项目管理",
+        "点击表情按钮打开 emoji 选择器。按住 ☰ 拖动排序。"
+      )
+    : renderDesktopSettingsSectionShell(
+        containerEl,
+        "kid-score-item-management-section",
+        "📝 打分项目管理",
+        "点击表情按钮打开 emoji 选择器。按住 ☰ 拖动排序。"
+      );
 
-  const itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
+  const itemsWrap = shell.body.createDiv({ cls: "kid-score-settings-items" });
   const renderItems = () =>
     renderItemSettingsList({
       plugin,
@@ -36,7 +48,15 @@ export function renderItemSettings({
 
   renderItems();
 
-  new Setting(containerEl)
+  const actionsHost = shell.body.createDiv({
+    cls:
+      "kid-score-settings-actions " +
+      (isTouchLayout
+        ? "kid-score-settings-actions-mobile"
+        : "kid-score-settings-actions-desktop"),
+  });
+
+  new Setting(actionsHost)
     .setName("添加新项目")
     .addButton((btn) =>
       btn

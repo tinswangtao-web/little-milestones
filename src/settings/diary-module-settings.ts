@@ -2,6 +2,9 @@ import { Notice } from "obsidian";
 import { makeDefaultDiaryModules } from "../constants";
 import type KidScorePlugin from "../main";
 import { showEmojiPicker } from "../ui/emoji-picker";
+import { getMobilePlatform } from "../utils/platform";
+import { renderDesktopDiaryModuleRowLayout } from "./desktop-settings-sections";
+import { renderMobileDiaryModuleRowLayout } from "./mobile-settings-sections";
 
 interface RenderDiaryModuleSettingsOptions {
   plugin: KidScorePlugin;
@@ -45,6 +48,7 @@ export function renderDiaryModuleSettingsSection({
   const render = () => {
     ensureDiaryModules();
     body.empty();
+    const isTouchLayout = getMobilePlatform() !== "desktop";
     const hint = body.createEl("p", {
       cls: "kid-score-hint",
       text: "你可以修改模块名称和提示文案，也可以新增或删除模块。天气/心情会保留快捷 emoji 功能。",
@@ -53,11 +57,10 @@ export function renderDiaryModuleSettingsSection({
 
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
-      const row = list.createDiv({ cls: "diary-module-settings-row" });
-      const top = row.createDiv({ cls: "diary-module-settings-top" });
-      const main = top.createDiv({ cls: "diary-module-settings-main" });
-      const meta = top.createDiv({ cls: "diary-module-settings-meta" });
-      const actions = top.createDiv({ cls: "diary-module-settings-actions" });
+      const layout = isTouchLayout
+        ? renderMobileDiaryModuleRowLayout(list)
+        : renderDesktopDiaryModuleRowLayout(list);
+      const { main, meta, actions, placeholderField } = layout;
 
       const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
       emojiField.createEl("label", {
@@ -96,9 +99,6 @@ export function renderDiaryModuleSettingsSection({
         render();
       };
 
-      const placeholderField = row.createDiv({
-        cls: "diary-module-settings-field is-wide is-full-row",
-      });
       placeholderField.createEl("label", {
         cls: "diary-module-settings-field-label",
         text: "提示文案",

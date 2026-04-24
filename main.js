@@ -4811,6 +4811,38 @@ var import_obsidian17 = require("obsidian");
 // src/settings/category-settings.ts
 var import_obsidian9 = require("obsidian");
 
+// src/settings/desktop-settings-shells.ts
+function renderDesktopSettingsSectionShell(containerEl, sectionClassName, titleText, hintText) {
+  const section = containerEl.createDiv({
+    cls: `kid-score-settings-section kid-score-settings-section-desktop ${sectionClassName}`.trim()
+  });
+  const title = section.createEl("h3", { text: titleText });
+  const hint = hintText ? section.createEl("p", {
+    cls: "kid-score-hint",
+    text: hintText
+  }) : null;
+  const body = section.createDiv({
+    cls: "kid-score-settings-section-body kid-score-settings-section-body-desktop"
+  });
+  return { section, title, hint, body };
+}
+
+// src/settings/mobile-settings-shells.ts
+function renderMobileSettingsSectionShell(containerEl, sectionClassName, titleText, hintText) {
+  const section = containerEl.createDiv({
+    cls: `kid-score-settings-section kid-score-settings-section-mobile ${sectionClassName}`.trim()
+  });
+  const title = section.createEl("h3", { text: titleText });
+  const hint = hintText ? section.createEl("p", {
+    cls: "kid-score-hint",
+    text: hintText
+  }) : null;
+  const body = section.createDiv({
+    cls: "kid-score-settings-section-body kid-score-settings-section-body-mobile"
+  });
+  return { section, title, hint, body };
+}
+
 // src/settings/category-settings-list.ts
 var import_obsidian8 = require("obsidian");
 function renderCategorySettingsList({
@@ -4983,10 +5015,19 @@ function renderCategorySettings({
   bindSettingsInput,
   refreshItems
 }) {
-  const catHeaderWrap = containerEl.createDiv({ cls: "kid-score-section-header" });
-  catHeaderWrap.createEl("h3", { text: "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406" });
-  catHeaderWrap.createSpan({ cls: "kid-score-section-desc", text: "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A" });
-  const catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
+  const isTouchLayout = getMobilePlatform() !== "desktop";
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(
+    containerEl,
+    "kid-score-category-section",
+    "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406",
+    "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A"
+  ) : renderDesktopSettingsSectionShell(
+    containerEl,
+    "kid-score-category-section",
+    "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406",
+    "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A"
+  );
+  const catWrap = shell.body.createDiv({ cls: "kid-score-cat-list" });
   const renderCategories = () => renderCategorySettingsList({
     plugin,
     catWrap,
@@ -4994,7 +5035,7 @@ function renderCategorySettings({
     refreshItems
   });
   renderCategories();
-  new import_obsidian9.Setting(containerEl).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
+  new import_obsidian9.Setting(shell.body).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
     (btn) => btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(async () => {
       plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
       await plugin.saveSettings();
@@ -5002,7 +5043,7 @@ function renderCategorySettings({
       refreshItems();
     })
   );
-  new import_obsidian9.Setting(containerEl).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
+  new import_obsidian9.Setting(shell.body).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
     (btn) => btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(async () => {
       await plugin.saveSettings();
       renderCategories();
@@ -5014,6 +5055,78 @@ function renderCategorySettings({
 
 // src/settings/diary-module-settings.ts
 var import_obsidian10 = require("obsidian");
+
+// src/settings/desktop-settings-sections.ts
+function renderDesktopDiaryModuleRowLayout(list) {
+  const row = list.createDiv({
+    cls: "diary-module-settings-row diary-module-settings-row-desktop"
+  });
+  const top = row.createDiv({
+    cls: "diary-module-settings-top diary-module-settings-top-desktop"
+  });
+  const main = top.createDiv({
+    cls: "diary-module-settings-main diary-module-settings-main-desktop"
+  });
+  const meta = top.createDiv({
+    cls: "diary-module-settings-meta diary-module-settings-meta-desktop"
+  });
+  const actions = top.createDiv({
+    cls: "diary-module-settings-actions diary-module-settings-actions-desktop"
+  });
+  const placeholderField = row.createDiv({
+    cls: "diary-module-settings-field diary-module-settings-field-desktop is-wide is-full-row"
+  });
+  return { row, top, main, meta, actions, placeholderField };
+}
+function renderDesktopItemSettingsRowLayout(itemsWrap) {
+  const wrap = itemsWrap.createDiv({
+    cls: "settings-item-wrap settings-item-wrap-desktop"
+  });
+  const row = wrap.createDiv({
+    cls: "settings-item-row-v2 settings-item-row-v2-desktop"
+  });
+  const noteRow = wrap.createDiv({
+    cls: "settings-item-note-row settings-item-note-row-desktop"
+  });
+  return { wrap, row, noteRow };
+}
+
+// src/settings/mobile-settings-sections.ts
+function renderMobileDiaryModuleRowLayout(list) {
+  const row = list.createDiv({
+    cls: "diary-module-settings-row diary-module-settings-row-mobile"
+  });
+  const top = row.createDiv({
+    cls: "diary-module-settings-top diary-module-settings-top-mobile"
+  });
+  const main = top.createDiv({
+    cls: "diary-module-settings-main diary-module-settings-main-mobile"
+  });
+  const meta = top.createDiv({
+    cls: "diary-module-settings-meta diary-module-settings-meta-mobile"
+  });
+  const actions = top.createDiv({
+    cls: "diary-module-settings-actions diary-module-settings-actions-mobile"
+  });
+  const placeholderField = row.createDiv({
+    cls: "diary-module-settings-field diary-module-settings-field-mobile is-wide is-full-row"
+  });
+  return { row, top, main, meta, actions, placeholderField };
+}
+function renderMobileItemSettingsRowLayout(itemsWrap) {
+  const wrap = itemsWrap.createDiv({
+    cls: "settings-item-wrap settings-item-wrap-mobile"
+  });
+  const row = wrap.createDiv({
+    cls: "settings-item-row-v2 settings-item-row-v2-mobile"
+  });
+  const noteRow = wrap.createDiv({
+    cls: "settings-item-note-row settings-item-note-row-mobile"
+  });
+  return { wrap, row, noteRow };
+}
+
+// src/settings/diary-module-settings.ts
 function renderDiaryModuleSettingsSection({
   plugin,
   containerEl,
@@ -5047,6 +5160,7 @@ function renderDiaryModuleSettingsSection({
   const render = () => {
     ensureDiaryModules();
     body.empty();
+    const isTouchLayout = getMobilePlatform() !== "desktop";
     const hint = body.createEl("p", {
       cls: "kid-score-hint",
       text: "\u4F60\u53EF\u4EE5\u4FEE\u6539\u6A21\u5757\u540D\u79F0\u548C\u63D0\u793A\u6587\u6848\uFF0C\u4E5F\u53EF\u4EE5\u65B0\u589E\u6216\u5220\u9664\u6A21\u5757\u3002\u5929\u6C14/\u5FC3\u60C5\u4F1A\u4FDD\u7559\u5FEB\u6377 emoji \u529F\u80FD\u3002"
@@ -5054,11 +5168,8 @@ function renderDiaryModuleSettingsSection({
     hint.style.marginBottom = "10px";
     const list = body.createDiv({ cls: "diary-module-settings-list" });
     plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
-      const row = list.createDiv({ cls: "diary-module-settings-row" });
-      const top = row.createDiv({ cls: "diary-module-settings-top" });
-      const main = top.createDiv({ cls: "diary-module-settings-main" });
-      const meta = top.createDiv({ cls: "diary-module-settings-meta" });
-      const actions2 = top.createDiv({ cls: "diary-module-settings-actions" });
+      const layout = isTouchLayout ? renderMobileDiaryModuleRowLayout(list) : renderDesktopDiaryModuleRowLayout(list);
+      const { main, meta, actions: actions2, placeholderField } = layout;
       const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
       emojiField.createEl("label", {
         cls: "diary-module-settings-field-label",
@@ -5093,9 +5204,6 @@ function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
         render();
       };
-      const placeholderField = row.createDiv({
-        cls: "diary-module-settings-field is-wide is-full-row"
-      });
       placeholderField.createEl("label", {
         cls: "diary-module-settings-field-label",
         text: "\u63D0\u793A\u6587\u6848"
@@ -5281,16 +5389,18 @@ function renderRulesSettingsSection({
 function renderContentSettingsSections({
   plugin,
   containerEl,
-  bindSettingsInput
+  bindSettingsInput,
+  isTouchLayout
 }) {
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(containerEl, "kid-score-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E") : renderDesktopSettingsSectionShell(containerEl, "kid-score-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E");
   renderRulesSettingsSection({
     plugin,
-    containerEl,
+    containerEl: shell.body,
     bindSettingsInput
   });
   renderDiaryModuleSettingsSection({
     plugin,
-    containerEl,
+    containerEl: shell.body,
     bindSettingsInput
   });
 }
@@ -5300,15 +5410,21 @@ var import_obsidian12 = require("obsidian");
 function renderGoalSettingsSection({
   plugin,
   containerEl,
-  bindSettingsInput
+  bindSettingsInput,
+  isTouchLayout
 }) {
-  const goalsWrap = containerEl.createDiv({ cls: "kid-score-goals-section" });
-  goalsWrap.createEl("h3", { text: "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807" });
-  goalsWrap.createEl("p", {
-    cls: "kid-score-hint",
-    text: "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
-  });
-  const goalsGrid = goalsWrap.createDiv({ cls: "kid-score-goals-grid" });
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(
+    containerEl,
+    "kid-score-goals-section",
+    "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
+    "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
+  ) : renderDesktopSettingsSectionShell(
+    containerEl,
+    "kid-score-goals-section",
+    "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
+    "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
+  );
+  const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
   const goalFields = [
     { key: "daily", label: "\u6BCF\u65E5\u76EE\u6807" },
     { key: "weekly", label: "\u6BCF\u5468\u76EE\u6807" },
@@ -5340,8 +5456,17 @@ function renderImportExportSettings({
   containerEl,
   refresh
 }) {
-  containerEl.createEl("h3", { text: "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E" });
-  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+  const isTouchLayout = getMobilePlatform() !== "desktop";
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(
+    containerEl,
+    "kid-score-import-export-section",
+    "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E"
+  ) : renderDesktopSettingsSectionShell(
+    containerEl,
+    "kid-score-import-export-section",
+    "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E"
+  );
+  new import_obsidian13.Setting(shell.body).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
     btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
       const data = {
         schemaVersion: 1,
@@ -5358,7 +5483,7 @@ function renderImportExportSettings({
       URL.revokeObjectURL(url);
     });
   });
-  new import_obsidian13.Setting(containerEl).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+  new import_obsidian13.Setting(shell.body).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
     btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
       const fileInput = document.createElement("input");
       fileInput.type = "file";
@@ -5473,6 +5598,7 @@ function renderItemSettingsList({
   setPendingScrollItemId
 }) {
   const useInlineCategoryPicker = isIOS();
+  const isTouchLayout = getMobilePlatform() !== "desktop";
   const getScrollContainer = () => itemsWrap.closest(".vertical-tab-content") || itemsWrap.closest(".modal-content") || itemsWrap.parentElement;
   const dragState = {
     dragging: false,
@@ -5607,9 +5733,9 @@ function renderItemSettingsList({
         });
         groupHeader.createSpan({ text: category });
       }
-      const wrap = itemsWrap.createDiv({ cls: "settings-item-wrap" });
+      const layout = isTouchLayout ? renderMobileItemSettingsRowLayout(itemsWrap) : renderDesktopItemSettingsRowLayout(itemsWrap);
+      const { wrap, row, noteRow } = layout;
       wrap.dataset.itemId = item.id;
-      const row = wrap.createDiv({ cls: "settings-item-row-v2" });
       row.dataset.idx = String(idx);
       const handle = row.createEl("span", {
         cls: "settings-drag-handle",
@@ -5708,7 +5834,6 @@ function renderItemSettingsList({
           );
         }
       };
-      const noteRow = wrap.createDiv({ cls: "settings-item-note-row" });
       const noteInput = noteRow.createEl("textarea", {
         cls: "settings-note-input"
       });
@@ -5804,15 +5929,22 @@ function renderItemSettingsList({
 function renderItemSettings({
   plugin,
   containerEl,
-  bindSettingsInput
+  bindSettingsInput,
+  isTouchLayout
 }) {
   let pendingScrollItemId = null;
-  containerEl.createEl("h3", { text: "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406" });
-  containerEl.createEl("p", {
-    cls: "kid-score-hint",
-    text: "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00emoji\u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
-  });
-  const itemsWrap = containerEl.createDiv({ cls: "kid-score-settings-items" });
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(
+    containerEl,
+    "kid-score-item-management-section",
+    "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406",
+    "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00 emoji \u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
+  ) : renderDesktopSettingsSectionShell(
+    containerEl,
+    "kid-score-item-management-section",
+    "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406",
+    "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00 emoji \u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
+  );
+  const itemsWrap = shell.body.createDiv({ cls: "kid-score-settings-items" });
   const renderItems = () => renderItemSettingsList({
     plugin,
     itemsWrap,
@@ -5823,7 +5955,10 @@ function renderItemSettings({
     }
   });
   renderItems();
-  new import_obsidian15.Setting(containerEl).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+  const actionsHost = shell.body.createDiv({
+    cls: "kid-score-settings-actions " + (isTouchLayout ? "kid-score-settings-actions-mobile" : "kid-score-settings-actions-desktop")
+  });
+  new import_obsidian15.Setting(actionsHost).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
     (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
       const defaultCat = plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
       const newItemId = "item_" + Date.now();
@@ -5857,14 +5992,21 @@ function renderUserSettingsSection({
   plugin,
   containerEl,
   bindSettingsInput,
-  refresh
+  refresh,
+  isTouchLayout
 }) {
-  containerEl.createEl("h3", { text: "\u{1F465} \u7528\u6237\u7BA1\u7406" });
-  containerEl.createEl("p", {
-    cls: "kid-score-hint",
-    text: "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
-  });
-  const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(
+    containerEl,
+    "kid-score-settings-users-section",
+    "\u{1F465} \u7528\u6237\u7BA1\u7406",
+    "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
+  ) : renderDesktopSettingsSectionShell(
+    containerEl,
+    "kid-score-settings-users-section",
+    "\u{1F465} \u7528\u6237\u7BA1\u7406",
+    "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
+  );
+  const userMgrWrap = shell.body.createDiv({ cls: "kid-score-settings-users" });
   const showUserDeleteConfirm = (user) => {
     const deleteModal = new class extends import_obsidian16.Modal {
       onOpen() {
@@ -5972,7 +6114,7 @@ function renderUserSettingsSection({
     };
   };
   renderUserMgr();
-  new import_obsidian16.Setting(containerEl).setName("\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+  new import_obsidian16.Setting(shell.body).setName("\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
     (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
       const newName = value.trim() || "\u672A\u547D\u540D";
       const oldName = plugin.currentUser.name;
@@ -5992,8 +6134,8 @@ function renderUserSettingsSection({
       }
     })
   );
-  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
-  new import_obsidian16.Setting(containerEl).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+  bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
+  new import_obsidian16.Setting(shell.body).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
     (text) => text.setPlaceholder("Little Milestones/Daily Records").setValue(plugin.currentUser.savePath).onChange(async (value) => {
       const newPath = value.trim() || "Little Milestones/Daily Records";
       const oldPath = plugin.currentUser.savePath;
@@ -6016,7 +6158,7 @@ function renderUserSettingsSection({
       }
     })
   );
-  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+  bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
 }
 
 // src/settings/settings-tab.ts
@@ -6030,6 +6172,7 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
   display() {
     const self = this;
     const containerEl = this.containerEl;
+    const isTouchLayout = getMobilePlatform() !== "desktop";
     containerEl.empty();
     containerEl.addClass("kid-score-settings");
     const bindSettingsInput = (input) => {
@@ -6044,17 +6187,20 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
       plugin: self.plugin,
       containerEl,
       bindSettingsInput,
-      refresh: () => self.display()
+      refresh: () => self.display(),
+      isTouchLayout
     });
     renderGoalSettingsSection({
       plugin: self.plugin,
       containerEl,
-      bindSettingsInput
+      bindSettingsInput,
+      isTouchLayout
     });
     renderContentSettingsSections({
       plugin: self.plugin,
       containerEl,
-      bindSettingsInput
+      bindSettingsInput,
+      isTouchLayout
     });
     renderCategorySettings({
       plugin: self.plugin,
@@ -6065,7 +6211,8 @@ var KidScoreSettingTab = class extends import_obsidian17.PluginSettingTab {
     renderItemSettings({
       plugin: self.plugin,
       containerEl,
-      bindSettingsInput
+      bindSettingsInput,
+      isTouchLayout
     });
     renderImportExportSettings({
       plugin: self.plugin,

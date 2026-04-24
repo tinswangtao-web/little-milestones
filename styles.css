@@ -1972,6 +1972,47 @@ textarea.custom-form-name-input {
   margin: 20px 0 8px;
 }
 
+.kid-score-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.kid-score-settings-section-desktop {
+  margin-bottom: 18px;
+}
+
+.kid-score-settings-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kid-score-category-section .kid-score-cat-list,
+.kid-score-import-export-section .setting-item {
+  width: 100%;
+}
+
+.kid-score-item-management-section .kid-score-settings-items,
+.kid-score-item-management-section .kid-score-settings-actions {
+  width: 100%;
+}
+
+.kid-score-settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kid-score-settings-actions .setting-item {
+  width: 100%;
+}
+
+.kid-score-settings-actions-desktop .setting-item {
+  padding: 10px 0;
+}
+
 .settings-item-row {
   display: grid;
   grid-template-columns: 52px 1fr 72px 36px;
@@ -2219,7 +2260,6 @@ textarea.custom-form-name-input {
 /* ─── Goals settings ─────────────────────────────────────────────────────────── */
 
 .kid-score-goals-section {
-  margin: 16px 0;
   padding: 12px;
   background: var(--background-secondary);
   border-radius: 10px;
@@ -2399,6 +2439,11 @@ textarea.custom-form-name-input {
   max-width: 100%;
 }
 
+.settings-item-wrap-desktop,
+.settings-item-wrap-mobile {
+  max-width: 100%;
+}
+
 .settings-item-wrap.is-new-item {
   border-radius: 12px;
   box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb, 99, 102, 241), 0.22);
@@ -2410,6 +2455,11 @@ textarea.custom-form-name-input {
 .settings-item-note-row {
   padding: 0 0 6px 36px;
   margin-bottom: 4px;
+  border-bottom: 1px dashed var(--background-modifier-border);
+}
+
+.settings-item-note-row-desktop,
+.settings-item-note-row-mobile {
   border-bottom: 1px dashed var(--background-modifier-border);
 }
 
@@ -2724,6 +2774,11 @@ textarea.custom-form-name-input {
   border: 1px solid var(--background-modifier-border);
   border-radius: 14px;
   background: color-mix(in srgb, var(--background-secondary) 84%, transparent);
+}
+
+.diary-module-settings-row-desktop,
+.diary-module-settings-row-mobile {
+  display: grid;
 }
 
 .diary-module-settings-top {
@@ -3055,6 +3110,14 @@ textarea.custom-form-name-input {
     min-height: 44px;
   }
 
+  .kid-score-settings-actions-mobile .setting-item {
+    padding: 10px 0;
+  }
+
+  .kid-score-settings-actions-mobile .setting-item-control {
+    width: 100%;
+  }
+
   .kid-score-goals-grid {
     grid-template-columns: 1fr;
     gap: 8px;
@@ -3076,6 +3139,10 @@ textarea.custom-form-name-input {
     background: var(--background-secondary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 12px;
+  }
+
+  .settings-item-wrap-mobile {
+    margin-bottom: 10px;
   }
 
   /* Popup — centered, safe from edges */
@@ -3755,6 +3822,12 @@ textarea.custom-form-name-input {
     border-bottom: none;
   }
 
+  .settings-item-note-row-mobile {
+    padding: 8px 0 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+
   .settings-cat-options {
     padding: 8px 0 0;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3766,6 +3839,11 @@ textarea.custom-form-name-input {
   }
 
   .diary-module-settings-row {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .diary-module-settings-row-mobile {
     gap: 10px;
     padding: 10px;
   }

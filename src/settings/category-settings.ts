@@ -1,5 +1,8 @@
 import { Notice, Setting } from "obsidian";
 import type KidScorePlugin from "../main";
+import { getMobilePlatform } from "../utils/platform";
+import { renderDesktopSettingsSectionShell } from "./desktop-settings-shells";
+import { renderMobileSettingsSectionShell } from "./mobile-settings-shells";
 import { renderCategorySettingsList } from "./category-settings-list";
 
 interface RenderCategorySettingsOptions {
@@ -15,11 +18,22 @@ export function renderCategorySettings({
   bindSettingsInput,
   refreshItems,
 }: RenderCategorySettingsOptions) {
-  const catHeaderWrap = containerEl.createDiv({ cls: "kid-score-section-header" });
-  catHeaderWrap.createEl("h3", { text: "📁 分类管理" });
-  catHeaderWrap.createSpan({ cls: "kid-score-section-desc", text: "可拖拽排序，项目会按分类分组显示" });
+  const isTouchLayout = getMobilePlatform() !== "desktop";
+  const shell = isTouchLayout
+    ? renderMobileSettingsSectionShell(
+        containerEl,
+        "kid-score-category-section",
+        "📁 分类管理",
+        "可拖拽排序，项目会按分类分组显示"
+      )
+    : renderDesktopSettingsSectionShell(
+        containerEl,
+        "kid-score-category-section",
+        "📁 分类管理",
+        "可拖拽排序，项目会按分类分组显示"
+      );
 
-  const catWrap = containerEl.createDiv({ cls: "kid-score-cat-list" });
+  const catWrap = shell.body.createDiv({ cls: "kid-score-cat-list" });
   const renderCategories = () =>
     renderCategorySettingsList({
       plugin,
@@ -30,7 +44,7 @@ export function renderCategorySettings({
 
   renderCategories();
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("添加分类")
     .addButton((btn) =>
       btn
@@ -44,7 +58,7 @@ export function renderCategorySettings({
         })
     );
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("保存并刷新")
     .setDesc("保存分类修改，刷新下方打分项目的分类下拉菜单")
     .addButton((btn) =>

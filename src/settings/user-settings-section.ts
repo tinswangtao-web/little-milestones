@@ -4,6 +4,8 @@ import type KidScorePlugin from "../main";
 import { attachPressGesture } from "../modals/helpers/press-gesture";
 import { bindModalInputFocus } from "../utils/dom";
 import { setupModalKeyboard } from "../utils/mobile";
+import { renderDesktopSettingsSectionShell } from "./desktop-settings-shells";
+import { renderMobileSettingsSectionShell } from "./mobile-settings-shells";
 
 interface RenderUserSettingsSectionOptions {
   app: App;
@@ -11,6 +13,7 @@ interface RenderUserSettingsSectionOptions {
   containerEl: HTMLElement;
   bindSettingsInput: (input: HTMLElement | null) => void;
   refresh: () => void;
+  isTouchLayout: boolean;
 }
 
 export function renderUserSettingsSection({
@@ -19,14 +22,23 @@ export function renderUserSettingsSection({
   containerEl,
   bindSettingsInput,
   refresh,
+  isTouchLayout,
 }: RenderUserSettingsSectionOptions): void {
-  containerEl.createEl("h3", { text: "👥 用户管理" });
-  containerEl.createEl("p", {
-    cls: "kid-score-hint",
-    text: "点击用户名切换，长按用户名可删除该用户。",
-  });
+  const shell = isTouchLayout
+    ? renderMobileSettingsSectionShell(
+        containerEl,
+        "kid-score-settings-users-section",
+        "👥 用户管理",
+        "点击用户名切换，长按用户名可删除该用户。"
+      )
+    : renderDesktopSettingsSectionShell(
+        containerEl,
+        "kid-score-settings-users-section",
+        "👥 用户管理",
+        "点击用户名切换，长按用户名可删除该用户。"
+      );
 
-  const userMgrWrap = containerEl.createDiv({ cls: "kid-score-settings-users" });
+  const userMgrWrap = shell.body.createDiv({ cls: "kid-score-settings-users" });
 
   const showUserDeleteConfirm = (user: ReturnType<typeof makeDefaultUser>) => {
     const deleteModal = new (class extends Modal {
@@ -148,7 +160,7 @@ export function renderUserSettingsSection({
 
   renderUserMgr();
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("姓名")
     .setDesc("当前用户的显示名字")
     .addText((text) =>
@@ -175,9 +187,9 @@ export function renderUserSettingsSection({
           }
         })
     );
-  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+  bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
 
-  new Setting(containerEl)
+  new Setting(shell.body)
     .setName("记录保存路径")
     .setDesc("每日打分 Markdown 文件存放的文件夹")
     .addText((text) =>
@@ -211,5 +223,5 @@ export function renderUserSettingsSection({
           }
         })
     );
-  bindSettingsInput(containerEl.querySelector(".setting-item:last-child input"));
+  bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
 }

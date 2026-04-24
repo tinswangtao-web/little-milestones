@@ -22,6 +22,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
   display(): void {
     const self = this;
     const containerEl = this.containerEl;
+    const isTouchLayout = getMobilePlatform() !== "desktop";
     containerEl.empty();
     containerEl.addClass("kid-score-settings");
     const bindSettingsInput = (input: HTMLElement | null) => {
@@ -38,18 +39,21 @@ export class KidScoreSettingTab extends PluginSettingTab {
       containerEl,
       bindSettingsInput,
       refresh: () => self.display(),
+      isTouchLayout,
     });
 
     renderGoalSettingsSection({
       plugin: self.plugin,
       containerEl,
       bindSettingsInput,
+      isTouchLayout,
     });
 
     renderContentSettingsSections({
       plugin: self.plugin,
       containerEl,
       bindSettingsInput,
+      isTouchLayout,
     });
 
     renderCategorySettings({
@@ -62,6 +66,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
       plugin: self.plugin,
       containerEl,
       bindSettingsInput,
+      isTouchLayout,
     });
 
     renderImportExportSettings({

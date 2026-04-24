@@ -1,25 +1,36 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../main";
+import { renderDesktopSettingsSectionShell } from "./desktop-settings-shells";
+import { renderMobileSettingsSectionShell } from "./mobile-settings-shells";
 
 interface RenderGoalSettingsSectionOptions {
   plugin: KidScorePlugin;
   containerEl: HTMLElement;
   bindSettingsInput: (input: HTMLElement | null) => void;
+  isTouchLayout: boolean;
 }
 
 export function renderGoalSettingsSection({
   plugin,
   containerEl,
   bindSettingsInput,
+  isTouchLayout,
 }: RenderGoalSettingsSectionOptions): void {
-  const goalsWrap = containerEl.createDiv({ cls: "kid-score-goals-section" });
-  goalsWrap.createEl("h3", { text: "🎯 每日目标" });
-  goalsWrap.createEl("p", {
-    cls: "kid-score-hint",
-    text: "以完成项目数为统计标准（含加分项、减分项和临时事项）",
-  });
+  const shell = isTouchLayout
+    ? renderMobileSettingsSectionShell(
+        containerEl,
+        "kid-score-goals-section",
+        "🎯 每日目标",
+        "以完成项目数为统计标准（含加分项、减分项和临时事项）"
+      )
+    : renderDesktopSettingsSectionShell(
+        containerEl,
+        "kid-score-goals-section",
+        "🎯 每日目标",
+        "以完成项目数为统计标准（含加分项、减分项和临时事项）"
+      );
 
-  const goalsGrid = goalsWrap.createDiv({ cls: "kid-score-goals-grid" });
+  const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
   const goalFields: Array<{ key: "daily" | "weekly" | "monthly"; label: string }> = [
     { key: "daily", label: "每日目标" },
     { key: "weekly", label: "每周目标" },
