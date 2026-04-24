@@ -56,6 +56,7 @@
 - 2026-04-23 20:55 [codex] completed the third settings-page shell split step: category-management and import/export sections now route through desktop/mobile shell helpers while preserving shared settings logic; rebuilt the primary workspace successfully and intentionally skipped Vault sync
 - 2026-04-23 21:00 [codex] extended the settings-page shell split to the score-item management section itself and its top action host, preserving shared item logic while keeping the work source-only and intentionally unsynced to the Vault
 - 2026-04-24 00:05 [codex] committed the source-only settings-page desktop/mobile shell split as 4873840 without syncing to Vault
+- 2026-04-24 09:28 [codex] synced the settings-page desktop/mobile shell split to the Vault from the primary workspace and verified `manifest.json`, `main.js`, and `styles.css` hashes match the workspace copies
 
 - 2026-04-22 10:35 [kimi] completed post-fix targeted review per user request; filed `.agents/reviews/2026-04-22-kimi-postfix-review.md`; focused on 5 areas: (1) CRLF compatibility — 2 regex locations in day-data-store.ts still hardcode \n, (2) renameUserInFiles — still regex-based with YAML quote / title format fragility, (3) performance — getAllScores still no cache, stats panel still O(n×m), (4) import validation — missing duplicate-id / integer-points / category-validity checks, (5) regression — streak/week/month/childName/goals/customItems schema all confirmed fixed; recommended top-5 priority fixes for codex.
 
