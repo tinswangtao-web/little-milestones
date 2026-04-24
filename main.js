@@ -1873,12 +1873,8 @@ function renderGoalCard(cards, currentUser, filtered, period) {
   bar.style.width = goalPct + "%";
   if (goalPct >= 100) bar.addClass("is-complete");
 }
-function calcCompleted(items, day) {
-  let completed = (day.customItems || []).length;
-  for (const item of items) {
-    if (isItemDone(item, day.scores[item.id] || 0)) completed++;
-  }
-  return completed;
+function calcCompleted(_items, day) {
+  return day.total;
 }
 function renderCategoryCompletion(statsBody, items, categories, filtered, doneCounts) {
   const categoryStats = {};
@@ -2742,6 +2738,7 @@ function createDiaryModuleField({
   syncAndRefresh
 }) {
   const card = moduleGrid.createDiv({ cls: "diary-module-card" });
+  card.dataset.moduleId = moduleDef.id;
   const header = card.createDiv({ cls: "diary-module-readonly-header" });
   header.createSpan({ cls: "diary-module-readonly-emoji", text: moduleDef.emoji || "\u{1F4DD}" });
   header.createSpan({ cls: "diary-module-readonly-label", text: moduleDef.label || "" });
@@ -2776,6 +2773,7 @@ function createDiaryQuickGroup({
   if (!moduleDef) return;
   let customEmoji = defaults[0].e;
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
+  group.dataset.moduleId = moduleDef.id;
   if (moduleDef.kind === "quick") {
     const header = group.createDiv({ cls: "diary-quick-built-in-header" });
     header.createSpan({ cls: "diary-quick-built-in-emoji", text: moduleDef.emoji || "\u{1F4DD}" });
@@ -3007,6 +3005,7 @@ function buildDiaryPanel(options) {
     insertDiaryText,
     wrapDiarySelection,
     onModulesChanged,
+    requestScrollToModule,
     isTouchLayout
   } = options;
   const diaryModules = options.diaryModules;
@@ -3017,9 +3016,14 @@ function buildDiaryPanel(options) {
   }
   const moduleConfig = plugin.currentUser.diaryModules;
   const removeModule = (id) => {
-    plugin.currentUser.diaryModules = plugin.currentUser.diaryModules.filter(
-      (moduleDef) => moduleDef.id !== id
-    );
+    var _a, _b;
+    const moduleList = plugin.currentUser.diaryModules;
+    const idx = moduleList.findIndex((m) => m.id === id);
+    const nextScrollId = ((_a = moduleList[idx + 1]) == null ? void 0 : _a.id) || ((_b = moduleList[idx - 1]) == null ? void 0 : _b.id) || null;
+    plugin.currentUser.diaryModules = moduleList.filter((m) => m.id !== id);
+    if (nextScrollId && requestScrollToModule) {
+      requestScrollToModule(nextScrollId);
+    }
   };
   let isPreview = false;
   let previewButtonBinder = (_active) => {
@@ -3148,13 +3152,17 @@ function buildDiaryPanel(options) {
     text: "\uFF0B \u65B0\u589E\u6A21\u5757"
   });
   addModuleBtn.onclick = async () => {
+    const newId = "module_" + Date.now();
     plugin.currentUser.diaryModules.push({
-      id: "module_" + Date.now(),
+      id: newId,
       emoji: "\u{1F4DD}",
       label: "\u65B0\u6A21\u5757",
       placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
       kind: "multi"
     });
+    if (requestScrollToModule) {
+      requestScrollToModule(newId);
+    }
     await onModulesChanged();
   };
   inlinePreviewBtn.onclick = () => togglePreview();
@@ -4812,6 +4820,7 @@ var DailyScoringModal = class extends BaseMobileModal {
     this.diaryModules = {};
     this.diaryControls = null;
     this.activeTab = "score";
+    this.pendingDiaryScrollId = null;
     this.pendingRenderState = null;
     this.enableKeyboardAdjustment = true;
     this.dateStr = initialDate || formatDate(0);
@@ -4938,6 +4947,9 @@ var DailyScoringModal = class extends BaseMobileModal {
           this.activeTab = "diary";
           await this.renderModal();
         },
+        requestScrollToModule: (id) => {
+          this.pendingDiaryScrollId = id;
+        },
         isTouchLayout: this.isTouchOptimizedMode()
       });
       renderBottomActions({
@@ -4966,6 +4978,16 @@ var DailyScoringModal = class extends BaseMobileModal {
       if (this.needsRerender) {
         this.needsRerender = false;
         await this.renderModal();
+      }
+      const scrollId = this.pendingDiaryScrollId;
+      this.pendingDiaryScrollId = null;
+      if (scrollId) {
+        requestAnimationFrame(() => {
+          const el = this.contentEl.querySelector(`[data-module-id="${scrollId}"]`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
       }
     }
   }

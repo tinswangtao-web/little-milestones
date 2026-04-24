@@ -114,6 +114,7 @@ export function createDiaryModuleField({
   syncAndRefresh,
 }: CreateDiaryModuleFieldOptions): void {
   const card = moduleGrid.createDiv({ cls: "diary-module-card" });
+  card.dataset.moduleId = moduleDef.id;
   // Read-only header: just emoji + label, no editable name/placeholder/delete.
   const header = card.createDiv({ cls: "diary-module-readonly-header" });
   header.createSpan({ cls: "diary-module-readonly-emoji", text: moduleDef.emoji || "📝" });
@@ -153,6 +154,7 @@ export function createDiaryQuickGroup({
   if (!moduleDef) return;
   let customEmoji = defaults[0].e;
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
+  group.dataset.moduleId = moduleDef.id;
   // Built-in quick modules (weather/mood) only need a simple read-only header,
   // not the full editable manager (label input, placeholder textarea, delete button).
   if (moduleDef.kind === "quick") {

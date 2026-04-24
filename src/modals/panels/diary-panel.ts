@@ -36,6 +36,7 @@ interface DiaryPanelBuilderOptions {
   insertDiaryText: (text: string) => void;
   wrapDiarySelection: (prefix: string, suffix?: string, placeholder?: string) => void;
   onModulesChanged: () => Promise<void>;
+  requestScrollToModule?: (id: string) => void;
   isTouchLayout: boolean;
 }
 
@@ -54,6 +55,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     insertDiaryText,
     wrapDiarySelection,
     onModulesChanged,
+    requestScrollToModule,
     isTouchLayout,
   } = options;
 
@@ -65,9 +67,13 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   }
   const moduleConfig = plugin.currentUser.diaryModules;
   const removeModule = (id: string) => {
-    plugin.currentUser.diaryModules = plugin.currentUser.diaryModules.filter(
-      (moduleDef) => moduleDef.id !== id
-    );
+    const moduleList = plugin.currentUser.diaryModules;
+    const idx = moduleList.findIndex((m) => m.id === id);
+    const nextScrollId = moduleList[idx + 1]?.id || moduleList[idx - 1]?.id || null;
+    plugin.currentUser.diaryModules = moduleList.filter((m) => m.id !== id);
+    if (nextScrollId && requestScrollToModule) {
+      requestScrollToModule(nextScrollId);
+    }
   };
 
   let isPreview = false;
@@ -211,13 +217,17 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     text: "＋ 新增模块",
   });
   addModuleBtn.onclick = async () => {
+    const newId = "module_" + Date.now();
     plugin.currentUser.diaryModules.push({
-      id: "module_" + Date.now(),
+      id: newId,
       emoji: "📝",
       label: "新模块",
       placeholder: "这里写一点今天的记录",
       kind: "multi",
     });
+    if (requestScrollToModule) {
+      requestScrollToModule(newId);
+    }
     await onModulesChanged();
   };
 

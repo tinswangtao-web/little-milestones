@@ -49,3 +49,4 @@
 [2026-04-24 14:16] kimi | vault sync done: manifest.json + main.js + styles.css copied to Vault, diff verified
 [2026-04-24 14:17] kimi | Packaged full codebase to Desktop/little-milestones-kimi-pass.tar.gz for codex review
 [2026-04-24 14:50 kimi] ChatGPT 5-point mobile optimization: extracted keyboard helpers, diary textarea focus scroll, calendar pointerdown+disabled future dates, renderModal needsRerender queue, CSS sectioning; tsc+build pass; vault sync diff-verified
+2026-04-24 23:52:11 +0800  commit 2f1cf62  [kimi] Remove redundant editing UI for built-in diary modules + emoji picker keyboard fix

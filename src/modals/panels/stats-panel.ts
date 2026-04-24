@@ -130,12 +130,8 @@ function renderGoalCard(
   if (goalPct >= 100) bar.addClass("is-complete");
 }
 
-function calcCompleted(items: ScoreItem[], day: DayData): number {
-  let completed = (day.customItems || []).length;
-  for (const item of items) {
-    if (isItemDone(item, day.scores[item.id] || 0)) completed++;
-  }
-  return completed;
+function calcCompleted(_items: ScoreItem[], day: DayData): number {
+  return day.total;
 }
 
 function renderCategoryCompletion(

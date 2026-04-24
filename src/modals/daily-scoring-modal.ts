@@ -51,6 +51,7 @@ export class DailyScoringModal extends BaseMobileModal {
   diaryModules: DiaryModuleValues = {};
   diaryControls: DiaryPanelControls | null = null;
   activeTab: "score" | "diary" = "score";
+  private pendingDiaryScrollId: string | null = null;
   private pendingRenderState:
     | {
         scores: Record<string, number>;
@@ -197,6 +198,9 @@ export class DailyScoringModal extends BaseMobileModal {
           this.activeTab = "diary";
           await this.renderModal();
         },
+        requestScrollToModule: (id) => {
+          this.pendingDiaryScrollId = id;
+        },
         isTouchLayout: this.isTouchOptimizedMode(),
       });
       renderBottomActions({
@@ -222,6 +226,16 @@ export class DailyScoringModal extends BaseMobileModal {
       if (this.needsRerender) {
         this.needsRerender = false;
         await this.renderModal();
+      }
+      const scrollId = this.pendingDiaryScrollId;
+      this.pendingDiaryScrollId = null;
+      if (scrollId) {
+        requestAnimationFrame(() => {
+          const el = this.contentEl.querySelector(`[data-module-id="${scrollId}"]`);
+          if (el) {
+            (el as HTMLElement).scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
       }
     }
   }
