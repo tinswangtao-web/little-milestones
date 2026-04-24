@@ -135,3 +135,100 @@ export function bindModalInputFocus(
     }, 180);
   });
 }
+
+export interface AttachAutoResizeOptions {
+  minHeight?: number;
+  immediate?: boolean;
+}
+
+export function attachAutoResize(
+  textarea: HTMLTextAreaElement,
+  options: AttachAutoResizeOptions = {}
+): void {
+  const { minHeight = 52, immediate = true } = options;
+  const resize = () => {
+    textarea.style.height = "auto";
+    textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
+  };
+  if (immediate) {
+    requestAnimationFrame(resize);
+    setTimeout(resize, 60);
+  }
+  textarea.addEventListener("input", resize);
+  textarea.addEventListener("focus", resize);
+}
+
+export interface BindTouchScrollGuardOptions {
+  releaseDelay?: number;
+  moveThreshold?: number;
+}
+
+export function bindTouchScrollGuard(
+  containerEl: HTMLElement,
+  options: BindTouchScrollGuardOptions = {}
+): () => void {
+  const { releaseDelay = 120, moveThreshold = 18 } = options;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchMoved = false;
+  let releaseTimer: number | null = null;
+
+  const releaseReadonlyInputs = () => {
+    if (releaseTimer !== null) {
+      window.clearTimeout(releaseTimer);
+      releaseTimer = null;
+    }
+    const inputs = containerEl.querySelectorAll(
+      'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
+    );
+    inputs.forEach((inp) => inp.removeAttribute("readonly"));
+  };
+
+  const onTouchStart = (e: TouchEvent) => {
+    releaseReadonlyInputs();
+    if (!e.touches || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+    touchMoved = false;
+  };
+
+  const onTouchMove = (e: TouchEvent) => {
+    if (!e.touches || e.touches.length !== 1) return;
+    const touch = e.touches[0];
+    if (
+      Math.abs(touch.clientX - touchStartX) > moveThreshold ||
+      Math.abs(touch.clientY - touchStartY) > moveThreshold
+    ) {
+      touchMoved = true;
+      const inputs = containerEl.querySelectorAll(
+        'input:not([type="button"]):not([type="submit"]), textarea'
+      );
+      inputs.forEach((inp) => inp.setAttribute("readonly", "readonly"));
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (touchMoved) {
+      releaseTimer = window.setTimeout(releaseReadonlyInputs, releaseDelay);
+    }
+  };
+
+  const onTouchCancel = () => {
+    touchMoved = false;
+    releaseReadonlyInputs();
+  };
+
+  containerEl.addEventListener("touchstart", onTouchStart, { passive: true });
+  containerEl.addEventListener("touchmove", onTouchMove, { passive: true });
+  containerEl.addEventListener("touchend", onTouchEnd, { passive: true });
+  containerEl.addEventListener("touchcancel", onTouchCancel, { passive: true });
+
+  return () => {
+    releaseReadonlyInputs();
+    containerEl.removeEventListener("touchstart", onTouchStart);
+    containerEl.removeEventListener("touchmove", onTouchMove);
+    containerEl.removeEventListener("touchend", onTouchEnd);
+    containerEl.removeEventListener("touchcancel", onTouchCancel);
+  };
+}

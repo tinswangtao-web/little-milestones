@@ -3,6 +3,50 @@ import { isIOS, isAndroid } from "./platform";
 
 export type KeyboardCleanup = () => void;
 
+function getKeyboardHeight(stableViewportHeight: number): number {
+  if (!window.visualViewport) return 0;
+  const vv = window.visualViewport;
+  const raw = Math.max(
+    0,
+    stableViewportHeight - vv.height - Math.max(0, vv.offsetTop || 0)
+  );
+  if (raw < 70) {
+    stableViewportHeight = Math.max(stableViewportHeight, vv.height);
+    return 0;
+  }
+  // Safety cap: iOS keyboard rarely exceeds ~350px. Anything larger is
+  // usually an orientation change or split-screen shrinking the viewport
+  // without an actual keyboard opening.
+  if (raw > 520) return 0;
+  return raw;
+}
+
+function hasFocusedModalField(contentEl: HTMLElement): boolean {
+  const active = document.activeElement as HTMLElement | null;
+  return !!(
+    active &&
+    contentEl.contains(active) &&
+    /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)
+  );
+}
+
+function getFocusScrollExtraBottom(
+  target: HTMLElement,
+  isEditModal: boolean,
+  isDailyModal: boolean
+): number {
+  if (isDailyModal && target.classList.contains("diary-textarea")) {
+    return 24;
+  }
+  if (target.tagName === "TEXTAREA") {
+    return 98;
+  }
+  if (isEditModal) {
+    return 76;
+  }
+  return 56;
+}
+
 export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const cEl = modal.containerEl;
   const mEl = modal.modalEl;
@@ -33,6 +77,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const previousContentStyles = {
     flex: contentEl.style.flex,
     minHeight: contentEl.style.minHeight,
+    height: contentEl.style.height,
+    display: contentEl.style.display,
     overflowY: contentEl.style.overflowY,
     position: contentEl.style.position,
     width: contentEl.style.width,
@@ -48,11 +94,21 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
   const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  const isDailyModal = (modal as { modalType?: string }).modalType === "daily";
   const requiresFullKeyboardHeight = !!mEl.querySelector(".kid-score-custom-form");
   let stableViewportHeight = window.visualViewport
     ? window.visualViewport.height
     : window.innerHeight;
   let isManualAdjusting = false;
+
+  // ── Unified layout scheduler ──
+  // We debounce all layout-triggering events into a single applyLayout call
+  // to prevent iOS keyboard animation jitter caused by multiple overlapping
+  // applyLayout + ensureTargetVisible invocations.
+  let layoutTimer: number | null = null;
+  let fallbackTimer: number | null = null;
+  let pendingFocusTarget: HTMLElement | null = null;
+  let lastFlushTime = 0;
 
   mEl.style.display = "flex";
   mEl.style.flexDirection = "column";
@@ -64,15 +120,27 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   contentEl.style.width = "100%";
   (contentEl.style as unknown as Record<string, string>)["overscrollBehavior"] = "contain";
   (contentEl.style as unknown as Record<string, string>)["touchAction"] = "pan-y";
-  (contentEl.style as unknown as Record<string, string>)["webkitOverflowScrolling"] =
-    "touch";
+  // iOS Safari: -webkit-overflow-scrolling:touch is a notorious source of scroll
+  // lock bugs. For daily modal we skip it entirely; for others we keep it.
+  if (!isDailyModal) {
+    (contentEl.style as unknown as Record<string, string>)["webkitOverflowScrolling"] =
+      "touch";
+  }
 
   const ensureTargetVisible = (target: HTMLElement | null, extraBottom = 96) => {
     if (!target || !contentEl.contains(target)) return;
     const contentRect = contentEl.getBoundingClientRect();
     const targetRect = target.getBoundingClientRect();
     const currentTop = targetRect.top - contentRect.top + contentEl.scrollTop;
-    const currentBottom = currentTop + targetRect.height;
+    let currentBottom = currentTop + targetRect.height;
+    if (isDailyModal && target.classList.contains("diary-textarea")) {
+      const actions = contentEl.querySelector<HTMLElement>(".kid-score-actions");
+      if (actions) {
+        const actionsRect = actions.getBoundingClientRect();
+        const actionsBottom = actionsRect.bottom - contentRect.top + contentEl.scrollTop;
+        currentBottom = Math.max(currentBottom, actionsBottom);
+      }
+    }
     const safeTop = contentEl.scrollTop + 12;
     const safeBottom = contentEl.scrollTop + contentEl.clientHeight - extraBottom;
 
@@ -97,29 +165,6 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   const readKeyboardOffset = () =>
     parseInt(mEl.style.getPropertyValue("--keyboard-modal-offset") || "0", 10) || 0;
 
-  const getKeyboardHeight = () => {
-    if (!window.visualViewport) return 0;
-    const vv = window.visualViewport;
-    const raw = Math.max(
-      0,
-      stableViewportHeight - vv.height - Math.max(0, vv.offsetTop || 0)
-    );
-    if (raw < 70) {
-      stableViewportHeight = Math.max(stableViewportHeight, vv.height);
-      return 0;
-    }
-    return raw;
-  };
-
-  const hasFocusedModalField = () => {
-    const active = document.activeElement as HTMLElement | null;
-    return !!(
-      active &&
-      contentEl.contains(active) &&
-      /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)
-    );
-  };
-
   const updateModalLift = (keyboardH: number) => {
     if (!(platformIsIOS && isEditModal)) {
       mEl.style.setProperty("--keyboard-modal-offset", "0px");
@@ -137,7 +182,13 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
       (isEditModal ? 24 : 8);
     const currentRect = mEl.getBoundingClientRect();
     const currentKeyboardOffset = readKeyboardOffset();
-    const nextKeyboardOffset = currentKeyboardOffset + (desiredBottom - currentRect.bottom);
+    // Derive the natural (un-lifted) bottom position by removing the current
+    // keyboard offset from the measured rect. This prevents cumulative drift
+    // where each layout pass adds another offset on top of the previous one.
+    const naturalBottom = currentRect.bottom - currentKeyboardOffset;
+    // Keyboard avoidance should never push the score-edit sheet downward.
+    // If the sheet is already above the keyboard, leave downward adjustment to manual drag.
+    const nextKeyboardOffset = Math.min(0, desiredBottom - naturalBottom);
     mEl.style.setProperty("--keyboard-modal-offset", Math.round(nextKeyboardOffset) + "px");
   };
 
@@ -153,8 +204,9 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     cEl.style.height = vvH + "px";
 
     if ((platformIsIOS || platformIsAndroid) && window.visualViewport) {
-      const keyboardH = getKeyboardHeight();
-      const forceKeyboardMode = platformIsIOS && isEditModal && hasFocusedModalField();
+      const keyboardH = getKeyboardHeight(stableViewportHeight);
+      const forceKeyboardMode =
+        platformIsIOS && hasFocusedModalField(contentEl) && (isEditModal || isDailyModal);
       const effectiveKeyboardH = forceKeyboardMode ? Math.max(keyboardH, 81) : keyboardH;
       if (effectiveKeyboardH > 80) {
         mEl.style.alignSelf = "flex-start";
@@ -164,10 +216,22 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.maxHeight = keyboardMaxHeight + "px";
         if (platformIsIOS && isEditModal && requiresFullKeyboardHeight) {
           mEl.style.height = keyboardMaxHeight + "px";
+        } else if (isDailyModal) {
+          // Daily modal: iOS Safari has a known bug where overflow-y:auto on a
+          // child is silently ignored if the parent has overflow:hidden. We
+          // remove the parent's clip (overflow:visible) and give the child a
+          // strict pixel height so it establishes its own scrollable box.
+          mEl.style.overflow = "visible";
+          mEl.style.height = keyboardMaxHeight + "px";
+          const titleHeight = modal.titleEl ? modal.titleEl.offsetHeight : 0;
+          const contentHeight = Math.max(100, keyboardMaxHeight - titleHeight);
+          contentEl.style.height = contentHeight + "px";
+          contentEl.style.display = "block";
+          contentEl.style.flex = "none";
         } else {
           mEl.style.height = "";
         }
-        const extraBottom = isEditModal ? 28 : 18;
+        const extraBottom = isEditModal ? 28 : isDailyModal ? 92 : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
         contentEl.style.scrollPaddingBottom = Math.round(extraBottom + 12) + "px";
       } else {
@@ -178,6 +242,11 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         mEl.style.height = "";
         contentEl.style.paddingBottom = "";
         contentEl.style.scrollPaddingBottom = "";
+        if (isDailyModal) {
+          mEl.style.overflow = previousModalStyles.overflow;
+          contentEl.style.height = previousContentStyles.height;
+          contentEl.style.display = "";
+        }
       }
       updateModalLift(effectiveKeyboardH);
     } else {
@@ -185,43 +254,74 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
       mEl.style.height = "";
       updateModalLift(0);
     }
+  };
 
-    const focused = document.activeElement as HTMLElement | null;
-    if (focused && contentEl.contains(focused)) {
-      setTimeout(() => {
-        ensureTargetVisible(focused, focused.tagName === "TEXTAREA" ? 98 : isEditModal ? 76 : 56);
-      }, platformIsIOS ? 120 : 60);
+  // Flush applies layout and then scrolls the pending focus target (if any)
+  // into view with the correct extraBottom margin.
+  const flushLayout = () => {
+    if (layoutTimer !== null) {
+      clearTimeout(layoutTimer);
+      layoutTimer = null;
     }
+    applyLayout();
+    if (pendingFocusTarget && contentEl.contains(pendingFocusTarget)) {
+      const extraBottom = getFocusScrollExtraBottom(
+        pendingFocusTarget,
+        isEditModal,
+        isDailyModal
+      );
+      ensureTargetVisible(pendingFocusTarget, extraBottom);
+    }
+    pendingFocusTarget = null;
+    lastFlushTime = Date.now();
+  };
+
+  // Schedule a single debounced layout pass. Multiple calls within `delay`
+  // collapse into one execution, eliminating the jitter from overlapping
+  // visualViewport resize + focusin + window resize events.
+  const scheduleLayout = (delay: number, captureFocusTarget = false) => {
+    if (layoutTimer !== null) {
+      clearTimeout(layoutTimer);
+    }
+    if (captureFocusTarget) {
+      const focused = document.activeElement as HTMLElement | null;
+      if (focused && contentEl.contains(focused)) {
+        pendingFocusTarget = focused;
+      }
+    }
+    layoutTimer = window.setTimeout(flushLayout, delay);
+  };
+
+  // iOS sometimes fails to fire visualViewport resize. This hard fallback
+  // guarantees that we run at least once ~400 ms after a focus event.
+  const scheduleHardFallback = () => {
+    if (fallbackTimer !== null) {
+      clearTimeout(fallbackTimer);
+    }
+    fallbackTimer = window.setTimeout(() => {
+      if (Date.now() - lastFlushTime > 300) {
+        flushLayout();
+      }
+    }, 420);
   };
 
   const onFocusIn = (e: Event) => {
     const target = e.target as HTMLElement | null;
     if (!target || !contentEl.contains(target)) return;
-    // Primary: rely on visualViewport resize listener to adjust layout.
-    // Fallback 1: quick retry for browsers with slightly delayed resize.
-    const delay = platformIsIOS ? 120 : 80;
-    setTimeout(() => {
-      applyLayout();
-      ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
-    }, delay);
-    // Fallback 2: longer retry for iOS where visualViewport resize may not
-    // fire reliably (observed on iOS 26.4.1).
+    scheduleLayout(platformIsIOS ? 120 : 80, true);
     if (platformIsIOS) {
-      setTimeout(() => {
-        applyLayout();
-        ensureTargetVisible(target, target.tagName === "TEXTAREA" ? 98 : 72);
-      }, 380);
+      scheduleHardFallback();
     }
   };
 
   const onVVChange = () => {
-    // Debounce slightly: iOS sometimes fires multiple resize events
-    // during keyboard animation.
-    setTimeout(applyLayout, 40);
+    // Slightly longer than before (40 -> 60) to catch the tail end of
+    // iOS keyboard animation frames without over-firing.
+    scheduleLayout(60);
   };
 
   const onWinResize = () => {
-    setTimeout(applyLayout, 80);
+    scheduleLayout(80);
   };
 
   if (window.visualViewport) {
@@ -238,9 +338,19 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   mEl.addEventListener("focusin", onFocusIn);
   mEl.addEventListener("kid-score:manual-drag-start", onManualDragStart as EventListener);
   mEl.addEventListener("kid-score:manual-drag-end", onManualDragEnd as EventListener);
-  applyLayout();
+
+  // Initial layout
+  flushLayout();
 
   return () => {
+    if (layoutTimer !== null) {
+      clearTimeout(layoutTimer);
+      layoutTimer = null;
+    }
+    if (fallbackTimer !== null) {
+      clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+    }
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", onVVChange);
       window.visualViewport.removeEventListener("scroll", onVVChange);
@@ -282,6 +392,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     mEl.style.marginBottom = previousModalStyles.marginBottom;
     contentEl.style.flex = previousContentStyles.flex;
     contentEl.style.minHeight = previousContentStyles.minHeight;
+    contentEl.style.height = previousContentStyles.height;
+    contentEl.style.display = previousContentStyles.display;
     contentEl.style.overflowY = previousContentStyles.overflowY;
     contentEl.style.position = previousContentStyles.position;
     contentEl.style.width = previousContentStyles.width;

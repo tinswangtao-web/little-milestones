@@ -808,6 +808,22 @@ button,
   margin-bottom: 10px;
 }
 
+.custom-form-main-row {
+  gap: 8px;
+}
+
+.custom-form-main-row .custom-form-name-input {
+  min-width: 0;
+}
+
+.custom-form-main-row .diary-tool-btn {
+  flex: 0 0 auto;
+  margin-left: 0 !important;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+}
+
 .custom-form-label {
   flex: 0 0 40px;
   font-size: 0.88em;
@@ -885,6 +901,10 @@ textarea.custom-form-name-input {
 .custom-form-row .value-popup-controls {
   flex: 1;
   margin-bottom: 0;
+}
+
+.custom-form-category-row {
+  margin-bottom: 16px;
 }
 
 /* ─── Full Emoji Picker (iOS-like) ─────────────────────────────────────────── */
@@ -1005,6 +1025,60 @@ textarea.custom-form-name-input {
 .emoji-fp-btn:active {
   -webkit-transform: scale(0.95);
   transform: scale(0.95);
+}
+
+/* ─── Confirm Modal ─────────────────────────────────────────── */
+
+.confirm-modal-message {
+  font-size: 0.95em;
+  line-height: 1.5;
+  color: var(--text-normal);
+  margin: 8px 0 16px;
+  word-break: break-word;
+}
+
+.confirm-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.confirm-modal-cancel,
+.confirm-modal-confirm {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--background-modifier-border);
+  transition: all 0.1s;
+  min-height: 44px;
+}
+
+.confirm-modal-cancel {
+  background: var(--background-secondary);
+  color: var(--text-normal);
+}
+.confirm-modal-cancel:hover {
+  background: var(--background-modifier-hover);
+}
+
+.confirm-modal-confirm {
+  background: var(--interactive-accent);
+  color: white;
+  border-color: var(--interactive-accent);
+}
+.confirm-modal-confirm:hover {
+  filter: brightness(1.1);
+}
+
+.confirm-modal-confirm.is-destructive {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+.confirm-modal-confirm.is-destructive:hover {
+  filter: brightness(1.15);
 }
 
 /* ─── Custom Items ──────────────────────────────────────────────────────────── */
@@ -1327,6 +1401,57 @@ textarea.custom-form-name-input {
   font-size: 0.82em;
   font-weight: 700;
   color: var(--text-muted);
+}
+
+.diary-module-manager {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 6px;
+  align-items: center;
+}
+
+.diary-module-emoji-btn,
+.diary-module-delete-btn {
+  min-width: 36px;
+  height: 36px;
+  padding: 0 8px;
+}
+
+.diary-module-title-input,
+.diary-module-placeholder-editor {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+
+.diary-module-title-input {
+  height: 36px;
+  padding: 6px 10px;
+  font-weight: 700;
+}
+
+.diary-module-placeholder-editor {
+  min-height: 44px;
+  padding: 8px 10px;
+  resize: vertical;
+  line-height: 1.4;
+  overflow: hidden;
+}
+
+.diary-module-manage-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.diary-module-add-btn {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-weight: 700;
 }
 
 .diary-module-input {
@@ -2863,10 +2988,13 @@ textarea.custom-form-name-input {
   font-size: 1.2em;
 }
 
-/* ─── 移动端适配 ─────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   移动端适配 — Mobile Layout
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
+/* ── Phone (≤480px) ────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
-  /* Modal base */
+  /* ── Modal shell ── */
   .kid-score-modal {
     padding: 6px;
     max-height: 90vh;
@@ -2895,7 +3023,7 @@ textarea.custom-form-name-input {
     touch-action: pan-y;
   }
 
-  /* Ensure focused inputs remain visible above virtual keyboard */
+  /* ── Focus visibility above virtual keyboard ── */
   .kid-score-modal input,
   .kid-score-modal textarea,
   .kid-score-modal .custom-form-name-input,
@@ -2905,7 +3033,7 @@ textarea.custom-form-name-input {
     scroll-margin-bottom: 120px;
   }
 
-  /* Score cards */
+  /* ── Score cards ── */
   .kid-score-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
@@ -2931,30 +3059,32 @@ textarea.custom-form-name-input {
   .kid-score-card-more-btn {
     display: inline-flex;
   }
+  .kid-score-card-mobile.is-deducted-active::after {
+    top: 6px;
+    right: auto;
+    left: 6px;
+  }
   .card-emoji { font-size: 1.6em; }
   .card-name { font-size: 0.8em; }
   .card-points { font-size: 0.75em; }
 
-  /* Stats */
+  /* ── Stats / Summary ── */
   .kid-score-summary-cards {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
   }
 
+  /* ── Bottom actions ── */
   .kid-score-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
-    position: sticky;
-    bottom: 0;
-    margin-top: 12px;
+    position: static;
+    margin-top: 16px;
     padding: 10px 0 calc(env(safe-area-inset-bottom, 4px) + 2px);
-    background: linear-gradient(to top, var(--background-primary) 78%, rgba(0,0,0,0));
-    backdrop-filter: blur(4px);
     z-index: 3;
   }
 
-  .kid-score-preview-btn,
   .kid-score-save-btn,
   .kid-score-stats-btn {
     min-height: 46px;
@@ -2963,9 +3093,11 @@ textarea.custom-form-name-input {
     border-radius: 12px;
   }
 
-  .kid-score-preview-btn,
-  .kid-score-save-btn {
+  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-save-btn,
+  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-stats-btn {
     grid-row: 1;
+    grid-column: auto;
+    width: 100%;
   }
 
   .kid-score-stats-btn {
@@ -3079,6 +3211,7 @@ textarea.custom-form-name-input {
     min-width: 360px;
   }
 
+  /* ── Calendar picker ── */
   .kid-score-calendar-popup {
     width: min(356px, calc(100vw - 32px));
     max-width: calc(100vw - 32px);
@@ -3116,11 +3249,22 @@ textarea.custom-form-name-input {
 
   .kid-score-calendar-popup .cal-day {
     min-width: 0;
+    min-height: 40px;
     width: 100%;
     aspect-ratio: 1;
     padding: 0;
     border-radius: 7px;
     font-size: 0.78em;
+  }
+
+  .kid-score-calendar-popup .cal-day.is-future {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .kid-score-calendar-popup .cal-day.is-future .cal-day-inner {
+    color: var(--text-muted);
   }
 
   .kid-score-calendar-popup .value-popup-cancel {
@@ -3195,7 +3339,7 @@ textarea.custom-form-name-input {
     margin-bottom: 10px;
   }
 
-  /* Popup — centered, safe from edges */
+  /* ── Popups & forms ── */
   .kid-score-value-overlay {
     padding: 12px;
     align-items: flex-end; /* slide up from bottom on mobile */
@@ -3232,7 +3376,7 @@ textarea.custom-form-name-input {
     border-radius: 8px;
   }
 
-  /* Custom form mobile */
+  /* ── Custom form ── */
   .custom-form-emoji-quick {
     padding-left: 0;
     justify-content: center;
@@ -3246,6 +3390,7 @@ textarea.custom-form-name-input {
 
   .custom-form-row {
     flex-wrap: wrap;
+    margin-bottom: 12px;
   }
 
   .custom-form-label {
@@ -3254,8 +3399,8 @@ textarea.custom-form-name-input {
   }
 
   .custom-form-emoji-input {
-    width: 50px;
-    height: 44px;
+    width: 46px;
+    height: 42px;
     font-size: 1.5em;
   }
 
@@ -3265,6 +3410,45 @@ textarea.custom-form-name-input {
     height: 44px;
     font-size: 16px;
     border-radius: 6px;
+  }
+
+  .kid-score-edit-modal .custom-form-main-row {
+    flex-wrap: wrap !important;
+    gap: 6px;
+    align-items: center !important;
+  }
+
+  .kid-score-edit-modal .custom-form-main-row .custom-form-label {
+    flex: 0 0 100%;
+    margin-bottom: 2px;
+  }
+
+  .kid-score-edit-modal .custom-form-main-row .custom-form-emoji-input {
+    flex: 0 0 46px;
+    width: 46px;
+  }
+
+  .kid-score-edit-modal .custom-form-main-row .diary-tool-btn {
+    flex: 0 0 46px;
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    padding: 0;
+  }
+
+  .kid-score-edit-modal .custom-form-main-row .custom-form-name-input {
+    flex: 1 1 100%;
+    min-width: 0;
+    margin-top: 4px;
+  }
+
+  .kid-score-edit-modal .custom-form-category-row {
+    margin-bottom: 18px;
+  }
+
+  .kid-score-edit-modal .value-popup-actions {
+    margin-top: 24px;
+    position: static;
   }
   textarea.custom-form-name-input {
     min-height: 60px;
@@ -3281,7 +3465,7 @@ textarea.custom-form-name-input {
     justify-content: center;
   }
 
-  /* Emoji picker — bottom sheet on mobile */
+  /* ── Emoji picker ── */
   .kid-score-emoji-picker {
     position: fixed !important;
     top: auto !important;
@@ -3389,7 +3573,7 @@ textarea.custom-form-name-input {
     text-align: left;
   }
 
-  /* User switcher */
+  /* ── User switcher ── */
   .kid-score-user-switcher {
     gap: 6px;
     margin-bottom: 8px;
@@ -3416,7 +3600,7 @@ textarea.custom-form-name-input {
     line-height: 1.35;
   }
 
-  /* Main tabs */
+  /* ── Main tabs ── */
   .kid-score-main-tabs {
     position: sticky;
     top: 0;
@@ -3451,7 +3635,7 @@ textarea.custom-form-name-input {
     min-height: 48px !important;
   }
 
-  /* Diary mobile */
+  /* ── Diary modules ── */
   .diary-toolbar {
     display: flex;
     gap: 8px;
@@ -3513,6 +3697,27 @@ textarea.custom-form-name-input {
     border: 1px solid var(--background-modifier-border);
   }
 
+  .diary-quick-built-in-header,
+  .diary-module-readonly-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 4px;
+  }
+
+  .diary-quick-built-in-emoji,
+  .diary-module-readonly-emoji {
+    font-size: 1.3em;
+    line-height: 1;
+  }
+
+  .diary-quick-built-in-label,
+  .diary-module-readonly-label {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+
   .diary-quick-header {
     display: flex;
     align-items: center;
@@ -3523,6 +3728,38 @@ textarea.custom-form-name-input {
   .diary-quick-label {
     padding-right: 2px;
     font-size: 0.82em;
+  }
+
+  .diary-module-manager {
+    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    gap: 6px;
+  }
+
+  .diary-module-emoji-btn,
+  .diary-module-delete-btn {
+    width: 42px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0;
+  }
+
+  .diary-module-title-input {
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .diary-module-placeholder-editor {
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .diary-module-manage-actions {
+    justify-content: stretch;
+  }
+
+  .diary-module-add-btn {
+    width: 100%;
+    min-height: 44px;
   }
 
   .diary-quick-value-input,
@@ -3577,19 +3814,28 @@ textarea.custom-form-name-input {
   }
 
   .diary-textarea {
-    min-height: 200px;
+    min-height: 160px;
+    max-height: 32vh; /* prevents infinite growth from pushing save button off-screen */
+    overflow-y: auto;
     font-size: 16px; /* prevents iOS zoom on focus */
     padding: 12px;
     border-radius: 10px;
+    scroll-margin-bottom: 140px;
+    outline-offset: 2px;
   }
 
-  /* Section titles */
+  .diary-textarea:focus {
+    outline: 2px solid var(--interactive-accent);
+    outline-offset: 2px;
+  }
+
+  /* ── Section titles ── */
   .kid-score-section-title {
     font-size: 0.88em;
     margin: 12px 0 6px;
   }
 
-  /* Total display */
+  /* ── Total display ── */
   .kid-score-total-display {
     display: flex;
     flex-direction: column;
@@ -3629,13 +3875,13 @@ textarea.custom-form-name-input {
     height: 7px;
   }
 
-  /* Hint text */
+  /* ── Hint text ── */
   .kid-score-hint {
     font-size: 0.78em;
     margin-bottom: 8px;
   }
 
-  /* Card note mobile — wraps within fixed-width card */
+  /* ── Card note ── */
   .card-note {
     font-size: 0.76em;
     max-height: 3.9em;
@@ -3646,10 +3892,10 @@ textarea.custom-form-name-input {
     text-overflow: ellipsis;
   }
 
-  /* Note row mobile */
+  /* ── Note row ── */
   .settings-item-note-row { padding-left: 28px; }
 
-  /* Date navigation mobile */
+  /* ── Date navigation ── */
   .kid-score-date-nav {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
@@ -3687,7 +3933,7 @@ textarea.custom-form-name-input {
     font-size: 0.8em;
   }
 
-  /* Full emoji picker mobile — bottom sheet */
+  /* ── Full emoji picker ── */
   .kid-score-emoji-fullpicker {
     min-width: auto;
     max-width: 100%;
@@ -3741,6 +3987,7 @@ textarea.custom-form-name-input {
     transform: scale(0.98);
   }
 
+  /* ── Rules section ── */
   .kid-score-rules-section {
     margin-bottom: 10px;
     border-radius: 12px;
@@ -3982,7 +4229,7 @@ textarea.custom-form-name-input {
   }
 }
 
-/* ─── 超小屏幕进一步适配 ────────────────────────────────────────────────────── */
+/* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
   .kid-score-grid {
@@ -4084,7 +4331,7 @@ textarea.custom-form-name-input {
   }
 }
 
-/* ─── 平板/横屏优化 ─────────────────────────────────────────────────────────── */
+/* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
   .kid-score-grid {
@@ -4093,6 +4340,78 @@ textarea.custom-form-name-input {
 
   .kid-score-value-overlay {
     align-items: center;
+  }
+
+  /* Touch-friendly card sizing */
+  .kid-score-card {
+    min-height: 80px;
+    padding: 18px 8px 12px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
+  }
+
+  /* Larger tap targets for tabs and buttons */
+  .kid-score-main-tab {
+    min-height: 48px;
+    padding: 14px 10px;
+  }
+
+  .kid-score-user-btn,
+  .kid-score-user-add-btn {
+    min-height: 42px;
+    padding: 10px 12px;
+  }
+
+  .date-nav-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .diary-tool-btn {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  /* Bottom actions sizing */
+  .kid-score-save-btn,
+  .kid-score-stats-btn {
+    min-height: 46px;
+    padding: 14px 10px;
+    border-radius: 12px;
+  }
+
+  /* Prevent iOS zoom on inputs */
+  .kid-score-modal.is-mobile-ios .date-nav-display,
+  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
+  .kid-score-modal.is-mobile-ios .custom-form-name-input,
+  .kid-score-modal.is-mobile-ios .value-popup-input {
+    font-size: 16px;
+  }
+}
+
+/* ── Large tablet landscape (769–1024px) ───────────────────────────────────── */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Critical touch rules for large tablets */
+  .kid-score-card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
+  }
+
+  .kid-score-main-tab,
+  .kid-score-user-btn,
+  .kid-score-user-add-btn {
+    min-height: 44px;
+  }
+
+  .diary-tool-btn {
+    min-height: 44px;
+  }
+
+  .kid-score-save-btn,
+  .kid-score-stats-btn {
+    min-height: 46px;
+    border-radius: 12px;
   }
 }
 

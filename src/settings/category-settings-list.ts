@@ -1,5 +1,6 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../main";
+import { showConfirmModal } from "../ui/confirm-modal";
 
 interface RenderCategorySettingsListOptions {
   plugin: KidScorePlugin;
@@ -166,30 +167,31 @@ export function renderCategorySettingsList({
       });
       delBtn.onclick = async () => {
         const removedCategory = plugin.currentUser.categories[idx];
-        if (
-          !confirm(
+        showConfirmModal(plugin.app, {
+          title: "删除分类",
+          message:
             "确定删除分类「" +
-              removedCategory +
-              "」吗？该分类下的项目将自动归入第一个分类。"
-          )
-        ) {
-          return;
-        }
-        try {
-          plugin.currentUser.categories.splice(idx, 1);
-          const fallback = plugin.currentUser.categories[0] || "其他";
-          for (const item of plugin.currentUser.items) {
-            if (item.category === removedCategory) item.category = fallback;
-          }
-          await plugin.saveSettings();
-          renderCategories();
-          refreshItems();
-        } catch (error) {
-          new Notice(
-            "❌ 删除失败：" +
-              (error instanceof Error ? error.message : String(error))
-          );
-        }
+            removedCategory +
+            "」吗？该分类下的项目将自动归入第一个分类。",
+          isDestructive: true,
+          onConfirm: async () => {
+            try {
+              plugin.currentUser.categories.splice(idx, 1);
+              const fallback = plugin.currentUser.categories[0] || "其他";
+              for (const item of plugin.currentUser.items) {
+                if (item.category === removedCategory) item.category = fallback;
+              }
+              await plugin.saveSettings();
+              renderCategories();
+              refreshItems();
+            } catch (error) {
+              new Notice(
+                "❌ 删除失败：" +
+                  (error instanceof Error ? error.message : String(error))
+              );
+            }
+          },
+        });
       };
 
       dragState.rows.push(row);

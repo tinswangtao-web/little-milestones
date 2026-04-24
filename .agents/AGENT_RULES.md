@@ -3,10 +3,11 @@
 This file is the short operational version of the collaboration protocol. Give it to `claude-code` and `kimi-code` as the working rule set for this repository.
 
 ## Ownership Rule
-- `codex` is the only default implementation agent for this plugin.
-- `claude-code` and `kimi-code` are review-only by default.
-- Unless the user explicitly says otherwise in the current thread, `claude-code` and `kimi-code` must stay read-only for plugin source/runtime files and only write review artifacts under `.agents/reviews/**` or other explicitly approved documentation files.
-- If the user grants a one-off coding exception to another agent, record that exception in `.agents/STATE.md` before any code edits begin.
+- `codex` is the normal default implementation agent for this plugin.
+- `claude-code` is review-only by default.
+- `kimi-code` is review-only by default, but may become the implementation agent when the user explicitly hands the task to Kimi and `.agents/STATE.md` records `owner: kimi-code`.
+- Unless `STATE.md` assigns implementation to Kimi, `kimi-code` must stay read-only for plugin source/runtime files and only write review artifacts under `.agents/reviews/**` or explicitly approved documentation files.
+- If the user grants a coding exception to another agent, record that exception in `.agents/STATE.md` before any code edits begin.
 
 ## Always Start Here
 1. Run `git status --short`.
@@ -20,7 +21,8 @@ This file is the short operational version of the collaboration protocol. Give i
 - Do not edit files owned by another agent's active lock.
 - If you need the lock, update `LOCK.md` first.
 - Declare a precise `write-scope`. Do not use vague scopes if a smaller one is enough.
-- If you are `claude-code` or `kimi-code`, assume you do **not** have permission to edit plugin code unless `STATE.md` explicitly records a user-approved exception.
+- If you are `claude-code`, assume you do **not** have permission to edit plugin code unless `STATE.md` explicitly records a user-approved exception.
+- If you are `kimi-code`, you may edit plugin code only when `STATE.md` explicitly assigns the current implementation task to Kimi.
 
 ## Shared Page Names
 - `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
@@ -32,7 +34,8 @@ This file is the short operational version of the collaboration protocol. Give i
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
 - Review, validation, and documentation can run in parallel if they are read-only or use a different `write-scope`.
 - Default code write-scope belongs to `codex`.
-- Default `claude-code` / `kimi-code` write-scope is `.agents/reviews/**` only.
+- Default `claude-code` write-scope is `.agents/reviews/**` only.
+- Default `kimi-code` write-scope is `.agents/reviews/**` only, unless `STATE.md` assigns Kimi as implementation owner for a precise plugin code scope.
 
 ## Workspace Rule
 - The primary workspace is the only normal code workspace for this repository.
@@ -85,8 +88,9 @@ This file is the short operational version of the collaboration protocol. Give i
   - `[claude]`
   - `[codex]`
   - `[kimi]`
-- In this repository, plugin code commits should normally be `[codex]`.
-- `[claude]` and `[kimi]` commits should normally be review/docs-only unless the user explicitly authorizes a coding exception.
+- In this repository, plugin code commits should normally be `[codex]`, except when `STATE.md` assigns implementation to Kimi.
+- `[kimi]` commits may include plugin code only for an explicitly assigned Kimi implementation task.
+- `[claude]` commits should normally be review/docs-only unless the user explicitly authorizes a coding exception.
 
 ## Review Rule
 - Reviews should state:
@@ -136,8 +140,8 @@ Before doing anything:
 - Read `.agents/LOCK.md`
 
 Rules:
-- You are review-only by default in this repository.
-- Do not edit plugin code unless the user explicitly authorizes that exception and the exception is recorded in `.agents/STATE.md`.
+- You are review-only by default in this repository, but may implement when `.agents/STATE.md` assigns the task to `kimi-code`.
+- For the current handoff, if `STATE.md` says `owner: kimi-code`, you are allowed to edit plugin code inside the declared `write-scope`.
 - Do not edit outside your declared `write-scope`
 - If `STATE.md` is awaiting another agent and you are not needed, stay read-only
 - Acquire `LOCK.md` before writing
@@ -149,4 +153,4 @@ Rules:
 - Prefer source files over generated artifacts
 - If you must hand-edit `main.js` or generated output, record why
 - Use commit prefix `[kimi]`
-- Your normal writable area is `.agents/reviews/**` plus explicitly approved docs-only files.
+- Your normal writable area is `.agents/reviews/**` plus explicitly approved docs-only files; during a Kimi implementation handoff, your writable area is the precise `write-scope` recorded in `STATE.md` / `LOCK.md`.

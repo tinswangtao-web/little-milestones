@@ -1,6 +1,7 @@
 import { App, Modal, Notice, Setting } from "obsidian";
 import { makeDefaultUser } from "../constants";
 import type KidScorePlugin from "../main";
+import { showConfirmModal } from "../ui/confirm-modal";
 import { attachPressGesture } from "../modals/helpers/press-gesture";
 import { bindModalInputFocus } from "../utils/dom";
 import { setupModalKeyboard } from "../utils/mobile";
@@ -171,20 +172,25 @@ export function renderUserSettingsSection({
           const newName = value.trim() || "未命名";
           const oldName = plugin.currentUser.name;
           if (newName === oldName) return;
-          if (!confirm("确定将用户名修改为「" + newName + "」吗？")) return;
-          try {
-            await plugin.renameUserInFiles(oldName, newName);
-            plugin.currentUser.name = newName;
-            await plugin.saveSettings();
-            renderUserMgr();
-            new Notice("✅ 用户名已更新，历史记录中的名称已同步替换");
-          } catch (error) {
-            console.error("[Little Milestones] renameUserInFiles error", error);
-            new Notice(
-              "❌ " +
-                (error instanceof Error ? error.message : String(error))
-            );
-          }
+          showConfirmModal(plugin.app, {
+            title: "修改用户名",
+            message: "确定将用户名修改为「" + newName + "」吗？",
+            onConfirm: async () => {
+              try {
+                await plugin.renameUserInFiles(oldName, newName);
+                plugin.currentUser.name = newName;
+                await plugin.saveSettings();
+                renderUserMgr();
+                new Notice("✅ 用户名已更新，历史记录中的名称已同步替换");
+              } catch (error) {
+                console.error("[Little Milestones] renameUserInFiles error", error);
+                new Notice(
+                  "❌ " +
+                    (error instanceof Error ? error.message : String(error))
+                );
+              }
+            },
+          });
         })
     );
   bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
@@ -200,27 +206,27 @@ export function renderUserSettingsSection({
           const newPath = value.trim() || "Little Milestones/Daily Records";
           const oldPath = plugin.currentUser.savePath;
           if (newPath === oldPath) return;
-          if (
-            !confirm(
+          showConfirmModal(plugin.app, {
+            title: "修改保存路径",
+            message:
               "确定将记录保存路径修改为「" +
-                newPath +
-                "」吗？\n已有的历史记录将自动迁移到新路径。"
-            )
-          ) {
-            return;
-          }
-          try {
-            await plugin.migrateSavePath(oldPath, newPath);
-            plugin.currentUser.savePath = newPath;
-            await plugin.saveSettings();
-            new Notice("✅ 保存路径已修改，历史记录已自动迁移");
-          } catch (error) {
-            console.error("[Little Milestones] migrateSavePath error", error);
-            new Notice(
-              "❌ " +
-                (error instanceof Error ? error.message : String(error))
-            );
-          }
+              newPath +
+              "」吗？\n已有的历史记录将自动迁移到新路径。",
+            onConfirm: async () => {
+              try {
+                await plugin.migrateSavePath(oldPath, newPath);
+                plugin.currentUser.savePath = newPath;
+                await plugin.saveSettings();
+                new Notice("✅ 保存路径已修改，历史记录已自动迁移");
+              } catch (error) {
+                console.error("[Little Milestones] migrateSavePath error", error);
+                new Notice(
+                  "❌ " +
+                    (error instanceof Error ? error.message : String(error))
+                );
+              }
+            },
+          });
         })
     );
   bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));

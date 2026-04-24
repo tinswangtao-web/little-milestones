@@ -1,6 +1,7 @@
 import { Notice, Component } from "obsidian";
 import type { App } from "obsidian";
 import { BaseMobileModal } from "../ui/base-mobile-modal";
+import { showConfirmModal } from "../ui/confirm-modal";
 import { formatDate, shiftDateString } from "../utils/date";
 import { makeDefaultDiaryModules } from "../constants";
 import type {
@@ -37,7 +38,9 @@ import { renderScorePanel } from "./panels/score-panel";
 import { composeDiaryContent } from "../diary/modules";
 
 export class DailyScoringModal extends BaseMobileModal {
+  readonly modalType = "daily";
   private isRendering = false;
+  private needsRerender = false;
   scores: Record<string, number> = {};
   customItems: CustomScoreItem[] = [];
   diaryContent = "";
@@ -48,6 +51,14 @@ export class DailyScoringModal extends BaseMobileModal {
   diaryModules: DiaryModuleValues = {};
   diaryControls: DiaryPanelControls | null = null;
   activeTab: "score" | "diary" = "score";
+  private pendingRenderState:
+    | {
+        scores: Record<string, number>;
+        customItems: CustomScoreItem[];
+        diaryContent: string;
+        diaryModules: DiaryModuleValues;
+      }
+    | null = null;
   protected enableKeyboardAdjustment = true;
 
   constructor(app: App, plugin: KidScorePlugin, initialDate?: string) {
@@ -65,8 +76,12 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   async renderModal() {
-    if (this.isRendering) return;
+    if (this.isRendering) {
+      this.needsRerender = true;
+      return;
+    }
     this.isRendering = true;
+    this.needsRerender = false;
     const self = this;
     try {
       const contentEl = this.contentEl;
@@ -80,11 +95,13 @@ export class DailyScoringModal extends BaseMobileModal {
       this.diaryControls = null;
 
       const state = await loadDailyModalState(this.plugin, this.dateStr);
+      const pendingState = this.pendingRenderState;
+      this.pendingRenderState = null;
       const yesterdayData = state.yesterdayData;
-      this.scores = state.scores;
-      this.customItems = state.customItems;
-      this.diaryContent = state.diaryContent;
-      this.diaryModules = state.diaryModules;
+      this.scores = pendingState?.scores || state.scores;
+      this.customItems = pendingState?.customItems || state.customItems;
+      this.diaryContent = pendingState?.diaryContent || state.diaryContent;
+      this.diaryModules = pendingState?.diaryModules || state.diaryModules;
 
       renderDailyHeader({
         containerEl: contentEl,
@@ -115,12 +132,14 @@ export class DailyScoringModal extends BaseMobileModal {
       const { scorePanel, diaryPanel } = renderMainTabs({
         containerEl: contentEl,
         isTouchLayout: this.isTouchOptimizedMode(),
+        activeTab: this.activeTab,
         onShowScore: () => {
           self.syncDiaryContent();
           self.activeTab = "score";
           contentEl.scrollTop = 0;
         },
         onShowDiary: () => {
+          self.syncDiaryContent();
           self.activeTab = "diary";
           contentEl.scrollTop = 0;
         },
@@ -166,13 +185,22 @@ export class DailyScoringModal extends BaseMobileModal {
         insertDiaryText: (text) => this.insertTextAtCursor(text),
         wrapDiarySelection: (prefix, suffix, placeholder) =>
           this.wrapDiarySelection(prefix, suffix, placeholder),
+        onModulesChanged: async () => {
+          this.syncDiaryContent();
+          this.pendingRenderState = {
+            scores: { ...this.scores },
+            customItems: this.customItems.map((item) => ({ ...item })),
+            diaryContent: this.diaryContent,
+            diaryModules: { ...this.diaryModules },
+          };
+          await this.plugin.saveSettings();
+          this.activeTab = "diary";
+          await this.renderModal();
+        },
         isTouchLayout: this.isTouchOptimizedMode(),
       });
       renderBottomActions({
         containerEl: contentEl,
-        onPreview: () => {
-          this.diaryControls?.togglePreview();
-        },
         onSave: async () => {
           self.syncDiaryContent();
           try {
@@ -191,6 +219,10 @@ export class DailyScoringModal extends BaseMobileModal {
       });
     } finally {
       this.isRendering = false;
+      if (this.needsRerender) {
+        this.needsRerender = false;
+        await this.renderModal();
+      }
     }
   }
 
@@ -311,10 +343,16 @@ export class DailyScoringModal extends BaseMobileModal {
       onDelete: (idx) => {
         const ci = self.customItems[idx];
         if (!ci) return;
-        if (!confirm("确定删除临时事项「" + ci.name + "」吗？")) return;
-        self.customItems.splice(idx, 1);
-        self.renderCustomItems();
-        self.updateTotalDisplay();
+        showConfirmModal(this.app, {
+          title: "删除临时事项",
+          message: "确定删除临时事项「" + ci.name + "」吗？",
+          isDestructive: true,
+          onConfirm: () => {
+            self.customItems.splice(idx, 1);
+            self.renderCustomItems();
+            self.updateTotalDisplay();
+          },
+        });
       },
     });
   }

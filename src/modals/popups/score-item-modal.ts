@@ -1,5 +1,6 @@
 import { App } from "obsidian";
 import { BaseMobileModal } from "../../ui/base-mobile-modal";
+import { showConfirmModal } from "../../ui/confirm-modal";
 import type KidScorePlugin from "../../main";
 import type { ScoreItem } from "../../types";
 import { bindModalInputFocus } from "../../utils/dom";
@@ -65,15 +66,21 @@ export class ScoreItemModal extends BaseMobileModal {
         if (this.onEdit) this.onEdit();
       };
       const delBtn = delRow.createEl("button", { cls: "value-popup-del-btn", text: "🗑 删除此打分项" });
-      delBtn.onclick = async () => {
-        if (!confirm("确定删除打分项「" + this.item.name + "」吗？")) return;
-        this.close();
-        const idx = this.plugin.currentUser.items.findIndex((it) => it.id === this.item.id);
-        if (idx !== -1) {
-          this.plugin.currentUser.items.splice(idx, 1);
-          await this.plugin.saveSettings();
-          this.onDelete?.();
-        }
+      delBtn.onclick = () => {
+        showConfirmModal(this.app, {
+          title: "删除打分项",
+          message: "确定删除打分项「" + this.item.name + "」吗？",
+          isDestructive: true,
+          onConfirm: async () => {
+            this.close();
+            const idx = this.plugin.currentUser.items.findIndex((it) => it.id === this.item.id);
+            if (idx !== -1) {
+              this.plugin.currentUser.items.splice(idx, 1);
+              await this.plugin.saveSettings();
+              this.onDelete?.();
+            }
+          },
+        });
       };
     }
   }

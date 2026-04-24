@@ -42,13 +42,35 @@ export function showEmojiPicker(
   customConfirm.className = "value-popup-confirm mod-cta";
   customConfirm.textContent = "确定";
   customConfirm.style.padding = "6px 16px";
+
+  // iOS keyboard avoidance for emoji picker:
+  // The overlay is position:fixed with top:0/bottom:0, so it covers the
+  // *layout* viewport (including the keyboard area). We shrink it to the
+  // *visual* viewport height so the popup aligns to the keyboard top edge.
+  const adjustForKeyboard = () => {
+    if (!window.visualViewport) return;
+    const vvH = window.visualViewport.height;
+    overlay.style.bottom = "auto";
+    overlay.style.height = vvH + "px";
+    popup.style.maxHeight = Math.max(200, vvH - 24) + "px";
+  };
+  const onVVResize = () => adjustForKeyboard();
+
   const removeOverlay = () => {
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onVVResize);
+    }
     if ((history.state as any)?.kidScoreOverlay) {
       history.back();
     }
   };
+
+  customInput.addEventListener("focus", adjustForKeyboard);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onVVResize);
+  }
 
   customConfirm.onclick = () => {
     const v = customInput.value.trim();

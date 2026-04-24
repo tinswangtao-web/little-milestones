@@ -62,11 +62,15 @@ export function openCalendarPicker({
       if (ds === currentDate) cell.addClass("is-selected");
       if (ds === todayStr) cell.addClass("is-today");
       if (recordDates.has(ds)) cell.addClass("has-record");
-      cell.onclick = () => {
-        if (ds > todayStr) return;
-        onSelect(ds);
-        removeOverlay();
-      };
+      if (ds > todayStr) {
+        cell.disabled = true;
+        cell.addClass("is-future");
+      } else {
+        cell.onclick = () => {
+          onSelect(ds);
+          removeOverlay();
+        };
+      }
     }
   };
 
@@ -100,6 +104,12 @@ export function openCalendarPicker({
   window.addEventListener("popstate", onPopstate);
 
   overlay.addEventListener("mousedown", (e) => {
+    if (e.target === overlay) {
+      e.preventDefault();
+      removeOverlay();
+    }
+  });
+  overlay.addEventListener("pointerdown", (e) => {
     if (e.target === overlay) {
       e.preventDefault();
       removeOverlay();

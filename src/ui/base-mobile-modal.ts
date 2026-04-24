@@ -12,6 +12,9 @@ export abstract class BaseMobileModal extends Modal {
   private _dragCleanup: DragCleanup | null = null;
   protected enableKeyboardAdjustment = true;
   protected enableManualDragAdjustment = false;
+  /** Identifies the modal type for keyboard/layout heuristics.
+   *  Must be set before super.onOpen() if it affects setupModalKeyboard. */
+  readonly modalType: string = "default";
 
   constructor(app: App, plugin: KidScorePlugin) {
     super(app);

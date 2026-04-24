@@ -1,7 +1,13 @@
 import { Notice } from "obsidian";
 import { makeDefaultDiaryModules } from "../constants";
 import type KidScorePlugin from "../main";
-import { showEmojiPicker } from "../ui/emoji-picker";
+import { showConfirmModal } from "../ui/confirm-modal";
+import {
+  createModuleEmojiField,
+  createModuleLabelField,
+  createModulePlaceholderField,
+  createModuleDeleteButton,
+} from "../ui/diary-module-editor";
 import { getMobilePlatform } from "../utils/platform";
 import { renderDesktopDiaryModuleRowLayout } from "./desktop-settings-sections";
 import { renderMobileDiaryModuleRowLayout } from "./mobile-settings-sections";
@@ -17,16 +23,7 @@ export function renderDiaryModuleSettingsSection({
   containerEl,
   bindSettingsInput,
 }: RenderDiaryModuleSettingsOptions): void {
-  const autoResize = (textarea: HTMLTextAreaElement, minHeight = 72) => {
-    const resize = () => {
-      textarea.style.height = "auto";
-      textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
-    };
-    requestAnimationFrame(resize);
-    setTimeout(resize, 60);
-    textarea.addEventListener("input", resize);
-    textarea.addEventListener("focus", resize);
-  };
+
 
   const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
   const header = section.createDiv({ cls: "kid-score-rules-header" });
@@ -67,54 +64,52 @@ export function renderDiaryModuleSettingsSection({
         cls: "diary-module-settings-field-label",
         text: "模块图标",
       });
-      const emojiBtn = emojiField.createEl("button", {
-        cls: "settings-emoji-btn diary-module-settings-emoji-btn",
-        text: moduleDef.emoji || "📝",
-      });
-      emojiBtn.type = "button";
-      emojiBtn.onclick = () => {
-        showEmojiPicker(async (emoji: string) => {
+      createModuleEmojiField({
+        app: plugin.app,
+        host: emojiField,
+        emoji: moduleDef.emoji || "📝",
+        onChange: async (emoji) => {
           plugin.currentUser.diaryModules[idx].emoji = emoji;
           await plugin.saveSettings();
-          emojiBtn.textContent = emoji;
-        }, containerEl);
-      };
+        },
+        containerEl,
+      });
 
       const labelField = main.createDiv({ cls: "diary-module-settings-field" });
       labelField.createEl("label", {
         cls: "diary-module-settings-field-label",
         text: "模块名称",
       });
-      const labelInput = labelField.createEl("input", {
-        cls: "diary-module-settings-input",
-        type: "text",
+      const labelInput = createModuleLabelField({
+        host: labelField,
+        label: moduleDef.label || "",
+        inputClass: "diary-module-settings-input",
+        skipBindInputFocus: true,
+        onChange: async (label) => {
+          plugin.currentUser.diaryModules[idx].label =
+            label || moduleDef.label || "新模块";
+          await plugin.saveSettings();
+          render();
+        },
       });
-      labelInput.value = moduleDef.label || "";
-      labelInput.placeholder = "模块名称";
       bindSettingsInput(labelInput);
-      labelInput.onchange = async () => {
-        plugin.currentUser.diaryModules[idx].label =
-          labelInput.value.trim() || moduleDef.label || "新模块";
-        await plugin.saveSettings();
-        render();
-      };
 
       placeholderField.createEl("label", {
         cls: "diary-module-settings-field-label",
         text: "提示文案",
       });
-      const placeholderInput = placeholderField.createEl("textarea", {
-        cls: "diary-module-settings-input is-wide diary-module-settings-textarea",
+      const placeholderInput = createModulePlaceholderField({
+        host: placeholderField,
+        placeholder: moduleDef.placeholder || "",
+        inputClass: "diary-module-settings-input is-wide diary-module-settings-textarea",
+        minHeight: 78,
+        skipBindInputFocus: true,
+        onChange: async (placeholder) => {
+          plugin.currentUser.diaryModules[idx].placeholder = placeholder;
+          await plugin.saveSettings();
+        },
       });
-      placeholderInput.value = moduleDef.placeholder || "";
-      placeholderInput.placeholder = "提示文案";
-      placeholderInput.rows = 2;
-      autoResize(placeholderInput, 78);
       bindSettingsInput(placeholderInput);
-      placeholderInput.onchange = async () => {
-        plugin.currentUser.diaryModules[idx].placeholder = placeholderInput.value.trim();
-        await plugin.saveSettings();
-      };
 
       const kindField = meta.createDiv({ cls: "diary-module-settings-field" });
       kindField.createEl("label", {
@@ -139,15 +134,17 @@ export function renderDiaryModuleSettingsSection({
         await plugin.saveSettings();
       };
 
-      const delBtn = actions.createEl("button", {
-        cls: "settings-delete-btn",
-        text: "🗑",
+      createModuleDeleteButton({
+        app: plugin.app,
+        host: actions,
+        moduleLabel: moduleDef.label || "未命名",
+        btnClass: "settings-delete-btn",
+        onDelete: async () => {
+          plugin.currentUser.diaryModules.splice(idx, 1);
+          await plugin.saveSettings();
+          render();
+        },
       });
-      delBtn.onclick = async () => {
-        plugin.currentUser.diaryModules.splice(idx, 1);
-        await plugin.saveSettings();
-        render();
-      };
     });
 
     const actions = body.createDiv({ cls: "kid-score-rules-actions" });
@@ -172,10 +169,17 @@ export function renderDiaryModuleSettingsSection({
       text: "恢复默认模块",
     });
     resetBtn.onclick = async () => {
-      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-      await plugin.saveSettings();
-      render();
-      new Notice("✅ 已恢复默认日记模块");
+      showConfirmModal(plugin.app, {
+        title: "恢复默认模块",
+        message: "恢复默认模块会替换当前日记模块设置，确定继续吗？",
+        isDestructive: true,
+        onConfirm: async () => {
+          plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+          await plugin.saveSettings();
+          render();
+          new Notice("✅ 已恢复默认日记模块");
+        },
+      });
     };
   };
 

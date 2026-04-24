@@ -19,9 +19,10 @@ Every time Codex enters this repository, do these steps first:
 - Review, validation, and documentation may run in parallel if they are read-only or have a separate `write-scope`.
 
 ## Ownership Rule
-- Codex is the sole default implementation agent for this plugin.
-- Other AIs are review-only by default and should not edit plugin code unless the user explicitly authorizes that exception in the current thread.
-- If the user grants such an exception, it must be recorded in `.agents/STATE.md` before any non-Codex code edits begin.
+- Codex is the normal default implementation agent for this plugin.
+- Claude Code is review-only by default and should not edit plugin code unless the user explicitly authorizes that exception in the current thread.
+- Kimi Code is review-only by default, but may become an implementation agent when the user explicitly hands the task to Kimi and `.agents/STATE.md` records `owner: kimi-code`.
+- If the user grants such an exception or Kimi implementation handoff, it must be recorded in `.agents/STATE.md` before any non-Codex code edits begin.
 
 ## Workspace Rule
 - The primary workspace is the only normal code workspace for this repository.
@@ -61,8 +62,9 @@ After Codex finishes a turn:
 - Use `[codex]` in commit messages for Codex-authored commits.
 
 ## External Agent Expectation
-- Treat `claude-code` and `kimi-code` feedback as review input by default.
-- Codex should be the one who turns approved review suggestions into actual plugin code changes unless the user explicitly chooses another arrangement.
+- Treat `claude-code` feedback as review input by default.
+- Treat `kimi-code` feedback as review input by default unless `.agents/STATE.md` explicitly assigns implementation to Kimi.
+- When Kimi is assigned implementation, Kimi may edit plugin code inside the declared `write-scope`, must update `.agents/`, and should use commit prefix `[kimi]`.
 
 ## First Read
 Codex should treat `.agents/AGENT_RULES.md` as the concise operator guide and `.agents/README.md` as the full protocol.

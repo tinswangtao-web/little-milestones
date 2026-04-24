@@ -49,9 +49,11 @@ export function renderStatsPanel(
 
   renderGoalCard(cards, currentUser, filtered, period);
 
+  let doneCounts: Map<string, number> | null = null;
   if (currentUser.items.length > 0) {
-    renderCategoryCompletion(statsBody, currentUser.items, currentUser.categories || [], filtered);
-    renderItemCompletion(statsBody, currentUser.items, filtered);
+    doneCounts = precomputeDoneCounts(currentUser.items, filtered);
+    renderCategoryCompletion(statsBody, currentUser.items, currentUser.categories || [], filtered, doneCounts);
+    renderItemCompletion(statsBody, currentUser.items, filtered, doneCounts);
   }
 
   statsBody.createEl("h3", { text: "每日得分趋势", cls: "stats-section-title" });
@@ -59,9 +61,9 @@ export function renderStatsPanel(
   const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
   canvas.width = 540;
   canvas.height = 200;
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     drawBarChart(canvas, filtered.slice(-20));
-  }, 50);
+  });
 
   if (period === "all" && filtered.length > 7) {
     renderMonthlySummary(statsBody, filtered);
@@ -107,16 +109,9 @@ function renderGoalCard(
   let goalTarget = 0;
   let goalCompleted = 0;
 
-  if (period === "week") {
-    goalLabel = "本周目标";
-    goalTarget = goals.weekly;
-    goalCompleted = filtered.reduce(
-      (sum, day) => sum + calcCompleted(currentUser.items, day),
-      0
-    );
-  } else if (period === "month") {
-    goalLabel = "本月目标";
-    goalTarget = goals.monthly;
+  if (period === "week" || period === "month") {
+    goalLabel = period === "week" ? "本周目标" : "本月目标";
+    goalTarget = period === "week" ? goals.weekly : goals.monthly;
     goalCompleted = filtered.reduce(
       (sum, day) => sum + calcCompleted(currentUser.items, day),
       0
@@ -138,9 +133,7 @@ function renderGoalCard(
 function calcCompleted(items: ScoreItem[], day: DayData): number {
   let completed = (day.customItems || []).length;
   for (const item of items) {
-    const val = day.scores[item.id] || 0;
-    const isDeduct = item.category === "减分" || item.points < 0;
-    if (isDeduct ? val !== 0 : val > 0) completed++;
+    if (isItemDone(item, day.scores[item.id] || 0)) completed++;
   }
   return completed;
 }
@@ -149,9 +142,9 @@ function renderCategoryCompletion(
   statsBody: HTMLElement,
   items: ScoreItem[],
   categories: string[],
-  filtered: DayData[]
+  filtered: DayData[],
+  doneCounts: Map<string, number>
 ): void {
-  const doneCounts = precomputeDoneCounts(items, filtered);
   const categoryStats: Record<string, { total: number; completed: number }> = {};
   categories.forEach((category) => {
     categoryStats[category] = { total: 0, completed: 0 };
@@ -181,11 +174,11 @@ function renderCategoryCompletion(
 function renderItemCompletion(
   statsBody: HTMLElement,
   items: ScoreItem[],
-  filtered: DayData[]
+  filtered: DayData[],
+  doneCounts: Map<string, number>
 ): void {
   statsBody.createEl("h3", { text: "各项目完成率", cls: "stats-section-title" });
   const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
-  const doneCounts = precomputeDoneCounts(items, filtered);
   const sortedFiltered = filtered
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -294,6 +287,10 @@ function drawBarChart(canvas: HTMLCanvasElement, data: DayData[]): void {
   ctx.stroke();
   ctx.setLineDash([]);
 
+  const labelFont = "bold " + Math.min(11, barWidth) + "px sans-serif";
+  const dateFont = "9px sans-serif";
+  ctx.textAlign = "center";
+
   data.forEach((score, index) => {
     const x = pad.left + index * (barWidth + 4);
     const pixPer = (chartHeight * 0.55) / maxAbs;
@@ -302,15 +299,14 @@ function drawBarChart(canvas: HTMLCanvasElement, data: DayData[]): void {
     ctx.fillStyle = isPositive ? "#4ade80" : "#f87171";
     ctx.fillRect(x, isPositive ? midY - barHeight : midY, barWidth, barHeight);
     ctx.fillStyle = "#333";
-    ctx.font = "bold " + Math.min(11, barWidth) + "px sans-serif";
-    ctx.textAlign = "center";
+    ctx.font = labelFont;
     ctx.fillText(
       String(score.total),
       x + barWidth / 2,
       isPositive ? midY - barHeight - 4 : midY + barHeight + 12
     );
-    ctx.font = "9px sans-serif";
     ctx.fillStyle = "#999";
+    ctx.font = dateFont;
     ctx.fillText(score.date.slice(5), x + barWidth / 2, height - 4);
   });
 }

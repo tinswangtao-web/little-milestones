@@ -17,10 +17,6 @@ export function renderMobileBottomActionsLayout(
   containerEl: HTMLElement
 ): BottomActionsLayoutRefs {
   const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-mobile" });
-  const previewBtn = actions.createEl("button", {
-    text: "查看预览",
-    cls: "kid-score-preview-btn",
-  });
   const saveBtn = actions.createEl("button", {
     text: "💾 保存记录",
     cls: "mod-cta kid-score-save-btn",
@@ -29,5 +25,5 @@ export function renderMobileBottomActionsLayout(
     text: "📊 查看统计",
     cls: "kid-score-stats-btn",
   });
-  return { actions, previewBtn, saveBtn, statsBtn };
+  return { actions, saveBtn, statsBtn };
 }

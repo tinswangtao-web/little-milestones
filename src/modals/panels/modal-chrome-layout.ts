@@ -6,7 +6,6 @@ export interface DailyHeaderLayoutRefs {
 
 export interface BottomActionsLayoutRefs {
   actions: HTMLElement;
-  previewBtn: HTMLButtonElement;
   saveBtn: HTMLButtonElement;
   statsBtn: HTMLButtonElement | null;
 }

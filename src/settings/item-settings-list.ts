@@ -1,6 +1,8 @@
 import { Notice } from "obsidian";
 import type KidScorePlugin from "../main";
+import { showConfirmModal } from "../ui/confirm-modal";
 import { showEmojiPicker } from "../ui/emoji-picker";
+import { attachAutoResize } from "../utils/dom";
 import { getMobilePlatform, isIOS } from "../utils/platform";
 import { sortItemsByCategories } from "./item-sorting";
 import { renderDesktopItemSettingsRowLayout } from "./desktop-settings-sections";
@@ -109,10 +111,7 @@ export function renderItemSettingsList({
     onDragEnd(e.clientY);
   };
 
-  const autoResize = (textarea: HTMLTextAreaElement) => {
-    textarea.style.height = "auto";
-    textarea.style.height = textarea.scrollHeight + "px";
-  };
+
 
   const startDrag = (idx: number, wrap: HTMLElement, clientY: number) => {
     dragState.dragging = true;
@@ -287,17 +286,23 @@ export function renderItemSettingsList({
         cls: "settings-delete-btn",
       });
       del.onclick = async () => {
-        if (!confirm("确定删除打分项「" + item.name + "」吗？")) return;
-        try {
-          plugin.currentUser.items.splice(idx, 1);
-          await plugin.saveSettings();
-          renderItems();
-        } catch (error) {
-          new Notice(
-            "❌ 删除失败：" +
-              (error instanceof Error ? error.message : String(error))
-          );
-        }
+        showConfirmModal(plugin.app, {
+          title: "删除打分项",
+          message: "确定删除打分项「" + item.name + "」吗？",
+          isDestructive: true,
+          onConfirm: async () => {
+            try {
+              plugin.currentUser.items.splice(idx, 1);
+              await plugin.saveSettings();
+              renderItems();
+            } catch (error) {
+              new Notice(
+                "❌ 删除失败：" +
+                  (error instanceof Error ? error.message : String(error))
+              );
+            }
+          },
+        });
       };
 
       const noteInput = noteRow.createEl("textarea", {
@@ -306,9 +311,7 @@ export function renderItemSettingsList({
       noteInput.placeholder = "备注（可选），支持多行";
       noteInput.value = item.note || "";
       noteInput.rows = 1;
-      autoResize(noteInput);
-      noteInput.addEventListener("input", () => autoResize(noteInput));
-      noteInput.addEventListener("focus", () => autoResize(noteInput));
+      attachAutoResize(noteInput);
       bindSettingsInput(noteInput);
       noteInput.addEventListener("change", async () => {
         plugin.currentUser.items[idx].note = noteInput.value;

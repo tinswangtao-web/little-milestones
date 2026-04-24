@@ -1,7 +1,7 @@
 import { MarkdownRenderer } from "obsidian";
 import type { App, Component } from "obsidian";
 import { makeDefaultDiaryModules } from "../../constants";
-import { bindModalInputFocus } from "../../utils/dom";
+import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import type KidScorePlugin from "../../main";
 import type { DiaryModuleValues } from "../../types";
 import {
@@ -15,7 +15,6 @@ import { renderMobileDiaryPanelLayout } from "./mobile-diary-panel";
 export interface DiaryPanelControls {
   togglePreview(): void;
   bindActionButtons(buttons: {
-    previewBtn: HTMLButtonElement;
     saveBtn: HTMLButtonElement;
     statsBtn: HTMLButtonElement | null;
     actions: HTMLElement;
@@ -36,6 +35,7 @@ interface DiaryPanelBuilderOptions {
   insertAttachment: (label: string, ext: string) => void;
   insertDiaryText: (text: string) => void;
   wrapDiarySelection: (prefix: string, suffix?: string, placeholder?: string) => void;
+  onModulesChanged: () => Promise<void>;
   isTouchLayout: boolean;
 }
 
@@ -53,31 +53,28 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     insertAttachment,
     insertDiaryText,
     wrapDiarySelection,
+    onModulesChanged,
     isTouchLayout,
   } = options;
 
   const diaryModules = options.diaryModules;
   let currentDiaryContent = diaryContent;
   const moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }> = [];
-  const moduleConfig =
-    plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length
-      ? plugin.currentUser.diaryModules
-      : makeDefaultDiaryModules();
+  if (!plugin.currentUser.diaryModules || plugin.currentUser.diaryModules.length === 0) {
+    plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+  }
+  const moduleConfig = plugin.currentUser.diaryModules;
+  const removeModule = (id: string) => {
+    plugin.currentUser.diaryModules = plugin.currentUser.diaryModules.filter(
+      (moduleDef) => moduleDef.id !== id
+    );
+  };
 
   let isPreview = false;
   let previewButtonBinder = (_active: boolean) => {};
   let diaryTextarea: HTMLTextAreaElement | null = null;
 
-  const attachAutoResize = (textarea: HTMLTextAreaElement, minHeight = 220) => {
-    const resize = () => {
-      textarea.style.height = "auto";
-      textarea.style.height = Math.max(minHeight, textarea.scrollHeight) + "px";
-    };
-    requestAnimationFrame(resize);
-    setTimeout(resize, 60);
-    textarea.addEventListener("input", resize);
-    textarea.addEventListener("focus", resize);
-  };
+
 
   const updateCharCount = () => {
     if (charCount) charCount.textContent = (currentDiaryContent || "").length + " 字";
@@ -136,6 +133,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     ? renderMobileDiaryPanelLayout(panel)
     : renderDesktopDiaryPanelLayout(panel);
   const {
+    moduleSection,
     moduleGrid,
     quickRow,
     textareaWrap,
@@ -150,12 +148,16 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     .filter((moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood")
     .forEach((moduleDef) =>
       createDiaryModuleField({
+        app,
         moduleGrid,
         moduleDef,
         diaryModules,
         moduleFields,
         updateDiaryModules,
         syncAndRefresh,
+        onModulesChanged,
+        panel,
+        removeModule,
       })
     );
 
@@ -177,6 +179,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   ];
 
   createDiaryQuickGroup({
+    app,
     quickRow,
     moduleDef: weatherModule,
     defaults: weatherEmojis,
@@ -185,8 +188,11 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     updateDiaryModules,
     syncAndRefresh,
     panel,
+    onModulesChanged,
+    removeModule,
   });
   createDiaryQuickGroup({
+    app,
     quickRow,
     moduleDef: moodModule,
     defaults: moodEmojis,
@@ -195,7 +201,25 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     updateDiaryModules,
     syncAndRefresh,
     panel,
+    onModulesChanged,
+    removeModule,
   });
+
+  const moduleActions = moduleSection.createDiv({ cls: "diary-module-manage-actions" });
+  const addModuleBtn = moduleActions.createEl("button", {
+    cls: "diary-tool-btn diary-module-add-btn",
+    text: "＋ 新增模块",
+  });
+  addModuleBtn.onclick = async () => {
+    plugin.currentUser.diaryModules.push({
+      id: "module_" + Date.now(),
+      emoji: "📝",
+      label: "新模块",
+      placeholder: "这里写一点今天的记录",
+      kind: "multi",
+    });
+    await onModulesChanged();
+  };
 
   inlinePreviewBtn.onclick = () => togglePreview();
   [
@@ -212,12 +236,17 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   bindModalInputFocus(diaryTextarea);
   diaryTextarea.value = diaryModules.freeWrite || "";
   diaryTextarea.rows = 12;
-  attachAutoResize(diaryTextarea, 220);
+  attachAutoResize(diaryTextarea, { minHeight: 220 });
   diaryTextarea.oninput = () => {
     diaryModules.freeWrite = diaryTextarea!.value;
     updateDiaryModules(diaryModules);
     syncAndRefresh();
   };
+  diaryTextarea.addEventListener("focus", () => {
+    requestAnimationFrame(() => {
+      diaryTextarea!.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    });
+  });
   setDiaryTextarea(diaryTextarea);
 
   ensureDefaultDiaryTemplate({
@@ -234,10 +263,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
 
   return {
     togglePreview,
-    bindActionButtons: ({ previewBtn, saveBtn, statsBtn, actions }) => {
+    bindActionButtons: ({ saveBtn, statsBtn, actions }) => {
       previewButtonBinder = (active) => {
-        previewBtn.style.display = "none";
-        previewBtn.classList.remove("is-active");
         if (inlinePreviewBtn) {
           inlinePreviewBtn.textContent = active ? "返回编辑" : "查看预览";
           inlinePreviewBtn.classList.toggle("is-active", active);

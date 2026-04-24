@@ -24,16 +24,15 @@ interface RenderTabsOptions {
   onShowScore: () => void;
   onShowDiary: () => void;
   isTouchLayout: boolean;
+  activeTab?: "score" | "diary";
 }
 
 interface RenderBottomActionsOptions {
   containerEl: HTMLElement;
-  onPreview: () => void;
   onSave: () => Promise<void>;
   onStats: () => void;
   isTouchLayout: boolean;
   bindDiaryActions: (buttons: {
-    previewBtn: HTMLButtonElement;
     saveBtn: HTMLButtonElement;
     statsBtn: HTMLButtonElement | null;
     actions: HTMLElement;
@@ -121,6 +120,7 @@ export function renderMainTabs({
   onShowScore,
   onShowDiary,
   isTouchLayout,
+  activeTab = "score",
 }: RenderTabsOptions) {
   const { scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout
     ? renderMobileMainTabsLayout(containerEl)
@@ -141,23 +141,28 @@ export function renderMainTabs({
     onShowDiary();
   };
 
+  if (activeTab === "diary") {
+    diaryTab.addClass("is-active");
+    scoreTab.removeClass("is-active");
+    diaryPanel.removeClass("is-hidden");
+    scorePanel.addClass("is-hidden");
+  }
+
   return { scorePanel, diaryPanel };
 }
 
 export function renderBottomActions({
   containerEl,
-  onPreview,
   onSave,
   onStats,
   isTouchLayout,
   bindDiaryActions,
 }: RenderBottomActionsOptions) {
-  const { actions, previewBtn, saveBtn, statsBtn } = isTouchLayout
+  const { actions, saveBtn, statsBtn } = isTouchLayout
     ? renderMobileBottomActionsLayout(containerEl)
     : renderDesktopBottomActionsLayout(containerEl);
 
-  bindDiaryActions({ previewBtn, saveBtn, statsBtn, actions });
-  previewBtn.onclick = onPreview;
+  bindDiaryActions({ saveBtn, statsBtn, actions });
   saveBtn.onclick = () => void onSave();
   if (statsBtn) statsBtn.onclick = onStats;
 }

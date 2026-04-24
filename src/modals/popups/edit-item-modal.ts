@@ -2,7 +2,7 @@ import { App, Notice } from "obsidian";
 import { BaseMobileModal } from "../../ui/base-mobile-modal";
 import type KidScorePlugin from "../../main";
 import type { ScoreItem } from "../../types";
-import { bindModalInputFocus } from "../../utils/dom";
+import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import { showEmojiPicker } from "../../ui/emoji-picker";
 
 export class EditItemModal extends BaseMobileModal {
@@ -24,9 +24,9 @@ export class EditItemModal extends BaseMobileModal {
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
 
-    const emojiRow = document.createElement("div");
-    emojiRow.className = "custom-form-row";
-    emojiRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "图标" }));
+    const mainRow = document.createElement("div");
+    mainRow.className = "custom-form-row custom-form-main-row";
+    mainRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "名称" }));
     const emojiInput = document.createElement("input");
     emojiInput.type = "text";
     emojiInput.className = "custom-form-emoji-input";
@@ -36,27 +36,21 @@ export class EditItemModal extends BaseMobileModal {
     const emojiPickBtn = document.createElement("button");
     emojiPickBtn.className = "diary-tool-btn";
     emojiPickBtn.textContent = "🔍";
-    emojiPickBtn.style.marginLeft = "4px";
     emojiPickBtn.onclick = () => {
       showEmojiPicker((em) => {
         emojiInput.value = em;
       }, this.contentEl);
     };
-    emojiRow.appendChild(emojiInput);
-    emojiRow.appendChild(emojiPickBtn);
-    c.appendChild(emojiRow);
-
-    const nameRow = document.createElement("div");
-    nameRow.className = "custom-form-row";
-    nameRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "名称" }));
+    mainRow.appendChild(emojiInput);
+    mainRow.appendChild(emojiPickBtn);
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.className = "custom-form-name-input";
     nameInput.value = this.item.name;
     nameInput.autocomplete = "off";
     bindModalInputFocus(nameInput);
-    nameRow.appendChild(nameInput);
-    c.appendChild(nameRow);
+    mainRow.appendChild(nameInput);
+    c.appendChild(mainRow);
 
     const pointsRow = document.createElement("div");
     pointsRow.className = "custom-form-row";
@@ -95,18 +89,11 @@ export class EditItemModal extends BaseMobileModal {
     bindModalInputFocus(noteInput);
     noteRow.appendChild(noteInput);
 
-    const autoResize = (ta: HTMLTextAreaElement) => {
-      ta.style.height = "auto";
-      ta.style.height = ta.scrollHeight + "px";
-    };
-    requestAnimationFrame(() => autoResize(noteInput));
-    setTimeout(() => autoResize(noteInput), 60);
-    noteInput.addEventListener("input", () => autoResize(noteInput));
-    noteInput.addEventListener("focus", () => autoResize(noteInput));
+    attachAutoResize(noteInput);
     c.appendChild(noteRow);
 
     const catRow = document.createElement("div");
-    catRow.className = "custom-form-row";
+    catRow.className = "custom-form-row custom-form-category-row";
     catRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "分类" }));
     const catSel = document.createElement("select");
     catSel.className = "custom-form-select";

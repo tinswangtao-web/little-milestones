@@ -2,7 +2,7 @@ import { App } from "obsidian";
 import { BaseMobileModal } from "../../ui/base-mobile-modal";
 import type KidScorePlugin from "../../main";
 import type { CustomScoreItem } from "../../types";
-import { bindModalInputFocus } from "../../utils/dom";
+import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import { showEmojiPicker } from "../../ui/emoji-picker";
 
 export class EditCustomModal extends BaseMobileModal {
@@ -24,23 +24,20 @@ export class EditCustomModal extends BaseMobileModal {
     const c = this.contentEl;
     c.addClass("kid-score-custom-form");
 
-    const emojiRow = c.createDiv({ cls: "custom-form-row" });
-    emojiRow.createSpan({ cls: "custom-form-label", text: "图标" });
-    const emojiInput = emojiRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
+    const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });
+    mainRow.createSpan({ cls: "custom-form-label", text: "事项" });
+    const emojiInput = mainRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
     emojiInput.value = this.item.emoji;
     emojiInput.maxLength = 2;
     bindModalInputFocus(emojiInput);
-    const emojiPickBtn = emojiRow.createEl("button", { cls: "diary-tool-btn", text: "🔍" });
-    emojiPickBtn.style.marginLeft = "4px";
+    const emojiPickBtn = mainRow.createEl("button", { cls: "diary-tool-btn", text: "🔍" });
     emojiPickBtn.onclick = () => {
       showEmojiPicker((em) => {
         emojiInput.value = em;
       }, this.containerEl);
     };
 
-    const nameRow = c.createDiv({ cls: "custom-form-row" });
-    nameRow.createSpan({ cls: "custom-form-label", text: "事项" });
-    const nameInput = nameRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
+    const nameInput = mainRow.createEl("input", { type: "text", cls: "custom-form-name-input" });
     nameInput.value = this.item.name;
     nameInput.autocomplete = "off";
     bindModalInputFocus(nameInput);
@@ -65,14 +62,7 @@ export class EditCustomModal extends BaseMobileModal {
     noteInput.autocomplete = "off";
     bindModalInputFocus(noteInput);
 
-    const autoResize = (ta: HTMLTextAreaElement) => {
-      ta.style.height = "auto";
-      ta.style.height = ta.scrollHeight + "px";
-    };
-    requestAnimationFrame(() => autoResize(noteInput));
-    setTimeout(() => autoResize(noteInput), 60);
-    noteInput.addEventListener("input", () => autoResize(noteInput));
-    noteInput.addEventListener("focus", () => autoResize(noteInput));
+    attachAutoResize(noteInput);
 
     const acts = c.createDiv({ cls: "value-popup-actions" });
     const cb = acts.createEl("button", { cls: "value-popup-cancel", text: "取消" });

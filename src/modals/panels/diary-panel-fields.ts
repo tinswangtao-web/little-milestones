@@ -1,17 +1,29 @@
+import type { App } from "obsidian";
 import { showEmojiPicker } from "../../ui/emoji-picker";
-import { bindModalInputFocus } from "../../utils/dom";
+import {
+  createModuleEmojiField,
+  createModuleLabelField,
+  createModulePlaceholderField,
+  createModuleDeleteButton,
+} from "../../ui/diary-module-editor";
+import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import type { DiaryModuleDefinition, DiaryModuleValues } from "../../types";
 
 interface CreateDiaryModuleFieldOptions {
+  app: App;
   moduleGrid: HTMLElement;
   moduleDef: DiaryModuleDefinition;
   diaryModules: DiaryModuleValues;
   moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }>;
   updateDiaryModules: (values: DiaryModuleValues) => void;
   syncAndRefresh: () => void;
+  onModulesChanged: () => Promise<void>;
+  panel: HTMLElement;
+  removeModule: (id: string) => void;
 }
 
 interface CreateDiaryQuickGroupOptions {
+  app: App;
   quickRow: HTMLElement;
   moduleDef: DiaryModuleDefinition | undefined;
   defaults: Array<{ e: string; l: string }>;
@@ -20,6 +32,8 @@ interface CreateDiaryQuickGroupOptions {
   updateDiaryModules: (values: DiaryModuleValues) => void;
   syncAndRefresh: () => void;
   panel: HTMLElement;
+  onModulesChanged: () => Promise<void>;
+  removeModule: (id: string) => void;
 }
 
 interface EnsureDefaultDiaryTemplateOptions {
@@ -31,18 +45,67 @@ interface EnsureDefaultDiaryTemplateOptions {
   syncAndRefresh: () => void;
 }
 
-function attachAutoResize(input: HTMLTextAreaElement, minHeight = 88): void {
-  const resize = () => {
-    input.style.height = "auto";
-    input.style.height = Math.max(minHeight, input.scrollHeight) + "px";
-  };
-  requestAnimationFrame(resize);
-  setTimeout(resize, 60);
-  input.addEventListener("input", resize);
-  input.addEventListener("focus", resize);
+function createModuleManager({
+  app,
+  host,
+  moduleDef,
+  diaryModules,
+  panel,
+  onModulesChanged,
+  removeModule,
+}: {
+  app: App;
+  host: HTMLElement;
+  moduleDef: DiaryModuleDefinition;
+  diaryModules: DiaryModuleValues;
+  panel: HTMLElement;
+  onModulesChanged: () => Promise<void>;
+  removeModule: (id: string) => void;
+}): void {
+  const manager = host.createDiv({ cls: "diary-module-manager" });
+  createModuleEmojiField({
+    app,
+    host: manager,
+    emoji: moduleDef.emoji || "📝",
+    onChange: async (emoji) => {
+      moduleDef.emoji = emoji;
+      await onModulesChanged();
+    },
+    containerEl: panel,
+    btnClass: "diary-module-emoji-btn",
+  });
+  createModuleLabelField({
+    host: manager,
+    label: moduleDef.label || "",
+    onChange: async (label) => {
+      moduleDef.label = label || moduleDef.label || "新模块";
+      await onModulesChanged();
+    },
+  });
+  createModuleDeleteButton({
+    app,
+    host: manager,
+    moduleLabel: moduleDef.label || "未命名",
+    onDelete: async () => {
+      delete diaryModules[moduleDef.id];
+      removeModule(moduleDef.id);
+      await onModulesChanged();
+    },
+    btnClass: "diary-module-delete-btn",
+  });
+  createModulePlaceholderField({
+    host,
+    placeholder: moduleDef.placeholder || "",
+    onChange: async (placeholder) => {
+      moduleDef.placeholder = placeholder;
+      await onModulesChanged();
+    },
+    minHeight: 44,
+  });
 }
 
 export function createDiaryModuleField({
+  app,
   moduleGrid,
   moduleDef,
   diaryModules,
@@ -51,10 +114,11 @@ export function createDiaryModuleField({
   syncAndRefresh,
 }: CreateDiaryModuleFieldOptions): void {
   const card = moduleGrid.createDiv({ cls: "diary-module-card" });
-  card.createSpan({
-    cls: "diary-module-label",
-    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" "),
-  });
+  // Read-only header: just emoji + label, no editable name/placeholder/delete.
+  const header = card.createDiv({ cls: "diary-module-readonly-header" });
+  header.createSpan({ cls: "diary-module-readonly-emoji", text: moduleDef.emoji || "📝" });
+  header.createSpan({ cls: "diary-module-readonly-label", text: moduleDef.label || "" });
+
   const isMultiline = moduleDef.kind !== "quick";
   const input = isMultiline
     ? card.createEl("textarea", { cls: "diary-module-input is-multiline" })
@@ -68,12 +132,13 @@ export function createDiaryModuleField({
     syncAndRefresh();
   });
   if (input instanceof HTMLTextAreaElement) {
-    attachAutoResize(input, 104);
+    attachAutoResize(input, { minHeight: 104 });
   }
   moduleFields.push({ key: moduleDef.id, input });
 }
 
 export function createDiaryQuickGroup({
+  app,
   quickRow,
   moduleDef,
   defaults,
@@ -82,15 +147,29 @@ export function createDiaryQuickGroup({
   updateDiaryModules,
   syncAndRefresh,
   panel,
+  onModulesChanged,
+  removeModule,
 }: CreateDiaryQuickGroupOptions): void {
   if (!moduleDef) return;
   let customEmoji = defaults[0].e;
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
-  const header = group.createDiv({ cls: "diary-quick-header" });
-  header.createSpan({
-    cls: "diary-quick-label",
-    text: [moduleDef.emoji, moduleDef.label].filter(Boolean).join(" "),
-  });
+  // Built-in quick modules (weather/mood) only need a simple read-only header,
+  // not the full editable manager (label input, placeholder textarea, delete button).
+  if (moduleDef.kind === "quick") {
+    const header = group.createDiv({ cls: "diary-quick-built-in-header" });
+    header.createSpan({ cls: "diary-quick-built-in-emoji", text: moduleDef.emoji || "📝" });
+    header.createSpan({ cls: "diary-quick-built-in-label", text: moduleDef.label || "" });
+  } else {
+    createModuleManager({
+      app,
+      host: group,
+      moduleDef,
+      diaryModules,
+      panel,
+      onModulesChanged,
+      removeModule,
+    });
+  }
   const valueInput = group.createEl("textarea", {
     cls: "diary-quick-value-input",
   });
@@ -103,7 +182,7 @@ export function createDiaryQuickGroup({
     updateDiaryModules(diaryModules);
     syncAndRefresh();
   });
-  attachAutoResize(valueInput, 54);
+  attachAutoResize(valueInput, { minHeight: 54 });
   moduleFields.push({ key: moduleDef.id, input: valueInput });
 
   const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
@@ -145,7 +224,7 @@ export function createDiaryQuickGroup({
         : "也可以自己补充一句";
   textInput.rows = 2;
   bindModalInputFocus(textInput);
-  attachAutoResize(textInput, 72);
+  attachAutoResize(textInput, { minHeight: 72 });
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
     text: "添加",
