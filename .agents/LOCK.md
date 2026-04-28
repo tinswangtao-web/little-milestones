@@ -1,7 +1,7 @@
 ## Write Lock
-- `owner`: none
-- `since`: 2026-04-28 11:41
-- `scope`: none
-- `reason`: Agents bookkeeping after removing `.claude/settings.local.json`; lock released
-- `expires-at`: 2026-04-28 12:41
-- `notes`: Repo hygiene only; plugin behavior unchanged since 2026-04-27 Vault sync.
+- `owner`: codex
+- `since`: 2026-04-28 15:32
+- `scope`: styles/04-diary.css, styles/07-mobile.css, styles.css, .agents/**
+- `reason`: Fix desktop diary module layout alignment on scoring page
+- `expires-at`: 2026-04-28 16:32
+- `notes`: Desktop-only CSS adjustments + rebuild generated `styles.css`.

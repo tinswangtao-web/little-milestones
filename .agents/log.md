@@ -55,3 +55,4 @@
 [2026-04-27 10:51] codex | removed all `debug-95e240` instrumentation from source, kept verified mobile fixes (overlay state ids, reorder insert index, pending diary nullish merge), rebuilt + typechecked + deployed to Vault
 [2026-04-28 11:41] codex | hygiene: deleted `.claude/settings.local.json`; refreshed `.agents/STATE.md`, `.agents/LOCK.md`, `.agents/tasks/2026-04-20-mobile-ux.md`
 2026-04-28 11:44:26 +0800  commit d05d71e  [codex] chore: remove local Claude settings and sync agents collaboration records
+2026-04-28 15:32 +0800  codex | start: desktop diary module layout alignment fix (styles-only); created task `2026-04-28-desktop-diary-layout`, took lock for `styles/04-diary.css` + rebuild `styles.css`

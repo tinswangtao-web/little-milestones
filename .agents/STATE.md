@@ -1,15 +1,15 @@
 ## Current Task
-- `task`: 2026-04-20-mobile-ux
-- `status`: completed
+- `task`: 2026-04-28-desktop-diary-layout
+- `status`: in-progress
 - `last-actor`: codex
-- `last-commit`: d05d71e
+- `last-commit`: f1486b7
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
-- `write-scope`: none
-- `read-scope`: src/**, styles/**, main.js, styles.css, .agents/**
-- `awaiting`: none
-- `handoff-note`: Fixed iOS daily modal scroll lock when keyboard is open. Root cause: `isDailyModal` was always false in `setupModalKeyboard` because class is added after keyboard setup. Introduced `modalType` property for early identification. Vault synced. Codex completed a read-only comprehensive review on 2026-04-25 and recorded 5 follow-up findings in `.agents/reviews/2026-04-25-codex-comprehensive-review.md`. On 2026-04-25 Codex also shipped debug-mode fixes for overlay history stack collisions, settings drag reorder insert math, and daily modal pending diary merge (`??` instead of `||`), then rebuilt + deployed to Vault; debug instrumentation cleanup completed on 2026-04-27 after user verification; rebuilt and synced to Vault. Removed machine-local Claude hook settings by deleting `.claude/settings.local.json` (hygiene-only; see `last-commit`).
+- `write-scope`: styles/04-diary.css, styles/07-mobile.css, styles.css, .agents/**
+- `read-scope`: src/**, styles/**, styles.css, .agents/**
+- `awaiting`: user-verification
+- `handoff-note`: Desktop scoring page diary modules show irregular layout in the diary panel (module cards and quick emoji rows). Target: make desktop module grid single-column and emoji buttons align into an even grid without size jitter; rebuild `styles.css` afterward.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

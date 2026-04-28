@@ -1504,6 +1504,27 @@ textarea.custom-form-name-input {
   margin-top: 2px;
 }
 
+
+.desktop-diary-panel .diary-module-grid {
+  grid-template-columns: 1fr;
+}
+
+.desktop-diary-panel .diary-quick-emoji-row {
+  grid-template-columns: repeat(6, minmax(38px, 1fr));
+}
+
+.desktop-diary-panel .diary-quick-btn {
+  height: auto;
+  min-height: 38px;
+  aspect-ratio: 1 / 1;
+  line-height: 1;
+}
+
+.desktop-diary-panel .diary-quick-btn:hover {
+  -webkit-transform: none;
+  transform: none;
+}
+
 .diary-quick-group {
   display: grid;
   gap: 8px;
