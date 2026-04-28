@@ -4967,7 +4967,12 @@ var DailyScoringModal = class extends BaseMobileModal {
           self.syncDiaryContent();
           try {
             await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            const filePath = self.plugin.filePath(self.dateStr);
+            const file = self.app.vault.getAbstractFileByPath(filePath);
             self.close();
+            if (file instanceof import_obsidian8.TFile) {
+              await self.app.workspace.getLeaf(true).openFile(file, { active: true });
+            }
           } catch (e) {
             new import_obsidian8.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
           }

@@ -1,4 +1,4 @@
-import { Notice, Component } from "obsidian";
+import { Notice, Component, TFile } from "obsidian";
 import type { App } from "obsidian";
 import { BaseMobileModal } from "../ui/base-mobile-modal";
 import { showConfirmModal } from "../ui/confirm-modal";
@@ -209,7 +209,12 @@ export class DailyScoringModal extends BaseMobileModal {
           self.syncDiaryContent();
           try {
             await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            const filePath = self.plugin.filePath(self.dateStr);
+            const file = self.app.vault.getAbstractFileByPath(filePath);
             self.close();
+            if (file instanceof TFile) {
+              await self.app.workspace.getLeaf(true).openFile(file, { active: true });
+            }
           } catch (e) {
             new Notice("❌ 保存失败：" + (e instanceof Error ? e.message : String(e)));
           }
