@@ -71,12 +71,18 @@ export function renderCategorySettingsList({
     document.body.style.userSelect = "";
     (document.body.style as CSSStyleDeclaration & { webkitUserSelect?: string }).webkitUserSelect = "";
     const targetIdx = getDragRowIndex(clientY);
-    let fromIdx = dragState.dragIdx;
-    if (targetIdx > fromIdx) fromIdx--;
+    const fromIdx = dragState.dragIdx;
+    let insertIdx = targetIdx;
+    if (targetIdx > fromIdx) insertIdx--;
     const arr = plugin.currentUser.categories;
-    if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+    if (
+      fromIdx !== insertIdx &&
+      fromIdx >= 0 &&
+      insertIdx >= 0 &&
+      insertIdx <= arr.length
+    ) {
       const moved = arr.splice(fromIdx, 1)[0];
-      arr.splice(targetIdx, 0, moved);
+      arr.splice(insertIdx, 0, moved);
       (async () => {
         await plugin.saveSettings();
         renderCategories();

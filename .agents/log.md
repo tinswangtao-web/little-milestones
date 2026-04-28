@@ -50,3 +50,6 @@
 [2026-04-24 14:17] kimi | Packaged full codebase to Desktop/little-milestones-kimi-pass.tar.gz for codex review
 [2026-04-24 14:50 kimi] ChatGPT 5-point mobile optimization: extracted keyboard helpers, diary textarea focus scroll, calendar pointerdown+disabled future dates, renderModal needsRerender queue, CSS sectioning; tsc+build pass; vault sync diff-verified
 2026-04-24 23:52:11 +0800  commit 2f1cf62  [kimi] Remove redundant editing UI for built-in diary modules + emoji picker keyboard fix
+[2026-04-25 10:25] codex | completed read-only comprehensive review across architecture, data logic, and mobile UX; filed `.agents/reviews/2026-04-25-codex-comprehensive-review.md`; build + typecheck pass; no plugin source edits and no Vault sync this round
+[2026-04-25 10:35] codex | debug-mode fixes: corrected overlay popstate dismissal logic; unique overlay history ids for calendar+emoji; fixed settings drag reorder insert index; fixed daily modal pending diary merge using nullish coalescing; rebuilt + typechecked + deployed to Vault; kept debug instrumentation for post-fix verification
+[2026-04-27 10:51] codex | removed all `debug-95e240` instrumentation from source, kept verified mobile fixes (overlay state ids, reorder insert index, pending diary nullish merge), rebuilt + typechecked + deployed to Vault

@@ -22,6 +22,8 @@ export function showEmojiPicker(
 
   const popup = document.createElement("div");
   popup.className = "kid-score-emoji-fullpicker";
+  const overlayStateId = "emoji-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+  let pushedHistoryState = false;
 
   const header = document.createElement("div");
   header.className = "emoji-fp-header";
@@ -62,7 +64,10 @@ export function showEmojiPicker(
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", onVVResize);
     }
-    if ((history.state as any)?.kidScoreOverlay) {
+    if (
+      pushedHistoryState &&
+      (history.state as any)?.kidScoreOverlayId === overlayStateId
+    ) {
       history.back();
     }
   };
@@ -194,12 +199,14 @@ export function showEmojiPicker(
   });
 
   const onPopstate = (e: PopStateEvent) => {
-    if ((e.state as any)?.kidScoreOverlay) {
-      overlay.remove();
-      window.removeEventListener("popstate", onPopstate);
-    }
+    if ((e.state as any)?.kidScoreOverlayId === overlayStateId) return;
+    if (!overlay.isConnected) return;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    pushedHistoryState = false;
   };
-  history.pushState({ kidScoreOverlay: true }, "");
+  history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");
+  pushedHistoryState = true;
   window.addEventListener("popstate", onPopstate);
   popup.addEventListener("mousedown", (e) => {
     e.stopPropagation();

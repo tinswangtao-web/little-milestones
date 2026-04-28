@@ -99,10 +99,10 @@ export class DailyScoringModal extends BaseMobileModal {
       const pendingState = this.pendingRenderState;
       this.pendingRenderState = null;
       const yesterdayData = state.yesterdayData;
-      this.scores = pendingState?.scores || state.scores;
-      this.customItems = pendingState?.customItems || state.customItems;
-      this.diaryContent = pendingState?.diaryContent || state.diaryContent;
-      this.diaryModules = pendingState?.diaryModules || state.diaryModules;
+      this.scores = pendingState?.scores ?? state.scores;
+      this.customItems = pendingState?.customItems ?? state.customItems;
+      this.diaryContent = pendingState?.diaryContent ?? state.diaryContent;
+      this.diaryModules = pendingState?.diaryModules ?? state.diaryModules;
 
       renderDailyHeader({
         containerEl: contentEl,

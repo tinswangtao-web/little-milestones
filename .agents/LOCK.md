@@ -1,7 +1,7 @@
 ## Write Lock
 - `owner`: none
-- `since`: 2026-04-24 15:05
+- `since`: 2026-04-27 10:52
 - `scope`: none
-- `reason`: Fixed daily modal iOS scroll lock; lock released
-- `expires-at`: 2026-04-24 17:00
-- `notes`: Root cause was `isDailyModal` evaluated too early (before renderModal added the class). Fixed by introducing `modalType` on BaseMobileModal. Vault synced.
+- `reason`: Debug instrumentation cleanup complete; lock released
+- `expires-at`: 2026-04-27 11:52
+- `notes`: Kept verified behavior fixes, removed `debug-95e240` logs/fetch, rebuilt + deployed to Vault.

@@ -2126,6 +2126,8 @@ function openCalendarPicker({
   const popup = document.createElement("div");
   popup.className = "kid-score-calendar-popup";
   let viewDate = parseDateString(currentDate);
+  const overlayStateId = "calendar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+  let pushedHistoryState = false;
   const header = popup.createDiv({ cls: "cal-header" });
   const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "\u25C0" });
   const monthLabel = header.createEl("span", { cls: "cal-month-label" });
@@ -2138,7 +2140,7 @@ function openCalendarPicker({
     var _a;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
-    if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
+    if (pushedHistoryState && ((_a = history.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) {
       history.back();
     }
   };
@@ -2191,12 +2193,14 @@ function openCalendarPicker({
   overlay.appendChild(popup);
   const onPopstate = (e) => {
     var _a;
-    if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
-      overlay.remove();
-      window.removeEventListener("popstate", onPopstate);
-    }
+    if (((_a = e.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) return;
+    if (!overlay.isConnected) return;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    pushedHistoryState = false;
   };
-  history.pushState({ kidScoreOverlay: true }, "");
+  history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");
+  pushedHistoryState = true;
   window.addEventListener("popstate", onPopstate);
   overlay.addEventListener("mousedown", (e) => {
     if (e.target === overlay) {
@@ -2439,6 +2443,8 @@ function showEmojiPicker(callback, container) {
   overlay.className = "kid-score-value-overlay";
   const popup = document.createElement("div");
   popup.className = "kid-score-emoji-fullpicker";
+  const overlayStateId = "emoji-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+  let pushedHistoryState = false;
   const header = document.createElement("div");
   header.className = "emoji-fp-header";
   header.textContent = "\u9009\u62E9\u56FE\u6807";
@@ -2471,7 +2477,7 @@ function showEmojiPicker(callback, container) {
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", onVVResize);
     }
-    if ((_a = history.state) == null ? void 0 : _a.kidScoreOverlay) {
+    if (pushedHistoryState && ((_a = history.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) {
       history.back();
     }
   };
@@ -2589,12 +2595,14 @@ function showEmojiPicker(callback, container) {
   });
   const onPopstate = (e) => {
     var _a;
-    if ((_a = e.state) == null ? void 0 : _a.kidScoreOverlay) {
-      overlay.remove();
-      window.removeEventListener("popstate", onPopstate);
-    }
+    if (((_a = e.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) return;
+    if (!overlay.isConnected) return;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    pushedHistoryState = false;
   };
-  history.pushState({ kidScoreOverlay: true }, "");
+  history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");
+  pushedHistoryState = true;
   window.addEventListener("popstate", onPopstate);
   popup.addEventListener("mousedown", (e) => {
     e.stopPropagation();
@@ -4833,6 +4841,7 @@ var DailyScoringModal = class extends BaseMobileModal {
     return this.mobilePlatform !== "desktop";
   }
   async renderModal() {
+    var _a, _b, _c, _d;
     if (this.isRendering) {
       this.needsRerender = true;
       return;
@@ -4853,10 +4862,10 @@ var DailyScoringModal = class extends BaseMobileModal {
       const pendingState = this.pendingRenderState;
       this.pendingRenderState = null;
       const yesterdayData = state.yesterdayData;
-      this.scores = (pendingState == null ? void 0 : pendingState.scores) || state.scores;
-      this.customItems = (pendingState == null ? void 0 : pendingState.customItems) || state.customItems;
-      this.diaryContent = (pendingState == null ? void 0 : pendingState.diaryContent) || state.diaryContent;
-      this.diaryModules = (pendingState == null ? void 0 : pendingState.diaryModules) || state.diaryModules;
+      this.scores = (_a = pendingState == null ? void 0 : pendingState.scores) != null ? _a : state.scores;
+      this.customItems = (_b = pendingState == null ? void 0 : pendingState.customItems) != null ? _b : state.customItems;
+      this.diaryContent = (_c = pendingState == null ? void 0 : pendingState.diaryContent) != null ? _c : state.diaryContent;
+      this.diaryModules = (_d = pendingState == null ? void 0 : pendingState.diaryModules) != null ? _d : state.diaryModules;
       renderDailyHeader({
         containerEl: contentEl,
         plugin: this.plugin,
@@ -4969,8 +4978,8 @@ var DailyScoringModal = class extends BaseMobileModal {
         },
         isTouchLayout: this.isTouchOptimizedMode(),
         bindDiaryActions: (buttons) => {
-          var _a;
-          return (_a = this.diaryControls) == null ? void 0 : _a.bindActionButtons(buttons);
+          var _a2;
+          return (_a2 = this.diaryControls) == null ? void 0 : _a2.bindActionButtons(buttons);
         }
       });
     } finally {
@@ -5276,12 +5285,13 @@ function renderCategorySettingsList({
     document.body.style.userSelect = "";
     document.body.style.webkitUserSelect = "";
     const targetIdx = getDragRowIndex(clientY);
-    let fromIdx = dragState.dragIdx;
-    if (targetIdx > fromIdx) fromIdx--;
+    const fromIdx = dragState.dragIdx;
+    let insertIdx = targetIdx;
+    if (targetIdx > fromIdx) insertIdx--;
     const arr = plugin.currentUser.categories;
-    if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+    if (fromIdx !== insertIdx && fromIdx >= 0 && insertIdx >= 0 && insertIdx <= arr.length) {
       const moved = arr.splice(fromIdx, 1)[0];
-      arr.splice(targetIdx, 0, moved);
+      arr.splice(insertIdx, 0, moved);
       (async () => {
         await plugin.saveSettings();
         renderCategories();
@@ -6027,12 +6037,13 @@ function renderItemSettingsList({
     document.body.style.userSelect = "";
     document.body.style.webkitUserSelect = "";
     const targetIdx = getDragRowIndex(clientY);
-    let fromIdx = dragState.dragIdx;
-    if (targetIdx > fromIdx) fromIdx--;
+    const fromIdx = dragState.dragIdx;
+    let insertIdx = targetIdx;
+    if (targetIdx > fromIdx) insertIdx--;
     const arr = plugin.currentUser.items;
-    if (fromIdx !== targetIdx && fromIdx >= 0 && targetIdx >= 0 && targetIdx < arr.length) {
+    if (fromIdx !== insertIdx && fromIdx >= 0 && insertIdx >= 0 && insertIdx <= arr.length) {
       const moved = arr.splice(fromIdx, 1)[0];
-      arr.splice(targetIdx, 0, moved);
+      arr.splice(insertIdx, 0, moved);
       (async () => {
         await plugin.saveSettings();
         renderItems();

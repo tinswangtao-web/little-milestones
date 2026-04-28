@@ -17,6 +17,8 @@ export function openCalendarPicker({
   popup.className = "kid-score-calendar-popup";
 
   let viewDate = parseDateString(currentDate);
+  const overlayStateId = "calendar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
+  let pushedHistoryState = false;
 
   const header = popup.createDiv({ cls: "cal-header" });
   const prevMonthBtn = header.createEl("button", { cls: "cal-nav-btn", text: "◀" });
@@ -31,7 +33,10 @@ export function openCalendarPicker({
   const removeOverlay = () => {
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
-    if ((history.state as any)?.kidScoreOverlay) {
+    if (
+      pushedHistoryState &&
+      (history.state as any)?.kidScoreOverlayId === overlayStateId
+    ) {
       history.back();
     }
   };
@@ -95,12 +100,17 @@ export function openCalendarPicker({
   overlay.appendChild(popup);
 
   const onPopstate = (e: PopStateEvent) => {
-    if ((e.state as any)?.kidScoreOverlay) {
-      overlay.remove();
-      window.removeEventListener("popstate", onPopstate);
-    }
+    // When the user navigates "back" away from our pushed overlay state, `e.state`
+    // becomes the previous history entry (not our overlay id). In that case we
+    // should dismiss the overlay.
+    if ((e.state as any)?.kidScoreOverlayId === overlayStateId) return;
+    if (!overlay.isConnected) return;
+    overlay.remove();
+    window.removeEventListener("popstate", onPopstate);
+    pushedHistoryState = false;
   };
-  history.pushState({ kidScoreOverlay: true }, "");
+  history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");
+  pushedHistoryState = true;
   window.addEventListener("popstate", onPopstate);
 
   overlay.addEventListener("mousedown", (e) => {
