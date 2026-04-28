@@ -2350,42 +2350,77 @@ function bindTouchScrollGuard(containerEl, options = {}) {
   let touchStartY = 0;
   let touchMoved = false;
   let releaseTimer = null;
+  let touchCandidateInput = null;
+  let readonlyLocked = [];
+  const isEditableField = (el) => {
+    if (!el) return false;
+    if (el instanceof HTMLTextAreaElement) return true;
+    if (!(el instanceof HTMLInputElement)) return false;
+    const type = (el.getAttribute("type") || "").toLowerCase();
+    return type !== "button" && type !== "submit";
+  };
   const releaseReadonlyInputs = () => {
     if (releaseTimer !== null) {
       window.clearTimeout(releaseTimer);
       releaseTimer = null;
     }
-    const inputs = containerEl.querySelectorAll(
-      'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
-    );
-    inputs.forEach((inp) => inp.removeAttribute("readonly"));
+    readonlyLocked.forEach((inp) => inp.removeAttribute("readonly"));
+    readonlyLocked = [];
   };
   const onTouchStart = (e) => {
+    var _a;
     releaseReadonlyInputs();
     if (!e.touches || e.touches.length !== 1) return;
     const touch = e.touches[0];
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
     touchMoved = false;
+    const target = e.target;
+    const candidate = ((_a = target == null ? void 0 : target.closest) == null ? void 0 : _a.call(target, "input, textarea")) || null;
+    touchCandidateInput = isEditableField(candidate) ? candidate : null;
   };
   const onTouchMove = (e) => {
     if (!e.touches || e.touches.length !== 1) return;
     const touch = e.touches[0];
     if (Math.abs(touch.clientX - touchStartX) > moveThreshold || Math.abs(touch.clientY - touchStartY) > moveThreshold) {
       touchMoved = true;
-      const inputs = containerEl.querySelectorAll(
-        'input:not([type="button"]):not([type="submit"]), textarea'
-      );
-      inputs.forEach((inp) => inp.setAttribute("readonly", "readonly"));
+      const inputs = containerEl.querySelectorAll("input, textarea");
+      readonlyLocked = [];
+      inputs.forEach((inp) => {
+        if (!isEditableField(inp)) return;
+        if (touchCandidateInput && inp === touchCandidateInput) return;
+        inp.setAttribute("readonly", "readonly");
+        readonlyLocked.push(inp);
+      });
     }
   };
   const onTouchEnd = () => {
     if (touchMoved) {
       releaseTimer = window.setTimeout(releaseReadonlyInputs, releaseDelay);
+      touchCandidateInput = null;
+      return;
+    }
+    const candidate = touchCandidateInput;
+    touchCandidateInput = null;
+    if (candidate && candidate.hasAttribute("readonly")) {
+      candidate.removeAttribute("readonly");
+    }
+    if (candidate && document.activeElement !== candidate) {
+      try {
+        candidate.focus();
+      } catch (e) {
+      }
+      requestAnimationFrame(() => {
+        try {
+          candidate.focus();
+        } catch (e) {
+        }
+      });
     }
   };
   const onTouchCancel = () => {
     touchMoved = false;
+    touchCandidateInput = null;
     releaseReadonlyInputs();
   };
   containerEl.addEventListener("touchstart", onTouchStart, { passive: true });

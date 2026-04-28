@@ -172,16 +172,26 @@ export function bindTouchScrollGuard(
   let touchStartY = 0;
   let touchMoved = false;
   let releaseTimer: number | null = null;
+  let touchCandidateInput: HTMLInputElement | HTMLTextAreaElement | null = null;
+  let readonlyLocked: Array<HTMLInputElement | HTMLTextAreaElement> = [];
+
+  const isEditableField = (el: Element | null): el is HTMLInputElement | HTMLTextAreaElement => {
+    if (!el) return false;
+    if (el instanceof HTMLTextAreaElement) return true;
+    if (!(el instanceof HTMLInputElement)) return false;
+    const type = (el.getAttribute("type") || "").toLowerCase();
+    return type !== "button" && type !== "submit";
+  };
 
   const releaseReadonlyInputs = () => {
     if (releaseTimer !== null) {
       window.clearTimeout(releaseTimer);
       releaseTimer = null;
     }
-    const inputs = containerEl.querySelectorAll(
-      'input[readonly]:not([type="button"]):not([type="submit"]), textarea[readonly]'
-    );
-    inputs.forEach((inp) => inp.removeAttribute("readonly"));
+    // Only release fields we locked during scroll-guard to avoid fighting with
+    // other readonly uses in the app.
+    readonlyLocked.forEach((inp) => inp.removeAttribute("readonly"));
+    readonlyLocked = [];
   };
 
   const onTouchStart = (e: TouchEvent) => {
@@ -191,6 +201,9 @@ export function bindTouchScrollGuard(
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
     touchMoved = false;
+    const target = e.target as HTMLElement | null;
+    const candidate = target?.closest?.("input, textarea") || null;
+    touchCandidateInput = isEditableField(candidate) ? candidate : null;
   };
 
   const onTouchMove = (e: TouchEvent) => {
@@ -201,21 +214,53 @@ export function bindTouchScrollGuard(
       Math.abs(touch.clientY - touchStartY) > moveThreshold
     ) {
       touchMoved = true;
-      const inputs = containerEl.querySelectorAll(
-        'input:not([type="button"]):not([type="submit"]), textarea'
-      );
-      inputs.forEach((inp) => inp.setAttribute("readonly", "readonly"));
+      // Lock inputs during scroll gestures to avoid accidental keyboard pop-ups.
+      // Exclude the touched input itself so a deliberate tap still focuses reliably.
+      const inputs = containerEl.querySelectorAll("input, textarea");
+      readonlyLocked = [];
+      inputs.forEach((inp) => {
+        if (!isEditableField(inp)) return;
+        if (touchCandidateInput && inp === touchCandidateInput) return;
+        inp.setAttribute("readonly", "readonly");
+        readonlyLocked.push(inp);
+      });
     }
   };
 
   const onTouchEnd = () => {
     if (touchMoved) {
       releaseTimer = window.setTimeout(releaseReadonlyInputs, releaseDelay);
+      touchCandidateInput = null;
+      return;
+    }
+
+    // For light taps, ensure the target input is not stuck in readonly and force focus.
+    // This fixes iOS cases where a tiny movement triggers the guard and blocks keyboard.
+    const candidate = touchCandidateInput;
+    touchCandidateInput = null;
+    if (candidate && candidate.hasAttribute("readonly")) {
+      candidate.removeAttribute("readonly");
+    }
+    if (candidate && document.activeElement !== candidate) {
+      // `focus()` in the same gesture is most reliable; if that fails, try next frame.
+      try {
+        candidate.focus();
+      } catch {
+        // ignore
+      }
+      requestAnimationFrame(() => {
+        try {
+          candidate.focus();
+        } catch {
+          // ignore
+        }
+      });
     }
   };
 
   const onTouchCancel = () => {
     touchMoved = false;
+    touchCandidateInput = null;
     releaseReadonlyInputs();
   };
 
