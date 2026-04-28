@@ -1,8 +1,8 @@
 ## Current Task
 - `task`: 2026-04-28-desktop-diary-layout
-- `status`: in-progress
+- `status`: completed
 - `last-actor`: codex
-- `last-commit`: f1486b7
+- `last-commit`: f4818a8
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
