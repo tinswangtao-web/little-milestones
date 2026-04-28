@@ -1,7 +1,7 @@
 ## Write Lock
 - `owner`: none
-- `since`: 2026-04-28 15:35
+- `since`: 2026-04-28 19:25
 - `scope`: none
-- `reason`: Desktop diary layout fix committed; lock released
-- `expires-at`: 2026-04-28 16:35
-- `notes`: Styles-only change; rebuild completed.
+- `reason`: Final record sync after user-authorized commits
+- `expires-at`: 2026-04-28 20:25
+- `notes`: Commits completed; no active write lock.

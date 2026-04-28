@@ -5,6 +5,7 @@
 - **created**: 2026-04-28
 - **status**: completed
 - **sync-to-vault**: done
+- **commit**: `e6b3761`
 - **write-scope**: `src/modals/daily-scoring-modal.ts`, `main.js`, `.agents/**`
 - **read-scope**: `src/**`, `.agents/**`
 
@@ -30,3 +31,5 @@
 
 - 2026-04-28 17:54 CST：Codex 构建通过，Vault 同步完成，并用 `diff -q` 验证 `manifest.json`、`main.js`、`styles.css` 一致。
 - 2026-04-28 17:58 CST：用户验证保存后已跳转到 `得分页`；未弹出确认框，用户确认可以接受。
+- 2026-04-28 18:15 CST：已提交 `e6b3761`（`[codex] open generated result after saving`）。
+- 2026-04-28 19:25 CST：commit hash 记录随 `.agents` 收尾提交同步。

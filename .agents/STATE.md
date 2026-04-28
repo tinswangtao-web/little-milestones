@@ -1,15 +1,15 @@
 ## Current Task
-- `task`: 2026-04-28-desktop-diary-layout
+- `task`: 2026-04-28-working-tree-organization-v2
 - `status`: completed
 - `last-actor`: codex
-- `last-commit`: f4818a8
+- `last-commit`: 1363d7a
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
-- `write-scope`: styles/04-diary.css, styles/07-mobile.css, styles.css, .agents/**
-- `read-scope`: src/**, styles/**, styles.css, .agents/**
-- `awaiting`: user-verification
-- `handoff-note`: Desktop scoring page diary modules show irregular layout in the diary panel (module cards and quick emoji rows). Target: make desktop module grid single-column and emoji buttons align into an even grid without size jitter; rebuild `styles.css` afterward.
+- `write-scope`: .agents/**
+- `read-scope`: src/**, styles/**, main.js, styles.css, scripts/**, esbuild.config.mjs, .agents/**
+- `awaiting`: none
+- `handoff-note`: User explicitly requested commit. Completed commits: a9db932 workflow rules, 4c44e06 deploy guard, ef2c07a CSS/mobile style/EOL, 1363d7a mobile touch focus. Final `.agents` record sync is being committed separately.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

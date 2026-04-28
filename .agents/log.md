@@ -55,6 +55,22 @@
 [2026-04-27 10:51] codex | removed all `debug-95e240` instrumentation from source, kept verified mobile fixes (overlay state ids, reorder insert index, pending diary nullish merge), rebuilt + typechecked + deployed to Vault
 [2026-04-28 11:41] codex | hygiene: deleted `.claude/settings.local.json`; refreshed `.agents/STATE.md`, `.agents/LOCK.md`, `.agents/tasks/2026-04-20-mobile-ux.md`
 2026-04-28 11:44:26 +0800  commit d05d71e  [codex] chore: remove local Claude settings and sync agents collaboration records
+2026-04-28 17:03 +0800  codex | start: mobile bottom-actions row + emoji picker sheet uplift/drag fix; created task `2026-04-28-mobile-emoji-sheet`
+[2026-04-28 17:08] codex | awaiting user verification: mobile bottom actions now single-row; emoji picker sheet lifted above bottom edge with touch drag support; build completed, changes not yet committed
+2026-04-28 17:24 +0800  codex | start: open generated MD after save (scoring modal → result doc)
 2026-04-28 15:32 +0800  codex | start: desktop diary module layout alignment fix (styles-only); created task `2026-04-28-desktop-diary-layout`, took lock for `styles/04-diary.css` + rebuild `styles.css`
 2026-04-28 15:31:31 +0800  commit f4818a8  [codex] fix desktop diary modules alignment
 [2026-04-28 15:35] codex | done: desktop diary layout fix committed; awaiting user verification
+[2026-04-28 17:54] codex | open-md-after-save verification prep: build passed; manifest/main/styles synced to Vault and diff-verified; awaiting user Obsidian save-flow verification
+[2026-04-28 17:58] codex | completed open-md-after-save: user verified save opens `得分页`; no confirmation dialog appeared and user accepted that behavior; task left uncommitted due mixed working tree
+[2026-04-28 18:08] codex | organized mixed working tree into four groups: verified open-md-after-save, mobile touch focus guard, mobile actions/emoji style changes, and desktop diary/style line-ending residue; no code edits or staging performed
+[2026-04-28 18:15] codex | committed verified open-md-after-save as e6b3761 `[codex] open generated result after saving`; remaining mixed working tree left unstaged
+[2026-04-28 19:41] codex | review-only output: added `.agents/reviews/2026-04-28-protocol-feedback.md` for Codex protocol/process hardening recommendations
+[2026-04-28 18:22] codex | updated collaboration protocol: Codex default implementation/integration, Cursor review-only, ChatGPT advisory-only; documentation-only change, plugin code untouched
+[2026-04-28 18:37] codex | protocol hardening: added explicit no-commit-without-user-request rule, task split rule, experimental UX rollback rule, CSS EOL check note, and `.gitattributes` LF policy; no commit created
+[2026-04-28 18:49] codex | deploy guard: scripts/deploy.mjs now enforces required artifacts, --no-build freshness checks, post-sync SHA-256 MATCH verification, --verify-only mode, and clearer Vault target/copy errors; npm run deploy, verify-only mismatch/restoration, node --check, and --no-build verified; no commit created
+[2026-04-28 18:58] codex | CSS EOL cleanup: normalized styles/04-diary.css and generated styles.css working copies to LF; buildStyles now normalizes CSS input to LF; npm run build passed; no commit created
+[2026-04-28 19:05] codex | working tree organization v2: regrouped current uncommitted changes after protocol hardening, deploy guard, and CSS EOL cleanup; documented remaining mobile validation and task-card correction needs; no commit created
+[2026-04-28 19:12] codex | records cleanup: marked desktop diary layout task completed/synced with commit refs f4818a8+cfeadf9; corrected mobile emoji task card to remove unimplemented emoji-picker sheet drag claims; no commit created
+[2026-04-28 19:18] codex | mobile validation accepted by user: marked mobile emoji/style task completed and added completed mobile touch focus task card; no commit created
+[2026-04-28 19:25] codex | user explicitly requested commit; committed workflow rules a9db932, deploy guard 4c44e06, CSS/mobile style/EOL ef2c07a, and mobile touch focus 1363d7a; committing final agent records next
