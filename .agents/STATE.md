@@ -2,7 +2,7 @@
 - `task`: 2026-04-20-mobile-ux
 - `status`: completed
 - `last-actor`: codex
-- `last-commit`: dba5544
+- `last-commit`: d05d71e
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
