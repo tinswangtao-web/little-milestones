@@ -111,8 +111,8 @@
   }
 
   .kid-score-stats-btn {
-    grid-column: 1 / -1;
-    grid-row: 2;
+    grid-column: auto;
+    grid-row: 1;
   }
 
   .kid-score-add-item-btn,
@@ -409,9 +409,9 @@
   }
 
   .custom-form-emoji-input {
-    width: 46px;
-    height: 42px;
-    font-size: 1.5em;
+    width: 56px;
+    height: 52px;
+    font-size: 1.8em;
   }
 
   .custom-form-name-input {
@@ -434,15 +434,17 @@
   }
 
   .kid-score-edit-modal .custom-form-main-row .custom-form-emoji-input {
-    flex: 0 0 46px;
-    width: 46px;
+    flex: 0 0 56px;
+    width: 56px;
+    height: 52px;
+    font-size: 1.8em;
   }
 
   .kid-score-edit-modal .custom-form-main-row .diary-tool-btn {
-    flex: 0 0 46px;
-    width: 46px;
-    min-width: 46px;
-    height: 46px;
+    flex: 0 0 56px;
+    width: 56px;
+    min-width: 56px;
+    height: 52px;
     padding: 0;
   }
 

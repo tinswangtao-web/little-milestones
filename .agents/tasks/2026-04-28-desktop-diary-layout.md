@@ -3,8 +3,9 @@
 - **slug**: 2026-04-28-desktop-diary-layout
 - **owner**: codex
 - **created**: 2026-04-28
-- **status**: in-progress
-- **sync-to-vault**: pending
+- **status**: completed
+- **sync-to-vault**: done
+- **commit**: `f4818a8`, `cfeadf9`
 - **write-scope**: `styles/04-diary.css`, `styles.css`, `.agents/**`
 - **read-scope**: `src/**`, `styles/**`, `.agents/**`
 
@@ -25,6 +26,11 @@
 
 ## 验收
 
-- [ ] 桌面端日记面板：模块卡片不出现多列参差，整体对齐稳定
-- [ ] 天气/心情 emoji 行按钮为等宽方块，行列间距一致
+- [x] 桌面端日记面板：模块卡片不出现多列参差，整体对齐稳定
+- [x] 天气/心情 emoji 行按钮为等宽方块，行列间距一致
 
+## 记录
+
+- 2026-04-28 15:31 CST：实现已提交为 `f4818a8`（`[codex] fix desktop diary modules alignment`）。
+- 2026-04-28 15:35 CST：任务关闭记录已提交为 `cfeadf9`（`[codex] chore: close desktop diary layout task and release lock`）。
+- 2026-04-28 19:12 CST：补齐任务卡状态，标记为 completed / sync done。

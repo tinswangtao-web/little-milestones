@@ -22,7 +22,7 @@ function buildStyles() {
     .sort();
   let css = "";
   for (const f of files) {
-    css += fs.readFileSync(path.join(styleDir, f), "utf-8") + "\n";
+    css += fs.readFileSync(path.join(styleDir, f), "utf-8").replace(/\r\n?/g, "\n") + "\n";
   }
   fs.writeFileSync(outFile, css);
   console.log(`✓ styles.css built from ${files.length} modules`);
