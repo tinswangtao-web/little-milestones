@@ -1,13 +1,13 @@
 # Shared Agent Rules
 
-This file is the short operational version of the collaboration protocol. Give it to `claude-code` and `kimi-code` as the working rule set for this repository.
+This file is the short operational version of the collaboration protocol. Give it to Cursor and any optional review agent as the working rule set for this repository.
 
 ## Ownership Rule
-- `codex` is the normal default implementation agent for this plugin.
-- `claude-code` is review-only by default.
-- `kimi-code` is review-only by default, but may become the implementation agent when the user explicitly hands the task to Kimi and `.agents/STATE.md` records `owner: kimi-code`.
-- Unless `STATE.md` assigns implementation to Kimi, `kimi-code` must stay read-only for plugin source/runtime files and only write review artifacts under `.agents/reviews/**` or explicitly approved documentation files.
-- If the user grants a coding exception to another agent, record that exception in `.agents/STATE.md` before any code edits begin.
+- `codex` is the normal default implementation, integration, Vault sync, and commit agent for this plugin.
+- Cursor is review-only by default. Cursor reviews Codex commits or working-tree diffs and should not edit plugin code in the normal flow.
+- ChatGPT is advisory only by default: product ideas, UX suggestions, and workflow advice. ChatGPT suggestions must become a `.agents` task before code work begins.
+- `claude-code` and `kimi-code` are review-only by default if used.
+- If the user grants a coding exception to any non-Codex agent, record that exception in `.agents/STATE.md` before any code edits begin.
 
 ## Always Start Here
 1. Run `git status --short`.
@@ -21,8 +21,8 @@ This file is the short operational version of the collaboration protocol. Give i
 - Do not edit files owned by another agent's active lock.
 - If you need the lock, update `LOCK.md` first.
 - Declare a precise `write-scope`. Do not use vague scopes if a smaller one is enough.
-- If you are `claude-code`, assume you do **not** have permission to edit plugin code unless `STATE.md` explicitly records a user-approved exception.
-- If you are `kimi-code`, you may edit plugin code only when `STATE.md` explicitly assigns the current implementation task to Kimi.
+- If you are Cursor, assume you do **not** have permission to edit plugin code unless `STATE.md` explicitly records a user-approved exception.
+- If you are `claude-code` or `kimi-code`, assume you do **not** have permission to edit plugin code unless `STATE.md` explicitly records a user-approved exception.
 
 ## Shared Page Names
 - `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
@@ -34,8 +34,8 @@ This file is the short operational version of the collaboration protocol. Give i
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
 - Review, validation, and documentation can run in parallel if they are read-only or use a different `write-scope`.
 - Default code write-scope belongs to `codex`.
-- Default `claude-code` write-scope is `.agents/reviews/**` only.
-- Default `kimi-code` write-scope is `.agents/reviews/**` only, unless `STATE.md` assigns Kimi as implementation owner for a precise plugin code scope.
+- Default Cursor write-scope is `.agents/reviews/**` only.
+- Default `claude-code` and `kimi-code` write-scope is `.agents/reviews/**` only.
 
 ## Workspace Rule
 - The primary workspace is the only normal code workspace for this repository.
@@ -51,6 +51,14 @@ This file is the short operational version of the collaboration protocol. Give i
 - Update the active task card in `.agents/tasks/`.
 - If you performed review, add or update a file in `.agents/reviews/`.
 
+## Task Split Rule
+- Create a new `.agents/tasks/*.md` card when the user's goal changes by feature, page, workflow, or acceptance criteria.
+- Keep the previous task card's status and handoff note intact when switching context.
+- For follow-up tasks, include an optional `origin` field naming the task that led to the new work.
+- Examples:
+  - Allowed same task: user clarifies wording or verifies the current acceptance checklist.
+  - New task required: user moves from `打分页` save behavior to mobile emoji sheet behavior, settings layout, deploy tooling, or collaboration protocol.
+
 ## Source And Artifact Rules For This Repo
 - Prefer editing `src/**` and `styles/**`.
 - Do not hand-edit `styles.css` unless the build chain is broken and you record why.
@@ -58,6 +66,13 @@ This file is the short operational version of the collaboration protocol. Give i
 - If runtime or generated files are hand-edited, record the reason in the task card and log.
 - If you changed `styles/**`, rebuild and stage `styles.css` in the same round.
 - Do not treat a style task as complete if only the source CSS changed but generated `styles.css` did not.
+- If a CSS diff looks much larger than the intended style change, check line endings with `git ls-files --eol` before reviewing or staging it.
+
+## Experimental UX Rollback Rule
+- Experimental interaction changes must be easy to reverse in one follow-up edit or commit.
+- Prefer a narrow class, flag, helper option, or isolated CSS block instead of scattering an experiment across unrelated files.
+- The task card must include a rollback note before release or Vault sync.
+- Example for emoji/gesture experiments: "Rollback: remove the `.kid-score-emoji-sheet-lifted` class/style block and disable the touch-drag handler; keep unrelated save-flow fixes."
 
 ## Mobile Style Rule
 - For iPhone/mobile layout fixes, check `styles/07-mobile.css` first.
@@ -84,13 +99,17 @@ This file is the short operational version of the collaboration protocol. Give i
 - If generated files are committed, include the matching source files in the same commit.
 
 ## Commit Rule
+- Do not create a git commit unless the user explicitly asks for "commit", "提交", or an equivalent instruction.
+- Allowed without a new confirmation only when the user's current instruction explicitly says to commit the current work.
+- Not allowed: "推进", "继续", "修一下", "整理一下", "验证一下", or "同步到 Vault" by themselves.
+- Emergency rollback or hotfix commits still require explicit user authorization; record the user's authorization wording in `.agents/STATE.md`.
 - Use agent prefixes:
-  - `[claude]`
   - `[codex]`
+  - `[cursor]`
+  - `[claude]`
   - `[kimi]`
-- In this repository, plugin code commits should normally be `[codex]`, except when `STATE.md` assigns implementation to Kimi.
-- `[kimi]` commits may include plugin code only for an explicitly assigned Kimi implementation task.
-- `[claude]` commits should normally be review/docs-only unless the user explicitly authorizes a coding exception.
+- In this repository, plugin code commits should normally be `[codex]`.
+- `[cursor]`, `[claude]`, and `[kimi]` commits should normally be review/docs-only unless the user explicitly authorizes a coding exception.
 
 ## Review Rule
 - Reviews should state:
@@ -99,11 +118,39 @@ This file is the short operational version of the collaboration protocol. Give i
   - suggested fix
   - resolved status
 - If there are no issues, say so clearly.
+- Cursor reviews should focus on clear bugs, regressions, missed requirements, mobile/Obsidian risks, and verification gaps. Do not turn review into a rewrite request unless the current code is genuinely unsafe.
 
 ## Required End-Of-Turn Check
 1. Run `git status --short` again.
 2. Make sure the handoff target is explicit in `STATE.md`.
 3. Release or update the lock.
+
+## Copy Block For Cursor
+You are collaborating in a shared repository using the `.agents/` protocol.
+
+Before doing anything:
+- Run `git status --short`
+- Read `.agents/README.md`
+- Read `.agents/STATE.md`
+- Read the current task card
+- Read `.agents/LOCK.md`
+
+Rules:
+- You are review-only by default in this repository.
+- Do not edit plugin code unless the user explicitly authorizes that exception and the exception is recorded in `.agents/STATE.md`.
+- Review the latest Codex commit or current working-tree diff.
+- Focus on clear bugs, regressions, missed requirements, mobile/Obsidian risks, and verification gaps.
+- Do not refactor, do not rewrite, and do not edit code during normal review.
+- If you write review output into the repo, use `.agents/reviews/**`, acquire `LOCK.md`, and update `STATE.md`, `LOCK.md`, task card, and `log.md` after work.
+- Treat Vault sync as a separate explicit step
+- Only the primary workspace may sync to the Vault
+- Worktrees are not part of the normal workflow here
+- Prefer source files over generated artifacts
+- Use commit prefix `[cursor]` only for review/docs commits
+- Your normal writable area is `.agents/reviews/**` plus explicitly approved docs-only files.
+- Do not create a git commit unless the user explicitly says "commit", "提交", or an equivalent instruction. "推进", "继续", "修一下", "整理一下", "验证一下", and "同步到 Vault" are not commit authorization.
+- If the user's goal changes by feature, page, workflow, or acceptance criteria, ask Codex/user to create a new task card instead of mixing it into the current task.
+- For experimental UX changes, verify the task card contains a rollback note before recommending release.
 
 ## Copy Block For Claude Code
 You are collaborating in a shared repository using the `.agents/` protocol.
@@ -140,8 +187,8 @@ Before doing anything:
 - Read `.agents/LOCK.md`
 
 Rules:
-- You are review-only by default in this repository, but may implement when `.agents/STATE.md` assigns the task to `kimi-code`.
-- For the current handoff, if `STATE.md` says `owner: kimi-code`, you are allowed to edit plugin code inside the declared `write-scope`.
+- You are review-only by default in this repository.
+- You may implement only when the user explicitly authorizes a coding exception and `.agents/STATE.md` records the precise owner and `write-scope`.
 - Do not edit outside your declared `write-scope`
 - If `STATE.md` is awaiting another agent and you are not needed, stay read-only
 - Acquire `LOCK.md` before writing

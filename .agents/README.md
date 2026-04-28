@@ -1,13 +1,13 @@
 # Agent Collaboration Protocol
 
-This repository uses a file-based handoff protocol so `claude-code`, `codex`, and `kimi-code` can collaborate safely through shared files.
+This repository uses a file-based handoff protocol so `codex`, Cursor, and optional external advisors can collaborate safely through shared files.
 
 ## Role Decision
-- `codex` is the normal default implementation agent for this plugin.
-- `claude-code` is review-only by default: it may inspect code, validate behavior, and suggest fixes.
-- `kimi-code` is allowed to become an implementation agent when the user explicitly hands the task to Kimi or when `.agents/STATE.md` says `owner: kimi-code`.
-- `claude-code` may edit plugin code only if the user explicitly asks for that exception in the current thread.
-- Any non-default coding exception or Kimi implementation handoff must be written into `.agents/STATE.md` before code edits begin.
+- `codex` is the normal default implementation and integration agent for this plugin.
+- Cursor is review-only by default: it should inspect Codex commits or working-tree diffs, identify bugs/risks, and suggest fixes without editing plugin code.
+- ChatGPT is an optional product/workflow advisor only. It may suggest feature ideas, UX direction, or process improvements, but its advice must be converted into a `.agents` task before any code work begins.
+- `claude-code` and `kimi-code` are review-only by default if used.
+- Any non-Codex coding exception must be explicitly requested by the user and recorded in `.agents/STATE.md` before code edits begin.
 
 ## Goals
 - Keep one shared source of truth for task state.
@@ -23,13 +23,26 @@ This repository uses a file-based handoff protocol so `claude-code`, `codex`, an
 - Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
 - Review, validation, and documentation can run in parallel with implementation when they are read-only or have a separate `write-scope`.
 - Every meaningful action updates `.agents/STATE.md` and appends one line to `.agents/log.md`.
+- Do not create a git commit unless the user explicitly asks for "commit", "提交", or an equivalent instruction.
+- "推进", "继续", "修一下", "整理一下", "验证一下", and "同步到 Vault" are not commit authorization by themselves.
 
 ## Agent Roles
-- `codex`: primary implementer when available, integration owner, vault sync owner, final code decision maker unless it has explicitly handed off.
-- `claude-code`: review, validation, planning suggestions, risk spotting, architecture feedback.
-- `kimi-code`: review and UI/detail polish by default; implementation owner when `STATE.md` explicitly assigns the task to Kimi.
+- `codex`: primary implementer, integration owner, vault sync owner, commit owner, final code decision maker unless the user explicitly overrides that role.
+- `cursor`: review, validation, risk spotting, regression checks, and concise feedback on Codex commits/diffs. Cursor should not edit plugin code in the normal flow.
+- `chatgpt`: product/UX/workflow brainstorming outside the code chain. ChatGPT suggestions are advisory until Codex turns them into a task card.
+- `claude-code` / `kimi-code`: optional review agents only unless the user explicitly grants a coding exception.
 
-Roles do not rotate silently. Kimi may write plugin code only when the user has explicitly authorized the handoff and `STATE.md` records Kimi as owner or implementation target.
+Roles do not rotate silently. Codex remains the implementation default. Cursor, ChatGPT, Claude Code, or Kimi Code may write plugin code only when the user explicitly authorizes that exception and `STATE.md` records the exact owner and `write-scope`.
+
+## Default Maintenance Workflow
+1. User describes the desired behavior in natural language.
+2. Codex creates or updates the task card, edits source files, rebuilds generated artifacts, syncs to the Vault when requested/needed, updates `.agents`, and commits with `[codex]`.
+3. Cursor reviews the latest Codex commit or current working-tree diff. Cursor should focus on obvious bugs, missed requirements, mobile/Obsidian regressions, and missing verification.
+4. Codex addresses accepted Cursor review findings and updates the same task card.
+5. User performs final Obsidian experience verification.
+
+Cursor review prompt template:
+> Review the latest Codex commit or current working-tree diff. Only report clear bugs, regressions, missed requirements, or verification gaps. Do not refactor and do not edit code.
 
 ## Shared Page Names
 Use these page names consistently across tasks, reviews, logs, and handoffs:
@@ -44,11 +57,19 @@ Use these page names consistently across tasks, reviews, logs, and handoffs:
 - `.agents/reviews/*.md`: review results and follow-up status.
 - `.agents/log.md`: append-only event log.
 
+## Task Split Rule
+- Create a new `.agents/tasks/*.md` card when the user's goal changes by feature, page, workflow, or acceptance criteria.
+- Keep the previous task card's status and handoff note intact when switching context.
+- For follow-up tasks, include an optional `origin` field naming the task that led to the new work.
+- Examples:
+  - Allowed same task: user clarifies wording or verifies the current acceptance checklist.
+  - New task required: user moves from `打分页` save behavior to mobile emoji sheet behavior, settings layout, deploy tooling, or collaboration protocol.
+
 ## Workspace Rule
 - The primary workspace is the only normal code workspace for this repository.
 - Treat the primary workspace `.agents/` directory as the canonical coordination layer.
 - Do not use `.claude/worktrees/**` or any other git worktree as part of the default implementation flow.
-- `claude-code` and `kimi-code` should review directly against the primary workspace, not through a separate worktree.
+- Cursor and any optional review agent should review directly against the primary workspace, not through a separate worktree.
 - Existing worktrees may remain on disk as historical leftovers, but they should be treated as inactive unless the user explicitly asks to inspect or reuse them.
 - If the user explicitly requests a one-off worktree workflow, record that exception in `.agents/STATE.md` before using it.
 
@@ -76,8 +97,8 @@ Before finishing a turn:
 - If your work is read-only, you do not need the lock.
 - Release the lock when handing off, pausing, or finishing.
 - If a lock becomes stale, do not override it silently. Record the situation in `STATE.md` and `log.md`.
-- `claude-code` should normally not take a code write lock for plugin source files because it is review-only by default.
-- `kimi-code` may take a plugin code write lock when `STATE.md` assigns implementation to Kimi.
+- Cursor should normally not take a code write lock for plugin source files because it is review-only by default.
+- Claude Code and Kimi Code should normally not take a code write lock for plugin source files because they are review-only by default.
 - Review-only work should stay read-only and write only to `.agents/reviews/**` unless the user explicitly authorizes a coding exception.
 
 ## Scope Rules
@@ -87,9 +108,9 @@ Before finishing a turn:
   - `.agents/**`
 - `read-scope` is optional but recommended when review or investigation is broad.
 - No two agents should hold overlapping `write-scope` at the same time.
-- By default, plugin code write-scope belongs to `codex`, unless `STATE.md` explicitly assigns implementation to `kimi-code`.
-- `claude-code` should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
-- `kimi-code` should use `read-scope` plus `.agents/reviews/**` for review turns, or a precise plugin code `write-scope` for implementation turns assigned in `STATE.md`.
+- By default, plugin code write-scope belongs to `codex`.
+- Cursor should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
+- Claude Code and Kimi Code should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
 
 ## Source Of Truth For Code
 This project currently has an unusual state:
@@ -104,6 +125,13 @@ Working rule for this repo:
 - If artifact files are hand-edited, record why in the task card and log.
 - If `styles/**` changes, rebuild `styles.css` before sync or commit.
 - Style changes are not complete until both the source style file and generated `styles.css` are updated together.
+- If a CSS diff looks much larger than the intended style change, check line endings with `git ls-files --eol` before reviewing or staging it.
+
+## Experimental UX Rollback Rule
+- Experimental interaction changes must be easy to reverse in one follow-up edit or commit.
+- Prefer a narrow class, flag, helper option, or isolated CSS block instead of scattering an experiment across unrelated files.
+- The task card must include a rollback note before release or Vault sync.
+- Example for emoji/gesture experiments: "Rollback: remove the `.kid-score-emoji-sheet-lifted` class/style block and disable the touch-drag handler; keep unrelated save-flow fixes."
 
 ## Mobile Style Rule
 - For iPhone/mobile layout tuning, prefer `styles/07-mobile.css` first.
@@ -134,16 +162,19 @@ When sync happens, record:
 - Do not run `git add`, `git status`, and `git commit` as parallel steps.
 - Stage first, then confirm staged state with `git status --short`, then commit.
 - If a commit changes generated files, make sure the corresponding source files are staged in the same commit.
+- Do not commit unless the user explicitly asks for a commit in the current instruction.
+- Emergency rollback or hotfix commits still require explicit user authorization; record the user's authorization wording in `.agents/STATE.md`.
 
 ## Commit Message Convention
 Use a visible agent prefix:
-- `[claude] ...`
 - `[codex] ...`
+- `[cursor] ...`
+- `[claude] ...`
 - `[kimi] ...`
 
 Default expectation in this repository:
 - plugin code commits should normally use `[codex]`
-- `[claude]` and `[kimi]` commits should normally be limited to reviews, notes, or other explicitly authorized exceptions
+- `[cursor]`, `[claude]`, and `[kimi]` commits should normally be limited to reviews, notes, or other explicitly authorized exceptions
 
 ## Review Expectations
 Each review should clearly state:
