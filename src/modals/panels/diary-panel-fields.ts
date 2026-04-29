@@ -37,6 +37,7 @@ interface CreateDiaryQuickGroupOptions {
 }
 
 interface EnsureDefaultDiaryTemplateOptions {
+  allowDefaultDiaryTemplate: boolean;
   diaryModules: DiaryModuleValues;
   moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }>;
   diaryTextarea: HTMLTextAreaElement | null;
@@ -255,6 +256,7 @@ export function createDiaryQuickGroup({
 }
 
 export function ensureDefaultDiaryTemplate({
+  allowDefaultDiaryTemplate,
   diaryModules,
   moduleFields,
   diaryTextarea,
@@ -266,7 +268,7 @@ export function ensureDefaultDiaryTemplate({
     Object.values(diaryModules).some((value) => String(value || "").trim().length > 0) ||
     moduleFields.some(({ input }) => input.value.trim().length > 0) ||
     !!diaryTextarea?.value.trim();
-  if (hasAnyContent) return;
+  if (!allowDefaultDiaryTemplate || hasAnyContent) return;
   if (!diaryModules.weather) diaryModules.weather = "☀️ 晴";
   if (!diaryModules.mood) diaryModules.mood = "😊 开心";
   if (!diaryModules.todayThing) diaryModules.todayThing = "今天我做了____。";

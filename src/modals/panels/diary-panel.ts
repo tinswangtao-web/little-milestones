@@ -28,6 +28,7 @@ interface DiaryPanelBuilderOptions {
   panel: HTMLElement;
   diaryContent: string;
   diaryModules: DiaryModuleValues;
+  allowDefaultDiaryTemplate: boolean;
   setDiaryTextarea: (textarea: HTMLTextAreaElement | null) => void;
   updateDiaryContent: (content: string) => void;
   updateDiaryModules: (values: DiaryModuleValues) => void;
@@ -47,6 +48,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     component,
     panel,
     diaryContent,
+    allowDefaultDiaryTemplate,
     setDiaryTextarea,
     updateDiaryContent,
     updateDiaryModules,
@@ -260,6 +262,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   setDiaryTextarea(diaryTextarea);
 
   ensureDefaultDiaryTemplate({
+    allowDefaultDiaryTemplate,
     diaryModules,
     moduleFields,
     diaryTextarea,

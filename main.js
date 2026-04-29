@@ -22,7 +22,7 @@ __export(main_exports, {
   default: () => KidScorePlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian21 = require("obsidian");
+var import_obsidian22 = require("obsidian");
 
 // src/data/emoji-data.ts
 var EMOJI_DATA = {
@@ -1159,7 +1159,7 @@ var DEFAULT_SETTINGS = {
 var DIARY_MARKER = "<!-- DIARY_START -->";
 
 // src/modals/daily-scoring-modal.ts
-var import_obsidian8 = require("obsidian");
+var import_obsidian9 = require("obsidian");
 
 // src/ui/base-mobile-modal.ts
 var import_obsidian = require("obsidian");
@@ -2903,6 +2903,7 @@ function createDiaryQuickGroup({
   });
 }
 function ensureDefaultDiaryTemplate({
+  allowDefaultDiaryTemplate,
   diaryModules,
   moduleFields,
   diaryTextarea,
@@ -2911,7 +2912,7 @@ function ensureDefaultDiaryTemplate({
   syncAndRefresh
 }) {
   const hasAnyContent = Object.values(diaryModules).some((value) => String(value || "").trim().length > 0) || moduleFields.some(({ input }) => input.value.trim().length > 0) || !!(diaryTextarea == null ? void 0 : diaryTextarea.value.trim());
-  if (hasAnyContent) return;
+  if (!allowDefaultDiaryTemplate || hasAnyContent) return;
   if (!diaryModules.weather) diaryModules.weather = "\u2600\uFE0F \u6674";
   if (!diaryModules.mood) diaryModules.mood = "\u{1F60A} \u5F00\u5FC3";
   if (!diaryModules.todayThing) diaryModules.todayThing = "\u4ECA\u5929\u6211\u505A\u4E86____\u3002";
@@ -3040,6 +3041,7 @@ function buildDiaryPanel(options) {
     component,
     panel,
     diaryContent,
+    allowDefaultDiaryTemplate,
     setDiaryTextarea,
     updateDiaryContent,
     updateDiaryModules,
@@ -3236,6 +3238,7 @@ function buildDiaryPanel(options) {
   });
   setDiaryTextarea(diaryTextarea);
   ensureDefaultDiaryTemplate({
+    allowDefaultDiaryTemplate,
     diaryModules,
     moduleFields,
     diaryTextarea,
@@ -3837,6 +3840,9 @@ function openQuickCustomAdjustModal(options) {
   new QuickCustomModal(app, plugin, customItem, onSubmit).open();
 }
 
+// src/modals/helpers/daily-modal-state.ts
+var import_obsidian6 = require("obsidian");
+
 // src/diary/modules.ts
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -3853,6 +3859,16 @@ function readDiarySection(content, heading) {
 }
 function normalizeDiarySentence(value) {
   return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
+}
+function normalizeBuiltInSampleValue(moduleId, value) {
+  const normalized = normalizeDiarySentence(String(value || ""));
+  const sampleValues = {
+    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86____",
+    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____",
+    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____",
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4____"
+  };
+  return sampleValues[moduleId] === normalized ? "" : value || "";
 }
 function readPrefixedSentence(lines, prefix) {
   const line = lines.find((item) => item.startsWith(prefix));
@@ -3912,9 +3928,15 @@ function parseDiaryModules(content, moduleConfig) {
     freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : ""
   };
   moduleConfig.forEach((moduleDef) => {
-    result[moduleDef.id] = readDiaryLine(raw, moduleDef.label);
+    result[moduleDef.id] = normalizeBuiltInSampleValue(
+      moduleDef.id,
+      readDiaryLine(raw, moduleDef.label)
+    );
   });
   fillNarrativeDiaryModules(result, raw, moduleConfig);
+  moduleConfig.forEach((moduleDef) => {
+    result[moduleDef.id] = normalizeBuiltInSampleValue(moduleDef.id, result[moduleDef.id]);
+  });
   return result;
 }
 function composeDiaryContent(values, moduleConfig) {
@@ -3955,6 +3977,8 @@ function composeDiaryContent(values, moduleConfig) {
 // src/modals/helpers/daily-modal-state.ts
 async function loadDailyModalState(plugin, dateStr) {
   const yesterdayStr = shiftDateString(dateStr, -1);
+  const todayFile = plugin.app.vault.getAbstractFileByPath(plugin.filePath(dateStr));
+  const hasExistingRecord = todayFile instanceof import_obsidian6.TFile;
   const existingToday = await plugin.readDayData(dateStr, { preferFreshRead: true });
   const yesterdayData = await plugin.readDayData(yesterdayStr, { preferFreshRead: true });
   const allScores = await plugin.getAllScores();
@@ -3971,6 +3995,7 @@ async function loadDailyModalState(plugin, dateStr) {
   const moduleConfig = plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length ? plugin.currentUser.diaryModules : makeDefaultDiaryModules();
   const diaryModules = diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {};
   return {
+    hasExistingRecord,
     yesterdayData,
     allScores,
     scores,
@@ -4006,7 +4031,7 @@ function renderDailyTotalDisplay({
 }
 
 // src/modals/panels/modal-chrome.ts
-var import_obsidian6 = require("obsidian");
+var import_obsidian7 = require("obsidian");
 
 // src/modals/panels/desktop-modal-chrome.ts
 function renderDesktopDailyHeaderLayout(containerEl, title) {
@@ -4161,7 +4186,7 @@ function renderDailyHeader({
         try {
           await onSwitchUser(u.id);
         } catch (e) {
-          new import_obsidian6.Notice("\u274C \u5207\u6362\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+          new import_obsidian7.Notice("\u274C \u5207\u6362\u7528\u6237\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
         }
       };
     }
@@ -4569,7 +4594,7 @@ function renderCustomItemsList({
 }
 
 // src/modals/panels/rules-section.ts
-var import_obsidian7 = require("obsidian");
+var import_obsidian8 = require("obsidian");
 
 // src/modals/panels/desktop-rules-section.ts
 function renderDesktopRulesSectionLayout(container) {
@@ -4659,7 +4684,7 @@ function renderRulesSection({
     view.empty();
     const text = plugin.currentUser.scoringRules || "";
     if (text.trim()) {
-      import_obsidian7.MarkdownRenderer.render(app, text, view, "", component);
+      import_obsidian8.MarkdownRenderer.render(app, text, view, "", component);
     } else {
       view.createEl("p", {
         cls: "kid-score-rules-empty",
@@ -4705,7 +4730,7 @@ function renderRulesSection({
     edit.addClass("is-hidden");
     renderView();
     onAfterRulesSaved();
-    new import_obsidian7.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
+    new import_obsidian8.Notice("\u2705 \u6253\u5206\u89C4\u5219\u5DF2\u4FDD\u5B58\uFF01");
   });
   cancelBtn.addEventListener("click", () => {
     isEditing = false;
@@ -5020,6 +5045,7 @@ var DailyScoringModal = class extends BaseMobileModal {
         panel: diaryPanel,
         diaryContent: this.diaryContent,
         diaryModules: this.diaryModules,
+        allowDefaultDiaryTemplate: !state.hasExistingRecord,
         setDiaryTextarea: (textarea) => {
           this.diaryTextarea = textarea;
         },
@@ -5059,11 +5085,11 @@ var DailyScoringModal = class extends BaseMobileModal {
             const filePath = self.plugin.filePath(self.dateStr);
             const file = self.app.vault.getAbstractFileByPath(filePath);
             self.close();
-            if (file instanceof import_obsidian8.TFile) {
+            if (file instanceof import_obsidian9.TFile) {
               await self.app.workspace.getLeaf(true).openFile(file, { active: true });
             }
           } catch (e) {
-            new import_obsidian8.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
+            new import_obsidian9.Notice("\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
           }
         },
         onStats: () => {
@@ -5282,10 +5308,10 @@ var DailyScoringModal = class extends BaseMobileModal {
 };
 
 // src/settings/settings-tab.ts
-var import_obsidian18 = require("obsidian");
+var import_obsidian19 = require("obsidian");
 
 // src/settings/category-settings.ts
-var import_obsidian10 = require("obsidian");
+var import_obsidian11 = require("obsidian");
 
 // src/settings/desktop-settings-shells.ts
 function renderDesktopSettingsSectionShell(containerEl, sectionClassName, titleText, hintText) {
@@ -5320,7 +5346,7 @@ function renderMobileSettingsSectionShell(containerEl, sectionClassName, titleTe
 }
 
 // src/settings/category-settings-list.ts
-var import_obsidian9 = require("obsidian");
+var import_obsidian10 = require("obsidian");
 function renderCategorySettingsList({
   plugin,
   catWrap,
@@ -5474,7 +5500,7 @@ function renderCategorySettingsList({
               renderCategories();
               refreshItems();
             } catch (error) {
-              new import_obsidian9.Notice(
+              new import_obsidian10.Notice(
                 "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
               );
             }
@@ -5514,7 +5540,7 @@ function renderCategorySettings({
     refreshItems
   });
   renderCategories();
-  new import_obsidian10.Setting(shell.body).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
+  new import_obsidian11.Setting(shell.body).setName("\u6DFB\u52A0\u5206\u7C7B").addButton(
     (btn) => btn.setButtonText("\uFF0B \u65B0\u5206\u7C7B").setCta().onClick(async () => {
       plugin.currentUser.categories.push("\u65B0\u5206\u7C7B");
       await plugin.saveSettings();
@@ -5522,18 +5548,18 @@ function renderCategorySettings({
       refreshItems();
     })
   );
-  new import_obsidian10.Setting(shell.body).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
+  new import_obsidian11.Setting(shell.body).setName("\u4FDD\u5B58\u5E76\u5237\u65B0").setDesc("\u4FDD\u5B58\u5206\u7C7B\u4FEE\u6539\uFF0C\u5237\u65B0\u4E0B\u65B9\u6253\u5206\u9879\u76EE\u7684\u5206\u7C7B\u4E0B\u62C9\u83DC\u5355").addButton(
     (btn) => btn.setButtonText("\u{1F504} \u4FDD\u5B58\u5E76\u5237\u65B0").onClick(async () => {
       await plugin.saveSettings();
       renderCategories();
       refreshItems();
-      new import_obsidian10.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
+      new import_obsidian11.Notice("\u2705 \u5206\u7C7B\u5DF2\u4FDD\u5B58\uFF0C\u6253\u5206\u9879\u76EE\u5DF2\u5237\u65B0");
     })
   );
 }
 
 // src/settings/diary-module-settings.ts
-var import_obsidian11 = require("obsidian");
+var import_obsidian12 = require("obsidian");
 
 // src/settings/desktop-settings-sections.ts
 function renderDesktopDiaryModuleRowLayout(list) {
@@ -5750,7 +5776,7 @@ function renderDiaryModuleSettingsSection({
           plugin.currentUser.diaryModules = makeDefaultDiaryModules();
           await plugin.saveSettings();
           render();
-          new import_obsidian11.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
+          new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
         }
       });
     };
@@ -5764,7 +5790,7 @@ function renderDiaryModuleSettingsSection({
 }
 
 // src/settings/rules-settings-section.ts
-var import_obsidian12 = require("obsidian");
+var import_obsidian13 = require("obsidian");
 function renderRulesSettingsSection({
   plugin,
   containerEl,
@@ -5807,7 +5833,7 @@ function renderRulesSettingsSection({
     view.empty();
     const text = plugin.currentUser.scoringRules || "";
     if (text.trim()) {
-      import_obsidian12.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
+      import_obsidian13.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
     } else {
       view.createEl("p", {
         cls: "kid-score-rules-empty",
@@ -5852,7 +5878,7 @@ function renderRulesSettingsSection({
     isEditing = false;
     view.removeClass("is-hidden");
     edit.addClass("is-hidden");
-    new import_obsidian12.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
+    new import_obsidian13.Notice("\u2705 \u89C4\u5219\u5DF2\u4FDD\u5B58");
   });
   cancelBtn.addEventListener("click", () => {
     isEditing = false;
@@ -5882,7 +5908,7 @@ function renderContentSettingsSections({
 }
 
 // src/settings/goal-settings-section.ts
-var import_obsidian13 = require("obsidian");
+var import_obsidian14 = require("obsidian");
 function renderGoalSettingsSection({
   plugin,
   containerEl,
@@ -5919,14 +5945,14 @@ function renderGoalSettingsSection({
       if (Number.isFinite(value) && value > 0) {
         plugin.currentUser.goals[goalField.key] = value;
         await plugin.saveSettings();
-        new import_obsidian13.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
+        new import_obsidian14.Notice("\u2705 " + goalField.label + "\u5DF2\u66F4\u65B0\u4E3A " + value);
       }
     };
   }
 }
 
 // src/settings/import-export-settings.ts
-var import_obsidian14 = require("obsidian");
+var import_obsidian15 = require("obsidian");
 function renderImportExportSettings({
   plugin,
   containerEl,
@@ -5942,7 +5968,7 @@ function renderImportExportSettings({
     "kid-score-import-export-section",
     "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E"
   );
-  new import_obsidian14.Setting(shell.body).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
+  new import_obsidian15.Setting(shell.body).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
     btn.setButtonText("\u{1F4E4} \u5BFC\u51FA").onClick(() => {
       const data = {
         schemaVersion: 1,
@@ -5959,7 +5985,7 @@ function renderImportExportSettings({
       URL.revokeObjectURL(url);
     });
   });
-  new import_obsidian14.Setting(shell.body).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
+  new import_obsidian15.Setting(shell.body).setName("\u5BFC\u5165\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u4ECE JSON \u6587\u4EF6\u5BFC\u5165\u5206\u7C7B\u548C\u6253\u5206\u9879\uFF08\u5C06\u8986\u76D6\u73B0\u6709\u914D\u7F6E\uFF09").addButton((btn) => {
     btn.setButtonText("\u{1F4E5} \u5BFC\u5165").onClick(() => {
       const fileInput = document.createElement("input");
       fileInput.type = "file";
@@ -5975,9 +6001,9 @@ function renderImportExportSettings({
           plugin.currentUser.categories = parsed.categories;
           await plugin.saveSettings();
           refresh();
-          new import_obsidian14.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
+          new import_obsidian15.Notice("\u2705 \u914D\u7F6E\u5BFC\u5165\u6210\u529F");
         } catch (e) {
-          new import_obsidian14.Notice(
+          new import_obsidian15.Notice(
             "\u274C " + (e instanceof Error ? e.message : "JSON \u683C\u5F0F\u6709\u8BEF\uFF0C\u5BFC\u5165\u5931\u8D25")
           );
         }
@@ -6051,7 +6077,7 @@ function parseImportedItem(item, index) {
 }
 
 // src/settings/item-settings.ts
-var import_obsidian16 = require("obsidian");
+var import_obsidian17 = require("obsidian");
 
 // src/settings/item-sorting.ts
 function sortItemsByCategories(items, categories) {
@@ -6065,7 +6091,7 @@ function sortItemsByCategories(items, categories) {
 }
 
 // src/settings/item-settings-list.ts
-var import_obsidian15 = require("obsidian");
+var import_obsidian16 = require("obsidian");
 function renderItemSettingsList({
   plugin,
   itemsWrap,
@@ -6306,7 +6332,7 @@ function renderItemSettingsList({
               await plugin.saveSettings();
               renderItems();
             } catch (error) {
-              new import_obsidian15.Notice(
+              new import_obsidian16.Notice(
                 "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
               );
             }
@@ -6356,7 +6382,7 @@ function renderItemSettingsList({
           setPendingScrollItemId(newItemId);
           renderItems();
         } catch (error) {
-          new import_obsidian15.Notice(
+          new import_obsidian16.Notice(
             "\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
           );
         }
@@ -6435,7 +6461,7 @@ function renderItemSettings({
   const actionsHost = shell.body.createDiv({
     cls: "kid-score-settings-actions " + (isTouchLayout ? "kid-score-settings-actions-mobile" : "kid-score-settings-actions-desktop")
   });
-  new import_obsidian16.Setting(actionsHost).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
+  new import_obsidian17.Setting(actionsHost).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
     (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
       const defaultCat = plugin.currentUser.categories[0] || "\u52A0\u5206\u9879";
       const newItemId = "item_" + Date.now();
@@ -6457,13 +6483,13 @@ function renderItemSettings({
       sortItemsByCategories(plugin.currentUser.items, plugin.currentUser.categories || []);
       await plugin.saveSettings();
       renderItems();
-      new import_obsidian16.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
+      new import_obsidian17.Notice("\u2705 \u5DF2\u6309\u5206\u7C7B\u6392\u5E8F");
     })
   );
 }
 
 // src/settings/user-settings-section.ts
-var import_obsidian17 = require("obsidian");
+var import_obsidian18 = require("obsidian");
 function renderUserSettingsSection({
   app,
   plugin,
@@ -6485,7 +6511,7 @@ function renderUserSettingsSection({
   );
   const userMgrWrap = shell.body.createDiv({ cls: "kid-score-settings-users" });
   const showUserDeleteConfirm = (user) => {
-    const deleteModal = new class extends import_obsidian17.Modal {
+    const deleteModal = new class extends import_obsidian18.Modal {
       onOpen() {
         this.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
         this.modalEl.addClass("kid-score-edit-modal");
@@ -6536,7 +6562,7 @@ function renderUserSettingsSection({
               refresh();
             }
           } catch (error) {
-            new import_obsidian17.Notice(
+            new import_obsidian18.Notice(
               "\u274C \u5220\u9664\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
             );
           }
@@ -6584,14 +6610,14 @@ function renderUserSettingsSection({
         await plugin.saveSettings();
         refresh();
       } catch (error) {
-        new import_obsidian17.Notice(
+        new import_obsidian18.Notice(
           "\u274C \u6DFB\u52A0\u7528\u6237\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
         );
       }
     };
   };
   renderUserMgr();
-  new import_obsidian17.Setting(shell.body).setName("\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
+  new import_obsidian18.Setting(shell.body).setName("\u59D3\u540D").setDesc("\u5F53\u524D\u7528\u6237\u7684\u663E\u793A\u540D\u5B57").addText(
     (text) => text.setPlaceholder("\u738B\u9756\u8FB0").setValue(plugin.currentUser.name).onChange(async (value) => {
       const newName = value.trim() || "\u672A\u547D\u540D";
       const oldName = plugin.currentUser.name;
@@ -6605,10 +6631,10 @@ function renderUserSettingsSection({
             plugin.currentUser.name = newName;
             await plugin.saveSettings();
             renderUserMgr();
-            new import_obsidian17.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
+            new import_obsidian18.Notice("\u2705 \u7528\u6237\u540D\u5DF2\u66F4\u65B0\uFF0C\u5386\u53F2\u8BB0\u5F55\u4E2D\u7684\u540D\u79F0\u5DF2\u540C\u6B65\u66FF\u6362");
           } catch (error) {
             console.error("[Little Milestones] renameUserInFiles error", error);
-            new import_obsidian17.Notice(
+            new import_obsidian18.Notice(
               "\u274C " + (error instanceof Error ? error.message : String(error))
             );
           }
@@ -6617,7 +6643,7 @@ function renderUserSettingsSection({
     })
   );
   bindSettingsInput(shell.body.querySelector(".setting-item:last-child input"));
-  new import_obsidian17.Setting(shell.body).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
+  new import_obsidian18.Setting(shell.body).setName("\u8BB0\u5F55\u4FDD\u5B58\u8DEF\u5F84").setDesc("\u6BCF\u65E5\u6253\u5206 Markdown \u6587\u4EF6\u5B58\u653E\u7684\u6587\u4EF6\u5939").addText(
     (text) => text.setPlaceholder("Little Milestones/Daily Records").setValue(plugin.currentUser.savePath).onChange(async (value) => {
       const newPath = value.trim() || "Little Milestones/Daily Records";
       const oldPath = plugin.currentUser.savePath;
@@ -6630,10 +6656,10 @@ function renderUserSettingsSection({
             await plugin.migrateSavePath(oldPath, newPath);
             plugin.currentUser.savePath = newPath;
             await plugin.saveSettings();
-            new import_obsidian17.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
+            new import_obsidian18.Notice("\u2705 \u4FDD\u5B58\u8DEF\u5F84\u5DF2\u4FEE\u6539\uFF0C\u5386\u53F2\u8BB0\u5F55\u5DF2\u81EA\u52A8\u8FC1\u79FB");
           } catch (error) {
             console.error("[Little Milestones] migrateSavePath error", error);
-            new import_obsidian17.Notice(
+            new import_obsidian18.Notice(
               "\u274C " + (error instanceof Error ? error.message : String(error))
             );
           }
@@ -6645,7 +6671,7 @@ function renderUserSettingsSection({
 }
 
 // src/settings/settings-tab.ts
-var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
+var KidScoreSettingTab = class extends import_obsidian19.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.touchGuardCleanup = null;
@@ -6850,7 +6876,7 @@ function ensureUserDefaults(user) {
 }
 
 // src/storage/day-data-store.ts
-var import_obsidian20 = require("obsidian");
+var import_obsidian21 = require("obsidian");
 
 // src/composers/day-data-composer.ts
 var DayDataComposer = class {
@@ -6964,7 +6990,7 @@ var DayDataComposer = class {
 };
 
 // src/renderers/report-sections.ts
-var import_obsidian19 = require("obsidian");
+var import_obsidian20 = require("obsidian");
 function buildFrontmatter(report) {
   const scoresYaml = Object.fromEntries(
     report.items.map((item) => [item.id, report.scores[item.id] || 0])
@@ -6985,7 +7011,7 @@ function buildFrontmatter(report) {
       ...item.note && item.note.trim() ? { note: item.note.trim() } : {}
     }));
   }
-  return "---\n" + (0, import_obsidian19.stringifyYaml)(frontmatter).trimEnd() + "\n---\n\n";
+  return "---\n" + (0, import_obsidian20.stringifyYaml)(frontmatter).trimEnd() + "\n---\n\n";
 }
 function buildSummaryCallout(report) {
   const totalSign = report.total >= 0 ? "+" : "";
@@ -7099,7 +7125,7 @@ var DayDataStore = class {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
-    if (!(file instanceof import_obsidian20.TFile)) return null;
+    if (!(file instanceof import_obsidian21.TFile)) return null;
     const content = await this.plugin.app.vault.read(file);
     const contentFrontmatter = this.readFrontmatterFromContent(content);
     const frontmatter = options.preferFreshRead ? contentFrontmatter || this.readFrontmatterFromCache(file) : this.readFrontmatterFromCache(file) || contentFrontmatter;
@@ -7110,7 +7136,7 @@ var DayDataStore = class {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
-    if (!(file instanceof import_obsidian20.TFile)) return null;
+    if (!(file instanceof import_obsidian21.TFile)) return null;
     const preferFreshRead = this.shouldPreferFreshRead(options);
     if (!preferFreshRead) {
       const cachedFrontmatter = this.readFrontmatterFromCache(file);
@@ -7136,7 +7162,7 @@ var DayDataStore = class {
       await this.ensureFolder(this.plugin.currentUser.savePath);
       const filePath = this.plugin.filePath(dateStr);
       const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
-      if (existing instanceof import_obsidian20.TFile) {
+      if (existing instanceof import_obsidian21.TFile) {
         await this.plugin.app.vault.modify(existing, fileContent);
       } else {
         await this.plugin.app.vault.create(filePath, fileContent);
@@ -7145,19 +7171,19 @@ var DayDataStore = class {
       this.markFreshReadWindow();
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
-      new import_obsidian20.Notice(
+      new import_obsidian21.Notice(
         "\u2705 " + dateStr + " \u8BB0\u5F55\u5DF2\u4FDD\u5B58\uFF01\u603B\u5206\uFF1A" + totalSign + report.total + " | \u7D2F\u8BA1\uFF1A" + grandSign + report.grandTotal
       );
     } catch (error) {
       console.error("[Little Milestones] saveDayData failed", error);
-      new import_obsidian20.Notice(
+      new import_obsidian21.Notice(
         "\u274C \u4FDD\u5B58\u5931\u8D25\uFF1A" + (error instanceof Error ? error.message : String(error))
       );
       throw error;
     }
   }
   async renameUserInFiles(oldName, newName) {
-    const dirPath = (0, import_obsidian20.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian21.normalizePath)(this.plugin.currentUser.savePath);
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
     );
@@ -7199,16 +7225,16 @@ var DayDataStore = class {
     this.invalidateCache();
   }
   async migrateSavePath(oldPath, newPath) {
-    const oldDir = (0, import_obsidian20.normalizePath)(oldPath);
-    const newDir = (0, import_obsidian20.normalizePath)(newPath);
+    const oldDir = (0, import_obsidian21.normalizePath)(oldPath);
+    const newDir = (0, import_obsidian21.normalizePath)(newPath);
     if (oldDir === newDir) return;
     const files = this.plugin.app.vault.getFiles().filter(
       (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
     );
     if (files.length === 0) return;
-    const conflicts = files.map((file) => (0, import_obsidian20.normalizePath)(newDir + "/" + file.name)).filter((targetPath) => {
+    const conflicts = files.map((file) => (0, import_obsidian21.normalizePath)(newDir + "/" + file.name)).filter((targetPath) => {
       const existing = this.plugin.app.vault.getAbstractFileByPath(targetPath);
-      return existing instanceof import_obsidian20.TFile;
+      return existing instanceof import_obsidian21.TFile;
     });
     if (conflicts.length > 0) {
       throw new Error(
@@ -7219,7 +7245,7 @@ var DayDataStore = class {
     let errorCount = 0;
     for (const file of files) {
       try {
-        const newFilePath = (0, import_obsidian20.normalizePath)(newDir + "/" + file.name);
+        const newFilePath = (0, import_obsidian21.normalizePath)(newDir + "/" + file.name);
         await this.plugin.app.vault.rename(file, newFilePath);
       } catch (error) {
         errorCount++;
@@ -7238,7 +7264,7 @@ var DayDataStore = class {
     }
   }
   async getAllScores(options = {}) {
-    const dirPath = (0, import_obsidian20.normalizePath)(this.plugin.currentUser.savePath);
+    const dirPath = (0, import_obsidian21.normalizePath)(this.plugin.currentUser.savePath);
     const preferFreshRead = this.shouldPreferFreshRead(options);
     const cached = this._allScoresCache;
     if (!preferFreshRead && cached && cached.path === dirPath && Date.now() - cached.timestamp < 5e3) {
@@ -7284,7 +7310,7 @@ var DayDataStore = class {
     const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
     if (!match) return null;
     try {
-      const parsed = (0, import_obsidian20.parseYaml)(match[1]);
+      const parsed = (0, import_obsidian21.parseYaml)(match[1]);
       return parsed && typeof parsed === "object" ? parsed : null;
     } catch (error) {
       console.error("[Little Milestones] parse frontmatter failed", error);
@@ -7370,7 +7396,7 @@ var DayDataStore = class {
     return trimmed ? trimmed : null;
   }
   async ensureFolder(dirPath) {
-    const normalized = (0, import_obsidian20.normalizePath)(dirPath);
+    const normalized = (0, import_obsidian21.normalizePath)(dirPath);
     if (!normalized || normalized === "/") return;
     if (this.plugin.app.vault.getAbstractFileByPath(normalized)) return;
     const segments = normalized.split("/").filter(Boolean);
@@ -7385,7 +7411,7 @@ var DayDataStore = class {
 };
 
 // src/main.ts
-var KidScorePlugin = class extends import_obsidian21.Plugin {
+var KidScorePlugin = class extends import_obsidian22.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -7439,7 +7465,7 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
     return this.settings.users.find((u) => u.id === cuid) || this.settings.users[0];
   }
   filePath(dateStr) {
-    return (0, import_obsidian21.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
+    return (0, import_obsidian22.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
   async readDayData(dateStr, options) {
     return this.dayDataStore.readDayData(dateStr, options);

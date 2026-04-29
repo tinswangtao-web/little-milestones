@@ -172,6 +172,7 @@ export class DailyScoringModal extends BaseMobileModal {
         panel: diaryPanel,
         diaryContent: this.diaryContent,
         diaryModules: this.diaryModules,
+        allowDefaultDiaryTemplate: !state.hasExistingRecord,
         setDiaryTextarea: (textarea) => {
           this.diaryTextarea = textarea;
         },

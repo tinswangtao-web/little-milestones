@@ -20,6 +20,17 @@ function normalizeDiarySentence(value: string): string {
   return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
 }
 
+function normalizeBuiltInSampleValue(moduleId: string, value: string | undefined): string {
+  const normalized = normalizeDiarySentence(String(value || ""));
+  const sampleValues: Record<string, string> = {
+    todayThing: "今天我做了____",
+    learnedThing: "今天我学会了____",
+    happyThing: "今天最开心的是____",
+    wantToSay: "我还想说____",
+  };
+  return sampleValues[moduleId] === normalized ? "" : value || "";
+}
+
 function readPrefixedSentence(lines: string[], prefix: string): string {
   const line = lines.find((item) => item.startsWith(prefix));
   return line ? normalizeDiarySentence(line.slice(prefix.length)) : "";
@@ -103,9 +114,15 @@ export function parseDiaryModules(
   };
 
   moduleConfig.forEach((moduleDef) => {
-    result[moduleDef.id] = readDiaryLine(raw, moduleDef.label);
+    result[moduleDef.id] = normalizeBuiltInSampleValue(
+      moduleDef.id,
+      readDiaryLine(raw, moduleDef.label)
+    );
   });
   fillNarrativeDiaryModules(result, raw, moduleConfig);
+  moduleConfig.forEach((moduleDef) => {
+    result[moduleDef.id] = normalizeBuiltInSampleValue(moduleDef.id, result[moduleDef.id]);
+  });
 
   return result;
 }

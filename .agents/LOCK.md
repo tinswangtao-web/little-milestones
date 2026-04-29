@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Negative-card visual/report sign-count changes committed after user verification and explicit authorization.
+- `notes`: Diary empty roundtrip/sample normalization task synced and committed after user authorization.
