@@ -8,12 +8,19 @@ import { compareDateStrings, isValidDateString } from "../utils/date";
 
 type FrontmatterData = Record<string, unknown>;
 
+const FRESH_READ_WINDOW_MS = 2000;
+
+export interface DayDataReadOptions {
+  preferFreshRead?: boolean;
+}
+
 export class DayDataStore {
   private _allScoresCache: {
     data: DayData[];
     path: string;
     timestamp: number;
   } | null = null;
+  private _freshReadUntil = 0;
 
   constructor(private plugin: KidScorePlugin) {}
 
@@ -21,31 +28,55 @@ export class DayDataStore {
     this._allScoresCache = null;
   }
 
-  async readDayData(dateStr: string): Promise<DayData | null> {
+  private markFreshReadWindow(): void {
+    this._freshReadUntil = Date.now() + FRESH_READ_WINDOW_MS;
+  }
+
+  private shouldPreferFreshRead(options: DayDataReadOptions): boolean {
+    return options.preferFreshRead === true || Date.now() < this._freshReadUntil;
+  }
+
+  async readDayData(
+    dateStr: string,
+    options: DayDataReadOptions = { preferFreshRead: true }
+  ): Promise<DayData | null> {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
     if (!(file instanceof TFile)) return null;
 
     const content = await this.plugin.app.vault.read(file);
-    const frontmatter =
-      this.readFrontmatterFromCache(file) || this.readFrontmatterFromContent(content);
+    const contentFrontmatter = this.readFrontmatterFromContent(content);
+    const frontmatter = options.preferFreshRead
+      ? contentFrontmatter || this.readFrontmatterFromCache(file)
+      : this.readFrontmatterFromCache(file) || contentFrontmatter;
     if (!frontmatter) return null;
+    return this.buildDayDataFromFrontmatter(frontmatter, dateStr, content);
+  }
 
-    const scores = this.normalizeScores(frontmatter.scores);
-    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
-    const total = this.readTotal(frontmatter.total, scores, customItems);
-    const diaryContent = this.extractDiaryContent(content);
+  async readDaySummary(
+    dateStr: string,
+    options: DayDataReadOptions = {}
+  ): Promise<DayData | null> {
+    const file = this.plugin.app.vault.getAbstractFileByPath(
+      this.plugin.filePath(dateStr)
+    );
+    if (!(file instanceof TFile)) return null;
 
-    return {
-      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
-      date: dateStr,
-      child: this.readChildName(frontmatter.child),
-      scores,
-      customItems,
-      total,
-      diaryContent,
-    };
+    const preferFreshRead = this.shouldPreferFreshRead(options);
+
+    if (!preferFreshRead) {
+      const cachedFrontmatter = this.readFrontmatterFromCache(file);
+      if (cachedFrontmatter) {
+        return this.buildDayDataFromFrontmatter(cachedFrontmatter, dateStr);
+      }
+    }
+
+    const content = await this.plugin.app.vault.read(file);
+    const frontmatter = this.readFrontmatterFromContent(content);
+    return frontmatter
+      ? this.buildDayDataFromFrontmatter(frontmatter, dateStr)
+      : null;
   }
 
   async saveDayData(
@@ -76,6 +107,7 @@ export class DayDataStore {
       }
 
       this.invalidateCache();
+      this.markFreshReadWindow();
 
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
@@ -198,11 +230,13 @@ export class DayDataStore {
     }
   }
 
-  async getAllScores(): Promise<DayData[]> {
+  async getAllScores(options: DayDataReadOptions = {}): Promise<DayData[]> {
     const dirPath = normalizePath(this.plugin.currentUser.savePath);
+    const preferFreshRead = this.shouldPreferFreshRead(options);
 
     const cached = this._allScoresCache;
     if (
+      !preferFreshRead &&
       cached &&
       cached.path === dirPath &&
       Date.now() - cached.timestamp < 5000
@@ -220,7 +254,7 @@ export class DayDataStore {
     for (const file of files) {
       const dateStr = file.basename;
       if (isValidDateString(dateStr)) {
-        const score = await this.readDayData(dateStr);
+        const score = await this.readDaySummary(dateStr, { preferFreshRead });
         if (score) results.push(score);
       }
     }
@@ -228,6 +262,26 @@ export class DayDataStore {
     const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
     this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
     return sorted;
+  }
+
+  private buildDayDataFromFrontmatter(
+    frontmatter: FrontmatterData,
+    dateStr: string,
+    content?: string
+  ): DayData {
+    const scores = this.normalizeScores(frontmatter.scores);
+    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
+    const total = this.readTotal(frontmatter.total, scores, customItems);
+
+    return {
+      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
+      date: dateStr,
+      child: this.readChildName(frontmatter.child),
+      scores,
+      customItems,
+      total,
+      ...(content !== undefined ? { diaryContent: this.extractDiaryContent(content) } : {}),
+    };
   }
 
   private readFrontmatterFromCache(file: TFile): FrontmatterData | null {

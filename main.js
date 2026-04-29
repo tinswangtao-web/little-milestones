@@ -3894,8 +3894,8 @@ function composeDiaryContent(values, moduleConfig) {
 // src/modals/helpers/daily-modal-state.ts
 async function loadDailyModalState(plugin, dateStr) {
   const yesterdayStr = shiftDateString(dateStr, -1);
-  const existingToday = await plugin.readDayData(dateStr);
-  const yesterdayData = await plugin.readDayData(yesterdayStr);
+  const existingToday = await plugin.readDayData(dateStr, { preferFreshRead: true });
+  const yesterdayData = await plugin.readDayData(yesterdayStr, { preferFreshRead: true });
   const allScores = await plugin.getAllScores();
   const scores = {};
   for (const item of plugin.currentUser.items) {
@@ -6807,7 +6807,9 @@ var DayDataComposer = class {
     const items = this.plugin.currentUser.items;
     const childName = this.plugin.currentUser.name;
     const yesterdayStr = shiftDateString(dateStr, -1);
-    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
+    const yesterdayData = await this.plugin.readDayData(yesterdayStr, {
+      preferFreshRead: true
+    });
     let total = 0;
     let earnedCount = 0;
     let missedCount = 0;
@@ -6838,7 +6840,7 @@ var DayDataComposer = class {
       customTotal += ci.points;
     }
     total += customTotal;
-    const allScores = await this.plugin.getAllScores();
+    const allScores = await this.plugin.getAllScores({ preferFreshRead: true });
     let cumulativeTotal = 0;
     let cumulativeDays = 0;
     for (const s of allScores) {
@@ -7026,35 +7028,48 @@ var MarkdownReportBuilder = class {
 };
 
 // src/storage/day-data-store.ts
+var FRESH_READ_WINDOW_MS = 2e3;
 var DayDataStore = class {
   constructor(plugin) {
     this.plugin = plugin;
     this._allScoresCache = null;
+    this._freshReadUntil = 0;
   }
   invalidateCache() {
     this._allScoresCache = null;
   }
-  async readDayData(dateStr) {
+  markFreshReadWindow() {
+    this._freshReadUntil = Date.now() + FRESH_READ_WINDOW_MS;
+  }
+  shouldPreferFreshRead(options) {
+    return options.preferFreshRead === true || Date.now() < this._freshReadUntil;
+  }
+  async readDayData(dateStr, options = { preferFreshRead: true }) {
     const file = this.plugin.app.vault.getAbstractFileByPath(
       this.plugin.filePath(dateStr)
     );
     if (!(file instanceof import_obsidian20.TFile)) return null;
     const content = await this.plugin.app.vault.read(file);
-    const frontmatter = this.readFrontmatterFromCache(file) || this.readFrontmatterFromContent(content);
+    const contentFrontmatter = this.readFrontmatterFromContent(content);
+    const frontmatter = options.preferFreshRead ? contentFrontmatter || this.readFrontmatterFromCache(file) : this.readFrontmatterFromCache(file) || contentFrontmatter;
     if (!frontmatter) return null;
-    const scores = this.normalizeScores(frontmatter.scores);
-    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
-    const total = this.readTotal(frontmatter.total, scores, customItems);
-    const diaryContent = this.extractDiaryContent(content);
-    return {
-      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
-      date: dateStr,
-      child: this.readChildName(frontmatter.child),
-      scores,
-      customItems,
-      total,
-      diaryContent
-    };
+    return this.buildDayDataFromFrontmatter(frontmatter, dateStr, content);
+  }
+  async readDaySummary(dateStr, options = {}) {
+    const file = this.plugin.app.vault.getAbstractFileByPath(
+      this.plugin.filePath(dateStr)
+    );
+    if (!(file instanceof import_obsidian20.TFile)) return null;
+    const preferFreshRead = this.shouldPreferFreshRead(options);
+    if (!preferFreshRead) {
+      const cachedFrontmatter = this.readFrontmatterFromCache(file);
+      if (cachedFrontmatter) {
+        return this.buildDayDataFromFrontmatter(cachedFrontmatter, dateStr);
+      }
+    }
+    const content = await this.plugin.app.vault.read(file);
+    const frontmatter = this.readFrontmatterFromContent(content);
+    return frontmatter ? this.buildDayDataFromFrontmatter(frontmatter, dateStr) : null;
   }
   async saveDayData(dateStr, scores, customItems, diaryContent) {
     try {
@@ -7076,6 +7091,7 @@ var DayDataStore = class {
         await this.plugin.app.vault.create(filePath, fileContent);
       }
       this.invalidateCache();
+      this.markFreshReadWindow();
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
       new import_obsidian20.Notice(
@@ -7170,10 +7186,11 @@ var DayDataStore = class {
       );
     }
   }
-  async getAllScores() {
+  async getAllScores(options = {}) {
     const dirPath = (0, import_obsidian20.normalizePath)(this.plugin.currentUser.savePath);
+    const preferFreshRead = this.shouldPreferFreshRead(options);
     const cached = this._allScoresCache;
-    if (cached && cached.path === dirPath && Date.now() - cached.timestamp < 5e3) {
+    if (!preferFreshRead && cached && cached.path === dirPath && Date.now() - cached.timestamp < 5e3) {
       return cached.data;
     }
     const files = this.plugin.app.vault.getFiles().filter(
@@ -7183,13 +7200,27 @@ var DayDataStore = class {
     for (const file of files) {
       const dateStr = file.basename;
       if (isValidDateString(dateStr)) {
-        const score = await this.readDayData(dateStr);
+        const score = await this.readDaySummary(dateStr, { preferFreshRead });
         if (score) results.push(score);
       }
     }
     const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
     this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
     return sorted;
+  }
+  buildDayDataFromFrontmatter(frontmatter, dateStr, content) {
+    const scores = this.normalizeScores(frontmatter.scores);
+    const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
+    const total = this.readTotal(frontmatter.total, scores, customItems);
+    return {
+      schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
+      date: dateStr,
+      child: this.readChildName(frontmatter.child),
+      scores,
+      customItems,
+      total,
+      ...content !== void 0 ? { diaryContent: this.extractDiaryContent(content) } : {}
+    };
   }
   readFrontmatterFromCache(file) {
     var _a;
@@ -7359,8 +7390,8 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
   filePath(dateStr) {
     return (0, import_obsidian21.normalizePath)(this.currentUser.savePath + "/" + dateStr + ".md");
   }
-  async readDayData(dateStr) {
-    return this.dayDataStore.readDayData(dateStr);
+  async readDayData(dateStr, options) {
+    return this.dayDataStore.readDayData(dateStr, options);
   }
   async saveDayData(dateStr, scores, customItems, diaryContent) {
     await this.dayDataStore.saveDayData(
@@ -7376,7 +7407,7 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
   async migrateSavePath(oldPath, newPath) {
     await this.dayDataStore.migrateSavePath(oldPath, newPath);
   }
-  async getAllScores() {
-    return this.dayDataStore.getAllScores();
+  async getAllScores(options) {
+    return this.dayDataStore.getAllScores(options);
   }
 };

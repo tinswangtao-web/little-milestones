@@ -19,8 +19,8 @@ export async function loadDailyModalState(
 ): Promise<DailyModalStateSnapshot> {
   const yesterdayStr = shiftDateString(dateStr, -1);
 
-  const existingToday = await plugin.readDayData(dateStr);
-  const yesterdayData = await plugin.readDayData(yesterdayStr);
+  const existingToday = await plugin.readDayData(dateStr, { preferFreshRead: true });
+  const yesterdayData = await plugin.readDayData(yesterdayStr, { preferFreshRead: true });
   const allScores = await plugin.getAllScores();
 
   const scores: Record<string, number> = {};

@@ -17,7 +17,9 @@ export class DayDataComposer {
     const childName = this.plugin.currentUser.name;
 
     const yesterdayStr = shiftDateString(dateStr, -1);
-    const yesterdayData = await this.plugin.readDayData(yesterdayStr);
+    const yesterdayData = await this.plugin.readDayData(yesterdayStr, {
+      preferFreshRead: true,
+    });
 
     let total = 0;
     let earnedCount = 0;
@@ -51,7 +53,7 @@ export class DayDataComposer {
     }
     total += customTotal;
 
-    const allScores = await this.plugin.getAllScores();
+    const allScores = await this.plugin.getAllScores({ preferFreshRead: true });
     let cumulativeTotal = 0;
     let cumulativeDays = 0;
     for (const s of allScores) {

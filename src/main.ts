@@ -5,7 +5,7 @@ import { DailyScoringModal } from "./modals/daily-scoring-modal";
 import { StatsModal } from "./modals/stats-modal";
 import { KidScoreSettingTab } from "./settings/settings-tab";
 import { normalizePluginSettings } from "./settings/normalize-settings";
-import { DayDataStore } from "./storage/day-data-store";
+import { DayDataStore, type DayDataReadOptions } from "./storage/day-data-store";
 import { getPlatformKey } from "./utils/platform";
 
 /*
@@ -155,8 +155,11 @@ export default class KidScorePlugin extends Plugin {
     return normalizePath(this.currentUser.savePath + "/" + dateStr + ".md");
   }
 
-  async readDayData(dateStr: string): Promise<DayData | null> {
-    return this.dayDataStore.readDayData(dateStr);
+  async readDayData(
+    dateStr: string,
+    options?: DayDataReadOptions
+  ): Promise<DayData | null> {
+    return this.dayDataStore.readDayData(dateStr, options);
   }
 
   async saveDayData(
@@ -180,7 +183,7 @@ export default class KidScorePlugin extends Plugin {
     await this.dayDataStore.migrateSavePath(oldPath, newPath);
   }
 
-  async getAllScores(): Promise<DayData[]> {
-    return this.dayDataStore.getAllScores();
+  async getAllScores(options?: DayDataReadOptions): Promise<DayData[]> {
+    return this.dayDataStore.getAllScores(options);
   }
 }
