@@ -9,6 +9,89 @@ export function readDiaryLine(content: string, label: string): string {
   return match ? match[1].trim() : "";
 }
 
+function readDiarySection(content: string, heading: string): string {
+  const match = content.match(
+    new RegExp("###\\s*" + escapeRegex(heading) + "\\s*([\\s\\S]*?)(?=\\n###\\s*|$)")
+  );
+  return match ? match[1].trim() : "";
+}
+
+function normalizeDiarySentence(value: string): string {
+  return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
+}
+
+function readPrefixedSentence(lines: string[], prefix: string): string {
+  const line = lines.find((item) => item.startsWith(prefix));
+  return line ? normalizeDiarySentence(line.slice(prefix.length)) : "";
+}
+
+function isLabelLine(line: string, moduleConfig: DiaryModuleDefinition[]): boolean {
+  return moduleConfig.some((moduleDef) =>
+    new RegExp("^" + escapeRegex(moduleDef.label) + "：").test(line)
+  );
+}
+
+function fillNarrativeDiaryModules(
+  result: DiaryModuleValues,
+  content: string,
+  moduleConfig: DiaryModuleDefinition[]
+): void {
+  const storySection = readDiarySection(content, "今天的小日记");
+  if (!storySection) return;
+
+  const lines = storySection
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const consumed = new Set<number>();
+
+  const takeLine = (predicate: (line: string) => boolean): string => {
+    const index = lines.findIndex((line, lineIndex) => !consumed.has(lineIndex) && predicate(line));
+    if (index < 0) return "";
+    consumed.add(index);
+    return normalizeDiarySentence(lines[index]);
+  };
+
+  const weather = readPrefixedSentence(lines, "今天的天气是");
+  if (!result.weather && weather) {
+    result.weather = weather;
+    const index = lines.findIndex((line) => line.startsWith("今天的天气是"));
+    if (index >= 0) consumed.add(index);
+  }
+
+  const mood = readPrefixedSentence(lines, "我今天的心情是");
+  if (!result.mood && mood) {
+    result.mood = mood;
+    const index = lines.findIndex((line) => line.startsWith("我今天的心情是"));
+    if (index >= 0) consumed.add(index);
+  }
+
+  const exactPrefixes: Record<string, string> = {
+    todayThing: "今天我做了",
+    learnedThing: "今天我学会了",
+    happyThing: "今天最开心的是",
+    wantToSay: "我还想说",
+  };
+
+  Object.entries(exactPrefixes).forEach(([id, prefix]) => {
+    if (result[id]) return;
+    const value = takeLine((line) => line.startsWith(prefix));
+    if (value) result[id] = value;
+  });
+
+  const narrativeIds = new Set(Object.keys(exactPrefixes));
+  const remainingLines = lines
+    .filter((line, lineIndex) => !consumed.has(lineIndex) && !isLabelLine(line, moduleConfig))
+    .map(normalizeDiarySentence)
+    .filter(Boolean);
+
+  moduleConfig.forEach((moduleDef) => {
+    if (!narrativeIds.has(moduleDef.id) || result[moduleDef.id]) return;
+    const nextLine = remainingLines.shift();
+    if (nextLine) result[moduleDef.id] = nextLine;
+  });
+}
+
 export function parseDiaryModules(
   content: string,
   moduleConfig: DiaryModuleDefinition[]
@@ -22,6 +105,7 @@ export function parseDiaryModules(
   moduleConfig.forEach((moduleDef) => {
     result[moduleDef.id] = readDiaryLine(raw, moduleDef.label);
   });
+  fillNarrativeDiaryModules(result, raw, moduleConfig);
 
   return result;
 }

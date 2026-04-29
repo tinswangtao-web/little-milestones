@@ -187,12 +187,6 @@ function renderCategoryRows(items: ScoreItem[], report: DayReport): string {
       status +
       " |\n";
 
-    if (report.hasYesterday && report.yesterdayData) {
-      const yVal = report.yesterdayData.scores[item.id] || 0;
-      const ySign = yVal >= 0 ? "+" : "";
-      const yIcon = renderScoreStatusIcon(yVal);
-      rows += "> [!quote]- 昨日：" + item.name + " " + ySign + yVal + " 分 " + yIcon + "\n";
-    }
   }
   return rows;
 }

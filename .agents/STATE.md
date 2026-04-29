@@ -1,15 +1,15 @@
 ## Current Task
-- `task`: 2026-04-29-split-commits-handoff
-- `status`: awaiting-cursor-round-review
+- `task`: 2026-04-29-post-vault-regressions
+- `status`: committed-awaiting-user-verification
 - `last-actor`: codex
-- `last-commit`: latest docs commit in `git log --oneline -1`
+- `last-commit`: ad35304
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
-- `write-scope`: .agents/**, AGENTS.md
+- `write-scope`: .agents/**
 - `read-scope`: src/**, styles/**, main.js, .agents/**
-- `awaiting`: cursor-round-review
-- `handoff-note`: User explicitly requested four atomic commits. Codex created 6a664dd day-data read options/summary/fresh window, 44b5505 score-card negative styling, 247450a goal progress by daily total, and the latest docs/review-card commit shown by `git log --oneline -1`. Final `npm run build`, `npx tsc --noEmit`, and `node --check main.js` pass. `npm run deploy` synced Vault and verified MATCH for `main.js`, `styles.css`, and `manifest.json`. Awaiting Cursor round review.
+- `awaiting`: user-vault-regression-test
+- `handoff-note`: Cursor round review done, Vault sync completed with MATCH for `main.js` (6d81dd41954f), `styles.css` (db81e41e0927), and `manifest.json` (e82c7257a300). User explicitly requested commit with: "提交代码". Post-Vault regression fixes are being committed; awaiting final user experience verification.
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

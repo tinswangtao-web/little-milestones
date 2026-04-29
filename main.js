@@ -3845,6 +3845,66 @@ function readDiaryLine(content, label) {
   const match = content.match(new RegExp(escapeRegex(label) + "\uFF1A\\s*(.+)"));
   return match ? match[1].trim() : "";
 }
+function readDiarySection(content, heading) {
+  const match = content.match(
+    new RegExp("###\\s*" + escapeRegex(heading) + "\\s*([\\s\\S]*?)(?=\\n###\\s*|$)")
+  );
+  return match ? match[1].trim() : "";
+}
+function normalizeDiarySentence(value) {
+  return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
+}
+function readPrefixedSentence(lines, prefix) {
+  const line = lines.find((item) => item.startsWith(prefix));
+  return line ? normalizeDiarySentence(line.slice(prefix.length)) : "";
+}
+function isLabelLine(line, moduleConfig) {
+  return moduleConfig.some(
+    (moduleDef) => new RegExp("^" + escapeRegex(moduleDef.label) + "\uFF1A").test(line)
+  );
+}
+function fillNarrativeDiaryModules(result, content, moduleConfig) {
+  const storySection = readDiarySection(content, "\u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0");
+  if (!storySection) return;
+  const lines = storySection.split("\n").map((line) => line.trim()).filter(Boolean);
+  const consumed = /* @__PURE__ */ new Set();
+  const takeLine = (predicate) => {
+    const index = lines.findIndex((line, lineIndex) => !consumed.has(lineIndex) && predicate(line));
+    if (index < 0) return "";
+    consumed.add(index);
+    return normalizeDiarySentence(lines[index]);
+  };
+  const weather = readPrefixedSentence(lines, "\u4ECA\u5929\u7684\u5929\u6C14\u662F");
+  if (!result.weather && weather) {
+    result.weather = weather;
+    const index = lines.findIndex((line) => line.startsWith("\u4ECA\u5929\u7684\u5929\u6C14\u662F"));
+    if (index >= 0) consumed.add(index);
+  }
+  const mood = readPrefixedSentence(lines, "\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F");
+  if (!result.mood && mood) {
+    result.mood = mood;
+    const index = lines.findIndex((line) => line.startsWith("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F"));
+    if (index >= 0) consumed.add(index);
+  }
+  const exactPrefixes = {
+    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86",
+    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86",
+    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F",
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4"
+  };
+  Object.entries(exactPrefixes).forEach(([id, prefix]) => {
+    if (result[id]) return;
+    const value = takeLine((line) => line.startsWith(prefix));
+    if (value) result[id] = value;
+  });
+  const narrativeIds = new Set(Object.keys(exactPrefixes));
+  const remainingLines = lines.filter((line, lineIndex) => !consumed.has(lineIndex) && !isLabelLine(line, moduleConfig)).map(normalizeDiarySentence).filter(Boolean);
+  moduleConfig.forEach((moduleDef) => {
+    if (!narrativeIds.has(moduleDef.id) || result[moduleDef.id]) return;
+    const nextLine = remainingLines.shift();
+    if (nextLine) result[moduleDef.id] = nextLine;
+  });
+}
 function parseDiaryModules(content, moduleConfig) {
   const raw = content || "";
   const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
@@ -3854,6 +3914,7 @@ function parseDiaryModules(content, moduleConfig) {
   moduleConfig.forEach((moduleDef) => {
     result[moduleDef.id] = readDiaryLine(raw, moduleDef.label);
   });
+  fillNarrativeDiaryModules(result, raw, moduleConfig);
   return result;
 }
 function composeDiaryContent(values, moduleConfig) {
@@ -6990,12 +7051,6 @@ function renderCategoryRows(items, report) {
     const defaultSign = item.points >= 0 ? "+" : "";
     const noteMarker = actual !== 0 && actual !== item.points ? " \u{1F4DD}" : "";
     rows += "| " + item.emoji + " " + item.name + " | " + defaultSign + item.points + " | " + renderScoreCell(actual, isDeductItem) + noteMarker + " | " + status + " |\n";
-    if (report.hasYesterday && report.yesterdayData) {
-      const yVal = report.yesterdayData.scores[item.id] || 0;
-      const ySign = yVal >= 0 ? "+" : "";
-      const yIcon = renderScoreStatusIcon(yVal);
-      rows += "> [!quote]- \u6628\u65E5\uFF1A" + item.name + " " + ySign + yVal + " \u5206 " + yIcon + "\n";
-    }
   }
   return rows;
 }

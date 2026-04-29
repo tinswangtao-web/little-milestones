@@ -3,7 +3,7 @@
 - **slug**: 2026-04-29-split-commits-handoff
 - **created**: 2026-04-29
 - **owner**: codex
-- **status**: awaiting-cursor-round-review
+- **status**: awaiting-user-verification
 - **origin**: Cursor review **P1-3** + 用户无法在 Vault 测试（尚未同步构建产物）
 
 ## 背景
@@ -97,3 +97,4 @@ git commit -m "<上面对应的 subject>"
 - 2026-04-29 15:24 CST：最终 `npm run build`、`npx tsc --noEmit`、`node --check main.js` 通过。
 - 2026-04-29 15:25 CST：已执行 `npm run deploy`，同步 `main.js`、`styles.css`、`manifest.json` 到 Vault；脚本校验三文件 `MATCH`。
 - 2026-04-29 15:26 CST：等待 Cursor round review。
+- 2026-04-29 16:02 CST：Cursor round review 完成，输出 `.agents/reviews/2026-04-29-round-review.md`；结论可发布，无 P0/P1 阻塞，待用户在 Vault 做最终回归验收。
