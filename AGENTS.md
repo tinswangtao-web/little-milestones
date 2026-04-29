@@ -22,6 +22,13 @@ Every time Codex enters this repository, do these steps first:
 - Emergency rollback or hotfix commits still require explicit user authorization, and the authorization wording must be recorded in `.agents/STATE.md`.
 - When the user's goal changes by feature, page, workflow, or acceptance criteria, create a new `.agents/tasks/*.md` card instead of mixing unrelated work into the current task.
 - Experimental UX changes must have a rollback note in the task card before release or Vault sync.
+- Each user-facing work update should cover four points: current state, risk judgment, user action to test, and pass condition.
+- For every normal feature request, follow: user goal -> Codex minimal implementation -> Cursor review -> Codex revision -> user acceptance -> explicit user approval before commit/deploy.
+- Before asking Cursor to review, provide requirement goal, changed file list, user-visible behavior changes, verification already run, and known unresolved risks.
+- After each implementation round, update `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md` as the fixed review handoff for Cursor. Include the user's original goal, changed files, user-visible behavior changes, verification run, known risks/open points, strict-review yes/no, and 2-4 user acceptance steps.
+- Once that card is ready, tell the user "可review"; do not ask the user to paste code, diffs, or screenshots into Cursor.
+- Before asking for final commit or Vault-sync approval, fill or summarize `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`.
+- Require strict review before commit when changing storage/composers/renderers, mobile keyboard/touch/overlay/back logic, data format/migration/save path, or more than 3 files.
 
 ## Ownership Rule
 - Codex is the normal default implementation agent for this plugin.
@@ -71,6 +78,7 @@ After Codex finishes a turn:
 
 ## External Agent Expectation
 - Treat `cursor` feedback as review input by default.
+- Cursor review should conclude releasable / needs fix / recommend rollback, group Findings as P0/P1/P2, include risk points, suggested fix order, and minimal retest steps, and say "No blocking issues" when appropriate.
 - Treat `claude-code` feedback as review input by default.
 - Treat `kimi-code` feedback as review input by default.
 - Treat `chatgpt` feedback as advisory product/workflow input by default, not as direct code instructions.

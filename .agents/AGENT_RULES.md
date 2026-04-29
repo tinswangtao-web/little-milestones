@@ -103,6 +103,9 @@ This file is the short operational version of the collaboration protocol. Give i
 - Allowed without a new confirmation only when the user's current instruction explicitly says to commit the current work.
 - Not allowed: "推进", "继续", "修一下", "整理一下", "验证一下", or "同步到 Vault" by themselves.
 - Emergency rollback or hotfix commits still require explicit user authorization; record the user's authorization wording in `.agents/STATE.md`.
+- Before asking the user/Cursor for final commit or Vault-sync approval, Codex must fill or summarize `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`.
+- After each implementation round, Codex must update `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md` so Cursor can review directly from the repo. The card must include the user's original goal, changed files, user-visible behavior changes, verification run, known risks/open points, strict-review yes/no, and 2-4 user acceptance steps.
+- Once that card is ready, tell the user "可review"; do not require the user to paste code, diffs, or screenshots into Cursor.
 - Use agent prefixes:
   - `[codex]`
   - `[cursor]`
@@ -119,6 +122,22 @@ This file is the short operational version of the collaboration protocol. Give i
   - resolved status
 - If there are no issues, say so clearly.
 - Cursor reviews should focus on clear bugs, regressions, missed requirements, mobile/Obsidian risks, and verification gaps. Do not turn review into a rewrite request unless the current code is genuinely unsafe.
+- Cursor review output must include:
+  - conclusion: releasable / needs fix / recommend rollback
+  - Findings grouped as P0, P1, P2
+  - risk points
+  - suggested fix order
+  - minimal retest steps for the user
+- Cursor should use `.agents/reviews/CURSOR_REVIEW_TEMPLATE.md` as the fixed output format for normal reviews.
+- If there are no blocking issues, write "No blocking issues".
+- Strict review is mandatory before commit when storage/composers/renderers change, mobile keyboard/touch/overlay/back logic changes, data format/migration/save path changes, or the change spans more than 3 files.
+
+## User Communication Rule
+- Each Codex round should tell the non-technical user:
+  1. current state
+  2. risk judgment
+  3. user action to test
+  4. pass condition
 
 ## Required End-Of-Turn Check
 1. Run `git status --short` again.
@@ -140,6 +159,11 @@ Rules:
 - Do not edit plugin code unless the user explicitly authorizes that exception and the exception is recorded in `.agents/STATE.md`.
 - Review the latest Codex commit or current working-tree diff.
 - Focus on clear bugs, regressions, missed requirements, mobile/Obsidian risks, and verification gaps.
+- Output a conclusion: releasable / needs fix / recommend rollback.
+- Group Findings as P0, P1, and P2.
+- Include risk points, suggested fix order, and minimal retest steps for the user.
+- Use `.agents/reviews/CURSOR_REVIEW_TEMPLATE.md` as the fixed output template.
+- If there are no blocking issues, write "No blocking issues".
 - Do not refactor, do not rewrite, and do not edit code during normal review.
 - If you write review output into the repo, use `.agents/reviews/**`, acquire `LOCK.md`, and update `STATE.md`, `LOCK.md`, task card, and `log.md` after work.
 - Treat Vault sync as a separate explicit step

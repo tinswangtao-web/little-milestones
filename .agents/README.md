@@ -44,6 +44,51 @@ Roles do not rotate silently. Codex remains the implementation default. Cursor, 
 Cursor review prompt template:
 > Review the latest Codex commit or current working-tree diff. Only report clear bugs, regressions, missed requirements, or verification gaps. Do not refactor and do not edit code.
 
+## Fixed Workflow V1
+- User owns requirements, experience feedback, final acceptance, and decisions to continue, rollback, commit, or sync to the Vault.
+- Codex is the only normal implementer: code edits, build, fixes, commits, and Vault sync.
+- Cursor is review-only: findings, risks, suggested fixes, and acceptance steps. Cursor does not edit business code.
+- Every feature request follows this sequence:
+  1. User gives goal and observed problem.
+  2. Codex implements the smallest reasonable change and performs local verification.
+  3. Cursor reviews with severity, risks, suggested fixes, and acceptance steps.
+  4. Codex revises based on accepted review feedback.
+  5. User accepts or rejects the experience.
+  6. Codex commits or deploys only after explicit user approval.
+- Codex must provide these four user-facing points each round:
+  - current state
+  - risk judgment
+  - user action to test
+  - pass condition
+- Codex should provide Cursor with this review input each round:
+  - requirement goal
+  - changed file list
+  - user-visible behavior changes
+  - verification already run
+  - known unresolved risks
+- After each implementation round, Codex must maintain `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md` as the fixed handoff card for Cursor. The card must include:
+  - the current round goal using the user's original wording
+  - changed file list
+  - key user-visible behavior changes
+  - verification already run, including build/typecheck/manual checks
+  - known risks and open confirmation points
+  - whether strict Cursor review is requested
+  - 2-4 suggested user acceptance steps
+- When the fixed handoff card is ready, Codex should tell the user only that it is "可review"; the user should not need to paste code, diffs, or screenshots into Cursor.
+- Before asking the user/Cursor for final commit or Vault-sync approval, Codex must fill or summarize `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`.
+- Cursor review output should use this shape:
+  - conclusion: releasable / needs fix / recommend rollback
+  - findings grouped as P0, P1, P2
+  - suggested fix order
+  - minimal retest steps for the user
+- Cursor should use `.agents/reviews/CURSOR_REVIEW_TEMPLATE.md` as the fixed review output template.
+- Cursor must write "No blocking issues" when no blocking issues are found.
+- Strict review is required before commit when any of these are true:
+  - storage, composers, or renderers changed
+  - mobile keyboard, touch, overlay, or back-navigation logic changed
+  - data format, migration, or save path changed
+  - the change spans more than 3 files
+
 ## Shared Page Names
 Use these page names consistently across tasks, reviews, logs, and handoffs:
 - `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
