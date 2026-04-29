@@ -50,10 +50,10 @@ export function buildSummaryCallout(report: DayReport): string {
     " (" +
     goalPct +
     "%)**\n" +
-    "> - ➕ 加分项：" +
+    "> - ➕ 加了分的项：" +
     report.positiveCount +
     " 项\n" +
-    "> - ➖ 减分项：" +
+    "> - ➖ 减了分的项：" +
     report.negativeCount +
     " 项\n" +
     "> - 📌 临时事项：" +

@@ -1,15 +1,15 @@
 ## Current Task
-- `task`: 2026-04-29-post-vault-regressions
-- `status`: committed-awaiting-user-verification
+- `task`: 2026-04-29-negative-card-and-report-sign-count
+- `status`: committed
 - `last-actor`: codex
-- `last-commit`: ad35304
+- `last-commit`: 5f674db
 - `active-workspace`: /Users/tins-macmini/Documents/Vibe Coding/obsidian-little-milestones
 - `legacy-worktree`: none
 - `owner`: codex
-- `write-scope`: .agents/**
+- `write-scope`: src/modals/panels/score-items-panel.ts, src/composers/day-data-composer.ts, src/renderers/report-sections.ts, main.js, .agents/**
 - `read-scope`: src/**, styles/**, main.js, .agents/**
-- `awaiting`: user-vault-regression-test
-- `handoff-note`: Cursor round review done, Vault sync completed with MATCH for `main.js` (6d81dd41954f), `styles.css` (db81e41e0927), and `manifest.json` (e82c7257a300). User explicitly requested commit with: "提交代码". Post-Vault regression fixes are being committed; awaiting final user experience verification.
+- `awaiting`: none
+- `handoff-note`: User reported Vault test successful and explicitly authorized commit with: "已测试成功，可以 commit 了". Negative-score card visual and report sign-count update committed. Vault sync passed with MATCH for `main.js` (3d16357fd93f), `styles.css` (db81e41e0927), and `manifest.json` (e82c7257a300).
 
 ## Next Task
 - `task`: 2026-04-20-build-pipeline-recovery

@@ -4439,8 +4439,7 @@ function renderScoreCard({
   const scoreVal = getScore(item.id);
   const isEarned = scoreVal > 0;
   const isNeg = scoreVal < 0;
-  const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-  const isDeductedActive = isDeductItem && scoreVal !== 0;
+  const isDeductedActive = isNeg;
   const cardClassName = (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "");
   const layout = isTouchMode ? renderMobileScoreCardLayout(grid, cardClassName) : renderDesktopScoreCardLayout(grid, cardClassName);
   const { card, emoji, name, noteHost, points, yesterday } = layout;
@@ -4494,8 +4493,7 @@ function renderScoreCard({
 function refreshScoreCard(card, item, scoreVal) {
   const isEarned = scoreVal > 0;
   const isNeg = scoreVal < 0;
-  const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
-  const isDeductedActive = isDeductItem && scoreVal !== 0;
+  const isDeductedActive = isNeg;
   card.classList.toggle("is-earned", isEarned);
   card.classList.toggle("is-negative", isNeg);
   card.classList.toggle("is-deducted-active", isDeductedActive);
@@ -6878,18 +6876,18 @@ var DayDataComposer = class {
       if (isDeduct) {
         if (val !== 0) {
           earnedCount++;
-          negativeCount++;
         } else {
           missedCount++;
         }
       } else {
         if (val > 0) {
           earnedCount++;
-          positiveCount++;
         } else {
           missedCount++;
         }
       }
+      if (val > 0) positiveCount++;
+      if (val < 0) negativeCount++;
     }
     let customTotal = 0;
     for (const ci of customItems) {
@@ -6999,7 +6997,7 @@ function buildSummaryCallout(report) {
     summary += "> - \u{1F4C5} \u6628\u65E5\u603B\u5206\uFF1A" + yTotalSign + report.yesterdayData.total + " \u5206\n";
   }
   const grandSign = report.grandTotal >= 0 ? "+" : "";
-  summary += "> - \u{1F3AF} \u76EE\u6807\u8FDB\u5EA6\uFF1A**" + report.total + "/" + dailyGoal + " (" + goalPct + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + report.positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + report.negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + report.customItems.length + " \u9879 (" + (report.customTotal >= 0 ? "+" : "") + report.customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + report.grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + report.grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + report.grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + report.streak + " \u5929\n";
+  summary += "> - \u{1F3AF} \u76EE\u6807\u8FDB\u5EA6\uFF1A**" + report.total + "/" + dailyGoal + " (" + goalPct + "%)**\n> - \u2795 \u52A0\u4E86\u5206\u7684\u9879\uFF1A" + report.positiveCount + " \u9879\n> - \u2796 \u51CF\u4E86\u5206\u7684\u9879\uFF1A" + report.negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + report.customItems.length + " \u9879 (" + (report.customTotal >= 0 ? "+" : "") + report.customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + report.grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + report.grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + report.grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + report.streak + " \u5929\n";
   return summary;
 }
 function buildGoalCallout(report) {

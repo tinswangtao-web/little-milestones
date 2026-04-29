@@ -33,18 +33,18 @@ export class DayDataComposer {
       if (isDeduct) {
         if (val !== 0) {
           earnedCount++;
-          negativeCount++;
         } else {
           missedCount++;
         }
       } else {
         if (val > 0) {
           earnedCount++;
-          positiveCount++;
         } else {
           missedCount++;
         }
       }
+      if (val > 0) positiveCount++;
+      if (val < 0) negativeCount++;
     }
 
     let customTotal = 0;
