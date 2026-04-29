@@ -29,6 +29,8 @@ export function buildFrontmatter(report: DayReport): string {
 
 export function buildSummaryCallout(report: DayReport): string {
   const totalSign = report.total >= 0 ? "+" : "";
+  const dailyGoal = report.goals.daily || 10;
+  const goalPct = clampPercent(Math.round((report.total / dailyGoal) * 100));
   let summary =
     "> [!summary] 📊 今日汇总\n" +
     "> - 🏆 今日总分：**" +
@@ -41,12 +43,12 @@ export function buildSummaryCallout(report: DayReport): string {
   }
   const grandSign = report.grandTotal >= 0 ? "+" : "";
   summary +=
-    "> - ✅ 完成项目：**" +
-    report.earnedCount +
+    "> - 🎯 目标进度：**" +
+    report.total +
     "/" +
-    report.totalItems +
+    dailyGoal +
     " (" +
-    report.completionRate +
+    goalPct +
     "%)**\n" +
     "> - ➕ 加分项：" +
     report.positiveCount +
@@ -75,14 +77,12 @@ export function buildSummaryCallout(report: DayReport): string {
 
 export function buildGoalCallout(report: DayReport): string {
   const dailyGoal = report.goals.daily || 10;
-  const goalPct = Math.min(
-    100,
-    Math.round((report.earnedCount / dailyGoal) * 100)
-  );
+  const progress = report.total;
+  const goalPct = clampPercent(Math.round((progress / dailyGoal) * 100));
   return (
     "> [!tip] 🎯 今日目标\n" +
-    "> 完成项目 **" +
-    report.earnedCount +
+    "> 得分进度 **" +
+    progress +
     "/" +
     dailyGoal +
     "** · " +
@@ -207,6 +207,10 @@ function renderProgressBar(pct: number): string {
   const filled = Math.round(pct / 5);
   const empty = 20 - filled;
   return "`" + "█".repeat(filled) + "░".repeat(empty) + " " + pct + "%`";
+}
+
+function clampPercent(value: number): number {
+  return Math.min(100, Math.max(0, value));
 }
 
 function renderScoreCell(actual: number, isDeduct: boolean): string {

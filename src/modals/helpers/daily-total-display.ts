@@ -16,21 +16,19 @@ export function renderDailyTotalDisplay({
   dailyGoal,
 }: RenderDailyTotalDisplayOptions) {
   let total = 0;
-  let completed = 0;
   for (const item of items) {
     const val = scores[item.id] || 0;
     total += val;
-    const isDeduct = item.category === "减分" || item.points < 0;
-    if (isDeduct ? val !== 0 : val > 0) {
-      completed++;
-    }
   }
-  completed += customItems.length;
-  const pct = Math.min(100, Math.round((completed / dailyGoal) * 100));
+  total += customItems.reduce((sum, item) => sum + item.points, 0);
+  const pct =
+    dailyGoal > 0
+      ? Math.min(100, Math.max(0, Math.round((total / dailyGoal) * 100)))
+      : 0;
   element.empty();
   element.createSpan({ text: "🏆 当前总分：" + (total >= 0 ? "+" : "") + total + " 分  " });
   const goalWrap = element.createSpan({ cls: "daily-goal-wrap" });
-  goalWrap.createSpan({ cls: "daily-goal-label", text: "今日目标 " + completed + "/" + dailyGoal });
+  goalWrap.createSpan({ cls: "daily-goal-label", text: "今日目标 " + total + "/" + dailyGoal });
   const barWrap = goalWrap.createSpan({ cls: "daily-goal-bar-wrap" });
   const bar = barWrap.createSpan({ cls: "daily-goal-bar" });
   bar.style.width = pct + "%";

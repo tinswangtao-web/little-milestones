@@ -1854,26 +1854,26 @@ function renderGoalCard(cards, currentUser, filtered, period) {
   const goals = currentUser.goals || { daily: 10, weekly: 70, monthly: 300 };
   let goalLabel = "";
   let goalTarget = 0;
-  let goalCompleted = 0;
+  let goalProgress = 0;
   if (period === "week" || period === "month") {
-    goalLabel = period === "week" ? "\u672C\u5468\u76EE\u6807" : "\u672C\u6708\u76EE\u6807";
+    goalLabel = period === "week" ? "\u672C\u5468\u5F97\u5206\u8FDB\u5EA6" : "\u672C\u6708\u5F97\u5206\u8FDB\u5EA6";
     goalTarget = period === "week" ? goals.weekly : goals.monthly;
-    goalCompleted = filtered.reduce(
-      (sum, day) => sum + calcCompleted(currentUser.items, day),
+    goalProgress = filtered.reduce(
+      (sum, day) => sum + calcGoalProgressByScore(day),
       0
     );
   }
   if (goalTarget <= 0) return;
-  const goalPct = Math.min(100, Math.round(goalCompleted / goalTarget * 100));
+  const goalPct = Math.min(100, Math.max(0, Math.round(goalProgress / goalTarget * 100)));
   const goalCard = cards.createDiv({ cls: "summary-card goal-card" });
-  goalCard.createDiv({ cls: "card-val", text: goalCompleted + "/" + goalTarget });
+  goalCard.createDiv({ cls: "card-val", text: goalProgress + "/" + goalTarget });
   goalCard.createDiv({ cls: "card-lbl", text: goalLabel });
   const wrap = goalCard.createDiv({ cls: "summary-goal-bar-wrap" });
   const bar = wrap.createDiv({ cls: "summary-goal-bar" });
   bar.style.width = goalPct + "%";
   if (goalPct >= 100) bar.addClass("is-complete");
 }
-function calcCompleted(_items, day) {
+function calcGoalProgressByScore(day) {
   return day.total;
 }
 function renderCategoryCompletion(statsBody, items, categories, filtered, doneCounts) {
@@ -3928,21 +3928,16 @@ function renderDailyTotalDisplay({
   dailyGoal
 }) {
   let total = 0;
-  let completed = 0;
   for (const item of items) {
     const val = scores[item.id] || 0;
     total += val;
-    const isDeduct = item.category === "\u51CF\u5206" || item.points < 0;
-    if (isDeduct ? val !== 0 : val > 0) {
-      completed++;
-    }
   }
-  completed += customItems.length;
-  const pct = Math.min(100, Math.round(completed / dailyGoal * 100));
+  total += customItems.reduce((sum, item) => sum + item.points, 0);
+  const pct = dailyGoal > 0 ? Math.min(100, Math.max(0, Math.round(total / dailyGoal * 100))) : 0;
   element.empty();
   element.createSpan({ text: "\u{1F3C6} \u5F53\u524D\u603B\u5206\uFF1A" + (total >= 0 ? "+" : "") + total + " \u5206  " });
   const goalWrap = element.createSpan({ cls: "daily-goal-wrap" });
-  goalWrap.createSpan({ cls: "daily-goal-label", text: "\u4ECA\u65E5\u76EE\u6807 " + completed + "/" + dailyGoal });
+  goalWrap.createSpan({ cls: "daily-goal-label", text: "\u4ECA\u65E5\u76EE\u6807 " + total + "/" + dailyGoal });
   const barWrap = goalWrap.createSpan({ cls: "daily-goal-bar-wrap" });
   const bar = barWrap.createSpan({ cls: "daily-goal-bar" });
   bar.style.width = pct + "%";
@@ -5839,12 +5834,12 @@ function renderGoalSettingsSection({
     containerEl,
     "kid-score-goals-section",
     "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
-    "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
+    "\u4EE5\u6700\u7EC8\u5F97\u5206\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u3001\u51CF\u5206\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
     "kid-score-goals-section",
     "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
-    "\u4EE5\u5B8C\u6210\u9879\u76EE\u6570\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u9879\u3001\u51CF\u5206\u9879\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
+    "\u4EE5\u6700\u7EC8\u5F97\u5206\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u3001\u51CF\u5206\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
   );
   const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
   const goalFields = [
@@ -6935,22 +6930,22 @@ function buildFrontmatter(report) {
 }
 function buildSummaryCallout(report) {
   const totalSign = report.total >= 0 ? "+" : "";
+  const dailyGoal = report.goals.daily || 10;
+  const goalPct = clampPercent(Math.round(report.total / dailyGoal * 100));
   let summary = "> [!summary] \u{1F4CA} \u4ECA\u65E5\u6C47\u603B\n> - \u{1F3C6} \u4ECA\u65E5\u603B\u5206\uFF1A**" + totalSign + report.total + " \u5206**\n";
   if (report.hasYesterday && report.yesterdayData) {
     const yTotalSign = report.yesterdayData.total >= 0 ? "+" : "";
     summary += "> - \u{1F4C5} \u6628\u65E5\u603B\u5206\uFF1A" + yTotalSign + report.yesterdayData.total + " \u5206\n";
   }
   const grandSign = report.grandTotal >= 0 ? "+" : "";
-  summary += "> - \u2705 \u5B8C\u6210\u9879\u76EE\uFF1A**" + report.earnedCount + "/" + report.totalItems + " (" + report.completionRate + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + report.positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + report.negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + report.customItems.length + " \u9879 (" + (report.customTotal >= 0 ? "+" : "") + report.customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + report.grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + report.grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + report.grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + report.streak + " \u5929\n";
+  summary += "> - \u{1F3AF} \u76EE\u6807\u8FDB\u5EA6\uFF1A**" + report.total + "/" + dailyGoal + " (" + goalPct + "%)**\n> - \u2795 \u52A0\u5206\u9879\uFF1A" + report.positiveCount + " \u9879\n> - \u2796 \u51CF\u5206\u9879\uFF1A" + report.negativeCount + " \u9879\n> - \u{1F4CC} \u4E34\u65F6\u4E8B\u9879\uFF1A" + report.customItems.length + " \u9879 (" + (report.customTotal >= 0 ? "+" : "") + report.customTotal + " \u5206)\n> - \u{1F4C8} \u7D2F\u8BA1\u603B\u5206\uFF1A" + grandSign + report.grandTotal + " \u5206 \xB7 \u{1F4C5} \u7D2F\u8BA1 " + report.grandDays + " \u5929 \xB7 \u{1F4CA} \u65E5\u5747 " + report.grandAvg + " \u5206 \xB7 \u{1F3C1} \u8FDE\u7EED " + report.streak + " \u5929\n";
   return summary;
 }
 function buildGoalCallout(report) {
   const dailyGoal = report.goals.daily || 10;
-  const goalPct = Math.min(
-    100,
-    Math.round(report.earnedCount / dailyGoal * 100)
-  );
-  return "> [!tip] \u{1F3AF} \u4ECA\u65E5\u76EE\u6807\n> \u5B8C\u6210\u9879\u76EE **" + report.earnedCount + "/" + dailyGoal + "** \xB7 " + renderProgressBar(goalPct) + "\n";
+  const progress = report.total;
+  const goalPct = clampPercent(Math.round(progress / dailyGoal * 100));
+  return "> [!tip] \u{1F3AF} \u4ECA\u65E5\u76EE\u6807\n> \u5F97\u5206\u8FDB\u5EA6 **" + progress + "/" + dailyGoal + "** \xB7 " + renderProgressBar(goalPct) + "\n";
 }
 function buildCategoryTables(report) {
   let content = "";
@@ -7013,6 +7008,9 @@ function renderProgressBar(pct) {
   const filled = Math.round(pct / 5);
   const empty = 20 - filled;
   return "`" + "\u2588".repeat(filled) + "\u2591".repeat(empty) + " " + pct + "%`";
+}
+function clampPercent(value) {
+  return Math.min(100, Math.max(0, value));
 }
 function renderScoreCell(actual, isDeduct) {
   const sign = actual >= 0 ? "+" : "";

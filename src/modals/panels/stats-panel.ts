@@ -107,22 +107,22 @@ function renderGoalCard(
   const goals = currentUser.goals || { daily: 10, weekly: 70, monthly: 300 };
   let goalLabel = "";
   let goalTarget = 0;
-  let goalCompleted = 0;
+  let goalProgress = 0;
 
   if (period === "week" || period === "month") {
-    goalLabel = period === "week" ? "本周目标" : "本月目标";
+    goalLabel = period === "week" ? "本周得分进度" : "本月得分进度";
     goalTarget = period === "week" ? goals.weekly : goals.monthly;
-    goalCompleted = filtered.reduce(
-      (sum, day) => sum + calcCompleted(currentUser.items, day),
+    goalProgress = filtered.reduce(
+      (sum, day) => sum + calcGoalProgressByScore(day),
       0
     );
   }
 
   if (goalTarget <= 0) return;
 
-  const goalPct = Math.min(100, Math.round((goalCompleted / goalTarget) * 100));
+  const goalPct = Math.min(100, Math.max(0, Math.round((goalProgress / goalTarget) * 100)));
   const goalCard = cards.createDiv({ cls: "summary-card goal-card" });
-  goalCard.createDiv({ cls: "card-val", text: goalCompleted + "/" + goalTarget });
+  goalCard.createDiv({ cls: "card-val", text: goalProgress + "/" + goalTarget });
   goalCard.createDiv({ cls: "card-lbl", text: goalLabel });
   const wrap = goalCard.createDiv({ cls: "summary-goal-bar-wrap" });
   const bar = wrap.createDiv({ cls: "summary-goal-bar" });
@@ -130,7 +130,7 @@ function renderGoalCard(
   if (goalPct >= 100) bar.addClass("is-complete");
 }
 
-function calcCompleted(_items: ScoreItem[], day: DayData): number {
+function calcGoalProgressByScore(day: DayData): number {
   return day.total;
 }
 

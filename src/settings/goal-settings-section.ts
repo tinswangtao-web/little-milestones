@@ -21,13 +21,13 @@ export function renderGoalSettingsSection({
         containerEl,
         "kid-score-goals-section",
         "🎯 每日目标",
-        "以完成项目数为统计标准（含加分项、减分项和临时事项）"
+        "以最终得分为统计标准（含加分、减分和临时事项）"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
         "kid-score-goals-section",
         "🎯 每日目标",
-        "以完成项目数为统计标准（含加分项、减分项和临时事项）"
+        "以最终得分为统计标准（含加分、减分和临时事项）"
       );
 
   const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
