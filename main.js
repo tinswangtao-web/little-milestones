@@ -4382,7 +4382,7 @@ function renderScoreCard({
 }) {
   const scoreVal = getScore(item.id);
   const isEarned = scoreVal > 0;
-  const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+  const isNeg = scoreVal < 0;
   const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
   const cardClassName = (isEarned ? " is-earned" : "") + (isNeg ? " is-negative" : "") + (isDeductedActive ? " is-deducted-active" : "");
@@ -4437,7 +4437,7 @@ function renderScoreCard({
 }
 function refreshScoreCard(card, item, scoreVal) {
   const isEarned = scoreVal > 0;
-  const isNeg = scoreVal < 0 || scoreVal === 0 && item.points < 0;
+  const isNeg = scoreVal < 0;
   const isDeductItem = item.category === "\u51CF\u5206" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
   card.classList.toggle("is-earned", isEarned);

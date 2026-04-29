@@ -42,7 +42,7 @@ export function renderScoreCard({
 }: RenderScoreCardOptions) {
   const scoreVal = getScore(item.id);
   const isEarned = scoreVal > 0;
-  const isNeg = scoreVal < 0 || (scoreVal === 0 && item.points < 0);
+  const isNeg = scoreVal < 0;
   const isDeductItem = item.category === "减分" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
   const cardClassName =
@@ -112,7 +112,7 @@ export function renderScoreCard({
 
 export function refreshScoreCard(card: HTMLElement, item: ScoreItem, scoreVal: number) {
   const isEarned = scoreVal > 0;
-  const isNeg = scoreVal < 0 || (scoreVal === 0 && item.points < 0);
+  const isNeg = scoreVal < 0;
   const isDeductItem = item.category === "减分" || item.points < 0;
   const isDeductedActive = isDeductItem && scoreVal !== 0;
   card.classList.toggle("is-earned", isEarned);
