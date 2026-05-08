@@ -35,8 +35,8 @@ function getFocusScrollExtraBottom(
   isEditModal: boolean,
   isDailyModal: boolean
 ): number {
-  if (isDailyModal && target.classList.contains("diary-textarea")) {
-    return 24;
+  if (isDailyModal) {
+    return Math.max(160, Math.round(window.innerHeight * 0.45));
   }
   if (target.tagName === "TEXTAREA") {
     return 98;
@@ -231,7 +231,11 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
         } else {
           mEl.style.height = "";
         }
-        const extraBottom = isEditModal ? 28 : isDailyModal ? 92 : 18;
+        const extraBottom = isEditModal
+          ? 28
+          : isDailyModal
+            ? Math.max(160, Math.round(stableViewportHeight * 0.5))
+            : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
         contentEl.style.scrollPaddingBottom = Math.round(extraBottom + 12) + "px";
       } else {

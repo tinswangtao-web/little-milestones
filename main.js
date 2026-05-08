@@ -1212,8 +1212,8 @@ function hasFocusedModalField(contentEl) {
   return !!(active && contentEl.contains(active) && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName));
 }
 function getFocusScrollExtraBottom(target, isEditModal, isDailyModal) {
-  if (isDailyModal && target.classList.contains("diary-textarea")) {
-    return 24;
+  if (isDailyModal) {
+    return Math.max(160, Math.round(window.innerHeight * 0.45));
   }
   if (target.tagName === "TEXTAREA") {
     return 98;
@@ -1371,7 +1371,7 @@ function setupModalKeyboard(modal) {
         } else {
           mEl.style.height = "";
         }
-        const extraBottom = isEditModal ? 28 : isDailyModal ? 92 : 18;
+        const extraBottom = isEditModal ? 28 : isDailyModal ? Math.max(160, Math.round(stableViewportHeight * 0.5)) : 18;
         contentEl.style.paddingBottom = Math.round(extraBottom) + "px";
         contentEl.style.scrollPaddingBottom = Math.round(extraBottom + 12) + "px";
       } else {
@@ -2053,8 +2053,9 @@ function drawSparkline(canvas, data, isDeduct) {
 
 // src/modals/stats-modal.ts
 var StatsModal = class extends BaseMobileModal {
-  constructor(app, plugin) {
+  constructor(app, plugin, options = {}) {
     super(app, plugin);
+    this.options = options;
     this.plugin = plugin;
   }
   async onOpen() {
@@ -2063,6 +2064,18 @@ var StatsModal = class extends BaseMobileModal {
     contentEl.empty();
     contentEl.addClass("kid-score-modal", "kid-score-stats-modal");
     contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
+    if (this.options.onBack) {
+      const backBar = contentEl.createDiv({ cls: "kid-score-stats-actions" });
+      const backBtn = backBar.createEl("button", {
+        cls: "diary-tool-btn kid-score-stats-back-btn",
+        text: this.options.backLabel || "\u2190 \u8FD4\u56DE\u4E0A\u4E00\u9875"
+      });
+      backBtn.onclick = () => {
+        const onBack = this.options.onBack;
+        this.close();
+        onBack == null ? void 0 : onBack();
+      };
+    }
     const allScores = await this.plugin.getAllScores();
     if (allScores.length === 0) {
       contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" });
@@ -3051,6 +3064,20 @@ function buildDiaryPanel(options) {
     plugin.currentUser.diaryModules = makeDefaultDiaryModules();
   }
   const moduleConfig = plugin.currentUser.diaryModules;
+  const defaultCommentModule = makeDefaultDiaryModules().find((moduleDef) => moduleDef.id === "comment") || {
+    id: "comment",
+    emoji: "\u{1F4AC}",
+    label: "\u8BC4\u8BED",
+    placeholder: "\u53EF\u4EE5\u5199\u4ECA\u5929\u7684\u8BC4\u8BED\u6216\u53CD\u9988",
+    kind: "multi"
+  };
+  if (defaultCommentModule && !moduleConfig.some((moduleDef) => moduleDef.id === "comment")) {
+    const insertAfterIndex = moduleConfig.findIndex((moduleDef) => moduleDef.id === "wantToSay");
+    moduleConfig.splice(insertAfterIndex >= 0 ? insertAfterIndex + 1 : moduleConfig.length, 0, {
+      ...defaultCommentModule
+    });
+    void plugin.saveSettings();
+  }
   const removeModule = (id) => {
     var _a, _b;
     const moduleList = plugin.currentUser.diaryModules;
@@ -3126,7 +3153,10 @@ function buildDiaryPanel(options) {
   } = layout;
   const weatherModule = moduleConfig.find((moduleDef) => moduleDef.id === "weather");
   const moodModule = moduleConfig.find((moduleDef) => moduleDef.id === "mood");
-  moduleConfig.filter((moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood").forEach(
+  const commentModule = moduleConfig.find((moduleDef) => moduleDef.id === "comment");
+  moduleConfig.filter(
+    (moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood" && moduleDef.id !== "comment"
+  ).forEach(
     (moduleDef) => createDiaryModuleField({
       app,
       moduleGrid,
@@ -3232,6 +3262,31 @@ function buildDiaryPanel(options) {
     });
   });
   setDiaryTextarea(diaryTextarea);
+  if (commentModule) {
+    const commentSection = panel.createDiv({
+      cls: "diary-module-section diary-comment-section"
+    });
+    commentSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F4AC} \u8BC4\u8BED" });
+    commentSection.createEl("p", {
+      cls: "diary-module-hint",
+      text: "\u5199\u5728\u81EA\u7531\u8BB0\u5F55\u540E\u9762\uFF0C\u4FBF\u4E8E\u4FDD\u5B58\u524D\u6700\u540E\u8865\u5145\u3002"
+    });
+    const commentGrid = commentSection.createDiv({
+      cls: "diary-module-grid diary-comment-grid"
+    });
+    createDiaryModuleField({
+      app,
+      moduleGrid: commentGrid,
+      moduleDef: commentModule,
+      diaryModules,
+      moduleFields,
+      updateDiaryModules,
+      syncAndRefresh,
+      onModulesChanged,
+      panel,
+      removeModule
+    });
+  }
   ensureDefaultDiaryTemplate({
     allowDefaultDiaryTemplate,
     diaryModules,
@@ -3416,7 +3471,7 @@ var AddItemModal = class extends BaseMobileModal {
         });
         await this.plugin.saveSettings();
         this.close();
-        this.onAdded();
+        await this.onAdded();
       } catch (e) {
         new import_obsidian4.Notice("\u274C \u6DFB\u52A0\u5931\u8D25\uFF1A" + (e instanceof Error ? e.message : String(e)));
       }
@@ -3861,7 +3916,8 @@ function normalizeBuiltInSampleValue(moduleId, value) {
     todayThing: "\u4ECA\u5929\u6211\u505A\u4E86____",
     learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____",
     happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____",
-    wantToSay: "\u6211\u8FD8\u60F3\u8BF4____"
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4____",
+    comment: "\u8BC4\u8BED____"
   };
   return sampleValues[moduleId] === normalized ? "" : value || "";
 }
@@ -3901,7 +3957,8 @@ function fillNarrativeDiaryModules(result, content, moduleConfig) {
     todayThing: "\u4ECA\u5929\u6211\u505A\u4E86",
     learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86",
     happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F",
-    wantToSay: "\u6211\u8FD8\u60F3\u8BF4"
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4",
+    comment: "\u8BC4\u8BED"
   };
   Object.entries(exactPrefixes).forEach(([id, prefix]) => {
     if (result[id]) return;
@@ -3953,10 +4010,17 @@ function composeDiaryContent(values, moduleConfig) {
   if (normalizedValues.learnedThing) appendSentence(normalizedValues.learnedThing);
   if (normalizedValues.happyThing) appendSentence(normalizedValues.happyThing);
   if (normalizedValues.wantToSay) appendSentence(normalizedValues.wantToSay);
+  if (normalizedValues.comment) appendSentence("\u8BC4\u8BED\uFF1A" + normalizedValues.comment);
   moduleConfig.forEach((moduleDef) => {
-    if (["weather", "mood", "todayThing", "learnedThing", "happyThing", "wantToSay"].includes(
-      moduleDef.id
-    )) {
+    if ([
+      "weather",
+      "mood",
+      "todayThing",
+      "learnedThing",
+      "happyThing",
+      "wantToSay",
+      "comment"
+    ].includes(moduleDef.id)) {
       return;
     }
     if (!normalizedValues[moduleDef.id]) return;
@@ -4944,6 +5008,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     this.diaryUiDrafts = cloneDiaryUiDrafts(void 0);
     this.activeTab = "score";
     this.pendingDiaryScrollId = null;
+    this.pendingScoreScrollTop = null;
     this.skipNextCloseDraftSave = false;
     this.pendingRenderState = null;
     this.enableKeyboardAdjustment = true;
@@ -4977,6 +5042,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
       const contentEl = this.contentEl;
       contentEl.empty();
       contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+      contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
       this.scores = {};
       this.customItems = [];
       this.diaryContent = "";
@@ -5034,11 +5100,13 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
         onShowScore: () => {
           self.syncDiaryContent();
           self.activeTab = "score";
+          contentEl.toggleClass("is-diary-tab-active", false);
           contentEl.scrollTop = 0;
         },
         onShowDiary: () => {
           self.syncDiaryContent();
           self.activeTab = "diary";
+          contentEl.toggleClass("is-diary-tab-active", true);
           contentEl.scrollTop = 0;
         }
       });
@@ -5125,9 +5193,17 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
           }
         },
         onStats: () => {
+          const returnDate = self.dateStr;
+          const returnTab = self.activeTab;
           self.saveDiaryDraft();
           self.close();
-          new StatsModal(self.app, self.plugin).open();
+          new StatsModal(self.app, self.plugin, {
+            onBack: () => {
+              const dailyModal = new _DailyScoringModal(self.app, self.plugin, returnDate);
+              dailyModal.activeTab = returnTab;
+              dailyModal.open();
+            }
+          }).open();
         },
         isTouchLayout: this.isTouchOptimizedMode(),
         bindDiaryActions: (buttons) => {
@@ -5151,7 +5227,18 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
           }
         });
       }
+      const pendingScrollTop = this.pendingScoreScrollTop;
+      this.pendingScoreScrollTop = null;
+      if (typeof pendingScrollTop === "number") {
+        requestAnimationFrame(() => {
+          this.contentEl.scrollTop = pendingScrollTop;
+        });
+      }
     }
+  }
+  captureScoreScrollTop() {
+    if (this.activeTab !== "score") return;
+    this.pendingScoreScrollTop = this.contentEl.scrollTop;
   }
   syncDiaryContent() {
     const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
@@ -5253,6 +5340,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     refreshScoreCard(card, item, this.scores[item.id] || 0);
   }
   showCustomValuePopup(item, callback, quickOnly = false) {
+    this.captureScoreScrollTop();
     openScoreItemValueModal({
       app: this.app,
       plugin: this.plugin,
@@ -5266,7 +5354,9 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     });
   }
   showAddItemPopup(category) {
+    this.captureScoreScrollTop();
     openAddItemModal(this.app, this.plugin, category, async () => {
+      this.activeTab = "score";
       await this.renderModal();
     });
   }

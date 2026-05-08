@@ -4,10 +4,15 @@ import KidScorePlugin from "../main";
 import type { StatsPeriod } from "../types";
 import { renderStatsPanel } from "./panels/stats-panel";
 
+interface StatsModalOptions {
+  onBack?: () => void;
+  backLabel?: string;
+}
+
 export class StatsModal extends BaseMobileModal {
   plugin: KidScorePlugin;
 
-  constructor(app: App, plugin: KidScorePlugin) {
+  constructor(app: App, plugin: KidScorePlugin, private options: StatsModalOptions = {}) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -19,6 +24,18 @@ export class StatsModal extends BaseMobileModal {
     contentEl.addClass("kid-score-modal", "kid-score-stats-modal");
 
     contentEl.createEl("h2", { text: "📊 " + this.plugin.currentUser.name + " 的打分统计" });
+    if (this.options.onBack) {
+      const backBar = contentEl.createDiv({ cls: "kid-score-stats-actions" });
+      const backBtn = backBar.createEl("button", {
+        cls: "diary-tool-btn kid-score-stats-back-btn",
+        text: this.options.backLabel || "← 返回上一页",
+      });
+      backBtn.onclick = () => {
+        const onBack = this.options.onBack;
+        this.close();
+        onBack?.();
+      };
+    }
     const allScores = await this.plugin.getAllScores();
     if (allScores.length === 0) {
       contentEl.createEl("p", { text: "📭 暂无数据", cls: "kid-score-empty" });

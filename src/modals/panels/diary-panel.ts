@@ -72,6 +72,20 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     plugin.currentUser.diaryModules = makeDefaultDiaryModules();
   }
   const moduleConfig = plugin.currentUser.diaryModules;
+  const defaultCommentModule = makeDefaultDiaryModules().find((moduleDef) => moduleDef.id === "comment") || {
+    id: "comment",
+    emoji: "💬",
+    label: "评语",
+    placeholder: "可以写今天的评语或反馈",
+    kind: "multi" as const,
+  };
+  if (defaultCommentModule && !moduleConfig.some((moduleDef) => moduleDef.id === "comment")) {
+    const insertAfterIndex = moduleConfig.findIndex((moduleDef) => moduleDef.id === "wantToSay");
+    moduleConfig.splice(insertAfterIndex >= 0 ? insertAfterIndex + 1 : moduleConfig.length, 0, {
+      ...defaultCommentModule,
+    });
+    void plugin.saveSettings();
+  }
   const removeModule = (id: string) => {
     const moduleList = plugin.currentUser.diaryModules;
     const idx = moduleList.findIndex((m) => m.id === id);
@@ -156,8 +170,12 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   } = layout;
   const weatherModule = moduleConfig.find((moduleDef) => moduleDef.id === "weather");
   const moodModule = moduleConfig.find((moduleDef) => moduleDef.id === "mood");
+  const commentModule = moduleConfig.find((moduleDef) => moduleDef.id === "comment");
   moduleConfig
-    .filter((moduleDef) => moduleDef.id !== "weather" && moduleDef.id !== "mood")
+    .filter(
+      (moduleDef) =>
+        moduleDef.id !== "weather" && moduleDef.id !== "mood" && moduleDef.id !== "comment"
+    )
     .forEach((moduleDef) =>
       createDiaryModuleField({
         app,
@@ -268,6 +286,32 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     });
   });
   setDiaryTextarea(diaryTextarea);
+
+  if (commentModule) {
+    const commentSection = panel.createDiv({
+      cls: "diary-module-section diary-comment-section",
+    });
+    commentSection.createEl("h4", { cls: "diary-module-title", text: "💬 评语" });
+    commentSection.createEl("p", {
+      cls: "diary-module-hint",
+      text: "写在自由记录后面，便于保存前最后补充。",
+    });
+    const commentGrid = commentSection.createDiv({
+      cls: "diary-module-grid diary-comment-grid",
+    });
+    createDiaryModuleField({
+      app,
+      moduleGrid: commentGrid,
+      moduleDef: commentModule,
+      diaryModules,
+      moduleFields,
+      updateDiaryModules,
+      syncAndRefresh,
+      onModulesChanged,
+      panel,
+      removeModule,
+    });
+  }
 
   ensureDefaultDiaryTemplate({
     allowDefaultDiaryTemplate,

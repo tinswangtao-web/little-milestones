@@ -11,7 +11,7 @@ export class AddItemModal extends BaseMobileModal {
     app: App,
     plugin: KidScorePlugin,
     private category: string,
-    private onAdded: () => void
+    private onAdded: () => void | Promise<void>
   ) {
     super(app, plugin);
   }
@@ -91,7 +91,7 @@ export class AddItemModal extends BaseMobileModal {
         });
         await this.plugin.saveSettings();
         this.close();
-        this.onAdded();
+        await this.onAdded();
       } catch (e) {
         new Notice("❌ 添加失败：" + (e instanceof Error ? e.message : String(e)));
       }

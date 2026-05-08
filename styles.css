@@ -3186,6 +3186,12 @@ textarea.custom-form-name-input {
     max-height: 90vh;
     overflow-y: auto;
   }
+  .kid-score-stats-actions {
+    margin: 6px 0 12px;
+  }
+  .kid-score-stats-back-btn {
+    width: 100%;
+  }
 
   .completion-row {
     flex-wrap: wrap;
@@ -3642,6 +3648,12 @@ textarea.custom-form-name-input {
 
   .kid-score-daily-modal {
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .kid-score-daily-modal.is-diary-tab-active::after {
+    content: "";
+    display: block;
+    flex: 0 0 min(50vh, 320px);
   }
   .kid-score-main-tab {
     padding: 14px 10px !important;

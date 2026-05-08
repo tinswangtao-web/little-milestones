@@ -27,6 +27,7 @@ function normalizeBuiltInSampleValue(moduleId: string, value: string | undefined
     learnedThing: "今天我学会了____",
     happyThing: "今天最开心的是____",
     wantToSay: "我还想说____",
+    comment: "评语____",
   };
   return sampleValues[moduleId] === normalized ? "" : value || "";
 }
@@ -82,6 +83,7 @@ function fillNarrativeDiaryModules(
     learnedThing: "今天我学会了",
     happyThing: "今天最开心的是",
     wantToSay: "我还想说",
+    comment: "评语",
   };
 
   Object.entries(exactPrefixes).forEach(([id, prefix]) => {
@@ -154,12 +156,19 @@ export function composeDiaryContent(
   if (normalizedValues.learnedThing) appendSentence(normalizedValues.learnedThing);
   if (normalizedValues.happyThing) appendSentence(normalizedValues.happyThing);
   if (normalizedValues.wantToSay) appendSentence(normalizedValues.wantToSay);
+  if (normalizedValues.comment) appendSentence("评语：" + normalizedValues.comment);
 
   moduleConfig.forEach((moduleDef) => {
     if (
-      ["weather", "mood", "todayThing", "learnedThing", "happyThing", "wantToSay"].includes(
-        moduleDef.id
-      )
+      [
+        "weather",
+        "mood",
+        "todayThing",
+        "learnedThing",
+        "happyThing",
+        "wantToSay",
+        "comment",
+      ].includes(moduleDef.id)
     ) {
       return;
     }

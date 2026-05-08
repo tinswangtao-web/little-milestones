@@ -71,6 +71,7 @@ export class DailyScoringModal extends BaseMobileModal {
   diaryUiDrafts: DiaryUiDraftState = cloneDiaryUiDrafts(undefined);
   activeTab: "score" | "diary" = "score";
   private pendingDiaryScrollId: string | null = null;
+  private pendingScoreScrollTop: number | null = null;
   private skipNextCloseDraftSave = false;
   private pendingRenderState:
     | {
@@ -118,6 +119,7 @@ export class DailyScoringModal extends BaseMobileModal {
       const contentEl = this.contentEl;
       contentEl.empty();
       contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+      contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
 
       this.scores = {};
       this.customItems = [];
@@ -179,11 +181,13 @@ export class DailyScoringModal extends BaseMobileModal {
         onShowScore: () => {
           self.syncDiaryContent();
           self.activeTab = "score";
+          contentEl.toggleClass("is-diary-tab-active", false);
           contentEl.scrollTop = 0;
         },
         onShowDiary: () => {
           self.syncDiaryContent();
           self.activeTab = "diary";
+          contentEl.toggleClass("is-diary-tab-active", true);
           contentEl.scrollTop = 0;
         },
       });
@@ -273,9 +277,17 @@ export class DailyScoringModal extends BaseMobileModal {
           }
         },
         onStats: () => {
+          const returnDate = self.dateStr;
+          const returnTab = self.activeTab;
           self.saveDiaryDraft();
           self.close();
-          new StatsModal(self.app, self.plugin).open();
+          new StatsModal(self.app, self.plugin, {
+            onBack: () => {
+              const dailyModal = new DailyScoringModal(self.app, self.plugin, returnDate);
+              dailyModal.activeTab = returnTab;
+              dailyModal.open();
+            },
+          }).open();
         },
         isTouchLayout: this.isTouchOptimizedMode(),
         bindDiaryActions: (buttons) => this.diaryControls?.bindActionButtons(buttons),
@@ -296,7 +308,19 @@ export class DailyScoringModal extends BaseMobileModal {
           }
         });
       }
+      const pendingScrollTop = this.pendingScoreScrollTop;
+      this.pendingScoreScrollTop = null;
+      if (typeof pendingScrollTop === "number") {
+        requestAnimationFrame(() => {
+          this.contentEl.scrollTop = pendingScrollTop;
+        });
+      }
     }
+  }
+
+  private captureScoreScrollTop(): void {
+    if (this.activeTab !== "score") return;
+    this.pendingScoreScrollTop = this.contentEl.scrollTop;
   }
 
   syncDiaryContent() {
@@ -412,6 +436,7 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   showCustomValuePopup(item: ScoreItem, callback: (val: number) => void, quickOnly = false) {
+    this.captureScoreScrollTop();
     openScoreItemValueModal({
       app: this.app,
       plugin: this.plugin,
@@ -426,7 +451,9 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   showAddItemPopup(category: string) {
+    this.captureScoreScrollTop();
     openAddItemModal(this.app, this.plugin, category, async () => {
+      this.activeTab = "score";
       await this.renderModal();
     });
   }
