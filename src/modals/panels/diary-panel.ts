@@ -32,6 +32,8 @@ interface DiaryPanelBuilderOptions {
   setDiaryTextarea: (textarea: HTMLTextAreaElement | null) => void;
   updateDiaryContent: (content: string) => void;
   updateDiaryModules: (values: DiaryModuleValues) => void;
+  quickCustomDrafts?: Record<string, string>;
+  updateQuickCustomDraft?: (moduleId: string, value: string) => void;
   composeDiaryContent: () => string;
   insertAttachment: (label: string, ext: string) => void;
   insertDiaryText: (text: string) => void;
@@ -52,6 +54,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     setDiaryTextarea,
     updateDiaryContent,
     updateDiaryModules,
+    quickCustomDrafts,
+    updateQuickCustomDraft,
     composeDiaryContent,
     insertAttachment,
     insertDiaryText,
@@ -198,6 +202,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     panel,
     onModulesChanged,
     removeModule,
+    quickCustomDrafts,
+    updateQuickCustomDraft,
   });
   createDiaryQuickGroup({
     app,
@@ -211,6 +217,8 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     panel,
     onModulesChanged,
     removeModule,
+    quickCustomDrafts,
+    updateQuickCustomDraft,
   });
 
   const moduleActions = moduleSection.createDiv({ cls: "diary-module-manage-actions" });

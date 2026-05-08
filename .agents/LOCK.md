@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: Diary empty roundtrip/sample normalization task synced and committed after user authorization.
+- `notes`: Diary draft autosave and quick custom placeholder regression accepted and committed in current `HEAD`. No active lock.

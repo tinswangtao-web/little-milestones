@@ -34,6 +34,8 @@ interface CreateDiaryQuickGroupOptions {
   panel: HTMLElement;
   onModulesChanged: () => Promise<void>;
   removeModule: (id: string) => void;
+  quickCustomDrafts?: Record<string, string>;
+  updateQuickCustomDraft?: (moduleId: string, value: string) => void;
 }
 
 interface EnsureDefaultDiaryTemplateOptions {
@@ -151,6 +153,8 @@ export function createDiaryQuickGroup({
   panel,
   onModulesChanged,
   removeModule,
+  quickCustomDrafts,
+  updateQuickCustomDraft,
 }: CreateDiaryQuickGroupOptions): void {
   if (!moduleDef) return;
   let customEmoji = defaults[0].e;
@@ -226,8 +230,12 @@ export function createDiaryQuickGroup({
         ? "也可以自己写心情，比如 有点紧张"
         : "也可以自己补充一句";
   textInput.rows = 2;
+  textInput.value = quickCustomDrafts?.[moduleDef.id] || "";
   bindModalInputFocus(textInput);
   attachAutoResize(textInput, { minHeight: 72 });
+  textInput.addEventListener("input", () => {
+    updateQuickCustomDraft?.(moduleDef.id, textInput.value);
+  });
   const addBtn = customRow.createEl("button", {
     cls: "diary-tool-btn diary-quick-add-btn",
     text: "添加",
@@ -245,6 +253,7 @@ export function createDiaryQuickGroup({
     updateDiaryModules(diaryModules);
     syncAndRefresh();
     textInput.value = "";
+    updateQuickCustomDraft?.(moduleDef.id, "");
   };
 
   addBtn.onclick = insertCustom;
@@ -260,8 +269,6 @@ export function ensureDefaultDiaryTemplate({
   diaryModules,
   moduleFields,
   diaryTextarea,
-  setDiaryTextarea,
-  updateDiaryModules,
   syncAndRefresh,
 }: EnsureDefaultDiaryTemplateOptions): void {
   const hasAnyContent =
@@ -269,21 +276,5 @@ export function ensureDefaultDiaryTemplate({
     moduleFields.some(({ input }) => input.value.trim().length > 0) ||
     !!diaryTextarea?.value.trim();
   if (!allowDefaultDiaryTemplate || hasAnyContent) return;
-  if (!diaryModules.weather) diaryModules.weather = "☀️ 晴";
-  if (!diaryModules.mood) diaryModules.mood = "😊 开心";
-  if (!diaryModules.todayThing) diaryModules.todayThing = "今天我做了____。";
-  if (!diaryModules.learnedThing) diaryModules.learnedThing = "今天我学会了____。";
-  if (!diaryModules.happyThing) diaryModules.happyThing = "今天最开心的是____。";
-  if (!diaryModules.wantToSay) diaryModules.wantToSay = "我还想说____。";
-  moduleFields.forEach(({ key, input }) => {
-    if (input.value.trim()) return;
-    input.value = diaryModules[key] || "";
-  });
-  if (diaryTextarea && !diaryTextarea.value.trim()) {
-    diaryTextarea.value = "今天还有一件我想记下来的事：\n";
-    diaryModules.freeWrite = diaryTextarea.value;
-    setDiaryTextarea(diaryTextarea);
-  }
-  updateDiaryModules(diaryModules);
   syncAndRefresh();
 }

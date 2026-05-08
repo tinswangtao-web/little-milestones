@@ -37,7 +37,25 @@ import {
 import { renderScorePanel } from "./panels/score-panel";
 import { composeDiaryContent } from "../diary/modules";
 
+interface DiaryUiDraftState {
+  quickCustomInputs: Record<string, string>;
+}
+
+interface DiaryDraftState {
+  diaryContent: string;
+  diaryModules: DiaryModuleValues;
+  uiDrafts: DiaryUiDraftState;
+}
+
+function cloneDiaryUiDrafts(value: DiaryUiDraftState | undefined): DiaryUiDraftState {
+  return {
+    quickCustomInputs: { ...(value?.quickCustomInputs || {}) },
+  };
+}
+
 export class DailyScoringModal extends BaseMobileModal {
+  private static diaryDrafts = new Map<string, DiaryDraftState>();
+
   readonly modalType = "daily";
   private isRendering = false;
   private needsRerender = false;
@@ -50,14 +68,17 @@ export class DailyScoringModal extends BaseMobileModal {
   diaryTextarea: HTMLTextAreaElement | null = null;
   diaryModules: DiaryModuleValues = {};
   diaryControls: DiaryPanelControls | null = null;
+  diaryUiDrafts: DiaryUiDraftState = cloneDiaryUiDrafts(undefined);
   activeTab: "score" | "diary" = "score";
   private pendingDiaryScrollId: string | null = null;
+  private skipNextCloseDraftSave = false;
   private pendingRenderState:
     | {
         scores: Record<string, number>;
         customItems: CustomScoreItem[];
         diaryContent: string;
         diaryModules: DiaryModuleValues;
+        diaryUiDrafts: DiaryUiDraftState;
       }
     | null = null;
   protected enableKeyboardAdjustment = true;
@@ -70,6 +91,15 @@ export class DailyScoringModal extends BaseMobileModal {
   onOpen(): void {
     super.onOpen();
     this.renderModal();
+  }
+
+  onClose(): void {
+    if (this.skipNextCloseDraftSave) {
+      this.skipNextCloseDraftSave = false;
+    } else {
+      this.saveDiaryDraft();
+    }
+    super.onClose();
   }
 
   private isTouchOptimizedMode(): boolean {
@@ -93,6 +123,7 @@ export class DailyScoringModal extends BaseMobileModal {
       this.customItems = [];
       this.diaryContent = "";
       this.diaryModules = {};
+      this.diaryUiDrafts = cloneDiaryUiDrafts(undefined);
       this.diaryControls = null;
 
       const state = await loadDailyModalState(this.plugin, this.dateStr);
@@ -103,6 +134,13 @@ export class DailyScoringModal extends BaseMobileModal {
       this.customItems = pendingState?.customItems ?? state.customItems;
       this.diaryContent = pendingState?.diaryContent ?? state.diaryContent;
       this.diaryModules = pendingState?.diaryModules ?? state.diaryModules;
+      this.diaryUiDrafts = cloneDiaryUiDrafts(pendingState?.diaryUiDrafts);
+      const diaryDraft = this.getDiaryDraft();
+      if (diaryDraft) {
+        this.diaryContent = diaryDraft.diaryContent;
+        this.diaryModules = { ...diaryDraft.diaryModules };
+        this.diaryUiDrafts = cloneDiaryUiDrafts(diaryDraft.uiDrafts);
+      }
 
       renderDailyHeader({
         containerEl: contentEl,
@@ -110,19 +148,23 @@ export class DailyScoringModal extends BaseMobileModal {
         dateStr: this.dateStr,
         allScores: state.allScores,
         onPrevDay: () => {
+          self.saveDiaryDraft();
           self.dateStr = shiftDateString(self.dateStr, -1);
           self.renderModal();
         },
         onNextDay: () => {
+          self.saveDiaryDraft();
           self.dateStr = shiftDateString(self.dateStr, 1);
           self.renderModal();
         },
         onCalendar: () => self.showCalendarPicker(),
         onGoToday: () => {
+          self.saveDiaryDraft();
           self.dateStr = formatDate(0);
           self.renderModal();
         },
         onSwitchUser: async (userId) => {
+          self.saveDiaryDraft();
           self.plugin.settings.currentUserId = userId;
           await self.plugin.saveSettings();
           await self.renderModal();
@@ -181,6 +223,12 @@ export class DailyScoringModal extends BaseMobileModal {
         },
         updateDiaryModules: (values) => {
           this.diaryModules = values;
+          this.saveDiaryDraft();
+        },
+        quickCustomDrafts: this.diaryUiDrafts.quickCustomInputs,
+        updateQuickCustomDraft: (moduleId, value) => {
+          this.diaryUiDrafts.quickCustomInputs[moduleId] = value;
+          this.saveDiaryDraft();
         },
         composeDiaryContent: () => this.syncDiaryContent(),
         insertAttachment: (label, ext) => this.insertAttachment(label, ext),
@@ -189,11 +237,13 @@ export class DailyScoringModal extends BaseMobileModal {
           this.wrapDiarySelection(prefix, suffix, placeholder),
         onModulesChanged: async () => {
           this.syncDiaryContent();
+          this.saveDiaryDraft();
           this.pendingRenderState = {
             scores: { ...this.scores },
             customItems: this.customItems.map((item) => ({ ...item })),
             diaryContent: this.diaryContent,
             diaryModules: { ...this.diaryModules },
+            diaryUiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
           };
           await this.plugin.saveSettings();
           this.activeTab = "diary";
@@ -210,6 +260,8 @@ export class DailyScoringModal extends BaseMobileModal {
           self.syncDiaryContent();
           try {
             await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            self.skipNextCloseDraftSave = true;
+            self.clearDiaryDraft();
             const filePath = self.plugin.filePath(self.dateStr);
             const file = self.app.vault.getAbstractFileByPath(filePath);
             self.close();
@@ -221,6 +273,7 @@ export class DailyScoringModal extends BaseMobileModal {
           }
         },
         onStats: () => {
+          self.saveDiaryDraft();
           self.close();
           new StatsModal(self.app, self.plugin).open();
         },
@@ -255,6 +308,33 @@ export class DailyScoringModal extends BaseMobileModal {
     return this.diaryContent;
   }
 
+  private getDiaryDraftKey(): string {
+    return `${this.plugin.currentUser.id || this.plugin.settings.currentUserId || "default"}:${this.dateStr}`;
+  }
+
+  private getDiaryDraft(): DiaryDraftState | null {
+    const draft = DailyScoringModal.diaryDrafts.get(this.getDiaryDraftKey());
+    if (!draft) return null;
+    return {
+      diaryContent: draft.diaryContent,
+      diaryModules: { ...draft.diaryModules },
+      uiDrafts: cloneDiaryUiDrafts(draft.uiDrafts),
+    };
+  }
+
+  private saveDiaryDraft(): void {
+    this.syncDiaryContent();
+    DailyScoringModal.diaryDrafts.set(this.getDiaryDraftKey(), {
+      diaryContent: this.diaryContent,
+      diaryModules: { ...this.diaryModules },
+      uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
+    });
+  }
+
+  private clearDiaryDraft(): void {
+    DailyScoringModal.diaryDrafts.delete(this.getDiaryDraftKey());
+  }
+
   insertTextAtCursor(text: string) {
     if (!this.diaryTextarea) return;
     const ta = this.diaryTextarea;
@@ -264,6 +344,7 @@ export class DailyScoringModal extends BaseMobileModal {
     ta.selectionStart = ta.selectionEnd = start + text.length;
     this.diaryModules.freeWrite = ta.value;
     this.syncDiaryContent();
+    this.saveDiaryDraft();
     ta.focus();
   }
 
@@ -280,6 +361,7 @@ export class DailyScoringModal extends BaseMobileModal {
     ta.selectionStart = ta.selectionEnd = cursorPos;
     this.diaryModules.freeWrite = ta.value;
     this.syncDiaryContent();
+    this.saveDiaryDraft();
     ta.focus();
   }
 
@@ -430,6 +512,7 @@ export class DailyScoringModal extends BaseMobileModal {
       currentDate: this.dateStr,
       recordDates: new Set(allScores.map((s) => s.date)),
       onSelect: (dateStr) => {
+        this.saveDiaryDraft();
         this.dateStr = dateStr;
         this.renderModal();
       },
