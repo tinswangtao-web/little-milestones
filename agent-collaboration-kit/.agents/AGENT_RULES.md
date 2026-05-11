@@ -7,17 +7,19 @@
 - **代码 AI**：默认实现、构建、按授权的部署与提交。
 - **Review AI**：默认可审不可改业务代码。
 - **顾问类 AI**：仅建议；先落成 `.agents` 任务再编码。
+- **文档 / Prompt AI**：仅写文档、提示词、规范、注释资产等非业务逻辑内容。
 - **非代码 AI** 改业务代码须用户授权且 `STATE.md` 已记录 `owner` 与 `write-scope`。
 
 ## 进入仓库后先做
 
 1. `git status --short`
 2. 读协作包内 `WORKFLOW.md`、`ROLES.md`（新任务或首轮；日常小改可跳过）
-3. 读 `.agents/README.md`
-4. 读 `PROJECT_PROFILE.md`（优先 Git 仓库根，否则读与协作包 `AGENTS.md` 同目录；若存在）
-5. 读 `.agents/STATE.md`
-6. 读当前任务卡
-7. 读 `.agents/LOCK.md`
+3. 按需读 `ARCHITECTURE_GUIDE.md`、`QUALITY_STANDARDS.md`、`BACKUP_AND_DELETION.md`
+4. 读 `.agents/README.md`
+5. 读 `PROJECT_PROFILE.md`（优先 Git 仓库根，否则读与协作包 `AGENTS.md` 同目录；若存在）
+6. 读 `.agents/STATE.md`
+7. 读当前任务卡
+8. 读 `.agents/LOCK.md`
 
 ## 写入前
 
@@ -27,6 +29,13 @@
 ## 写权限
 
 - 同文件互斥；默认业务代码归属 **代码 AI**；**Review AI** 通常仅 `.agents/reviews/**`。
+- **文档 / Prompt AI** 通常仅写文档 / 提示词路径，例如 `docs/**`、`prompts/**`、`*.md` 中的规则文件。
+
+## 状态口径
+
+- `status` 只写流程阶段：`planned` / `in-progress` / `awaiting-review` / `awaiting-user` / `awaiting-deploy` / `done` / `cancelled`
+- `awaiting` 只写在等谁：`user` / `review-ai` / `code-ai` / `docs-ai`
+- `idle` 只用于 `STATE.md` 表示当前没有活跃任务
 
 ## 回合结束
 
@@ -39,6 +48,7 @@
 ## 源码与产物
 
 - 以 `PROJECT_PROFILE.md` 为准；工程与安全注意见协作包内 `ENGINEERING_NOTES.md`。
+- 删除、覆盖与批量移动前，先按 `BACKUP_AND_DELETION.md` 备份。
 
 ## 实验与部署
 

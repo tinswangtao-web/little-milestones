@@ -11,6 +11,7 @@
 - 代码/配置路径：
 - 生成物（若有）：
 - `.agents/` 是否已更新：
+- 若本轮有**删除/大覆盖**：是否已按 [BACKUP_AND_DELETION.md](../../BACKUP_AND_DELETION.md) 写入 `.ai-deletion-backups/` 与 `MANIFEST.txt`？
 
 ## C. 风险自检
 

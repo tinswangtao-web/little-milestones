@@ -8,14 +8,18 @@
 
 - **需求 → 方案 → 任务卡 → 实现 → 审查 → 验收/发布**：详见与同目录 `AGENTS.md` 平级的 [WORKFLOW.md](../WORKFLOW.md)。小任务可在任务卡注明跳过独立设计阶段；触及存储/安全/严审条件时不得跳过方案记录。
 - **角色分工与 STATE 字段**：见 [ROLES.md](../ROLES.md)。
+- **架构与技术路线**：见 [ARCHITECTURE_GUIDE.md](../ARCHITECTURE_GUIDE.md)。
+- **质量、测试与重构**：见 [QUALITY_STANDARDS.md](../QUALITY_STANDARDS.md)。
 - **顾问类 AI**（产品/架构/UX）的产出须**先写入任务卡或设计文档**，再进入编码；避免未记录的口头方案直接改仓库。
 - **通用工程注意**（安全、依赖、兼容等）：见 [ENGINEERING_NOTES.md](../ENGINEERING_NOTES.md)。
+- **删除 / 覆盖前备份**：见 [BACKUP_AND_DELETION.md](../BACKUP_AND_DELETION.md)。
 
 ## 角色划分
 
 - **代码 AI**：默认实现与集成（改源码、构建、测试、按授权的部署与提交）。
 - **Review AI**：默认可审不可改业务代码；审查 **代码 AI** 的 commit 或工作区 diff；除用户明确授权外不直接改业务代码。
 - **顾问类 AI**：仅建议；须先落成 `.agents` 任务卡再进入编码。
+- **文档 / Prompt AI**（可选）：仅修改文档、提示词、规范、注释资产等非业务逻辑内容；其 `write-scope` 应限于文档或提示词路径。
 - 任何**非代码 AI**要改业务代码，必须经用户明确授权，并在 `.agents/STATE.md` 记录 `owner` 与 `write-scope`。
 
 ## 目标
@@ -29,8 +33,31 @@
 - 写权限由 `.agents/LOCK.md` 控制；同一范围互斥。
 - 仅当 `write-scope` 不重叠且不依赖未完成修改时允许并行。
 - 重要动作须更新 `STATE.md` 并在 `log.md` 追加一行。
+- 删除、覆盖或批量移动前，按 [BACKUP_AND_DELETION.md](../BACKUP_AND_DELETION.md) 写入备份区；已跟踪文件优先依赖 git 历史，备份作双保险。
 - 除非用户明确「commit」「提交」或同等授权，否则不创建 git commit。
 - 「推进」「继续」「修一下」等单独出现不构成提交授权。
+
+## 状态契约（推荐统一口径）
+
+- **`status`**：只表示**流程阶段**
+- **`awaiting`**：只表示**当前在等谁**
+- 推荐共享状态集合（任务卡与 `STATE.md` 共用）：
+  - `planned`
+  - `in-progress`
+  - `awaiting-review`
+  - `awaiting-user`
+  - `awaiting-deploy`
+  - `done`
+  - `cancelled`
+- 仅 `STATE.md` 可额外使用：
+  - `idle`：当前没有活跃任务
+  - `Next Task.status: none`：没有排队中的下一张卡
+- 推荐组合：
+  - `in-progress` + `awaiting: none`
+  - `awaiting-review` + `awaiting: review-ai`
+  - `awaiting-user` + `awaiting: user`
+  - `awaiting-deploy` + `awaiting: user` 或 `code-ai`
+- 避免把角色或动作塞进 `status`，例如 `awaiting-user-feedback`、`awaiting-fix`、`committed-no-push` 这类混合词不建议作为通用模板状态。
 
 ## 默认维护流程（与阶段模型配合）
 
@@ -40,6 +67,12 @@
 2. **代码 AI** 实现与自测 → 更新 `.agents` 与交接卡。
 3. **Review AI** 审查 → **代码 AI** 修订。
 4. 用户验收 → 用户明确授权后 **代码 AI** 才 commit 或 deploy。
+
+常见状态流转可写成：
+
+`planned` → `in-progress` → `awaiting-review` → `awaiting-user` → `awaiting-deploy`（若有）→ `done`
+
+若 review 要求修订，通常回到 `in-progress`；若任务终止或并入他卡，标记 `cancelled`。
 
 **Review AI** 提示模板示例：
 
@@ -76,7 +109,7 @@
 
 ## 固定开场 / 收场
 
-**开场**：`git status --short` → [WORKFLOW.md](../WORKFLOW.md) / [ROLES.md](../ROLES.md)（新任务或首轮）→ `.agents/README.md` → `PROJECT_PROFILE.md`（若有）→ `STATE.md` → 当前任务卡 → `LOCK.md`。
+**开场**：`git status --short` → [WORKFLOW.md](../WORKFLOW.md) / [ROLES.md](../ROLES.md)（新任务或首轮）→ [ARCHITECTURE_GUIDE.md](../ARCHITECTURE_GUIDE.md) / [QUALITY_STANDARDS.md](../QUALITY_STANDARDS.md)（按需）→ `.agents/README.md` → `PROJECT_PROFILE.md`（若有）→ `STATE.md` → 当前任务卡 → `LOCK.md`。
 
 **收场**：再 `git status --short` → 更新 `STATE.md`、`LOCK.md` → `log.md` 追加 → 更新任务卡与 `reviews/`。
 
@@ -85,6 +118,7 @@
 - 仅锁持有者可改 `write-scope` 内文件；审查默认写入 `.agents/reviews/**`。
 - 默认业务代码 `write-scope`：**代码 AI**。
 - **Review AI** 默认：`read-scope` + `.agents/reviews/**`。
+- **文档 / Prompt AI** 默认：`read-scope` + 文档/提示词路径（如 `docs/**`、`prompts/**`）。
 
 ## 源码与产物
 

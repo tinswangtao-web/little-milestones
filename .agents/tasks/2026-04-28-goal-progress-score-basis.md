@@ -45,5 +45,5 @@
 - 2026-04-28 21:10 CST：生成 Markdown 的目标 callout 与汇总 callout 改为得分进度口径。
 - 2026-04-28 21:10 CST：设置页目标说明改为“以最终得分为统计标准（含加分、减分和临时事项）”。
 - 2026-04-28 21:10 CST：已运行 `npx tsc --noEmit`、`npm run build`、`node --check main.js`。
-- 2026-04-28 21:18 CST：按用户新流程要求，已更新固定 Cursor review handoff 卡 `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md`，后续无需用户手动粘贴代码/diff。
+- 2026-04-28 21:18 CST：按用户新流程要求，已更新固定交接卡 `.agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`，后续无需用户手动粘贴代码/diff。
 - 2026-04-29 14:12 CST：按用户要求，固定 Cursor review handoff 卡已扩展为最近三轮合并版：stats summary/freshness、score-card color logic、goal-progress score basis。

@@ -1,242 +1,221 @@
 # Agent Collaboration Protocol
 
-This repository uses a file-based handoff protocol so `codex`, Cursor, and optional external advisors can collaborate safely through shared files.
+本仓库用基于文件的交接协议，让**代码 AI**、**Review AI** 与可选的**顾问类 AI** 通过共享文件安全协作。不绑定具体模型或产品名称。
 
-## Role Decision
-- `codex` is the normal default implementation and integration agent for this plugin.
-- Cursor is review-only by default: it should inspect Codex commits or working-tree diffs, identify bugs/risks, and suggest fixes without editing plugin code.
-- ChatGPT is an optional product/workflow advisor only. It may suggest feature ideas, UX direction, or process improvements, but its advice must be converted into a `.agents` task before any code work begins.
-- `claude-code` and `kimi-code` are review-only by default if used.
-- Any non-Codex coding exception must be explicitly requested by the user and recorded in `.agents/STATE.md` before code edits begin.
+## 角色划分
 
-## Goals
-- Keep one shared source of truth for task state.
-- Avoid silent overwrite conflicts.
-- Make every implementation, review, and handoff visible.
-- Support both coding and review work without relying on external services.
+- **代码 AI**：默认的实现与集成方（改源码、构建、按授权同步 Vault、按授权提交）。
+- **Review AI**：默认可审不可改业务代码；审查**代码 AI** 的 commit 或工作区 diff，识别缺陷与风险，除用户明确授权外不直接改插件代码。
+- **顾问类 AI**（任意只做建议的会话）：可提供产品/UX/流程想法；须先落成 `.agents` 任务卡再进入编码环节。
+- **文档 / Prompt AI**（可选）：仅修改文档、提示词、规范、注释资产等非业务逻辑内容；其 `write-scope` 应限于文档或提示词路径。
+- 任何**非代码 AI**要改插件代码，必须经用户明确授权，并在 `.agents/STATE.md` 记录后方可开始。
 
-## Core Rules
-- Use `git` plus `.agents/` as the shared coordination layer.
-- A task must always have a clear current owner in `.agents/STATE.md`.
-- File write access is controlled by `.agents/LOCK.md`.
-- Write access is mutually exclusive per file or file range.
-- Parallel work is allowed only when `write-scope` does not overlap and does not depend on unfinished edits from another agent.
-- Review, validation, and documentation can run in parallel with implementation when they are read-only or have a separate `write-scope`.
-- Every meaningful action updates `.agents/STATE.md` and appends one line to `.agents/log.md`.
-- Do not create a git commit unless the user explicitly asks for "commit", "提交", or an equivalent instruction.
-- "推进", "继续", "修一下", "整理一下", "验证一下", and "同步到 Vault" are not commit authorization by themselves.
+## 目标
 
-## Agent Roles
-- `codex`: primary implementer, integration owner, vault sync owner, commit owner, final code decision maker unless the user explicitly overrides that role.
-- `cursor`: review, validation, risk spotting, regression checks, and concise feedback on Codex commits/diffs. Cursor should not edit plugin code in the normal flow.
-- `chatgpt`: product/UX/workflow brainstorming outside the code chain. ChatGPT suggestions are advisory until Codex turns them into a task card.
-- `claude-code` / `kimi-code`: optional review agents only unless the user explicitly grants a coding exception.
+- 任务状态只有一处权威来源。
+- 避免静默互相覆盖。
+- 实现、审查、交接过程可追溯。
+- 不依赖外部服务即可完成协作。
 
-Roles do not rotate silently. Codex remains the implementation default. Cursor, ChatGPT, Claude Code, or Kimi Code may write plugin code only when the user explicitly authorizes that exception and `STATE.md` records the exact owner and `write-scope`.
+## 核心规则
 
-## Default Maintenance Workflow
-1. User describes the desired behavior in natural language.
-2. Codex creates or updates the task card, edits source files, rebuilds generated artifacts, syncs to the Vault when requested/needed, updates `.agents`, and commits with `[codex]`.
-3. Cursor reviews the latest Codex commit or current working-tree diff. Cursor should focus on obvious bugs, missed requirements, mobile/Obsidian regressions, and missing verification.
-4. Codex addresses accepted Cursor review findings and updates the same task card.
-5. User performs final Obsidian experience verification.
+- 用 `git` 与 `.agents/` 作为协作层。
+- 当前任务在 `.agents/STATE.md` 中必须有清晰归属。
+- 写权限由 `.agents/LOCK.md` 控制。
+- 同一文件或范围的写权限互斥。
+- 仅当 `write-scope` 不重叠且不依赖未完成修改时允许并行。
+- 实现与（只读的）审查可并行，或各自使用独立 `write-scope`。
+- 重要动作须更新 `STATE.md` 并在 `log.md` 追加一行。
+- 除非用户明确「commit」「提交」或同等授权，否则不创建 git commit。
+- 「推进」「继续」「修一下」「整理一下」「验证一下」「同步到 Vault」单独出现不构成提交授权。
 
-Cursor review prompt template:
-> Review the latest Codex commit or current working-tree diff. Only report clear bugs, regressions, missed requirements, or verification gaps. Do not refactor and do not edit code.
+## 角色职责（摘要）
 
-## Fixed Workflow V1
-- User owns requirements, experience feedback, final acceptance, and decisions to continue, rollback, commit, or sync to the Vault.
-- Codex is the only normal implementer: code edits, build, fixes, commits, and Vault sync.
-- Cursor is review-only: findings, risks, suggested fixes, and acceptance steps. Cursor does not edit business code.
-- Every feature request follows this sequence:
-  1. User gives goal and observed problem.
-  2. Codex implements the smallest reasonable change and performs local verification.
-  3. Cursor reviews with severity, risks, suggested fixes, and acceptance steps.
-  4. Codex revises based on accepted review feedback.
-  5. User accepts or rejects the experience.
-  6. Codex commits or deploys only after explicit user approval.
-- Codex must provide these four user-facing points each round:
-  - current state
-  - risk judgment
-  - user action to test
-  - pass condition
-- Codex should provide Cursor with this review input each round:
-  - requirement goal
-  - changed file list
-  - user-visible behavior changes
-  - verification already run
-  - known unresolved risks
-- After each implementation round, Codex must maintain `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md` as the fixed handoff card for Cursor. The card must include:
-  - the current round goal using the user's original wording
-  - changed file list
-  - key user-visible behavior changes
-  - verification already run, including build/typecheck/manual checks
-  - known risks and open confirmation points
-  - whether strict Cursor review is requested
-  - 2-4 suggested user acceptance steps
-- When the fixed handoff card is ready, Codex should tell the user only that it is "可review"; the user should not need to paste code, diffs, or screenshots into Cursor.
-- Before asking the user/Cursor for final commit or Vault-sync approval, Codex must fill or summarize `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`.
-- Cursor review output should use this shape:
-  - conclusion: releasable / needs fix / recommend rollback
-  - findings grouped as P0, P1, P2
-  - suggested fix order
-  - minimal retest steps for the user
-- Cursor should use `.agents/reviews/CURSOR_REVIEW_TEMPLATE.md` as the fixed review output template.
-- Cursor must write "No blocking issues" when no blocking issues are found.
-- Strict review is required before commit when any of these are true:
-  - storage, composers, or renderers changed
-  - mobile keyboard, touch, overlay, or back-navigation logic changed
-  - data format, migration, or save path changed
-  - the change spans more than 3 files
+- **代码 AI**：主实现、集成、Vault 同步（按授权）、提交（按授权）、代码结论默认责任方（除非用户另行指定）。
+- **Review AI**：审查、校验、风险、回归关注点、对 **代码 AI** 产出给出简洁反馈；正常流程不改插件业务代码。
+- **顾问类 AI**：代码链外的脑暴；建议须经**代码 AI**落成任务卡才进入实现。
 
-## Shared Page Names
-Use these page names consistently across tasks, reviews, logs, and handoffs:
-- `设置页`: the Little Milestones settings page opened from Obsidian third-party plugin settings via the gear entry.
-- `打分页`: the main scoring page opened by clicking the star icon in Obsidian's left sidebar.
-- `得分页`: the generated Markdown result document page.
+角色不静默轮换：**代码 AI** 仍是默认实现方。**Review AI** 与**顾问类 AI** 仅在用户授权且 `STATE.md` 写明 `owner` 与 `write-scope` 时可改插件代码。
 
-## Required Files
-- `.agents/STATE.md`: current task, status, owner, handoff, scopes.
-- `.agents/LOCK.md`: current write lock.
-- `.agents/tasks/*.md`: one task card per task.
-- `.agents/reviews/*.md`: review results and follow-up status.
-- `.agents/log.md`: append-only event log.
+## 默认维护流程
 
-## Task Split Rule
-- Create a new `.agents/tasks/*.md` card when the user's goal changes by feature, page, workflow, or acceptance criteria.
-- Keep the previous task card's status and handoff note intact when switching context.
-- For follow-up tasks, include an optional `origin` field naming the task that led to the new work.
-- Examples:
-  - Allowed same task: user clarifies wording or verifies the current acceptance checklist.
-  - New task required: user moves from `打分页` save behavior to mobile emoji sheet behavior, settings layout, deploy tooling, or collaboration protocol.
+1. 用户用自然语言描述期望行为。
+2. **代码 AI** 创建或更新任务卡、改源码、重建产物、按需同步 Vault、更新 `.agents`、按授权使用 `[code-ai]` 前缀提交。
+3. **Review AI** 审查最新 commit 或当前工作区 diff，聚焦明显缺陷、遗漏需求、移动端/Obsidian 回归与验证缺口。
+4. **代码 AI** 根据已采纳的审查意见修改，并更新同一任务卡。
+5. 用户在 Obsidian 中做最终体验确认。
 
-## Workspace Rule
-- The primary workspace is the only normal code workspace for this repository.
-- Treat the primary workspace `.agents/` directory as the canonical coordination layer.
-- Do not use `.claude/worktrees/**` or any other git worktree as part of the default implementation flow.
-- Cursor and any optional review agent should review directly against the primary workspace, not through a separate worktree.
-- Existing worktrees may remain on disk as historical leftovers, but they should be treated as inactive unless the user explicitly asks to inspect or reuse them.
-- If the user explicitly requests a one-off worktree workflow, record that exception in `.agents/STATE.md` before using it.
+**Review AI** 提示模板示例：
 
-## Fixed Per-Agent Routine
-Every agent should do these steps first:
+> 审查最新由**代码 AI**产生的 commit 或当前工作区 diff。只报告明确缺陷、回归、遗漏需求或验证缺口。正常审查不要求重构、不要求直接改代码。
 
-1. Run `git status --short`.
-2. Read `.agents/README.md`.
-3. Read `.agents/STATE.md`.
-4. Read the current task file referenced by `STATE.md`.
-5. Check `.agents/LOCK.md` before writing anything.
+## 固定工作流 V1
 
-Before finishing a turn:
+- 用户拥有：需求、体验反馈、最终验收，以及是否继续/回滚/commit/同步 Vault 的决策权。
+- **代码 AI** 是唯一常规实现方：编辑、构建、修复、提交、Vault 同步（均须按授权）。
+- **Review AI** 为审查方：结论、风险、建议修复与验收步骤；正常不改业务代码。
+- 每个功能需求按序：
+  1. 用户给出目标与问题。
+  2. **代码 AI** 做最小合理改动并完成本地验证。
+  3. **Review AI** 按严重度、风险、建议修复与验收步骤出审查意见。
+  4. **代码 AI** 根据已采纳意见修订。
+  5. 用户接受或拒绝当前体验。
+  6. 仅在用户明确批准后 **代码 AI** 才 commit 或 deploy。
+- **代码 AI** 每轮对用户须说明：当前状态、风险判断、建议测试动作、通过条件。
+- **代码 AI** 每轮为 **Review AI** 须准备：需求目标、改动列表、用户可见变化、已做验证、已知风险。
+- 每轮实现后，**代码 AI** 须维护 `.agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`，作为给 **Review AI** 的固定交接卡，包含：
+  - 用户原话目标
+  - 改动文件列表
+  - 关键用户可见变化
+  - 已做验证（含构建/类型检查/手测）
+  - 风险与待确认点
+  - 是否要求严格 review
+  - 2～4 条用户验收步骤
+- 交接卡就绪后，**代码 AI** 只对用户说「可 review」；勿要求用户向 **Review AI** 粘贴代码、整份 diff 或截图。
+- 最终 commit 或 Vault 同步前，**代码 AI** 须填写或摘要 `.agents/reviews/PRECOMMIT_CHECKLIST.md`。
+- **Review AI** 输出建议包含：
+  - 结论：可发布 / 需修复 / 建议回滚
+  - Findings：P0 / P1 / P2
+  - 建议修复顺序
+  - 用户最小复测步骤
+- **Review AI** 正常审查使用 `.agents/reviews/REVIEW_OUTPUT_TEMPLATE.md` 作为固定输出模板。
+- 无阻塞问题时须写明 **No blocking issues**。
+- 以下情况在 commit 前必须经过**严格 review**：存储/composer/renderer 变更；移动端键盘/触摸/遮罩/返回逻辑变更；数据格式/迁移/保存路径变更；或改动超过 3 个文件。
 
-1. Run `git status --short` again.
-2. Update `.agents/STATE.md`.
-3. Update `.agents/LOCK.md`.
-4. Append one line to `.agents/log.md`.
-5. If a review happened, write or update the matching file in `.agents/reviews/`.
-6. If code was changed, include the commit hash in task notes once committed.
+## 共享页面名
 
-## Locking Rules
-- Only the lock owner may modify files inside the declared `write-scope`.
-- If `LOCK.md` says another agent owns the relevant scope, do not edit those files.
-- If your work is read-only, you do not need the lock.
-- Release the lock when handing off, pausing, or finishing.
-- If a lock becomes stale, do not override it silently. Record the situation in `STATE.md` and `log.md`.
-- Cursor should normally not take a code write lock for plugin source files because it is review-only by default.
-- Claude Code and Kimi Code should normally not take a code write lock for plugin source files because they are review-only by default.
-- Review-only work should stay read-only and write only to `.agents/reviews/**` unless the user explicitly authorizes a coding exception.
+任务、审查、日志与交接中统一使用：
 
-## Scope Rules
-- `write-scope` must be specific. Examples:
-  - `src/settings/settings-tab.ts`
-  - `src/utils/**`
-  - `.agents/**`
-- `read-scope` is optional but recommended when review or investigation is broad.
-- No two agents should hold overlapping `write-scope` at the same time.
-- By default, plugin code write-scope belongs to `codex`.
-- Cursor should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
-- Claude Code and Kimi Code should use `read-scope` plus `.agents/reviews/**` write-scope for normal review turns.
+- `设置页`：Obsidian 第三方插件设置里齿轮进入的 Little Milestones 设置页。
+- `打分页`：点击左侧栏星形图标打开的主打分页。
+- `得分页`：生成的 Markdown 结果文档页面。
 
-## Source Of Truth For Code
-This project currently has an unusual state:
-- `main.js` is currently a real working source file in practice.
-- `src/**` and `styles/**` also exist and should be preferred when the build chain supports them.
-- `styles.css` is generated/merged output and should not be hand-edited unless the build chain is broken and the reason is recorded.
+## 必备文件
 
-Working rule for this repo:
-- Prefer editing `src/**` and `styles/**`.
-- Do not hand-edit generated/runtime artifacts like `styles.css` unless necessary.
-- Only hand-edit `main.js` when it is the effective source of truth or when the build pipeline is broken.
-- If artifact files are hand-edited, record why in the task card and log.
-- If `styles/**` changes, rebuild `styles.css` before sync or commit.
-- Style changes are not complete until both the source style file and generated `styles.css` are updated together.
-- If a CSS diff looks much larger than the intended style change, check line endings with `git ls-files --eol` before reviewing or staging it.
+- `.agents/STATE.md`：当前任务、状态、归属、交接、范围。
+- `.agents/LOCK.md`：写锁。
+- `.agents/tasks/*.md`：任务卡。
+- `.agents/reviews/*.md`：审查结果与跟进。
+- `.agents/log.md`：仅追加的事件日志。
 
-## Experimental UX Rollback Rule
-- Experimental interaction changes must be easy to reverse in one follow-up edit or commit.
-- Prefer a narrow class, flag, helper option, or isolated CSS block instead of scattering an experiment across unrelated files.
-- The task card must include a rollback note before release or Vault sync.
-- Example for emoji/gesture experiments: "Rollback: remove the `.kid-score-emoji-sheet-lifted` class/style block and disable the touch-drag handler; keep unrelated save-flow fixes."
+## 任务拆分规则
 
-## Mobile Style Rule
-- For iPhone/mobile layout tuning, prefer `styles/07-mobile.css` first.
-- Only edit other style files for mobile behavior when the base component styles truly belong there.
-- If mobile styles are split across files, record which files were touched in the task card or log.
+- 功能、页面、流程或验收标准变化时，新建 `.agents/tasks/*.md`。
+- 切换上下文时保留前一任务卡的状态与交接说明。
+- 跟进任务可加可选字段 `origin` 指向来源任务。
 
-## Vault Sync Rule
-Syncing to the Obsidian Vault is a separate step, not implied by implementation.
+## 工作区规则
 
-Additional guardrails for this repo:
-- Only the primary workspace may sync files into the Obsidian Vault plugin directory.
-- A worktree must never sync directly to the Vault.
-- If work happens inside a worktree, sync code and `.agents/` state back to the primary workspace first, then sync to the Vault from the primary workspace.
-- Before every Vault sync, verify that `manifest.json`, `main.js`, and `styles.css` match the current primary workspace version.
-- After every Vault sync, verify that the Vault copies of `manifest.json`, `main.js`, and `styles.css` match the primary workspace version using `diff`, hashes, or another explicit comparison.
+- **主工作区**是唯一常规代码工作区。
+- 以主工作区下的 `.agents/` 为协作权威。
+- 默认不使用 `.claude/worktrees/**` 或其他 worktree 做实现。
+- **Review AI** 应直接针对主工作区审查，不经过独立 worktree。
+- 磁盘上可能留有历史 worktree，默认视为未激活，除非用户明确要求使用并在 `STATE.md` 记录。
 
-Track it explicitly in the task card:
-- `sync-to-vault: pending`
-- `sync-to-vault: done`
-- `sync-to-vault: n/a`
+## 固定开场流程
 
-When sync happens, record:
-- which files were synced
-- who synced them
-- when sync happened
+每个会话开始前：
 
-## Git Safety Rule
-- Do not run `git add`, `git status`, and `git commit` as parallel steps.
-- Stage first, then confirm staged state with `git status --short`, then commit.
-- If a commit changes generated files, make sure the corresponding source files are staged in the same commit.
-- Do not commit unless the user explicitly asks for a commit in the current instruction.
-- Emergency rollback or hotfix commits still require explicit user authorization; record the user's authorization wording in `.agents/STATE.md`.
+1. `git status --short`
+2. 读 `.agents/README.md`
+3. 读 `.agents/STATE.md`
+4. 读 `STATE.md` 指向的当前任务卡
+5. 写入前查 `.agents/LOCK.md`
 
-## Commit Message Convention
-Use a visible agent prefix:
-- `[codex] ...`
-- `[cursor] ...`
-- `[claude] ...`
-- `[kimi] ...`
+回合结束前：
 
-Default expectation in this repository:
-- plugin code commits should normally use `[codex]`
-- `[cursor]`, `[claude]`, and `[kimi]` commits should normally be limited to reviews, notes, or other explicitly authorized exceptions
+1. 再次 `git status --short`
+2. 更新 `.agents/STATE.md`
+3. 更新 `.agents/LOCK.md`
+4. 在 `.agents/log.md` 追加一行
+5. 若做了审查，写或更新 `.agents/reviews/` 下对应文件
+6. 若已 commit，在任务备注中记录 commit hash
 
-## Review Expectations
-Each review should clearly state:
-- findings
-- severity
-- suggested fix
-- whether each item is resolved
+## 加锁规则
 
-If there are no findings, say so explicitly.
+- 仅锁的持有者可改声明的 `write-scope` 内文件。
+- `LOCK.md` 显示他方持有相关范围时，勿改那些文件。
+- 只读工作无需占锁。
+- 交接、暂停或结束时释放锁。
+- 锁过期或异常勿静默覆盖，在 `STATE.md` 与 `log.md` 说明。
+- **Review AI** 默认不为插件源码占写锁（审查为主）。
+- **非代码 AI** 在默认可审不可改规则下，也不为插件源码占写锁。
+- 审查工作保持只读；写入范围通常为 `.agents/reviews/**`，除非用户授权例外。
 
-## Acceptance Checklist Guidance
-Each task card should include concrete verification steps. For this plugin, common checks include:
-- iPhone scoring page interaction
-- iPhone settings page scroll behavior
-- keyboard overlap behavior
-- Obsidian desktop verification
-- vault sync verification
+## 范围规则
 
-## Current Practical Note
-This repository is not necessarily clean at all times. Agents should not assume a clean working tree. The required `git status` checks are there to make the current state visible, not to block all work until everything is clean.
+- `write-scope` 须具体，例如：`src/settings/settings-tab.ts`、`src/utils/**`、`.agents/**`。
+- 可选 `read-scope` 用于广域阅读。
+- 两名角色不得同时持有重叠的 `write-scope`。
+- 默认插件源码的 `write-scope` 归属 **代码 AI**。
+- **Review AI** 默认：`read-scope` + 可写 `.agents/reviews/**`。
+- **文档 / Prompt AI** 默认：`read-scope` + 可写文档/提示词路径（如 `docs/**`、`prompts/**`）。
+- **非代码 AI**（审查模式）同上。
+
+## 代码与产物真相源
+
+- 当前仓库中 `main.js` 可能仍是实际运行源之一。
+- 优先维护 `src/**` 与 `styles/**`（在构建链支持的前提下）。
+- `styles.css` 为生成/合并产物，非必要勿手改。
+- 工作约定：优先改 `src/**`、`styles/**`；勿随意手改生成物；确需手改 `main.js` 等须在任务卡与 log 说明；改 `styles/**` 后须重建 `styles.css`；样式任务须源文件与 `styles.css` 同轮一致；异常巨大的 CSS diff 先查 `git ls-files --eol`。
+
+## 实验性 UX 回滚
+
+- 实验须能在一轮跟进编辑或一次 revert 内收回。
+- 优先用独立 class、开关、小范围 CSS，勿打散到无关文件。
+- 发布或同步 Vault 前任务卡须有回滚说明。
+
+## 移动端样式
+
+- iPhone/移动端优先看 `styles/07-mobile.css`。
+- 仅当基础样式确属他文件时再扩散修改。
+- 多文件改动时在任务卡或 log 中列出。
+
+## Vault 同步
+
+同步到 Obsidian Vault **不是**实现的隐含步骤。
+
+默认 `npm run deploy` 的目标目录见 `scripts/deploy.mjs` 中的 `DEFAULT_VAULT_PLUGIN_DIR`。可用环境变量 `LITTLE_MILESTONES_VAULT_DIR` 指向同一插件目录（`.obsidian/plugins/little-milestones`）以覆盖。
+
+本仓库额外约定：
+
+- 仅从**主工作区**同步到 Vault 插件目录。
+- worktree 禁止直同步 Vault。
+- worktree 中改动须先回到主工作区，再从主工作区同步。
+- 每次同步前后核对 `manifest.json`、`main.js`、`styles.css` 与主工作区一致（`diff`、哈希等）。
+
+任务卡中显式跟踪：
+
+- `sync-to-vault: pending | done | n/a`
+
+同步发生时记录：同步了哪些文件、谁同步、何时。
+
+## Git 安全
+
+- 勿并行执行 `git add`、`git status`、`git commit`。
+- 先 stage，再用 `git status --short` 确认，再 commit。
+- commit 若含生成文件，须在同次 commit 中包含对应源文件。
+- 除非用户当前指令明确要求 commit，否则不提交。
+- 紧急回滚/热修须用户授权，授权原文记入 `STATE.md`。
+
+## 提交信息前缀（可见角色标签）
+
+- `[code-ai] …`：**代码 AI**（常规插件改动）
+- `[review-ai] …`：**Review AI**（审查记录、文档等，常规为审查/文档向）
+
+默认期望：
+
+- 插件源码 commit 正常用 `[code-ai]`
+- `[review-ai]` 通常限于审查输出、说明文档，或用户明确授权的其他例外
+
+## 审查期望
+
+每条审查应写明：发现项、严重度、建议修复、是否已解决。若无发现须明确说明。
+
+## 验收清单指引
+
+任务卡中应有可执行验证步骤。本插件常见项包括：iPhone 打分页、iPhone 设置页滚动、键盘遮挡、Obsidian 桌面端、Vault 同步核对。
+
+## 实用说明
+
+工作区不一定始终干净；`git status` 用于暴露当前状态，而非强制一切洁净后才能工作。

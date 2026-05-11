@@ -22,10 +22,11 @@
 - 影响模块与接口（若有）
 
 ## Ownership
-- `owner`: <code-ai | review-ai | none>
-- `status`: <planned | in-progress | awaiting-review | awaiting-fix | awaiting-deploy | done>
+- `owner`: <code-ai | review-ai | docs-ai | none>
+- `status`: <planned | in-progress | awaiting-review | awaiting-user | awaiting-deploy | done | cancelled>
 - `write-scope`: <文件或 glob>
 - `read-scope`: <可选>
+- `awaiting`: <none | user | review-ai | code-ai | docs-ai>
 - `sync-or-deploy`: <pending | done | n/a>（若项目无此步骤，填 n/a）
 
 ## Artifacts（可选）
@@ -61,5 +62,11 @@
 - [YYYY-MM-DD code-ai] …
 
 ## Handoff
-- `next-owner`: <review-ai | code-ai | none>
+- `next-owner`: <review-ai | code-ai | docs-ai | none>
 - `note`: …
+
+## Status Notes（建议）
+- `status` 只写流程阶段；`awaiting` 只写在等谁。
+- 推荐流转：`planned` → `in-progress` → `awaiting-review` → `awaiting-user` → `awaiting-deploy`（若有）→ `done`
+- 若 review 发现问题，通常回到 `in-progress`，并把 `awaiting` 改为 `code-ai`
+- 若任务放弃或并入他卡，标记 `cancelled`

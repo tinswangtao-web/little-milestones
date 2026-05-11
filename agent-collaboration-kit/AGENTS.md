@@ -1,6 +1,6 @@
 # 代码 AI 进入本仓库时的启动规则
 
-本仓库使用 **与本 `AGENTS.md` 同目录**下的 `.agents/` 协作协议。角色名称与具体模型、厂商无关：**代码 AI**（实现）、**Review AI**（审查）、可选 **顾问类 AI**（仅建议）。
+本仓库使用 **与本 `AGENTS.md` 同目录**下的 `.agents/` 协作协议。角色名称与具体模型、厂商无关：**代码 AI**（实现）、**Review AI**（审查）、可选 **顾问类 AI**（仅建议）、以及可选 **文档 / Prompt AI**（只写文档与提示词）。
 
 > **整夹复制**：若本文件位于子目录（例如 `agent-collaboration-kit/AGENTS.md`），下面所有 `.agents/...` 路径均指该子目录内的 `.agents/`，无需再拷到仓库根。
 
@@ -8,13 +8,16 @@
 
 - [WORKFLOW.md](WORKFLOW.md)：从需求澄清到发布的阶段与闸门  
 - [ROLES.md](ROLES.md)：多 AI 角色与 `STATE.md` 字段建议  
+- [ARCHITECTURE_GUIDE.md](ARCHITECTURE_GUIDE.md)：架构设计、技术路线对比、模块与数据流
+- [QUALITY_STANDARDS.md](QUALITY_STANDARDS.md)：质量维度、Review 框架、测试与重构标准
 - [ENGINEERING_NOTES.md](ENGINEERING_NOTES.md)：通用工程与安全注意项  
 - [META_FOR_REVIEWERS.md](META_FOR_REVIEWERS.md)：给其他 AI 改进本规则时的约定
+- [BACKUP_AND_DELETION.md](BACKUP_AND_DELETION.md)：删除前备份、保留期与恢复
 
 **`PROJECT_PROFILE.md`（项目专属）** 阅读顺序：
 
 1. **Git 仓库根目录**下的 `PROJECT_PROFILE.md`（推荐把模板复制到根目录后填写）
-2. 若不存在，再读 **与本 `AGENTS.md` 同目录**下的 `PROJECT_PROFILE.md`
+2. 若不存在，再读 **与本 `AGENTS.md` 同目录**下随包附带的 fallback `PROJECT_PROFILE.md`
 
 ## 进入后必做顺序
 
@@ -22,9 +25,9 @@
 
 1. 在 **Git 仓库根**运行 `git status --short`（工作区以仓库根为准）
 2. 阅读 **与本文件同目录的** [WORKFLOW.md](WORKFLOW.md) 与 [ROLES.md](ROLES.md)（首轮或新任务开始时；日常小改可只复习 `.agents/README.md` 中的阶段摘要）
-3. 阅读 **与本文件同目录的** `.agents/README.md`
-4. 按上文顺序阅读 `PROJECT_PROFILE.md`（若任一处存在）
-5. 实现与审查阶段对照 [ENGINEERING_NOTES.md](ENGINEERING_NOTES.md)（尤其安全、迁移、依赖）
+3. 按需阅读 [ARCHITECTURE_GUIDE.md](ARCHITECTURE_GUIDE.md) 与 [QUALITY_STANDARDS.md](QUALITY_STANDARDS.md)（涉及架构选型或 review 时）
+4. 阅读 **与本文件同目录的** `.agents/README.md`
+5. 按上文顺序阅读 `PROJECT_PROFILE.md`（若任一处存在）
 6. 阅读 `.agents/STATE.md`
 7. 阅读 `STATE.md` 指向的当前任务文件
 8. 阅读 `.agents/LOCK.md`
@@ -52,6 +55,7 @@
 - **代码 AI**：默认实现方（改代码、构建、按授权的部署与提交）。
 - **Review AI**：默认可审不可改业务代码；审查 **代码 AI** 的 commit 或工作区 diff，除非用户在本线程明确授权例外且已写入 `STATE.md`。
 - **顾问类 AI**：仅产品/流程/UX 建议；须先落成 `.agents` 任务卡再动代码。
+- **文档 / Prompt AI**：默认只修改文档、提示词与规范资产；`write-scope` 应限于文档或提示词路径。
 - 任何非**代码 AI**要改业务代码，须用户明确授权，并在 `.agents/STATE.md` 记录 `owner` 与 `write-scope` 后方可开始。
 
 ## 工作区规则
@@ -76,3 +80,9 @@
 ## 首次阅读
 
 **代码 AI** 以 `.agents/AGENT_RULES.md` 为简明操作说明，以 `.agents/README.md` 为完整协议；阶段与角色以 [WORKFLOW.md](WORKFLOW.md)、[ROLES.md](ROLES.md) 为准；编码对照 [ENGINEERING_NOTES.md](ENGINEERING_NOTES.md)。
+
+## 非 Cursor 使用
+
+- 若所用工具支持**项目规则文件 / 仓库级提示词文件**，直接引用当前文件：`agent-collaboration-kit/AGENTS.md`。
+- 若工具不支持文件引用，就把本文件内容直接粘贴进该工具的项目规则或系统提示中。
+- 不论使用哪种工具，协作状态与任务流转都写在同目录下的 `.agents/`。

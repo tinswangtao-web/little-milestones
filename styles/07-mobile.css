@@ -620,9 +620,7 @@
 
   /* ── Main tabs ── */
   .kid-score-main-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 3;
+    position: static;
     margin-top: 2px;
     background: var(--background-primary);
     border-radius: 10px;
@@ -630,9 +628,7 @@
   }
 
   .kid-score-main-tabs-mobile {
-    position: sticky;
-    top: 0;
-    z-index: 3;
+    position: static;
   }
 
   .kid-score-daily-modal {

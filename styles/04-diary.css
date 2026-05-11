@@ -57,6 +57,7 @@
 
 .kid-score-tab-panel {
   /* visible by default */
+  touch-action: pan-y;
 }
 
 .kid-score-tab-panel.is-hidden {

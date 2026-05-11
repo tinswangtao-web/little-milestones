@@ -122,7 +122,7 @@ export function renderMainTabs({
   isTouchLayout,
   activeTab = "score",
 }: RenderTabsOptions) {
-  const { scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout
+  const { tabs, scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout
     ? renderMobileMainTabsLayout(containerEl)
     : renderDesktopMainTabsLayout(containerEl);
 
@@ -148,7 +148,7 @@ export function renderMainTabs({
     scorePanel.addClass("is-hidden");
   }
 
-  return { scorePanel, diaryPanel };
+  return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
 }
 
 export function renderBottomActions({

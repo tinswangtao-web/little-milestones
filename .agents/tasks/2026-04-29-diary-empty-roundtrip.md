@@ -35,7 +35,7 @@
 - [x] 得分页手动修改日记内容后，重新打开同一天打分页，模块反映最新文件内容。
 - [x] 默认示例文案不会在用户删除后的旧记录里变成真实输入内容。
 - [x] `npm run build`、`npx tsc --noEmit`、`node --check main.js` 通过。
-- [x] 更新 `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md`。
+- [x] 更新 `.agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`。
 
 ## Codex 执行记录
 

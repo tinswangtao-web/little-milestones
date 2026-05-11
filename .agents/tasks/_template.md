@@ -4,7 +4,7 @@
 - Describe the user request in plain language.
 
 ## Ownership
-- `owner`: <claude-code | codex | kimi-code>
+- `owner`: <code-ai | review-ai | none>
 - `status`: <planned | in-progress | awaiting-review | awaiting-fix | awaiting-sync | done>
 - `write-scope`: <files or globs>
 - `read-scope`: <optional files or globs>
@@ -39,5 +39,5 @@
 - [agent @ YYYY-MM-DD HH:MM] Added task card.
 
 ## Handoff
-- `next-owner`: <agent or none>
+- `next-owner`: <code-ai | review-ai | none>
 - `note`: <what to inspect next>

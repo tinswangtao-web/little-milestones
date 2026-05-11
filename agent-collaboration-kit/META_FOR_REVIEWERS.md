@@ -4,6 +4,7 @@
 
 ## 请保留的核心约定
 
+- **删除前备份**：[BACKUP_AND_DELETION.md](BACKUP_AND_DELETION.md) 与 `.ai-deletion-backups/` 约定；弱化会破坏用户恢复误删的能力。
 - **整夹复制**：`AGENTS.md` 与 `.agents/` 保持同级；用户通过复制整个文件夹接入新项目。
 - **项目差异出仓库**：栈、命令、部署路径写在 **`PROJECT_PROFILE.md`（仓库根）**，不要写死在通用协议里（除非是示例占位）。
 - **角色名与厂商解耦**：继续使用 **代码 AI / Review AI / 顾问类 AI** 等角色名，不写具体产品名。

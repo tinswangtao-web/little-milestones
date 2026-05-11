@@ -2,55 +2,75 @@
 
 ## Current round goal
 
-用户要求处理 `2026-05-11-diary-character-count` 这一轮的 Vault 同步、验收后提交收尾。用户已完成 Vault 手测验收并明确授权 commit；本轮不 push。
+用户原话目标：继续补最后一层，把 `agent-collaboration-kit` 里的状态字段命名和任务状态枚举彻底统一。
+
+本轮收口点：
+
+- 把 `status` 与 `awaiting` 的职责拆清：前者表示流程阶段，后者表示在等谁
+- 统一 `STATE.md`、任务卡模板、流程文档与 example 的状态枚举
+- 清掉旧的混合型状态命名（例如 `awaiting-fix` 一类）在通用模板里的推荐地位
+
+## Architecture / approach summary（可选）
+
+- 不改协议主流程，只补一层“状态契约”。
+- 采用两条原则：
+  - `status` 只表示流程阶段
+  - `awaiting` 只表示在等谁
+- `idle` 只保留给 `STATE.md`，表示当前没有活跃任务；`none` 只保留给 `Next Task.status`。
 
 ## Changed file list
 
-- diary-character-count 相关源码与生成产物
-- `main.js`（`npm run build` 生成）
-- `styles.css`（`npm run build` 生成）
+- `agent-collaboration-kit/.agents/STATE.md`
+- `agent-collaboration-kit/.agents/tasks/_template.md`
+- `agent-collaboration-kit/.agents/README.md`
+- `agent-collaboration-kit/.agents/AGENT_RULES.md`
+- `agent-collaboration-kit/WORKFLOW.md`
+- `agent-collaboration-kit/examples/minimal-project/README.md`
+- `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md`
+- `agent-collaboration-kit/examples/minimal-project/.agents/tasks/2026-05-11-add-export-command.md`
+- `.agents/tasks/2026-05-11-agent-collaboration-kit-polish.md`
 - `.agents/STATE.md`
 - `.agents/LOCK.md`
 - `.agents/log.md`
-- `.agents/tasks/2026-05-11-diary-character-count.md`
 - `.agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`
-- `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md`
-- `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`
 
 ## User-visible behavior changes
 
-- 无新增业务代码变化。本轮只把已通过 Review AI 复查的 diary-character-count 构建产物同步到用户当前 Vault，供 Obsidian 手测。
-- 用户手测已通过，本轮进入 commit-only 收尾；不 push。
+- 规则包内部现在明确规定：`status` 只写流程阶段，`awaiting` 只写等待对象
+- `STATE.md` 模板、任务卡模板、`WORKFLOW.md` 和 example 现在使用同一套推荐状态：
+  - `planned`
+  - `in-progress`
+  - `awaiting-review`
+  - `awaiting-user`
+  - `awaiting-deploy`
+  - `done`
+  - `cancelled`
+- example 里的 `Next Task.status` 已与模板统一为 `none`
 
 ## Verification already run
 
-- `npx tsc --noEmit`: pass
-- `npm run build`: pass
-- `node --check main.js`: pass
-- target-file `git diff --check`: pass
-- pre-sync workspace hashes:
-  - `manifest.json e2456f26890b`
-  - `main.js 2ada6872a653`
-  - `styles.css c0f5c6ca1bf5`
-- `npm run deploy`: pass
-- `node scripts/deploy.mjs --verify-only`: pass
-  - `MATCH main.js 2ada6872a653`
-  - `MATCH styles.css c0f5c6ca1bf5`
-  - `MATCH manifest.json e2456f26890b`
+- `git diff --check -- agent-collaboration-kit/ .agents/STATE.md .agents/LOCK.md .agents/log.md .agents/tasks/2026-05-11-agent-collaboration-kit-polish.md .agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`
+- `rg` 检查：`awaiting-fix`、`awaiting-user-feedback`、example 中的 ``status: n/a`` 已从规则包模板/示例中清掉
+- 逐文件人工核对：
+  - `agent-collaboration-kit/.agents/STATE.md`
+  - `agent-collaboration-kit/.agents/tasks/_template.md`
+  - `agent-collaboration-kit/.agents/README.md`
+  - `agent-collaboration-kit/WORKFLOW.md`
+  - `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md`
+  - `agent-collaboration-kit/examples/minimal-project/.agents/tasks/2026-05-11-add-export-command.md`
 
 ## Known risks / open points
 
-- Full `git diff --check` remains blocked by unrelated `.gitignore` / `agent-collaboration-kit/**` trailing whitespace outside this diary task.
-- User completed hand test in Obsidian and explicitly authorized commit.
-- Push was not requested and must not be performed in this round.
+- 本轮仍是 docs-only，没有运行构建或测试命令
+- `examples/minimal-project/` 仍是“同一任务不同阶段的样板集合”，不是单一时刻快照
+- 工作树中仍有大量插件业务代码相关未提交改动；review 时应只看本轮规则文档范围
 
 ## Strict Review AI review requested
 
-- `否`。本轮无业务代码变更；此前 Review AI re-check 已通过。
+- `否`
 
 ## Suggested user acceptance steps
 
-1. 自由记录里写 `## 我的小标题` 后保存并重开，确认标题和后续内容仍在。
-2. 同时填写自由记录和评语，确认 `## 📝 今日日记` 与 `## 💬 评语` 分离且重开不串。
-3. 只填评语，确认字数仍为 0。
-4. 填 weather、mood、todayThing、freeWrite 后保存重开，确认模块值和字数一致。
+1. 打开 `agent-collaboration-kit/.agents/STATE.md` 与 `.agents/tasks/_template.md`，确认 `status` / `awaiting` 的分工足够清楚
+2. 打开 `agent-collaboration-kit/WORKFLOW.md`，确认流程阶段与推荐状态流转对得上
+3. 打开 `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md` 与任务卡，确认 example 也沿用了同一套状态口径
