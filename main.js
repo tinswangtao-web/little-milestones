@@ -2266,6 +2266,243 @@ function openCalendarPicker({
 // src/modals/panels/diary-panel.ts
 var import_obsidian3 = require("obsidian");
 
+// src/settings/normalize-settings.ts
+var FIXED_DIARY_MODULE_IDS = /* @__PURE__ */ new Set(["weather", "mood", "comment"]);
+function normalizeDiaryModules(value) {
+  const defaults = makeDefaultDiaryModules();
+  const defaultById = new Map(defaults.map((moduleDef) => [moduleDef.id, moduleDef]));
+  const current = Array.isArray(value) ? value : [];
+  let changed = !Array.isArray(value);
+  const fixedById = /* @__PURE__ */ new Map();
+  const smallRecords = [];
+  if (current.length === 0) {
+    return { modules: defaults.map((moduleDef) => ({ ...moduleDef })), changed: true };
+  }
+  for (const moduleDef of current) {
+    if (!moduleDef || typeof moduleDef.id !== "string" || !moduleDef.id.trim()) {
+      changed = true;
+      continue;
+    }
+    const normalized = normalizeDiaryModuleDefinition(
+      moduleDef,
+      defaultById.get(moduleDef.id)
+    );
+    if (normalized.changed) changed = true;
+    if (FIXED_DIARY_MODULE_IDS.has(moduleDef.id)) {
+      if (fixedById.has(moduleDef.id)) {
+        changed = true;
+        continue;
+      }
+      fixedById.set(moduleDef.id, normalized.moduleDef);
+    } else {
+      smallRecords.push(normalized.moduleDef);
+    }
+  }
+  for (const fixedId of FIXED_DIARY_MODULE_IDS) {
+    if (!fixedById.has(fixedId)) {
+      const fallback = defaultById.get(fixedId);
+      if (fallback) {
+        fixedById.set(fixedId, { ...fallback });
+        changed = true;
+      }
+    }
+  }
+  const modules = [
+    fixedById.get("weather"),
+    fixedById.get("mood"),
+    ...smallRecords,
+    fixedById.get("comment")
+  ].filter((moduleDef) => !!moduleDef);
+  if (current.length !== modules.length || current.some((moduleDef, index) => {
+    var _a;
+    return (moduleDef == null ? void 0 : moduleDef.id) !== ((_a = modules[index]) == null ? void 0 : _a.id);
+  })) {
+    changed = true;
+  }
+  return { modules, changed };
+}
+function sanitizeDoubleTapThreshold(value, fallback) {
+  const n = parseInt(String(value), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(120, Math.min(600, n));
+}
+function normalizePluginSettings(loaded) {
+  const data = loaded || {};
+  let changed = false;
+  if (data.childName !== void 0 && !data.users) {
+    const user = makeDefaultUser();
+    user.name = data.childName || "\u672A\u547D\u540D";
+    user.savePath = data.savePath || "Little Milestones/Daily Records";
+    user.items = Array.isArray(data.items) ? data.items : [];
+    user.categories = Array.isArray(data.categories) && data.categories.length ? data.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+    user.scoringRules = data.scoringRules || "";
+    user.diaryTemplate = data.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
+    user.diaryModules = Array.isArray(data.diaryModules) && data.diaryModules.length ? data.diaryModules : makeDefaultDiaryModules();
+    ensureUserDefaults(user);
+    return {
+      settings: {
+        users: [user],
+        currentUserId: user.id,
+        doubleTapThresholds: { ...DEFAULT_SETTINGS.doubleTapThresholds }
+      },
+      changed: true
+    };
+  }
+  const settings = { ...DEFAULT_SETTINGS, ...data };
+  const dt = {
+    ...DEFAULT_SETTINGS.doubleTapThresholds,
+    ...settings.doubleTapThresholds || {}
+  };
+  dt.windows = sanitizeDoubleTapThreshold(
+    dt.windows,
+    DEFAULT_SETTINGS.doubleTapThresholds.windows
+  );
+  dt.mac = sanitizeDoubleTapThreshold(
+    dt.mac,
+    DEFAULT_SETTINGS.doubleTapThresholds.mac
+  );
+  dt.android = sanitizeDoubleTapThreshold(
+    dt.android,
+    DEFAULT_SETTINGS.doubleTapThresholds.android
+  );
+  dt.ios = sanitizeDoubleTapThreshold(
+    dt.ios,
+    DEFAULT_SETTINGS.doubleTapThresholds.ios
+  );
+  dt.fallback = sanitizeDoubleTapThreshold(
+    dt.fallback,
+    DEFAULT_SETTINGS.doubleTapThresholds.fallback
+  );
+  settings.doubleTapThresholds = dt;
+  if (!settings.users || !settings.users.length) {
+    const user = makeDefaultUser();
+    settings.users = [user];
+    settings.currentUserId = user.id;
+    changed = true;
+  } else {
+    for (const user of settings.users) {
+      changed = ensureUserDefaults(user) || changed;
+    }
+    if (!settings.currentUserId || !settings.users.find((user) => user.id === settings.currentUserId)) {
+      settings.currentUserId = settings.users[0].id;
+      changed = true;
+    }
+  }
+  return { settings, changed };
+}
+function ensureUserDefaults(user) {
+  let changed = false;
+  if (!user.id) {
+    user.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+    changed = true;
+  }
+  if (!user.name) {
+    user.name = "\u672A\u547D\u540D";
+    changed = true;
+  }
+  if (!user.savePath || !String(user.savePath).trim()) {
+    user.savePath = "Little Milestones/Daily Records";
+    changed = true;
+  }
+  if (!Array.isArray(user.items)) {
+    user.items = [];
+    changed = true;
+  }
+  if (!Array.isArray(user.categories) || !user.categories.length) {
+    user.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
+    changed = true;
+  }
+  if (typeof user.scoringRules !== "string") {
+    user.scoringRules = "";
+    changed = true;
+  }
+  if (!user.diaryTemplate) {
+    user.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
+    changed = true;
+  }
+  const normalizedDiaryModules = normalizeDiaryModules(user.diaryModules);
+  if (normalizedDiaryModules.changed) changed = true;
+  user.diaryModules = normalizedDiaryModules.modules;
+  const normalizedWeatherPresets = normalizeWeatherPresets(
+    user.weatherPresets,
+    makeDefaultWeatherPresets()
+  );
+  if (normalizedWeatherPresets.changed) changed = true;
+  user.weatherPresets = normalizedWeatherPresets.presets;
+  const normalizedMoodPresets = normalizeQuickPresets(
+    user.moodPresets,
+    makeDefaultMoodPresets()
+  );
+  if (normalizedMoodPresets.changed) changed = true;
+  user.moodPresets = normalizedMoodPresets.presets;
+  if (!user.goals) {
+    user.goals = { daily: 10, weekly: 70, monthly: 300 };
+    changed = true;
+  }
+  for (const item of user.items) {
+    if (!item.category) {
+      item.category = item.points >= 0 ? user.categories[0] : user.categories[1] || user.categories[0];
+      changed = true;
+    }
+  }
+  return changed;
+}
+function normalizeDiaryModuleDefinition(moduleDef, fallback) {
+  const emoji = typeof moduleDef.emoji === "string" && moduleDef.emoji.trim() ? moduleDef.emoji : (fallback == null ? void 0 : fallback.emoji) || "\u{1F4DD}";
+  const label = typeof moduleDef.label === "string" ? moduleDef.label : (fallback == null ? void 0 : fallback.label) || "\u65B0\u6A21\u5757";
+  const placeholder = typeof moduleDef.placeholder === "string" ? moduleDef.placeholder : (fallback == null ? void 0 : fallback.placeholder) || "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55";
+  const kind = moduleDef.kind === "quick" || moduleDef.kind === "multi" ? moduleDef.kind : (fallback == null ? void 0 : fallback.kind) || "multi";
+  const next = { ...moduleDef, emoji, label, placeholder, kind };
+  return {
+    moduleDef: next,
+    changed: next.emoji !== moduleDef.emoji || next.label !== moduleDef.label || next.placeholder !== moduleDef.placeholder || next.kind !== moduleDef.kind
+  };
+}
+var LEGACY_WEATHER_DEFAULT_LABELS = /* @__PURE__ */ new Set([
+  "\u6674",
+  "\u6674\u8F6C\u591A\u4E91",
+  "\u591A\u4E91",
+  "\u9634",
+  "\u96E8",
+  "\u96F7\u96E8",
+  "\u96EA",
+  "\u6709\u98CE",
+  "\u96FE",
+  "\u5F69\u8679"
+]);
+function normalizeWeatherPresets(value, defaults) {
+  if (isLegacyDefaultWeatherPresetSet(value)) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+  return normalizeQuickPresets(value, defaults);
+}
+function isLegacyDefaultWeatherPresetSet(value) {
+  if (!Array.isArray(value) || value.length === 0) return false;
+  const labels = value.map((preset) => String((preset == null ? void 0 : preset.label) || "").trim());
+  const legacyLabelCount = labels.filter(
+    (label) => LEGACY_WEATHER_DEFAULT_LABELS.has(label)
+  ).length;
+  const hasSnow = labels.includes("\u96EA");
+  const hasLegacyOnlyLabel = labels.includes("\u6674\u8F6C\u591A\u4E91") || labels.includes("\u6709\u98CE") || labels.includes("\u96FE");
+  return hasSnow && legacyLabelCount >= 6 && (value.length > 8 || hasLegacyOnlyLabel);
+}
+function normalizeQuickPresets(value, defaults) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+  let changed = value.length !== defaults.length;
+  const next = defaults.map((fallback, index) => {
+    const preset = value[index];
+    const emoji = typeof (preset == null ? void 0 : preset.emoji) === "string" && preset.emoji.trim() ? preset.emoji.trim() : fallback.emoji;
+    const label = typeof (preset == null ? void 0 : preset.label) === "string" && preset.label.trim() ? preset.label.trim() : fallback.label;
+    if (!preset || emoji !== preset.emoji || label !== preset.label) {
+      changed = true;
+    }
+    return { emoji, label };
+  });
+  return { presets: next, changed };
+}
+
 // src/utils/dom.ts
 function getOverlayMount(containerEl) {
   return document.body.classList.contains("is-mobile") ? document.body : containerEl || document.body;
@@ -3310,24 +3547,12 @@ function buildDiaryPanel(options) {
   const diaryModules = options.diaryModules;
   let currentDiaryContent = diaryContent;
   const moduleFields = [];
-  if (!plugin.currentUser.diaryModules || plugin.currentUser.diaryModules.length === 0) {
-    plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-  }
-  const moduleConfig = plugin.currentUser.diaryModules;
-  const defaultCommentModule = makeDefaultDiaryModules().find((moduleDef) => moduleDef.id === "comment") || {
-    id: "comment",
-    emoji: "\u{1F4AC}",
-    label: "\u8BC4\u8BED",
-    placeholder: "\u53EF\u4EE5\u5199\u4ECA\u5929\u7684\u8BC4\u8BED\u6216\u53CD\u9988",
-    kind: "multi"
-  };
-  if (defaultCommentModule && !moduleConfig.some((moduleDef) => moduleDef.id === "comment")) {
-    const insertAfterIndex = moduleConfig.findIndex((moduleDef) => moduleDef.id === "wantToSay");
-    moduleConfig.splice(insertAfterIndex >= 0 ? insertAfterIndex + 1 : moduleConfig.length, 0, {
-      ...defaultCommentModule
-    });
+  const normalizedModules = normalizeDiaryModules(plugin.currentUser.diaryModules);
+  plugin.currentUser.diaryModules = normalizedModules.modules;
+  if (normalizedModules.changed) {
     void plugin.saveSettings();
   }
+  const moduleConfig = plugin.currentUser.diaryModules;
   const removeModule = (id) => {
     var _a, _b;
     const moduleList = plugin.currentUser.diaryModules;
@@ -5866,24 +6091,10 @@ function renderCategorySettings({
 
 // src/settings/diary-module-settings.ts
 var import_obsidian12 = require("obsidian");
-var FIXED_DIARY_MODULE_IDS = /* @__PURE__ */ new Set(["weather", "mood", "comment"]);
-function cloneModule(moduleDef) {
-  return { ...moduleDef };
-}
 function ensureDiaryModules(plugin) {
-  const defaults = makeDefaultDiaryModules();
-  const current = Array.isArray(plugin.currentUser.diaryModules) ? plugin.currentUser.diaryModules : [];
-  const byId = new Map(current.map((moduleDef) => [moduleDef.id, moduleDef]));
-  for (const fallback of defaults) {
-    if (!byId.has(fallback.id)) {
-      byId.set(fallback.id, cloneModule(fallback));
-    }
-  }
-  const weather = byId.get("weather");
-  const mood = byId.get("mood");
-  const comment = byId.get("comment");
-  const smallRecords = current.filter((moduleDef) => !FIXED_DIARY_MODULE_IDS.has(moduleDef.id));
-  plugin.currentUser.diaryModules = [weather, mood, ...smallRecords, comment];
+  const normalized = normalizeDiaryModules(plugin.currentUser.diaryModules);
+  plugin.currentUser.diaryModules = normalized.modules;
+  return normalized.changed;
 }
 function getSmallRecordModules(plugin) {
   return plugin.currentUser.diaryModules.filter(
@@ -5927,7 +6138,9 @@ function renderDiaryModuleSettingsSection({
   const body = section.createDiv({ cls: "kid-score-rules-body diary-settings-body" });
   let isOpen = true;
   const render = () => {
-    ensureDiaryModules(plugin);
+    if (ensureDiaryModules(plugin)) {
+      void plugin.saveSettings();
+    }
     ensurePresets(plugin);
     body.empty();
     renderPresetBlock({
@@ -6280,7 +6493,7 @@ function renderSmallRecordsBlock({
       message: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757\u4F1A\u66FF\u6362\u5F53\u524D\u5C0F\u8BB0\u5F55\u3001\u5929\u6C14/\u5FC3\u60C5\u6A21\u5757\u548C\u8BC4\u8BED\u8BBE\u7F6E\uFF0C\u4F46\u4E0D\u4F1A\u4FEE\u6539\u5386\u53F2\u65E5\u8BB0\u5185\u5BB9\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F",
       isDestructive: true,
       onConfirm: async () => {
-        plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+        plugin.currentUser.diaryModules = normalizeDiaryModules([]).modules;
         await plugin.saveSettings();
         render();
         new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
@@ -7340,190 +7553,6 @@ var KidScoreSettingTab = class extends import_obsidian19.PluginSettingTab {
     }
   }
 };
-
-// src/settings/normalize-settings.ts
-function sanitizeDoubleTapThreshold(value, fallback) {
-  const n = parseInt(String(value), 10);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(120, Math.min(600, n));
-}
-function normalizePluginSettings(loaded) {
-  const data = loaded || {};
-  let changed = false;
-  if (data.childName !== void 0 && !data.users) {
-    const user = makeDefaultUser();
-    user.name = data.childName || "\u672A\u547D\u540D";
-    user.savePath = data.savePath || "Little Milestones/Daily Records";
-    user.items = Array.isArray(data.items) ? data.items : [];
-    user.categories = Array.isArray(data.categories) && data.categories.length ? data.categories : ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-    user.scoringRules = data.scoringRules || "";
-    user.diaryTemplate = data.diaryTemplate || DEFAULT_DIARY_TEMPLATE;
-    user.diaryModules = Array.isArray(data.diaryModules) && data.diaryModules.length ? data.diaryModules : makeDefaultDiaryModules();
-    ensureUserDefaults(user);
-    return {
-      settings: {
-        users: [user],
-        currentUserId: user.id,
-        doubleTapThresholds: { ...DEFAULT_SETTINGS.doubleTapThresholds }
-      },
-      changed: true
-    };
-  }
-  const settings = { ...DEFAULT_SETTINGS, ...data };
-  const dt = {
-    ...DEFAULT_SETTINGS.doubleTapThresholds,
-    ...settings.doubleTapThresholds || {}
-  };
-  dt.windows = sanitizeDoubleTapThreshold(
-    dt.windows,
-    DEFAULT_SETTINGS.doubleTapThresholds.windows
-  );
-  dt.mac = sanitizeDoubleTapThreshold(
-    dt.mac,
-    DEFAULT_SETTINGS.doubleTapThresholds.mac
-  );
-  dt.android = sanitizeDoubleTapThreshold(
-    dt.android,
-    DEFAULT_SETTINGS.doubleTapThresholds.android
-  );
-  dt.ios = sanitizeDoubleTapThreshold(
-    dt.ios,
-    DEFAULT_SETTINGS.doubleTapThresholds.ios
-  );
-  dt.fallback = sanitizeDoubleTapThreshold(
-    dt.fallback,
-    DEFAULT_SETTINGS.doubleTapThresholds.fallback
-  );
-  settings.doubleTapThresholds = dt;
-  if (!settings.users || !settings.users.length) {
-    const user = makeDefaultUser();
-    settings.users = [user];
-    settings.currentUserId = user.id;
-    changed = true;
-  } else {
-    for (const user of settings.users) {
-      changed = ensureUserDefaults(user) || changed;
-    }
-    if (!settings.currentUserId || !settings.users.find((user) => user.id === settings.currentUserId)) {
-      settings.currentUserId = settings.users[0].id;
-      changed = true;
-    }
-  }
-  return { settings, changed };
-}
-function ensureUserDefaults(user) {
-  let changed = false;
-  const defaultDiaryModules = makeDefaultDiaryModules();
-  if (!user.id) {
-    user.id = "user_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
-    changed = true;
-  }
-  if (!user.name) {
-    user.name = "\u672A\u547D\u540D";
-    changed = true;
-  }
-  if (!user.savePath || !String(user.savePath).trim()) {
-    user.savePath = "Little Milestones/Daily Records";
-    changed = true;
-  }
-  if (!Array.isArray(user.items)) {
-    user.items = [];
-    changed = true;
-  }
-  if (!Array.isArray(user.categories) || !user.categories.length) {
-    user.categories = ["\u52A0\u5206\u9879", "\u51CF\u5206\u9879"];
-    changed = true;
-  }
-  if (typeof user.scoringRules !== "string") {
-    user.scoringRules = "";
-    changed = true;
-  }
-  if (!user.diaryTemplate) {
-    user.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
-    changed = true;
-  }
-  if (!Array.isArray(user.diaryModules) || user.diaryModules.length === 0) {
-    user.diaryModules = defaultDiaryModules;
-    changed = true;
-  } else {
-    user.diaryModules = user.diaryModules.map((moduleDef, index) => {
-      const fallback = defaultDiaryModules[index];
-      const next = {
-        ...moduleDef,
-        emoji: typeof moduleDef.emoji === "string" && moduleDef.emoji.trim() ? moduleDef.emoji : (fallback == null ? void 0 : fallback.emoji) || "\u{1F4DD}"
-      };
-      if (next.emoji !== moduleDef.emoji) changed = true;
-      return next;
-    });
-  }
-  const normalizedWeatherPresets = normalizeWeatherPresets(
-    user.weatherPresets,
-    makeDefaultWeatherPresets()
-  );
-  if (normalizedWeatherPresets.changed) changed = true;
-  user.weatherPresets = normalizedWeatherPresets.presets;
-  const normalizedMoodPresets = normalizeQuickPresets(
-    user.moodPresets,
-    makeDefaultMoodPresets()
-  );
-  if (normalizedMoodPresets.changed) changed = true;
-  user.moodPresets = normalizedMoodPresets.presets;
-  if (!user.goals) {
-    user.goals = { daily: 10, weekly: 70, monthly: 300 };
-    changed = true;
-  }
-  for (const item of user.items) {
-    if (!item.category) {
-      item.category = item.points >= 0 ? user.categories[0] : user.categories[1] || user.categories[0];
-      changed = true;
-    }
-  }
-  return changed;
-}
-var LEGACY_WEATHER_DEFAULT_LABELS = /* @__PURE__ */ new Set([
-  "\u6674",
-  "\u6674\u8F6C\u591A\u4E91",
-  "\u591A\u4E91",
-  "\u9634",
-  "\u96E8",
-  "\u96F7\u96E8",
-  "\u96EA",
-  "\u6709\u98CE",
-  "\u96FE",
-  "\u5F69\u8679"
-]);
-function normalizeWeatherPresets(value, defaults) {
-  if (isLegacyDefaultWeatherPresetSet(value)) {
-    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
-  }
-  return normalizeQuickPresets(value, defaults);
-}
-function isLegacyDefaultWeatherPresetSet(value) {
-  if (!Array.isArray(value) || value.length === 0) return false;
-  const labels = value.map((preset) => String((preset == null ? void 0 : preset.label) || "").trim());
-  const legacyLabelCount = labels.filter(
-    (label) => LEGACY_WEATHER_DEFAULT_LABELS.has(label)
-  ).length;
-  const hasSnow = labels.includes("\u96EA");
-  const hasLegacyOnlyLabel = labels.includes("\u6674\u8F6C\u591A\u4E91") || labels.includes("\u6709\u98CE") || labels.includes("\u96FE");
-  return hasSnow && legacyLabelCount >= 6 && (value.length > 8 || hasLegacyOnlyLabel);
-}
-function normalizeQuickPresets(value, defaults) {
-  if (!Array.isArray(value) || value.length === 0) {
-    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
-  }
-  let changed = value.length !== defaults.length;
-  const next = defaults.map((fallback, index) => {
-    const preset = value[index];
-    const emoji = typeof (preset == null ? void 0 : preset.emoji) === "string" && preset.emoji.trim() ? preset.emoji.trim() : fallback.emoji;
-    const label = typeof (preset == null ? void 0 : preset.label) === "string" && preset.label.trim() ? preset.label.trim() : fallback.label;
-    if (!preset || emoji !== preset.emoji || label !== preset.label) {
-      changed = true;
-    }
-    return { emoji, label };
-  });
-  return { presets: next, changed };
-}
 
 // src/storage/day-data-store.ts
 var import_obsidian21 = require("obsidian");

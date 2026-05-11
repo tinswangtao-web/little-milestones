@@ -2,39 +2,28 @@
 
 ## Current round goal
 
-用户原话目标：`验收。干第五组`
+用户原话目标：`请修一下日记模块的固定区块迁移兜底问题。`
 
-本轮处理的是 dirty 第 5 组：`2026-05-09-diary-module-order-presets-mobile-settings`。
+当前已按用户后续授权完成 Vault sync，等待用户在 Obsidian 中做最终验收。
 
 ## Architecture / approach summary（可选）
 
-- 第 5 组不是杂项，属于已存在任务卡的日记模块业务改动。
-- Cursor 已在 2026-05-09 18:28 复审通过，No blocking issues。
-- 本轮没有改业务逻辑，只重新验证当前 dirty 状态，并把协议记录从第 4 组切回第 5 组。
+- 新增共享 helper `normalizeDiaryModules()`，按 `id` 补齐 `weather` / `mood` / `comment`，并固定顺序为 `weather -> mood -> smallRecords -> comment`。
+- 归一化逻辑已前移到 `normalizePluginSettings()` / `ensureUserDefaults()`，旧配置即使不先打开 `设置页`，直接打开 `打分页` 也会自动恢复固定区块。
+- `设置页` 与 `打分页` 现在复用同一个 helper，不再保留“只补 `comment`”的单点兜底逻辑。
 
 ## Changed file list
 
-业务 dirty 范围：
+业务改动：
 
-- `src/constants.ts`
-- `src/types.ts`
 - `src/settings/normalize-settings.ts`
-- `src/settings/diary-module-settings.ts`
-- `src/modals/panels/desktop-diary-panel.ts`
 - `src/modals/panels/diary-panel.ts`
-- `src/modals/panels/diary-panel-fields.ts`
-- `src/ui/emoji-picker.ts`
-- `styles/02-popups.css`
-- `styles/04-diary.css`
-- `styles/06-settings.css`
-- `styles/07-mobile.css`
-- `styles.css`
+- `src/settings/diary-module-settings.ts`
 - `main.js`
-- `scripts/deploy.mjs`
 
 本轮协议记录更新：
 
-- `.agents/tasks/2026-05-09-diary-module-order-presets-mobile-settings.md`
+- `.agents/tasks/2026-05-11-diary-fixed-module-normalization.md`
 - `.agents/STATE.md`
 - `.agents/LOCK.md`
 - `.agents/log.md`
@@ -42,34 +31,32 @@
 
 ## User-visible behavior changes
 
-- `打分页` 与 `设置页` 日记模块顺序统一为：天气和心情 -> 各项小记录 -> 自由记录 -> 评语。
-- 天气/心情快捷预设可在设置页编辑并恢复默认。
-- 默认天气/心情为各 8 个，打分页按钮显示 emoji + 名称，布局为 4 列 x 2 行。
-- 各项小记录可在设置页拖动排序，打分页按设置顺序展示。
-- 移动端 emoji picker 靠近顶部，减少键盘遮挡。
-- `scripts/deploy.mjs` 默认 Vault 路径已指向用户当前 Vault：`/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones`。
+- 旧配置如果缺少 `weather` / `mood` / `comment`，现在在插件加载阶段就会自动补齐，不需要先进入 `设置页`。
+- `打分页` 打开时会使用归一化后的固定模块顺序，避免只显示部分固定区块。
+- `设置页` 与 `打分页` 对固定区块的补齐和排序口径一致。
 
 ## Verification already run
 
 - `npx tsc --noEmit`
 - `npm run build`
 - `node --check main.js`
-- `git diff --check -- main.js scripts/deploy.mjs src/constants.ts src/modals/panels/desktop-diary-panel.ts src/modals/panels/diary-panel-fields.ts src/modals/panels/diary-panel.ts src/settings/diary-module-settings.ts src/settings/normalize-settings.ts src/types.ts src/ui/emoji-picker.ts styles.css styles/02-popups.css styles/04-diary.css styles/06-settings.css styles/07-mobile.css`
+- `git diff --check -- main.js src/modals/panels/diary-panel.ts src/settings/diary-module-settings.ts src/settings/normalize-settings.ts`
+- 构造缺少 `weather` / `mood` / `comment` 的旧用户配置，走 `normalizePluginSettings()` 后检查输出
+- `npm run deploy`
+- `shasum main.js styles.css manifest.json <vault copies>`，确认 workspace 与 Vault 三文件一致
 
 ## Known risks / open points
 
-- 本组改动面较大，已按规则经过严格 Cursor review；当前仍需要用户在 Obsidian/Vault 中做最终手测。
-- 当前没有执行 Vault sync；同步需要用户明确授权。
-- 当前没有 commit；提交需要用户明确授权。
-- 工作树中第 4 组 `agent-collaboration-kit` 文档改动仍未提交，后续提交需分组 stage，避免混入。
+- 已完成严格 review，当前无阻塞问题；仍需要用户在 Obsidian / Vault 中验证旧配置缺少固定模块时的实际表现。
+- 当前已完成 Vault sync，但未 commit；若用户后续确认体验通过，仍需单独明确授权 commit。
 
 ## Strict Review AI review requested
 
-- `否`。Cursor 已复审通过；若用户要求，可再次 review 当前工作区。
+- `是`。已完成，结论：No blocking issues。
 
 ## Suggested user acceptance steps
 
-1. 同步到 Vault 后打开设置页，确认天气预设为 `晴 / 多云 / 阴 / 小雨 / 大雨 / 雷雨 / 台风 / 彩虹`，且不再出现 `雪`。
-2. 在设置页拖动各项小记录排序，打开打分页确认顺序同步并能重开保持。
-3. 在桌面和手机打分页确认天气/心情按钮为 4 列 x 2 行，显示 emoji + 名称。
-4. 在手机设置页和打分页打开 emoji picker，确认弹层靠上且键盘不遮挡主要选择区。
+1. 用一个旧配置或导入配置，制造缺少 `weather`、`mood` 或 `comment` 的情况。
+2. 不先打开 `设置页`，直接打开 `打分页`，确认天气和心情区块会自动出现。
+3. 重启 Obsidian 后再次打开 `打分页`，确认固定区块仍然存在且顺序为“天气和心情 -> 各项小记录 -> 自由记录 -> 评语”。
+4. 确认已有自定义小记录的内容、顺序和 placeholder 没有被错误重置。

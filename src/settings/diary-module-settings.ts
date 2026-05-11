@@ -1,6 +1,5 @@
 import { Notice } from "obsidian";
 import {
-  makeDefaultDiaryModules,
   makeDefaultMoodPresets,
   makeDefaultWeatherPresets,
 } from "../constants";
@@ -14,6 +13,10 @@ import {
 import { showEmojiPicker } from "../ui/emoji-picker";
 import { getMobilePlatform } from "../utils/platform";
 import type { DiaryModuleDefinition, DiaryQuickPreset } from "../types";
+import {
+  FIXED_DIARY_MODULE_IDS,
+  normalizeDiaryModules,
+} from "./normalize-settings";
 
 interface RenderDiaryModuleSettingsOptions {
   plugin: KidScorePlugin;
@@ -21,30 +24,10 @@ interface RenderDiaryModuleSettingsOptions {
   bindSettingsInput: (input: HTMLElement | null) => void;
 }
 
-const FIXED_DIARY_MODULE_IDS = new Set(["weather", "mood", "comment"]);
-
-function cloneModule(moduleDef: DiaryModuleDefinition): DiaryModuleDefinition {
-  return { ...moduleDef };
-}
-
-function ensureDiaryModules(plugin: KidScorePlugin): void {
-  const defaults = makeDefaultDiaryModules();
-  const current = Array.isArray(plugin.currentUser.diaryModules)
-    ? plugin.currentUser.diaryModules
-    : [];
-  const byId = new Map(current.map((moduleDef) => [moduleDef.id, moduleDef]));
-
-  for (const fallback of defaults) {
-    if (!byId.has(fallback.id)) {
-      byId.set(fallback.id, cloneModule(fallback));
-    }
-  }
-
-  const weather = byId.get("weather")!;
-  const mood = byId.get("mood")!;
-  const comment = byId.get("comment")!;
-  const smallRecords = current.filter((moduleDef) => !FIXED_DIARY_MODULE_IDS.has(moduleDef.id));
-  plugin.currentUser.diaryModules = [weather, mood, ...smallRecords, comment];
+function ensureDiaryModules(plugin: KidScorePlugin): boolean {
+  const normalized = normalizeDiaryModules(plugin.currentUser.diaryModules);
+  plugin.currentUser.diaryModules = normalized.modules;
+  return normalized.changed;
 }
 
 function getSmallRecordModules(plugin: KidScorePlugin): DiaryModuleDefinition[] {
@@ -95,7 +78,9 @@ export function renderDiaryModuleSettingsSection({
   let isOpen = true;
 
   const render = () => {
-    ensureDiaryModules(plugin);
+    if (ensureDiaryModules(plugin)) {
+      void plugin.saveSettings();
+    }
     ensurePresets(plugin);
     body.empty();
 
@@ -504,7 +489,7 @@ function renderSmallRecordsBlock({
       message: "恢复默认模块会替换当前小记录、天气/心情模块和评语设置，但不会修改历史日记内容。确定继续吗？",
       isDestructive: true,
       onConfirm: async () => {
-        plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+        plugin.currentUser.diaryModules = normalizeDiaryModules([]).modules;
         await plugin.saveSettings();
         render();
         new Notice("✅ 已恢复默认日记模块");

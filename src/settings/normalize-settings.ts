@@ -1,4 +1,9 @@
-import type { DiaryQuickPreset, PluginSettings, User } from "../types";
+import type {
+  DiaryModuleDefinition,
+  DiaryQuickPreset,
+  PluginSettings,
+  User,
+} from "../types";
 import {
   DEFAULT_DIARY_TEMPLATE,
   DEFAULT_SETTINGS,
@@ -23,6 +28,71 @@ type LoadedSettings = Partial<PluginSettings> & {
 export interface NormalizedSettingsResult {
   settings: PluginSettings;
   changed: boolean;
+}
+
+export const FIXED_DIARY_MODULE_IDS = new Set(["weather", "mood", "comment"]);
+
+export function normalizeDiaryModules(
+  value: User["diaryModules"] | undefined
+): { modules: DiaryModuleDefinition[]; changed: boolean } {
+  const defaults = makeDefaultDiaryModules();
+  const defaultById = new Map(defaults.map((moduleDef) => [moduleDef.id, moduleDef]));
+  const current = Array.isArray(value) ? value : [];
+  let changed = !Array.isArray(value);
+  const fixedById = new Map<string, DiaryModuleDefinition>();
+  const smallRecords: DiaryModuleDefinition[] = [];
+
+  if (current.length === 0) {
+    return { modules: defaults.map((moduleDef) => ({ ...moduleDef })), changed: true };
+  }
+
+  for (const moduleDef of current) {
+    if (!moduleDef || typeof moduleDef.id !== "string" || !moduleDef.id.trim()) {
+      changed = true;
+      continue;
+    }
+    const normalized = normalizeDiaryModuleDefinition(
+      moduleDef,
+      defaultById.get(moduleDef.id)
+    );
+    if (normalized.changed) changed = true;
+
+    if (FIXED_DIARY_MODULE_IDS.has(moduleDef.id)) {
+      if (fixedById.has(moduleDef.id)) {
+        changed = true;
+        continue;
+      }
+      fixedById.set(moduleDef.id, normalized.moduleDef);
+    } else {
+      smallRecords.push(normalized.moduleDef);
+    }
+  }
+
+  for (const fixedId of FIXED_DIARY_MODULE_IDS) {
+    if (!fixedById.has(fixedId)) {
+      const fallback = defaultById.get(fixedId);
+      if (fallback) {
+        fixedById.set(fixedId, { ...fallback });
+        changed = true;
+      }
+    }
+  }
+
+  const modules = [
+    fixedById.get("weather"),
+    fixedById.get("mood"),
+    ...smallRecords,
+    fixedById.get("comment"),
+  ].filter((moduleDef): moduleDef is DiaryModuleDefinition => !!moduleDef);
+
+  if (
+    current.length !== modules.length ||
+    current.some((moduleDef, index) => moduleDef?.id !== modules[index]?.id)
+  ) {
+    changed = true;
+  }
+
+  return { modules, changed };
 }
 
 export function sanitizeDoubleTapThreshold(
@@ -117,7 +187,6 @@ export function normalizePluginSettings(
 
 function ensureUserDefaults(user: User): boolean {
   let changed = false;
-  const defaultDiaryModules = makeDefaultDiaryModules();
 
   if (!user.id) {
     user.id =
@@ -148,23 +217,10 @@ function ensureUserDefaults(user: User): boolean {
     user.diaryTemplate = DEFAULT_DIARY_TEMPLATE;
     changed = true;
   }
-  if (!Array.isArray(user.diaryModules) || user.diaryModules.length === 0) {
-    user.diaryModules = defaultDiaryModules;
-    changed = true;
-  } else {
-    user.diaryModules = user.diaryModules.map((moduleDef, index) => {
-      const fallback = defaultDiaryModules[index];
-      const next = {
-        ...moduleDef,
-        emoji:
-          typeof moduleDef.emoji === "string" && moduleDef.emoji.trim()
-            ? moduleDef.emoji
-            : fallback?.emoji || "📝",
-      };
-      if (next.emoji !== moduleDef.emoji) changed = true;
-      return next;
-    });
-  }
+  const normalizedDiaryModules = normalizeDiaryModules(user.diaryModules);
+  if (normalizedDiaryModules.changed) changed = true;
+  user.diaryModules = normalizedDiaryModules.modules;
+
   const normalizedWeatherPresets = normalizeWeatherPresets(
     user.weatherPresets,
     makeDefaultWeatherPresets()
@@ -192,6 +248,37 @@ function ensureUserDefaults(user: User): boolean {
   }
 
   return changed;
+}
+
+function normalizeDiaryModuleDefinition(
+  moduleDef: DiaryModuleDefinition,
+  fallback: DiaryModuleDefinition | undefined
+): { moduleDef: DiaryModuleDefinition; changed: boolean } {
+  const emoji =
+    typeof moduleDef.emoji === "string" && moduleDef.emoji.trim()
+      ? moduleDef.emoji
+      : fallback?.emoji || "📝";
+  const label =
+    typeof moduleDef.label === "string"
+      ? moduleDef.label
+      : fallback?.label || "新模块";
+  const placeholder =
+    typeof moduleDef.placeholder === "string"
+      ? moduleDef.placeholder
+      : fallback?.placeholder || "这里写一点今天的记录";
+  const kind =
+    moduleDef.kind === "quick" || moduleDef.kind === "multi"
+      ? moduleDef.kind
+      : fallback?.kind || "multi";
+  const next = { ...moduleDef, emoji, label, placeholder, kind };
+  return {
+    moduleDef: next,
+    changed:
+      next.emoji !== moduleDef.emoji ||
+      next.label !== moduleDef.label ||
+      next.placeholder !== moduleDef.placeholder ||
+      next.kind !== moduleDef.kind,
+  };
 }
 
 const LEGACY_WEATHER_DEFAULT_LABELS = new Set([

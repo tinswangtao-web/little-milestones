@@ -1,6 +1,6 @@
 import { MarkdownRenderer } from "obsidian";
 import type { App, Component } from "obsidian";
-import { makeDefaultDiaryModules } from "../../constants";
+import { normalizeDiaryModules } from "../../settings/normalize-settings";
 import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import type KidScorePlugin from "../../main";
 import type { DiaryModuleValues } from "../../types";
@@ -69,24 +69,12 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   const diaryModules = options.diaryModules;
   let currentDiaryContent = diaryContent;
   const moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }> = [];
-  if (!plugin.currentUser.diaryModules || plugin.currentUser.diaryModules.length === 0) {
-    plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-  }
-  const moduleConfig = plugin.currentUser.diaryModules;
-  const defaultCommentModule = makeDefaultDiaryModules().find((moduleDef) => moduleDef.id === "comment") || {
-    id: "comment",
-    emoji: "💬",
-    label: "评语",
-    placeholder: "可以写今天的评语或反馈",
-    kind: "multi" as const,
-  };
-  if (defaultCommentModule && !moduleConfig.some((moduleDef) => moduleDef.id === "comment")) {
-    const insertAfterIndex = moduleConfig.findIndex((moduleDef) => moduleDef.id === "wantToSay");
-    moduleConfig.splice(insertAfterIndex >= 0 ? insertAfterIndex + 1 : moduleConfig.length, 0, {
-      ...defaultCommentModule,
-    });
+  const normalizedModules = normalizeDiaryModules(plugin.currentUser.diaryModules);
+  plugin.currentUser.diaryModules = normalizedModules.modules;
+  if (normalizedModules.changed) {
     void plugin.saveSettings();
   }
+  const moduleConfig = plugin.currentUser.diaryModules;
   const removeModule = (id: string) => {
     const moduleList = plugin.currentUser.diaryModules;
     const idx = moduleList.findIndex((m) => m.id === id);
