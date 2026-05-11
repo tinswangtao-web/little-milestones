@@ -1,6 +1,9 @@
 # 项目档案
 
-> **推荐**：将本文件复制到 **Git 仓库根目录**，命名为 **`PROJECT_PROFILE.md`**（与 `agent-collaboration-kit` 文件夹并列）。协议会优先读仓库根的这一份。  
+> **AI 引导说明**：本模板是首次接入时的**唯一问答源**。AI 应先按 `agent-collaboration-kit/.agents` 协议创建 onboarding 任务卡并取得写锁，再读取本模板；根据用户回答整理拟写内容与写入路径，征得用户确认后在仓库根生成正式 `PROJECT_PROFILE.md`。
+> 用户无需手动复制和填写模板；只需回答 AI 的问题，并确认最终生成内容与写入路径。
+>
+> **推荐**：将填好的版本放在 **Git 仓库根目录**，命名为 **`PROJECT_PROFILE.md`**（与 `agent-collaboration-kit` 文件夹并列）。协议会优先读仓库根的这一份。
 > **代码 AI** 与 **Review AI** 除阅读协作包内 `.agents/README.md` 外，应阅读本文件（若存在）。
 
 ---

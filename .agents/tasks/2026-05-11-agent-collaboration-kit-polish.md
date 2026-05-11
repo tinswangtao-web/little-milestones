@@ -3,7 +3,7 @@
 - **slug**: 2026-05-11-agent-collaboration-kit-polish
 - **owner**: none
 - **created**: 2026-05-11
-- **status**: awaiting-user-feedback
+- **status**: committing
 - **sync-to-vault**: n/a
 - **write-scope**: `agent-collaboration-kit/**`, `AGENTS.md`, `.gitignore`, `.agents/STATE.md`, `.agents/LOCK.md`, `.agents/log.md`
 - **read-scope**: `agent-collaboration-kit/**`, `AGENTS.md`, `.gitignore`, `.agents/**`
@@ -28,6 +28,8 @@
 6. 新增 `examples/minimal-project/`，给出项目档案、任务卡、交接卡、review 输出的填好样例。
 7. 根据 review 收口：让 example 任务卡对齐模板、补齐 `PROJECT_PROFILE.md` fallback stub、修正坏链接、统一文档角色命名。
 8. 继续补最后一层：统一 `STATE.md`、任务卡模板、流程文档与 example 中的状态字段与状态枚举。
+9. 再收 onboarding：首次接入也走协议（任务卡 + 锁），并统一 `template` / `fallback stub` 的职责。
+10. 根据用户确认继续收口：将首次接入的“自动完成/自动生成”口径改为“AI 引导 + 用户确认后写入”，并明确包内 `.agents` 与仓库根 `PROJECT_PROFILE.md` 的边界。
 
 ## 影响文件
 
@@ -63,6 +65,10 @@
 - [x] 文档角色命名在 `ROLES.md`、模板、README 中统一。
 - [x] `STATE.md` 与任务卡模板使用一套清晰、可解释的状态集合。
 - [x] `WORKFLOW.md`、`.agents/README.md` 与 example 对状态流转的说明一致。
+- [x] 首次接入引导本身也遵守 `.agents` 协议，不再绕过任务卡和写锁。
+- [x] `PROJECT_PROFILE.template.md` 成为唯一 onboarding 问答源，`PROJECT_PROFILE.md` fallback stub 仅作说明/引用，不再与模板打架。
+- [x] 首次接入不再承诺自动写根目录文件；AI 需先列出拟写内容与写入路径，经用户确认后再写入。
+- [x] 文档中明确运行时状态在 `agent-collaboration-kit/.agents/`，项目专属档案在仓库根 `PROJECT_PROFILE.md`。
 
 ## 记录
 
@@ -74,3 +80,8 @@
 - 2026-05-11 16:52 +0800：本轮收口完成：已新增包内 `PROJECT_PROFILE.md` fallback stub，修正 `PROJECT_PROFILE.template.md` 链接，example 任务卡改成当前模板结构，并统一 `文档 / Prompt AI` 命名。
 - 2026-05-11 17:08 +0800：继续补最后一层，聚焦状态契约：统一 `STATE.md`、任务卡模板、流程文档和 example 的状态字段与流转说明。
 - 2026-05-11 17:18 +0800：状态契约收口完成：`status` 与 `awaiting` 已拆分职责，`STATE.md`、任务卡模板、`.agents/README.md`、`WORKFLOW.md` 与 example 使用同一套推荐状态。
+- 2026-05-11 19:24 +0800：根据最新 review 继续收口 onboarding：让首次接入也走任务卡/锁流程，并把 `PROJECT_PROFILE.template.md` 与 `PROJECT_PROFILE.md` fallback stub 的职责拆清。
+- 2026-05-11 19:33 +0800：onboarding 收口完成：`AGENTS.md` 现要求首次接入也先开 onboarding 任务卡并占锁；`PROJECT_PROFILE.template.md` 成为唯一问答源；`PROJECT_PROFILE.md` 仅作 reference-only fallback stub；`README.md` 与 `QUICKSTART.md` 已统一到同一路径。
+- 2026-05-11 20:51 +0800：按用户确认继续执行建议：把首次接入文案从“自动生成/自动完成”收为“AI 引导、展示草案与写入范围、用户确认后写入”；同时明确包内 `agent-collaboration-kit/.agents/` 与仓库根 `PROJECT_PROFILE.md` 的职责边界。
+- 2026-05-11 22:32 +0800：用户要求继续第六步。Codex 确认当前只剩本规则包文档 dirty；旧自动写入口径 `rg` 检查无命中，目标文件 `git diff --check` 通过。用户先前已验收，但本组尚无明确 commit 授权。
+- 2026-05-11 22:35 +0800：用户明确授权“提交第 4 组”。Codex 准备选择性提交本规则包文档与对应协议记录；不需要 Vault sync，不 push。

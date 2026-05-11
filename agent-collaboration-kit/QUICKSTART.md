@@ -1,30 +1,28 @@
 # Quick Start
 
-适合第一次把 `agent-collaboration-kit` 用到新项目的人类或 AI。目标是：**5 分钟内接入，10 分钟内跑通第一轮协作**。
+适合第一次把 `agent-collaboration-kit` 用到新项目的人类或 AI。
 
-## 1. 接入
+## 接入（只需一步）
 
-把整个 `agent-collaboration-kit/` 复制到新项目仓库根目录，然后做三件事：
+把整个 `agent-collaboration-kit/` 复制到新项目仓库根目录。
 
-1. 在仓库根复制 `agent-collaboration-kit/PROJECT_PROFILE.template.md` 为 `PROJECT_PROFILE.md`
-2. 在仓库根 `.gitignore` 追加 `agent-collaboration-kit/gitignore.snippet` 的内容
-3. 让你的 AI 工具读取 `agent-collaboration-kit/AGENTS.md`
+然后告诉你的 AI：
 
-若工具不支持读取文件，就把 `AGENTS.md` 内容直接粘贴为项目规则。
+> "请读取 `agent-collaboration-kit/AGENTS.md`，按规则定义角色，并引导我完成项目接入。"
 
-## 2. 第一次进入项目
+AI 会检测是否需要首次接入引导，并带你完成剩余步骤：
 
-**代码 AI** 首次进入时，按这个顺序：
+- 先创建 onboarding 任务卡并占对应写锁
+- 问你几个项目信息（类型、语言、构建命令等）
+- 读取 `PROJECT_PROFILE.template.md`，整理仓库根 `PROJECT_PROFILE.md` 草案
+- 列出将写入的路径和项目档案摘要，等你确认
+- 在确认后创建仓库根正式 `PROJECT_PROFILE.md`
+- 检查并修补 `.gitignore`（加入 `.ai-deletion-backups/`，先征求确认）
+- 确认 `agent-collaboration-kit/.agents/` 状态文件就绪
 
-1. `git status --short`
-2. 读 `agent-collaboration-kit/WORKFLOW.md`
-3. 读 `agent-collaboration-kit/ROLES.md`
-4. 读 `agent-collaboration-kit/.agents/README.md`
-5. 优先读仓库根 `PROJECT_PROFILE.md`；若还没创建，则至少先看 `agent-collaboration-kit/PROJECT_PROFILE.md` fallback stub
-6. 读 `agent-collaboration-kit/.agents/STATE.md`
-7. 读当前任务卡与 `LOCK.md`
+你只需回答问题并确认最终写入范围，不需要手动复制模板；首次接入本身也按 `.agents` 协议执行。
 
-## 3. 第一个需求怎么走
+## 第一个需求怎么走
 
 用一句话理解流程：
 
@@ -32,7 +30,7 @@
 
 小改动可以跳过独立设计阶段；涉及存储、安全、迁移、关键交互时不要跳过。
 
-## 4. 你现在该看哪个文件
+## 你现在该看哪个文件
 
 | 场景 | 先看 |
 |------|------|
@@ -41,9 +39,9 @@
 | 我想决定技术路线 / 架构 | `ARCHITECTURE_GUIDE.md` |
 | 我想做 review / 补测试 | `QUALITY_STANDARDS.md` |
 | 我怕误删、想可恢复 | `BACKUP_AND_DELETION.md` |
-| 我想知道本项目自己的命令和约束 | `PROJECT_PROFILE.md` |
+| 我想知道本项目自己的命令和约束 | 仓库根 `PROJECT_PROFILE.md` |
 
-## 5. 第一轮协作的最小动作
+## 第一轮协作的最小动作
 
 ### 代码 AI
 
@@ -60,15 +58,15 @@
 3. 按 `REVIEW_OUTPUT_TEMPLATE.md` 输出
 4. 无阻塞问题时写 **No blocking issues**
 
-## 6. 常见坑
+## 常见坑
 
 - 没写任务卡就直接改代码
 - 没占锁就和另一个 AI 改同一文件
-- 用户没明确说“commit/提交”，就提前提交
+- 用户没明确说"commit/提交"，就提前提交
 - 删除/覆盖前没按 `BACKUP_AND_DELETION.md` 先备份
 - 项目特有命令没写进仓库根 `PROJECT_PROFILE.md`
 
-## 7. 最小示例
+## 最小示例
 
 可直接参考：
 

@@ -16,8 +16,9 @@
 
 **`PROJECT_PROFILE.md`（项目专属）** 阅读顺序：
 
-1. **Git 仓库根目录**下的 `PROJECT_PROFILE.md`（推荐把模板复制到根目录后填写）
-2. 若不存在，再读 **与本 `AGENTS.md` 同目录**下随包附带的 fallback `PROJECT_PROFILE.md`
+1. **Git 仓库根目录**下的 `PROJECT_PROFILE.md`（推荐由首次接入引导根据模板整理，并在用户确认后生成）
+2. 若不存在，读取同目录的 `PROJECT_PROFILE.template.md`，用于首次接入问答与生成
+3. 同目录的 `PROJECT_PROFILE.md` 仅作 fallback 说明文件，**不是**首次接入的问答源
 
 ## 进入后必做顺序
 
@@ -27,10 +28,55 @@
 2. 阅读 **与本文件同目录的** [WORKFLOW.md](WORKFLOW.md) 与 [ROLES.md](ROLES.md)（首轮或新任务开始时；日常小改可只复习 `.agents/README.md` 中的阶段摘要）
 3. 按需阅读 [ARCHITECTURE_GUIDE.md](ARCHITECTURE_GUIDE.md) 与 [QUALITY_STANDARDS.md](QUALITY_STANDARDS.md)（涉及架构选型或 review 时）
 4. 阅读 **与本文件同目录的** `.agents/README.md`
-5. 按上文顺序阅读 `PROJECT_PROFILE.md`（若任一处存在）
+5. 按上文顺序处理 `PROJECT_PROFILE` 相关文件（仓库根正式版优先；若不存在则读 `PROJECT_PROFILE.template.md`）
 6. 阅读 `.agents/STATE.md`
 7. 阅读 `STATE.md` 指向的当前任务文件
 8. 阅读 `.agents/LOCK.md`
+
+## 新项目首次接入（仍走协议）
+
+完成上面的启动顺序后，**代码 AI** 再检测是否需要首次接入引导。
+
+推荐检测信号：
+
+- 仓库根**不存在** `PROJECT_PROFILE.md`
+- 或协作包内 `.agents/STATE.md` 仍明显保留模板占位（例如 `<none | ...>` / `<idle | ...>`），说明尚未真正开始项目协作
+
+若进入首次接入，引导流程也必须遵守 `.agents` 协议：
+
+1. **先创建 onboarding 任务卡**
+   例如：`.agents/tasks/<date>-project-onboarding.md`
+
+2. **先更新 `STATE.md`**
+   把当前任务切到 onboarding；声明本轮 `write-scope`
+
+3. **先取得 `LOCK.md`**
+   至少覆盖：仓库根 `PROJECT_PROFILE.md`、仓库根 `.gitignore`、以及 `agent-collaboration-kit/.agents/**`
+
+4. **再向用户说明**
+   > "检测到这是首次使用协作规则包。我会按协议引导你完成接入，先整理项目档案草案和写入范围，待你确认后再写文件，然后进入第一个需求。"
+
+5. **读取 `PROJECT_PROFILE.template.md`**
+   以它作为首次接入问答源；不要把 fallback `PROJECT_PROFILE.md` 当成问答模板
+
+6. **逐项提问**（只问必要的，可跳过可选项）
+   - 项目类型是什么？（CLI / Web / Library / Mobile / Desktop / Plugin / Other）
+   - 主要编程语言和最低版本？（例：Node 22+ / Python 3.11+）
+   - 源码目录和构建命令？
+   - 是否有部署/同步到运行环境的步骤？
+   - 这个项目有什么特殊的严审触发条件吗？
+
+7. **确认写入范围与项目档案草案**
+   写入前向用户列出将修改的路径（通常是仓库根 `PROJECT_PROFILE.md`，以及可选的仓库根 `.gitignore`）和 `PROJECT_PROFILE.md` 草案摘要；得到用户确认后再写入。
+
+8. **在仓库根生成正式 `PROJECT_PROFILE.md`**
+   根据用户确认后的内容生成；之后以仓库根这份为项目专属真相源
+
+9. **检查 `.gitignore`**
+   若缺少 `.ai-deletion-backups/`，先与用户确认，再追加
+
+10. **完成 onboarding 收尾**
+   更新 `STATE.md` / `LOCK.md` / `log.md`，然后再继续处理用户的第一个正式需求
 
 ## 工作规则（摘要）
 
