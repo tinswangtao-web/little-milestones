@@ -72,7 +72,7 @@
 - [x] `git diff --check` (pass; existing `manifest.json`, `src/constants.ts`, and `styles/00-base.css` EOL warnings only)
 
 ## Status
-- `cursor-review-passed-awaiting-user-acceptance`
+- `user-verified-complete-committing`
 
 ## Notes
 - 2026-05-09 20:58 +0800：Implemented CSS-only responsive goals grid fix. No settings data structure or save logic changed. `styles.css` regenerated. Awaiting Cursor review; no Vault sync or commit authorized.
@@ -86,3 +86,4 @@
 - 2026-05-09 22:11 +0800：Cursor review 通过，未发现 P0/P1。确认移动端分类标题行右侧 `+` 新增打分项按钮间距修复只改 `styles/07-mobile.css` 的 `.kid-score-cat-header-mobile` / `.kid-score-cat-action-host-mobile`，不改桌面布局或新增打分项逻辑；`styles.css` 已包含对应规则。Cursor 重跑 `npx tsc --noEmit`、`npm run build`、`node --check main.js`、`git diff --check` 通过，仅有 `manifest.json` / `src/constants.ts` / `styles/00-base.css` 既有 EOL warning。等待用户验收或明确授权 Vault sync。
 - 2026-05-09 22:00 +0800：追加修复移动端分类标题行右侧 `+` 新增打分项按钮和下方第一行卡片贴太近的问题。仅在 `styles/07-mobile.css` 为 `.kid-score-cat-header-mobile` 增加 `margin-bottom: 10px`，为 `.kid-score-cat-action-host-mobile` 增加 `padding-bottom: 2px`；不改桌面端布局和新增打分项逻辑。Build/typecheck/node-check/diff-check 通过；等待 review，未同步 Vault，未 commit。
 - 2026-05-09 22:16 +0800：Cursor review 通过后，用户要求同步 Vault 验证移动端分类 `+` 按钮间距。已执行 `npm run deploy`，MATCH：`main.js 44358ad564f7`、`styles.css c0f5c6ca1bf5`、`manifest.json e2456f26890b`。Vault `styles.css` 确认包含 `.kid-score-cat-header-mobile { margin-bottom: 10px; }`、`.kid-score-cat-action-host-mobile { padding-bottom: 2px; }`，且保留 `.kid-score-custom-section-mobile` 间距修复。等待用户验证；无 commit 授权。
+- 2026-05-11：用户确认第 3 组验收通过并明确授权 commit；本次只提交本任务相关改动，不 push。

@@ -7731,9 +7731,10 @@ var KidScorePlugin = class extends import_obsidian22.Plugin {
   }
   async onload() {
     await this.loadSettings();
-    this.addRibbonIcon("star", "Little Milestones \u{1F331}", () => {
+    const ribbonIcon = this.addRibbonIcon("sprout", "\u{1F331} Little Milestones", () => {
       new DailyScoringModal(this.app, this).open();
     });
+    ribbonIcon.addClass("little-milestones-ribbon-icon");
     this.addCommand({
       id: "open-daily-score",
       name: "\u6253\u5F00\u4ECA\u65E5\u6253\u5206",

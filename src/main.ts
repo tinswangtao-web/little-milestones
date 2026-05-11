@@ -94,9 +94,10 @@ export default class KidScorePlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
-    this.addRibbonIcon("star", "Little Milestones 🌱", () => {
+    const ribbonIcon = this.addRibbonIcon("sprout", "🌱 Little Milestones", () => {
       new DailyScoringModal(this.app, this).open();
     });
+    ribbonIcon.addClass("little-milestones-ribbon-icon");
 
     this.addCommand({
       id: "open-daily-score",

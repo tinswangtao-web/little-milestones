@@ -141,6 +141,7 @@
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
+    margin-bottom: 10px;
   }
 
   .kid-score-cat-title-host-mobile,
@@ -150,6 +151,7 @@
 
   .kid-score-cat-action-host-mobile {
     justify-content: flex-end;
+    padding-bottom: 2px;
   }
 
   .kid-score-total-display-mobile {
@@ -568,6 +570,14 @@
     min-height: 48px;
     border-radius: 8px;
     line-height: 1.5;
+  }
+
+  .kid-score-custom-section-mobile {
+    margin-bottom: 10px;
+  }
+
+  .kid-score-custom-section-mobile .kid-score-add-custom-btn {
+    margin-bottom: 0;
   }
 
   .kid-score-cumulative-banner {

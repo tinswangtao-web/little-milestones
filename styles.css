@@ -5,6 +5,16 @@ button,
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
+
+.little-milestones-ribbon-icon {
+  color: #22c55e;
+}
+
+.little-milestones-ribbon-icon:hover,
+.little-milestones-ribbon-icon.is-active {
+  color: #16a34a;
+}
+
 @keyframes pulse {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.1); opacity: 0.8; }
@@ -2414,15 +2424,17 @@ textarea.custom-form-name-input {
 
 .kid-score-goals-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
   gap: 10px;
   margin-top: 8px;
+  min-width: 0;
 }
 
 .kid-score-goal-cell {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .kid-score-goal-cell label {
@@ -2431,6 +2443,9 @@ textarea.custom-form-name-input {
 }
 
 .kid-score-goal-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   padding: 6px 8px;
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
@@ -3153,6 +3168,7 @@ textarea.custom-form-name-input {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
+    margin-bottom: 10px;
   }
 
   .kid-score-cat-title-host-mobile,
@@ -3162,6 +3178,7 @@ textarea.custom-form-name-input {
 
   .kid-score-cat-action-host-mobile {
     justify-content: flex-end;
+    padding-bottom: 2px;
   }
 
   .kid-score-total-display-mobile {
@@ -3580,6 +3597,14 @@ textarea.custom-form-name-input {
     min-height: 48px;
     border-radius: 8px;
     line-height: 1.5;
+  }
+
+  .kid-score-custom-section-mobile {
+    margin-bottom: 10px;
+  }
+
+  .kid-score-custom-section-mobile .kid-score-add-custom-btn {
+    margin-bottom: 0;
   }
 
   .kid-score-cumulative-banner {
