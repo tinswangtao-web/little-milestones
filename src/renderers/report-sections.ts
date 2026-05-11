@@ -23,6 +23,12 @@ export function buildFrontmatter(report: DayReport): string {
       ...(item.note && item.note.trim() ? { note: item.note.trim() } : {}),
     }));
   }
+  const diaryModules = Object.fromEntries(
+    Object.entries(report.diaryModules || {}).filter(([, value]) => String(value || "").trim())
+  );
+  if (Object.keys(diaryModules).length > 0) {
+    frontmatter.diaryModules = diaryModules;
+  }
 
   return "---\n" + stringifyYaml(frontmatter).trimEnd() + "\n---\n\n";
 }

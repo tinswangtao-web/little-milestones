@@ -4,6 +4,7 @@ import { makeDefaultDiaryModules } from "../../constants";
 import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
 import type KidScorePlugin from "../../main";
 import type { DiaryModuleValues } from "../../types";
+import { countDiaryCharacters } from "../../diary/modules";
 import {
   createDiaryModuleField,
   createDiaryQuickGroup,
@@ -103,7 +104,10 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
 
 
   const updateCharCount = () => {
-    if (charCount) charCount.textContent = (currentDiaryContent || "").length + " 字";
+    if (!charCount) return;
+    const count = countDiaryCharacters(diaryModules, moduleConfig);
+    charCount.textContent = "日记字数：" + count + " 字（不含评语）";
+    charCount.title = "按字符数统计，仅统计有效用户输入，不含评语模块";
   };
 
   const syncAndRefresh = () => {

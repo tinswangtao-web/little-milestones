@@ -2449,6 +2449,215 @@ function bindTouchScrollGuard(containerEl, options = {}) {
   };
 }
 
+// src/diary/modules.ts
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+function readDiaryLine(content, label) {
+  const match = content.match(new RegExp(escapeRegex(label) + "\uFF1A\\s*(.+)"));
+  return match ? match[1].trim() : "";
+}
+function readDiarySection(content, heading) {
+  const match = content.match(
+    new RegExp("###\\s*" + escapeRegex(heading) + "\\s*([\\s\\S]*?)(?=\\n###\\s*|$)")
+  );
+  return match ? match[1].trim() : "";
+}
+function normalizeDiarySentence(value) {
+  return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
+}
+function normalizeBuiltInSampleValue(moduleId, value) {
+  const normalized = normalizeDiarySentence(String(value || ""));
+  const sampleValues = {
+    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86____",
+    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____",
+    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____",
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4____",
+    comment: "\u8BC4\u8BED____"
+  };
+  const emptyValues = {
+    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86\u65E0",
+    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86\u65E0",
+    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F\u65E0",
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4\u65E0",
+    comment: "\u8BC4\u8BED\u65E0"
+  };
+  if (emptyValues[moduleId] === normalized) return "";
+  return sampleValues[moduleId] === normalized ? "" : value || "";
+}
+var DIARY_COUNT_EXCLUDED_MODULE_IDS = /* @__PURE__ */ new Set(["comment"]);
+var DIARY_COUNT_NARRATIVE_PREFIXES = {
+  todayThing: "\u4ECA\u5929\u6211\u505A\u4E86",
+  learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86",
+  happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F",
+  wantToSay: "\u6211\u8FD8\u60F3\u8BF4"
+};
+function normalizeModuleValue(moduleId, value) {
+  return normalizeBuiltInSampleValue(
+    moduleId,
+    String(value || "").replace(/\s*\n+\s*/g, " / ").trim()
+  );
+}
+function normalizeCountableDiaryValue(moduleId, value) {
+  let normalized = normalizeModuleValue(moduleId, value);
+  const prefix = DIARY_COUNT_NARRATIVE_PREFIXES[moduleId];
+  if (prefix && normalized.startsWith(prefix)) {
+    normalized = normalizeDiarySentence(normalized.slice(prefix.length));
+  }
+  return normalized;
+}
+function readPrefixedSentence(lines, prefix) {
+  const line = lines.find((item) => item.startsWith(prefix));
+  return line ? normalizeDiarySentence(line.slice(prefix.length)) : "";
+}
+function isLabelLine(line, moduleConfig) {
+  return moduleConfig.some(
+    (moduleDef) => new RegExp("^" + escapeRegex(moduleDef.label) + "\uFF1A").test(line)
+  );
+}
+function fillNarrativeDiaryModules(result, content, moduleConfig) {
+  const storySection = readDiarySection(content, "\u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0");
+  if (!storySection) return;
+  const lines = storySection.split("\n").map((line) => line.trim()).filter(Boolean);
+  const consumed = /* @__PURE__ */ new Set();
+  const takeLine = (predicate) => {
+    const index = lines.findIndex((line, lineIndex) => !consumed.has(lineIndex) && predicate(line));
+    if (index < 0) return "";
+    consumed.add(index);
+    return normalizeDiarySentence(lines[index]);
+  };
+  const weather = readPrefixedSentence(lines, "\u4ECA\u5929\u7684\u5929\u6C14\u662F");
+  if (!result.weather && weather) {
+    result.weather = weather;
+    const index = lines.findIndex((line) => line.startsWith("\u4ECA\u5929\u7684\u5929\u6C14\u662F"));
+    if (index >= 0) consumed.add(index);
+  }
+  const mood = readPrefixedSentence(lines, "\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F");
+  if (!result.mood && mood) {
+    result.mood = mood;
+    const index = lines.findIndex((line) => line.startsWith("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F"));
+    if (index >= 0) consumed.add(index);
+  }
+  const exactPrefixes = {
+    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86",
+    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86",
+    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F",
+    wantToSay: "\u6211\u8FD8\u60F3\u8BF4",
+    comment: "\u8BC4\u8BED"
+  };
+  Object.entries(exactPrefixes).forEach(([id, prefix]) => {
+    if (result[id]) return;
+    const value = takeLine((line) => line.startsWith(prefix));
+    if (value) result[id] = value;
+  });
+  const narrativeIds = new Set(Object.keys(exactPrefixes));
+  const remainingLines = lines.filter((line, lineIndex) => !consumed.has(lineIndex) && !isLabelLine(line, moduleConfig)).map(normalizeDiarySentence).filter(Boolean);
+  moduleConfig.forEach((moduleDef) => {
+    if (!narrativeIds.has(moduleDef.id) || result[moduleDef.id]) return;
+    const nextLine = remainingLines.shift();
+    if (nextLine) result[moduleDef.id] = nextLine;
+  });
+}
+function fillPlainDiaryModules(result, content, moduleConfig) {
+  if (!content.trim()) return;
+  const hasStructuredValues = moduleConfig.some((moduleDef) => String(result[moduleDef.id] || "").trim().length > 0) || String(result.freeWrite || "").trim().length > 0;
+  if (hasStructuredValues) return;
+  const sections = content.split(/\n{2,}/).map((section) => section.trim()).filter(Boolean);
+  if (!sections.length) return;
+  const moduleLines = sections[0].split("\n").map((line) => normalizeDiarySentence(line.trim())).filter(Boolean);
+  if (!moduleLines.length) return;
+  const consumed = /* @__PURE__ */ new Set();
+  const assignLine = (moduleId, lineIndex, value) => {
+    if (!moduleConfig.some((moduleDef) => moduleDef.id === moduleId)) return;
+    if (result[moduleId]) return;
+    result[moduleId] = normalizeBuiltInSampleValue(moduleId, value);
+    consumed.add(lineIndex);
+  };
+  moduleLines.forEach((line, lineIndex) => {
+    const prefixedEntry = Object.entries(DIARY_COUNT_NARRATIVE_PREFIXES).find(
+      ([, prefix]) => line.startsWith(prefix)
+    );
+    if (!prefixedEntry) return;
+    assignLine(prefixedEntry[0], lineIndex, line);
+  });
+  const remainingModuleLines = moduleLines.filter((_, lineIndex) => !consumed.has(lineIndex));
+  const freeWriteSections = [...remainingModuleLines, ...sections.slice(1)].filter(Boolean);
+  result.freeWrite = freeWriteSections.join("\n\n").trim();
+}
+function parseDiaryModules(content, moduleConfig) {
+  const raw = content || "";
+  const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
+  const result = {
+    freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : ""
+  };
+  moduleConfig.forEach((moduleDef) => {
+    result[moduleDef.id] = normalizeBuiltInSampleValue(
+      moduleDef.id,
+      readDiaryLine(raw, moduleDef.label)
+    );
+  });
+  fillNarrativeDiaryModules(result, raw, moduleConfig);
+  moduleConfig.forEach((moduleDef) => {
+    result[moduleDef.id] = normalizeBuiltInSampleValue(moduleDef.id, result[moduleDef.id]);
+  });
+  fillPlainDiaryModules(result, raw, moduleConfig);
+  return result;
+}
+function composeDiaryContent(values, moduleConfig) {
+  const sections = [];
+  const contentLines = [];
+  const normalizedValues = {};
+  const appendDiaryValue = (text) => {
+    const cleaned = String(text || "").trim();
+    if (!cleaned) return;
+    contentLines.push(cleaned);
+  };
+  moduleConfig.forEach((moduleDef) => {
+    const value = normalizeModuleValue(moduleDef.id, values[moduleDef.id]);
+    normalizedValues[moduleDef.id] = value;
+  });
+  if (normalizedValues.weather) appendDiaryValue(normalizedValues.weather);
+  if (normalizedValues.mood) appendDiaryValue(normalizedValues.mood);
+  if (normalizedValues.todayThing) appendDiaryValue(normalizedValues.todayThing);
+  if (normalizedValues.learnedThing) appendDiaryValue(normalizedValues.learnedThing);
+  if (normalizedValues.happyThing) appendDiaryValue(normalizedValues.happyThing);
+  if (normalizedValues.wantToSay) appendDiaryValue(normalizedValues.wantToSay);
+  moduleConfig.forEach((moduleDef) => {
+    if ([
+      "weather",
+      "mood",
+      "todayThing",
+      "learnedThing",
+      "happyThing",
+      "wantToSay",
+      "comment"
+    ].includes(moduleDef.id)) {
+      return;
+    }
+    if (!normalizedValues[moduleDef.id]) return;
+    appendDiaryValue(normalizedValues[moduleDef.id]);
+  });
+  if (contentLines.length) sections.push(contentLines.join("\n"));
+  if (values.freeWrite && values.freeWrite.trim()) {
+    sections.push(values.freeWrite.trim());
+  }
+  return sections.join("\n\n").trim();
+}
+function composeDiaryCommentContent(values) {
+  return normalizeModuleValue("comment", values.comment);
+}
+function countDiaryCharacters(values, moduleConfig) {
+  const countableValues = [];
+  moduleConfig.forEach((moduleDef) => {
+    if (DIARY_COUNT_EXCLUDED_MODULE_IDS.has(moduleDef.id)) return;
+    const value = normalizeCountableDiaryValue(moduleDef.id, values[moduleDef.id]);
+    if (value) countableValues.push(value);
+  });
+  const freeWrite = String(values.freeWrite || "").trim();
+  if (freeWrite) countableValues.push(freeWrite);
+  return countableValues.reduce((sum, value) => sum + Array.from(value).length, 0);
+}
+
 // src/ui/emoji-picker-search.ts
 function getEmojiCategoryKeys() {
   return Object.keys(EMOJI_DATA);
@@ -3093,7 +3302,10 @@ function buildDiaryPanel(options) {
   };
   let diaryTextarea = null;
   const updateCharCount = () => {
-    if (charCount) charCount.textContent = (currentDiaryContent || "").length + " \u5B57";
+    if (!charCount) return;
+    const count = countDiaryCharacters(diaryModules, moduleConfig);
+    charCount.textContent = "\u65E5\u8BB0\u5B57\u6570\uFF1A" + count + " \u5B57\uFF08\u4E0D\u542B\u8BC4\u8BED\uFF09";
+    charCount.title = "\u6309\u5B57\u7B26\u6570\u7EDF\u8BA1\uFF0C\u4EC5\u7EDF\u8BA1\u6709\u6548\u7528\u6237\u8F93\u5165\uFF0C\u4E0D\u542B\u8BC4\u8BED\u6A21\u5757";
   };
   const syncAndRefresh = () => {
     currentDiaryContent = composeDiaryContent2();
@@ -3892,148 +4104,6 @@ function openQuickCustomAdjustModal(options) {
 
 // src/modals/helpers/daily-modal-state.ts
 var import_obsidian6 = require("obsidian");
-
-// src/diary/modules.ts
-function escapeRegex(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-function readDiaryLine(content, label) {
-  const match = content.match(new RegExp(escapeRegex(label) + "\uFF1A\\s*(.+)"));
-  return match ? match[1].trim() : "";
-}
-function readDiarySection(content, heading) {
-  const match = content.match(
-    new RegExp("###\\s*" + escapeRegex(heading) + "\\s*([\\s\\S]*?)(?=\\n###\\s*|$)")
-  );
-  return match ? match[1].trim() : "";
-}
-function normalizeDiarySentence(value) {
-  return value.trim().replace(/[。！？.!?]\s*$/, "").trim();
-}
-function normalizeBuiltInSampleValue(moduleId, value) {
-  const normalized = normalizeDiarySentence(String(value || ""));
-  const sampleValues = {
-    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86____",
-    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86____",
-    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F____",
-    wantToSay: "\u6211\u8FD8\u60F3\u8BF4____",
-    comment: "\u8BC4\u8BED____"
-  };
-  return sampleValues[moduleId] === normalized ? "" : value || "";
-}
-function readPrefixedSentence(lines, prefix) {
-  const line = lines.find((item) => item.startsWith(prefix));
-  return line ? normalizeDiarySentence(line.slice(prefix.length)) : "";
-}
-function isLabelLine(line, moduleConfig) {
-  return moduleConfig.some(
-    (moduleDef) => new RegExp("^" + escapeRegex(moduleDef.label) + "\uFF1A").test(line)
-  );
-}
-function fillNarrativeDiaryModules(result, content, moduleConfig) {
-  const storySection = readDiarySection(content, "\u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0");
-  if (!storySection) return;
-  const lines = storySection.split("\n").map((line) => line.trim()).filter(Boolean);
-  const consumed = /* @__PURE__ */ new Set();
-  const takeLine = (predicate) => {
-    const index = lines.findIndex((line, lineIndex) => !consumed.has(lineIndex) && predicate(line));
-    if (index < 0) return "";
-    consumed.add(index);
-    return normalizeDiarySentence(lines[index]);
-  };
-  const weather = readPrefixedSentence(lines, "\u4ECA\u5929\u7684\u5929\u6C14\u662F");
-  if (!result.weather && weather) {
-    result.weather = weather;
-    const index = lines.findIndex((line) => line.startsWith("\u4ECA\u5929\u7684\u5929\u6C14\u662F"));
-    if (index >= 0) consumed.add(index);
-  }
-  const mood = readPrefixedSentence(lines, "\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F");
-  if (!result.mood && mood) {
-    result.mood = mood;
-    const index = lines.findIndex((line) => line.startsWith("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F"));
-    if (index >= 0) consumed.add(index);
-  }
-  const exactPrefixes = {
-    todayThing: "\u4ECA\u5929\u6211\u505A\u4E86",
-    learnedThing: "\u4ECA\u5929\u6211\u5B66\u4F1A\u4E86",
-    happyThing: "\u4ECA\u5929\u6700\u5F00\u5FC3\u7684\u662F",
-    wantToSay: "\u6211\u8FD8\u60F3\u8BF4",
-    comment: "\u8BC4\u8BED"
-  };
-  Object.entries(exactPrefixes).forEach(([id, prefix]) => {
-    if (result[id]) return;
-    const value = takeLine((line) => line.startsWith(prefix));
-    if (value) result[id] = value;
-  });
-  const narrativeIds = new Set(Object.keys(exactPrefixes));
-  const remainingLines = lines.filter((line, lineIndex) => !consumed.has(lineIndex) && !isLabelLine(line, moduleConfig)).map(normalizeDiarySentence).filter(Boolean);
-  moduleConfig.forEach((moduleDef) => {
-    if (!narrativeIds.has(moduleDef.id) || result[moduleDef.id]) return;
-    const nextLine = remainingLines.shift();
-    if (nextLine) result[moduleDef.id] = nextLine;
-  });
-}
-function parseDiaryModules(content, moduleConfig) {
-  const raw = content || "";
-  const freeWriteMatch = raw.match(/###\s*自由记录\s*([\s\S]*)$/);
-  const result = {
-    freeWrite: freeWriteMatch ? freeWriteMatch[1].trim() : ""
-  };
-  moduleConfig.forEach((moduleDef) => {
-    result[moduleDef.id] = normalizeBuiltInSampleValue(
-      moduleDef.id,
-      readDiaryLine(raw, moduleDef.label)
-    );
-  });
-  fillNarrativeDiaryModules(result, raw, moduleConfig);
-  moduleConfig.forEach((moduleDef) => {
-    result[moduleDef.id] = normalizeBuiltInSampleValue(moduleDef.id, result[moduleDef.id]);
-  });
-  return result;
-}
-function composeDiaryContent(values, moduleConfig) {
-  const sections = [];
-  const storyLines = [];
-  const normalizedValues = {};
-  const appendSentence = (text) => {
-    const cleaned = String(text || "").trim();
-    if (!cleaned) return;
-    storyLines.push(/[。！？.!?]$/.test(cleaned) ? cleaned : cleaned + "\u3002");
-  };
-  moduleConfig.forEach((moduleDef) => {
-    const value = String(values[moduleDef.id] || "").replace(/\s*\n+\s*/g, " / ").trim();
-    normalizedValues[moduleDef.id] = value;
-  });
-  if (normalizedValues.weather) appendSentence("\u4ECA\u5929\u7684\u5929\u6C14\u662F" + normalizedValues.weather);
-  if (normalizedValues.mood) appendSentence("\u6211\u4ECA\u5929\u7684\u5FC3\u60C5\u662F" + normalizedValues.mood);
-  if (normalizedValues.todayThing) appendSentence(normalizedValues.todayThing);
-  if (normalizedValues.learnedThing) appendSentence(normalizedValues.learnedThing);
-  if (normalizedValues.happyThing) appendSentence(normalizedValues.happyThing);
-  if (normalizedValues.wantToSay) appendSentence(normalizedValues.wantToSay);
-  if (normalizedValues.comment) appendSentence("\u8BC4\u8BED\uFF1A" + normalizedValues.comment);
-  moduleConfig.forEach((moduleDef) => {
-    if ([
-      "weather",
-      "mood",
-      "todayThing",
-      "learnedThing",
-      "happyThing",
-      "wantToSay",
-      "comment"
-    ].includes(moduleDef.id)) {
-      return;
-    }
-    if (!normalizedValues[moduleDef.id]) return;
-    appendSentence(moduleDef.label + "\uFF1A" + normalizedValues[moduleDef.id]);
-  });
-  if (storyLines.length) sections.push("### \u4ECA\u5929\u7684\u5C0F\u65E5\u8BB0\n" + storyLines.join("\n"));
-  if (values.freeWrite && values.freeWrite.trim()) {
-    sections.push("### \u81EA\u7531\u8BB0\u5F55\n" + values.freeWrite.trim());
-  }
-  return sections.join("\n\n").trim();
-}
-
-// src/modals/helpers/daily-modal-state.ts
 async function loadDailyModalState(plugin, dateStr) {
   const yesterdayStr = shiftDateString(dateStr, -1);
   const todayFile = plugin.app.vault.getAbstractFileByPath(plugin.filePath(dateStr));
@@ -4052,7 +4122,7 @@ async function loadDailyModalState(plugin, dateStr) {
   const customItems = (existingToday == null ? void 0 : existingToday.customItems) || [];
   const diaryContent = (existingToday == null ? void 0 : existingToday.diaryContent) || "";
   const moduleConfig = plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length ? plugin.currentUser.diaryModules : makeDefaultDiaryModules();
-  const diaryModules = diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {};
+  const diaryModules = (existingToday == null ? void 0 : existingToday.diaryModules) || (diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {});
   return {
     hasExistingRecord,
     yesterdayData,
@@ -5179,7 +5249,13 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
         onSave: async () => {
           self.syncDiaryContent();
           try {
-            await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            await self.plugin.saveDayData(
+              self.dateStr,
+              self.scores,
+              self.customItems,
+              self.diaryContent,
+              self.diaryModules
+            );
             self.skipNextCloseDraftSave = true;
             self.clearDiaryDraft();
             const filePath = self.plugin.filePath(self.dateStr);
@@ -7034,7 +7110,7 @@ var DayDataComposer = class {
   constructor(plugin) {
     this.plugin = plugin;
   }
-  async compose(dateStr, scores, customItems, diaryContent) {
+  async compose(dateStr, scores, customItems, diaryContent, diaryModuleValues) {
     const items = this.plugin.currentUser.items;
     const childName = this.plugin.currentUser.name;
     const yesterdayStr = shiftDateString(dateStr, -1);
@@ -7092,6 +7168,8 @@ var DayDataComposer = class {
     );
     const diaryText = diaryContent || "";
     const diaryModules = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
+    const resolvedDiaryModuleValues = diaryModuleValues || (diaryText ? parseDiaryModules(diaryText, diaryModules) : {});
+    const diaryCharacterCount = countDiaryCharacters(resolvedDiaryModuleValues, diaryModules);
     const weatherModule = diaryModules.find((moduleDef) => moduleDef.id === "weather");
     const moodModule = diaryModules.find((moduleDef) => moduleDef.id === "mood");
     const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
@@ -7106,6 +7184,8 @@ var DayDataComposer = class {
       scores,
       customItems,
       diaryContent,
+      diaryModules: resolvedDiaryModuleValues,
+      diaryCharacterCount,
       goals: this.plugin.currentUser.goals,
       total,
       earnedCount,
@@ -7122,8 +7202,8 @@ var DayDataComposer = class {
       hasYesterday: !!yesterdayData,
       yesterdayData,
       tags: {
-        weather: weatherModule ? readDiaryLine(diaryText, weatherModule.label) || void 0 : void 0,
-        mood: moodModule ? readDiaryLine(diaryText, moodModule.label) || void 0 : void 0,
+        weather: weatherModule ? resolvedDiaryModuleValues.weather || void 0 : void 0,
+        mood: moodModule ? resolvedDiaryModuleValues.mood || void 0 : void 0,
         homeCook: homeCookMatch ? homeCookMatch[1].trim() : void 0,
         exercise: exerciseMatch ? exerciseMatch[1].trim() : void 0,
         sleep: sleepMatch ? sleepMatch[1].trim() : void 0,
@@ -7161,6 +7241,12 @@ function buildFrontmatter(report) {
       points: item.points,
       ...item.note && item.note.trim() ? { note: item.note.trim() } : {}
     }));
+  }
+  const diaryModules = Object.fromEntries(
+    Object.entries(report.diaryModules || {}).filter(([, value]) => String(value || "").trim())
+  );
+  if (Object.keys(diaryModules).length > 0) {
+    frontmatter.diaryModules = diaryModules;
   }
   return "---\n" + (0, import_obsidian20.stringifyYaml)(frontmatter).trimEnd() + "\n---\n\n";
 }
@@ -7251,7 +7337,9 @@ function renderScoreCell(actual, isDeduct) {
 // src/renderers/report-builder.ts
 var MarkdownReportBuilder = class {
   build(report) {
-    return buildFrontmatter(report) + "# \u{1F4CB} " + report.dateStr + " " + report.childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n" + buildSummaryCallout(report) + "\n" + buildGoalCallout(report) + "\n---\n" + buildCategoryTables(report) + buildCustomItemsCallout(report.customItems) + "---\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (report.diaryContent || "") + "\n";
+    const diaryComment = composeDiaryCommentContent(report.diaryModules || {});
+    const commentSection = diaryComment ? "\n\n## \u{1F4AC} \u8BC4\u8BED\n\n" + diaryComment + "\n" : "\n";
+    return buildFrontmatter(report) + "# \u{1F4CB} " + report.dateStr + " " + report.childName + "\u7684\u6BCF\u65E5\u8BB0\u5F55\n\n" + buildSummaryCallout(report) + "\n" + buildGoalCallout(report) + "\n---\n" + buildCategoryTables(report) + buildCustomItemsCallout(report.customItems) + "---\n\n> \u5B57\u6570\uFF08\u4E0D\u542B\u8BC4\u8BED\uFF09\uFF1A**" + report.diaryCharacterCount + " \u5B57**\n\n## \u{1F4DD} \u4ECA\u65E5\u65E5\u8BB0\n\n" + (report.diaryContent || "") + commentSection;
   }
 };
 
@@ -7299,7 +7387,7 @@ var DayDataStore = class {
     const frontmatter = this.readFrontmatterFromContent(content);
     return frontmatter ? this.buildDayDataFromFrontmatter(frontmatter, dateStr) : null;
   }
-  async saveDayData(dateStr, scores, customItems, diaryContent) {
+  async saveDayData(dateStr, scores, customItems, diaryContent, diaryModules) {
     try {
       const composer = new DayDataComposer(this.plugin);
       const builder = new MarkdownReportBuilder();
@@ -7307,7 +7395,8 @@ var DayDataStore = class {
         dateStr,
         scores,
         customItems,
-        diaryContent
+        diaryContent,
+        diaryModules
       );
       const fileContent = builder.build(report);
       await this.ensureFolder(this.plugin.currentUser.savePath);
@@ -7447,6 +7536,7 @@ var DayDataStore = class {
       scores,
       customItems,
       total,
+      diaryModules: this.normalizeDiaryModules(frontmatter.diaryModules),
       ...content !== void 0 ? { diaryContent: this.extractDiaryContent(content) } : {}
     };
   }
@@ -7487,6 +7577,16 @@ var DayDataStore = class {
     if (!Array.isArray(rawCustomItems)) return [];
     return rawCustomItems.map((entry, index) => this.normalizeCustomItem(entry, dateStr, index)).filter((entry) => !!entry);
   }
+  normalizeDiaryModules(rawDiaryModules) {
+    if (!rawDiaryModules || typeof rawDiaryModules !== "object") return void 0;
+    const result = {};
+    for (const [key, value] of Object.entries(rawDiaryModules)) {
+      if (typeof value !== "string") continue;
+      if (!value.trim()) continue;
+      result[key] = value;
+    }
+    return Object.keys(result).length > 0 ? result : void 0;
+  }
   normalizeCustomItem(rawItem, dateStr, index) {
     if (typeof rawItem === "string") {
       const parts = rawItem.split("|");
@@ -7526,13 +7626,20 @@ var DayDataStore = class {
     const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
     if ((diaryHeadingMatch == null ? void 0 : diaryHeadingMatch.index) !== void 0) {
-      return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();
+      const afterDiaryHeading = body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length);
+      return this.stripDiaryCommentSection(afterDiaryHeading).trim();
     }
     const diaryIdx = body.indexOf(DIARY_MARKER);
     if (diaryIdx !== -1) {
-      return body.slice(diaryIdx + DIARY_MARKER.length).replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "").trim();
+      const diaryBody = body.slice(diaryIdx + DIARY_MARKER.length).replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "");
+      return this.stripDiaryCommentSection(diaryBody).trim();
     }
     return "";
+  }
+  stripDiaryCommentSection(diaryBody) {
+    const commentHeadingMatch = /^##\s*💬\s*评语\s*$/m.exec(diaryBody);
+    if ((commentHeadingMatch == null ? void 0 : commentHeadingMatch.index) === void 0) return diaryBody;
+    return diaryBody.slice(0, commentHeadingMatch.index);
   }
   readSchemaVersion(rawSchemaVersion) {
     const version = Number(rawSchemaVersion);
@@ -7621,12 +7728,13 @@ var KidScorePlugin = class extends import_obsidian22.Plugin {
   async readDayData(dateStr, options) {
     return this.dayDataStore.readDayData(dateStr, options);
   }
-  async saveDayData(dateStr, scores, customItems, diaryContent) {
+  async saveDayData(dateStr, scores, customItems, diaryContent, diaryModules) {
     await this.dayDataStore.saveDayData(
       dateStr,
       scores,
       customItems,
-      diaryContent
+      diaryContent,
+      diaryModules
     );
   }
   async renameUserInFiles(oldName, newName) {

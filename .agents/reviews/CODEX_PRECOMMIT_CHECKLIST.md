@@ -1,83 +1,91 @@
-# Codex 提交前自检模板（与 Cursor Review 配套）
-
-用途：Codex 每次准备“提交/同步Vault”前，必须填完发给用户与 Cursor  
-目标：减少返工、避免错误提交
+# Codex 提交前自检
 
 ## A. 本轮目标
 
-- 用户目标：
-- 本轮实际完成：
-- 未完成项（如有）：
+- 用户目标：日记字数统计、Markdown 字数字段、排除评语；后续要求日记 Markdown 只保留用户输入内容，不输出内部标题/固定句式；最新验收反馈要求自由记录留在今日日记章节，评语拆成同级章节。
+- 本轮实际完成：用 frontmatter 结构化 `diaryModules` 保证 label-free Markdown 可逆回读；评语从主日记正文拆出，渲染为 `## 💬 评语`，自由记录仍留在 `## 📝 今日日记` 内；已完成本地验证。
+- 未完成项：无；用户已完成 Vault 手测验收并明确授权 commit。本轮不 push。
 
 ## B. 改动范围
 
 - 代码文件：
-  - `src/...`
-  - `styles/...`
+  - `src/diary/modules.ts`
+  - `src/renderers/report-builder.ts`
+  - `src/types.ts`
+  - `src/storage/day-data-store.ts`
+  - `src/composers/day-data-composer.ts`
+  - `src/renderers/report-sections.ts`
+  - `src/modals/helpers/daily-modal-state.ts`
+  - `src/modals/daily-scoring-modal.ts`
+  - `src/main.ts`
+  - `src/modals/panels/diary-panel.ts`
 - 产物文件：
-  - `main.js`（是/否）
-  - `styles.css`（是/否）
-- 协议文件（如有）：
-  - `.agents/...`
+  - `main.js`
+  - `styles.css`（由 build 刷新）
+- 协议文件：
+  - `.agents/**`
 
-## C. 风险自检（必答）
+## C. 风险自检
 
-- 是否涉及数据读写/迁移：`是/否`
-- 是否涉及移动端键盘/触摸/overlay：`是/否`
-- 是否涉及保存流程/文件路径：`是/否`
-- 是否跨 3 个以上文件：`是/否`
-- 若任一为“是”，是否已请求 Cursor 严格review：`是/否`
+- 是否涉及数据读写/迁移：`是，新增读取/写入 frontmatter.diaryModules`
+- 是否涉及 composer/parser/renderer 输出：`是`
+- 是否涉及移动端键盘/触摸/overlay：`否`
+- 是否涉及保存流程/文件路径：`是，saveDayData 传递结构化 diaryModules`
+- 是否跨 3 个以上文件：`是`
+- 若任一为“是”，是否已请求 Cursor 严格review：`是，review card 已更新`
 
 ## D. 验证结果
 
-- Build：`通过/失败`
-- Typecheck/Lint：`通过/失败`
-- 手工验证（列步骤）：
-  1. ...
-  2. ...
-  3. ...
-- 结果：
-  - [ ] 与用户目标一致
-  - [ ] 无明显回归
-  - [ ] 异常场景已测（至少1个）
+- Build：`通过`
+- Typecheck/Lint：`通过`
+- `node --check main.js`：`通过`
+- Intended-file `git diff --check`：`通过`
+- Full `git diff --check`：`失败于无关 dirty 文件 .gitignore / agent-collaboration-kit/** trailing whitespace`
+- 行为验证：
+  1. 普通一行自由记录解析为 `freeWrite`，不再被猜为 `weather`
+  2. 普通一行 `跑步` 解析为 `freeWrite`，不再被猜为 `weather`
+  3. prefixed `今天我做了跑步` 兜底解析为 `todayThing`
+  4. `todayThing='无'` compose 后仍显示 `无`
+  5. diary compose 保留 freeWrite 在主日记正文，并排除 comment
+  6. comment compose 单独返回评语内容，用于 `## 💬 评语`
+  7. 旧/边界日记正文里的 `## 我的小标题` 不会被截断
+  8. 新生成的 `## 💬 评语` 会从 extracted `diaryContent` 中排除
+  9. 模块多行值与 compose/count 的 ` / ` 归一一致
+  10. comment-only 字数为 0
 
-## E. Vault 同步检查（若要同步）
+## E. Vault 同步检查
 
-- 是否已获用户同意同步：`是/否`
-- 同步前：
-  - [ ] `manifest.json/main.js/styles.css` 为当前最新版本
-- 同步后：
-  - [ ] 三文件 hash/diff 一致（workspace vs vault）
-- 同步结果：`成功/失败`
+- 是否已获用户同意同步最新修复：`是，2026-05-11 15:20 +0800 用户明确要求同步到当前 Vault`
+- 最新修复同步结果：`已执行，npm run deploy + verify-only 均通过`
+- 上一次 Vault sync：
+  - `MATCH main.js 2ada6872a653`
+  - `MATCH styles.css c0f5c6ca1bf5`
+  - `MATCH manifest.json e2456f26890b`
 
-## F. 提交门禁（必须全部满足）
+## F. 提交门禁
 
-- [ ] 用户明确说“可以提交/commit”
-- [ ] Cursor review 结论不是“需修复”
-- [ ] P0 问题为 0
-- [ ] 产物与源码一致（若本轮有对应改动）
-- [ ] `.agents` 记录已更新（STATE/LOCK/log/task）
+- [x] 用户明确说“可以提交/commit”
+- [x] Follow-up review 结论不是“需修复”
+- [x] P0 问题为 0
+- [x] 产物与源码一致
+- [x] `.agents` 记录已更新
 
 ## G. 建议提交信息
 
-- commit message：
-  - `[codex] ...`
-- 包含内容摘要（1-2行）：
-  - ...
+- `[code-ai] refine diary markdown output`
 
-## H. 需要用户做的最后确认（非技术）
+## H. 需要用户做的最后确认
 
-- 请你只测这 2-3 项：
-  1. ...
-  2. ...
-  3. ...
-- 如果都通过，我再执行：
-  - `提交 / 同步Vault / 两者都做`
+1. “今天做了”只输入 `无`，保存重开仍保留。
+2. 天气、心情、今天做了保存重开后仍在对应模块，且 Markdown 不重复。
+3. 今日日记下方没有自动标题/固定句式，只显示用户输入内容。
+4. 只填评语时字数为 0。
+5. 同时填自由记录和评语时，自由记录在 `## 📝 今日日记` 里，评语在后面的同级 `## 💬 评语` 里。
 
-## 30秒简版（紧急场景）
+## 30秒简版
 
-- 目标完成：`是/否`
-- Build通过：`是/否`
-- 有无P0：`有/无`
-- 用户是否同意提交：`是/否`
-- 可执行动作：`提交 / 仅同步 / 继续修`
+- 目标完成：`是`
+- Build通过：`是`
+- 有无P0：`无`
+- 用户是否同意提交：`是，2026-05-11 用户明确授权 diary-character-count commit`
+- 可执行动作：`commit only，不 push`

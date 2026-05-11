@@ -42,7 +42,8 @@ export async function loadDailyModalState(
     plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length
       ? plugin.currentUser.diaryModules
       : makeDefaultDiaryModules();
-  const diaryModules = diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {};
+  const diaryModules =
+    existingToday?.diaryModules || (diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {});
 
   return {
     hasExistingRecord,

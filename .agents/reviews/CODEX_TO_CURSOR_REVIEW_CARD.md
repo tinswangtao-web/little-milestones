@@ -2,52 +2,96 @@
 
 ## Current round goal
 
-根据用户手机端复测反馈做二次修正：打分页新增/删除后避免明显弹跳；评语模块改到自由记录下方与保存按钮上方；统计页返回按钮与历史累计总分卡片拉开间距；保留已验证通过的底部半屏上滑能力。
+用户原始目标：为日记增加字数统计；打分页实时显示，保存后的 Markdown 也记录；排除 `comment` 评语模块；只统计有效用户输入，不统计占位/示例/自动模板句式。
+
+后续目标：
+- 空日记小模块生成 Markdown 时保持为空，不自动写 `无`。
+- 得分页 `## 📝 今日日记` 下方只呈现用户输入内容，不出现 `今天的小日记`、`今天的天气是`、`自由记录` 等内部标题或自动句式。
+- 本轮处理 Review AI follow-up 阻塞：label-free Markdown 正文不可逆、`tags.weather/mood` 仍依赖旧标签行解析。
+- 本轮用户验收反馈：自由记录应属于 `## 📝 今日日记` 的完整章节内容；评语应拆成另一个同级章节，并放在日记内容之后。
 
 ## Changed file list
 
-- src/modals/daily-scoring-modal.ts
-- src/modals/popups/add-item-modal.ts
-- src/modals/helpers/daily-modal-actions.ts
-- src/modals/panels/diary-panel.ts
-- src/modals/stats-modal.ts
-- styles/07-mobile.css
-- styles.css
-- main.js
-- .agents/tasks/2026-05-08-mobile-daily-diary-fixes.md
-- .agents/STATE.md
-- .agents/LOCK.md
-- .agents/log.md
+本轮 Review AI findings 修复重点：
+- `src/diary/modules.ts`
+- `src/renderers/report-builder.ts`
+- `src/storage/day-data-store.ts`
+- `src/types.ts`
+- `src/composers/day-data-composer.ts`
+- `src/renderers/report-sections.ts`
+- `src/modals/helpers/daily-modal-state.ts`
+- `src/modals/daily-scoring-modal.ts`
+- `src/main.ts`
+- `src/modals/panels/diary-panel.ts`
+- generated `main.js`
+- `.agents/STATE.md`
+- `.agents/LOCK.md`
+- `.agents/log.md`
+- `.agents/tasks/2026-05-11-diary-character-count.md`
+- `.agents/reviews/CODEX_TO_CURSOR_REVIEW_CARD.md`
+- `.agents/reviews/CODEX_PRECOMMIT_CHECKLIST.md`
 
-本轮 review 仅限“改动文件清单”列出的文件；其他 dirty 文件为历史/行尾噪音，不计入本轮结论。
+注意：工作树里有大量前序未提交改动和无关 dirty 文件。请本轮重点审查以上文件中与日记输出、回读、字数统计相关的 diff。
 
-## User-visible behavior changes
+## Findings addressed
 
-- 打分页新增/删除打分项后，列表保持在弹窗前的大致浏览位置，不再执行明显平滑跳转。
-- 评语模块移动到自由记录下方（仍在保存按钮上方），输入继续走现有 diaryModules 草稿自动保存。
-- 统计页“返回上一页”按钮与历史累计总分卡片之间增加垂直间距，不再叠在一起。
-- 已解决的“底部可上滑半屏”保留，不回退。
+- P1 fixed: new label-free visible Markdown body no longer needs to be reverse-engineered by line order. `diaryModules` are persisted in YAML frontmatter and loaded back through `DayDataStore` / `loadDailyModalState()`.
+- P1 mitigation: plain-body parsing is now conservative fallback only. It recognizes legacy/prefixed narrative lines, but ordinary one-line content stays `freeWrite` instead of being guessed as weather/mood.
+- P2 fixed: `DayDataComposer` derives `tags.weather` / `tags.mood` from resolved structured diary module values, not removed visible label lines.
+- Previous review fixes kept: single user-entered `无` is preserved; exact prefixed built-in empty forms still normalize to empty; module newlines normalize to ` / ` for compose/count; UI copy is `日记字数：X 字（不含评语）`; count sums segments without artificial connector newlines.
+- User acceptance feedback fixed: `comment` is no longer part of `composeDiaryContent()`; non-empty comment renders after the diary body as a separate same-level `## 💬 评语` section.
+
+## Core logic
+
+- `composeDiaryContent()` outputs only user-entered values/freewrite under `## 📝 今日日记`; no internal diary subheadings, labels, fixed weather/comment phrases, or auto punctuation are emitted.
+- `composeDiaryCommentContent()` normalizes the `comment` module separately, and `MarkdownReportBuilder` appends it as `## 💬 评语` only when non-empty.
+- `extractDiaryContent()` stops only before the explicit `## 💬 评语` heading, so reopening a generated file does not pull the separate comment section into `freeWrite` while preserving user-authored Markdown headings inside the diary body.
+- `buildFrontmatter()` writes non-empty `report.diaryModules` into YAML frontmatter. This is the machine-readable source for reopening same-day diary modules.
+- `DayDataStore` reads `frontmatter.diaryModules` into `DayData.diaryModules`; `loadDailyModalState()` prefers that structured value and only falls back to `parseDiaryModules()` for older files.
+- `parseDiaryModules()` keeps legacy parsing and conservative prefixed-line fallback, but no longer maps arbitrary first lines by fixed module order.
+- `comment` remains excluded from character count.
 
 ## Verification already run
 
-- npx tsc --noEmit: pass
-- npm run build: pass, regenerated main.js/styles.css
-- node --check main.js: pass
-- git diff --check on intended files: pass
+- `npx tsc --noEmit`: pass
+- `npm run build`: pass, regenerated `main.js` / `styles.css`
+- `node --check main.js`: pass
+- Intended-file `git diff --check`: pass
+- Vault sync closeout: pass
+  - `npm run deploy` synced to `/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones`
+  - `node scripts/deploy.mjs --verify-only`: pass
+  - `MATCH main.js 2ada6872a653`
+  - `MATCH styles.css c0f5c6ca1bf5`
+  - `MATCH manifest.json e2456f26890b`
+- Node behavior checks: pass
+  - `parseDiaryModules('自由记录一句')` keeps content in `freeWrite`, not weather
+  - `parseDiaryModules('跑步')` keeps content in `freeWrite`, not weather
+  - prefixed `今天我做了跑步` fallback is recognized as `todayThing`
+  - `todayThing='无'` composes as visible `无`
+  - diary compose keeps freeWrite in the main diary body and excludes comment
+  - comment compose returns the separate comment text
+  - legacy diary/freeWrite content containing `## 我的小标题` stays intact
+  - generated `## 💬 评语` is excluded from extracted `diaryContent`
+  - module multiline count matches composed ` / ` normalization
+  - comment-only count is 0
+
+Full `git diff --check` still fails on unrelated dirty files outside this task: `.gitignore` and `agent-collaboration-kit/**` trailing whitespace.
 
 ## Known risks / open confirmations
 
-- 真实移动端键盘高度、惯性滚动和 Obsidian WebView 行为仍需用户在 Vault 中手测确认。
-- 新增/删除后采用“恢复滚动位置”策略，不再保证自动定位到新卡片；以用户当前偏好为准。
-- src/constants.ts 仍因历史 CRLF/mixed line-ending 状态显示 dirty，本轮未纳入改动文件清单。
+- Existing already-saved label-free Markdown files that were created before this structured frontmatter fix may not have `diaryModules` in frontmatter. For those files, ambiguous plain content falls back to `freeWrite` rather than being guessed into the wrong module.
+- Latest acceptance-feedback fix has been synced to Vault. User completed Vault acceptance and explicitly authorized commit for this diary-character-count round. No push requested.
+- Strict review requested because this changes diary composer/parser behavior.
 
 ## Strict Cursor review requested
 
-Yes. This touches modal navigation, mobile keyboard avoidance, diary compose/parse, generated main.js/styles.css, and more than 3 files.
+Yes.
 
 ## Suggested user acceptance steps
 
-1. 在打分页滚动到中部，新增一个打分项后关闭弹窗，确认页面保持原浏览位置、无明显弹跳。
-2. 在任意项目上进入分值弹窗并删除该项，确认返回后列表仍保持原浏览位置。
-3. 日记页确认“评语”位于自由记录下方且在保存按钮上方；输入后切统计再返回，草稿仍在。
-4. 统计页点击“返回上一页”，确认按钮与历史累计总分卡片间距正常，不再视觉重叠。
+1. 在“今天做了”模块只输入 `无`，保存后重开，确认该模块仍保留 `无`。
+2. 填写 weather、mood、todayThing 后保存，重开同一天，确认模块值正确回读，`freeWrite` 没有重复堆积，重新保存后 Markdown 无重复。
+3. 在模块输入框输入带换行的多行文字，确认打分页字数与 Markdown 中 ` / ` 后的实际字符数一致。
+4. 只填评语模块、其它留空，确认字数显示为 0。
+5. 保存后确认得分页 `## 📝 今日日记` 下方不出现 `今天的小日记`、`今天的天气是`、`自由记录` 等自动文案。
+6. 同时填写自由记录和评语，确认自由记录仍在 `## 📝 今日日记` 内，评语出现在后面的同级 `## 💬 评语` 章节。

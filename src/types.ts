@@ -56,6 +56,7 @@ export interface DayData {
   scores: Record<string, number>;
   customItems: CustomScoreItem[];
   diaryContent?: string;
+  diaryModules?: DiaryModuleValues;
 }
 
 export interface DoubleTapThresholds {
@@ -84,6 +85,8 @@ export interface DayReport {
   scores: Record<string, number>;
   customItems: CustomScoreItem[];
   diaryContent: string;
+  diaryModules: DiaryModuleValues;
+  diaryCharacterCount: number;
   goals: UserGoals;
 
   total: number;

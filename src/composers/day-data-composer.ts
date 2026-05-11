@@ -1,7 +1,7 @@
-import type { DayData, DayReport, ScoreItem, CustomScoreItem } from "../types";
+import type { DayData, DayReport, ScoreItem, CustomScoreItem, DiaryModuleValues } from "../types";
 import type KidScorePlugin from "../main";
 import { makeDefaultDiaryModules } from "../constants";
-import { readDiaryLine } from "../diary/modules";
+import { countDiaryCharacters, parseDiaryModules } from "../diary/modules";
 import { countPositiveDateStreak, shiftDateString } from "../utils/date";
 
 export class DayDataComposer {
@@ -11,7 +11,8 @@ export class DayDataComposer {
     dateStr: string,
     scores: Record<string, number>,
     customItems: CustomScoreItem[],
-    diaryContent: string
+    diaryContent: string,
+    diaryModuleValues?: DiaryModuleValues
   ): Promise<DayReport> {
     const items = this.plugin.currentUser.items;
     const childName = this.plugin.currentUser.name;
@@ -80,6 +81,9 @@ export class DayDataComposer {
       this.plugin.currentUser.diaryModules.length
         ? this.plugin.currentUser.diaryModules
         : makeDefaultDiaryModules();
+    const resolvedDiaryModuleValues =
+      diaryModuleValues || (diaryText ? parseDiaryModules(diaryText, diaryModules) : {});
+    const diaryCharacterCount = countDiaryCharacters(resolvedDiaryModuleValues, diaryModules);
     const weatherModule = diaryModules.find((moduleDef) => moduleDef.id === "weather");
     const moodModule = diaryModules.find((moduleDef) => moduleDef.id === "mood");
     const breakfastMatch = diaryText.match(/早餐：\s*(.+)/);
@@ -95,6 +99,8 @@ export class DayDataComposer {
       scores,
       customItems,
       diaryContent,
+      diaryModules: resolvedDiaryModuleValues,
+      diaryCharacterCount,
       goals: this.plugin.currentUser.goals,
       total,
       earnedCount,
@@ -111,8 +117,8 @@ export class DayDataComposer {
       hasYesterday: !!yesterdayData,
       yesterdayData,
       tags: {
-        weather: weatherModule ? readDiaryLine(diaryText, weatherModule.label) || undefined : undefined,
-        mood: moodModule ? readDiaryLine(diaryText, moodModule.label) || undefined : undefined,
+        weather: weatherModule ? resolvedDiaryModuleValues.weather || undefined : undefined,
+        mood: moodModule ? resolvedDiaryModuleValues.mood || undefined : undefined,
         homeCook: homeCookMatch ? homeCookMatch[1].trim() : undefined,
         exercise: exerciseMatch ? exerciseMatch[1].trim() : undefined,
         sleep: sleepMatch ? sleepMatch[1].trim() : undefined,

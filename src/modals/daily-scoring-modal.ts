@@ -263,7 +263,13 @@ export class DailyScoringModal extends BaseMobileModal {
         onSave: async () => {
           self.syncDiaryContent();
           try {
-            await self.plugin.saveDayData(self.dateStr, self.scores, self.customItems, self.diaryContent);
+            await self.plugin.saveDayData(
+              self.dateStr,
+              self.scores,
+              self.customItems,
+              self.diaryContent,
+              self.diaryModules
+            );
             self.skipNextCloseDraftSave = true;
             self.clearDiaryDraft();
             const filePath = self.plugin.filePath(self.dateStr);

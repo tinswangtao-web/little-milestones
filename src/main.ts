@@ -1,5 +1,5 @@
 import { Plugin, normalizePath } from "obsidian";
-import type { PluginSettings, DayData, CustomScoreItem } from "./types";
+import type { PluginSettings, DayData, CustomScoreItem, DiaryModuleValues } from "./types";
 import { DEFAULT_SETTINGS } from "./constants";
 import { DailyScoringModal } from "./modals/daily-scoring-modal";
 import { StatsModal } from "./modals/stats-modal";
@@ -166,13 +166,15 @@ export default class KidScorePlugin extends Plugin {
     dateStr: string,
     scores: Record<string, number>,
     customItems: CustomScoreItem[],
-    diaryContent: string
+    diaryContent: string,
+    diaryModules?: DiaryModuleValues
   ) {
     await this.dayDataStore.saveDayData(
       dateStr,
       scores,
       customItems,
-      diaryContent
+      diaryContent,
+      diaryModules
     );
   }
   async renameUserInFiles(oldName: string, newName: string): Promise<void> {

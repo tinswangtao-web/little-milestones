@@ -1,5 +1,5 @@
 import { Notice, TFile, normalizePath, parseYaml } from "obsidian";
-import type { CustomScoreItem, DayData } from "../types";
+import type { CustomScoreItem, DayData, DiaryModuleValues } from "../types";
 import type KidScorePlugin from "../main";
 import { DIARY_MARKER } from "../constants";
 import { DayDataComposer } from "../composers/day-data-composer";
@@ -83,7 +83,8 @@ export class DayDataStore {
     dateStr: string,
     scores: Record<string, number>,
     customItems: CustomScoreItem[],
-    diaryContent: string
+    diaryContent: string,
+    diaryModules?: DiaryModuleValues
   ): Promise<void> {
     try {
       const composer = new DayDataComposer(this.plugin);
@@ -92,7 +93,8 @@ export class DayDataStore {
         dateStr,
         scores,
         customItems,
-        diaryContent
+        diaryContent,
+        diaryModules
       );
       const fileContent = builder.build(report);
 
@@ -280,6 +282,7 @@ export class DayDataStore {
       scores,
       customItems,
       total,
+      diaryModules: this.normalizeDiaryModules(frontmatter.diaryModules),
       ...(content !== undefined ? { diaryContent: this.extractDiaryContent(content) } : {}),
     };
   }
@@ -331,6 +334,17 @@ export class DayDataStore {
     return rawCustomItems
       .map((entry, index) => this.normalizeCustomItem(entry, dateStr, index))
       .filter((entry): entry is CustomScoreItem => !!entry);
+  }
+
+  private normalizeDiaryModules(rawDiaryModules: unknown): DiaryModuleValues | undefined {
+    if (!rawDiaryModules || typeof rawDiaryModules !== "object") return undefined;
+    const result: DiaryModuleValues = {};
+    for (const [key, value] of Object.entries(rawDiaryModules as FrontmatterData)) {
+      if (typeof value !== "string") continue;
+      if (!value.trim()) continue;
+      result[key] = value;
+    }
+    return Object.keys(result).length > 0 ? result : undefined;
   }
 
   private normalizeCustomItem(
@@ -386,18 +400,25 @@ export class DayDataStore {
     const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
     const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
     if (diaryHeadingMatch?.index !== undefined) {
-      return body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length).trim();
+      const afterDiaryHeading = body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length);
+      return this.stripDiaryCommentSection(afterDiaryHeading).trim();
     }
 
     const diaryIdx = body.indexOf(DIARY_MARKER);
     if (diaryIdx !== -1) {
-      return body
+      const diaryBody = body
         .slice(diaryIdx + DIARY_MARKER.length)
-        .replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "")
-        .trim();
+        .replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "");
+      return this.stripDiaryCommentSection(diaryBody).trim();
     }
 
     return "";
+  }
+
+  private stripDiaryCommentSection(diaryBody: string): string {
+    const commentHeadingMatch = /^##\s*💬\s*评语\s*$/m.exec(diaryBody);
+    if (commentHeadingMatch?.index === undefined) return diaryBody;
+    return diaryBody.slice(0, commentHeadingMatch.index);
   }
 
   private readSchemaVersion(rawSchemaVersion: unknown): number | undefined {

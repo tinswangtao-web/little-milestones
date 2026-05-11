@@ -1,4 +1,5 @@
 import { DayReport } from "../types";
+import { composeDiaryCommentContent } from "../diary/modules";
 import {
   buildCategoryTables,
   buildCustomItemsCallout,
@@ -9,6 +10,9 @@ import {
 
 export class MarkdownReportBuilder {
   build(report: DayReport): string {
+    const diaryComment = composeDiaryCommentContent(report.diaryModules || {});
+    const commentSection = diaryComment ? "\n\n## 💬 评语\n\n" + diaryComment + "\n" : "\n";
+
     return (
       buildFrontmatter(report) +
       "# 📋 " +
@@ -24,9 +28,12 @@ export class MarkdownReportBuilder {
       buildCategoryTables(report) +
       buildCustomItemsCallout(report.customItems) +
       "---\n\n" +
+      "> 字数（不含评语）：**" +
+      report.diaryCharacterCount +
+      " 字**\n\n" +
       "## 📝 今日日记\n\n" +
       (report.diaryContent || "") +
-      "\n"
+      commentSection
     );
   }
 }

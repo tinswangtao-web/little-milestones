@@ -29,7 +29,42 @@ function normalizeBuiltInSampleValue(moduleId: string, value: string | undefined
     wantToSay: "我还想说____",
     comment: "评语____",
   };
+  const emptyValues: Record<string, string> = {
+    todayThing: "今天我做了无",
+    learnedThing: "今天我学会了无",
+    happyThing: "今天最开心的是无",
+    wantToSay: "我还想说无",
+    comment: "评语无",
+  };
+  if (emptyValues[moduleId] === normalized) return "";
   return sampleValues[moduleId] === normalized ? "" : value || "";
+}
+
+const DIARY_COUNT_EXCLUDED_MODULE_IDS = new Set(["comment"]);
+
+const DIARY_COUNT_NARRATIVE_PREFIXES: Record<string, string> = {
+  todayThing: "今天我做了",
+  learnedThing: "今天我学会了",
+  happyThing: "今天最开心的是",
+  wantToSay: "我还想说",
+};
+
+function normalizeModuleValue(moduleId: string, value: string | undefined): string {
+  return normalizeBuiltInSampleValue(
+    moduleId,
+    String(value || "")
+      .replace(/\s*\n+\s*/g, " / ")
+      .trim()
+  );
+}
+
+function normalizeCountableDiaryValue(moduleId: string, value: string | undefined): string {
+  let normalized = normalizeModuleValue(moduleId, value);
+  const prefix = DIARY_COUNT_NARRATIVE_PREFIXES[moduleId];
+  if (prefix && normalized.startsWith(prefix)) {
+    normalized = normalizeDiarySentence(normalized.slice(prefix.length));
+  }
+  return normalized;
 }
 
 function readPrefixedSentence(lines: string[], prefix: string): string {
@@ -105,6 +140,51 @@ function fillNarrativeDiaryModules(
   });
 }
 
+function fillPlainDiaryModules(
+  result: DiaryModuleValues,
+  content: string,
+  moduleConfig: DiaryModuleDefinition[]
+): void {
+  if (!content.trim()) return;
+  const hasStructuredValues =
+    moduleConfig.some((moduleDef) => String(result[moduleDef.id] || "").trim().length > 0) ||
+    String(result.freeWrite || "").trim().length > 0;
+  if (hasStructuredValues) return;
+
+  const sections = content
+    .split(/\n{2,}/)
+    .map((section) => section.trim())
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  const moduleLines = sections[0]
+    .split("\n")
+    .map((line) => normalizeDiarySentence(line.trim()))
+    .filter(Boolean);
+  if (!moduleLines.length) return;
+
+  const consumed = new Set<number>();
+
+  const assignLine = (moduleId: string, lineIndex: number, value: string): void => {
+    if (!moduleConfig.some((moduleDef) => moduleDef.id === moduleId)) return;
+    if (result[moduleId]) return;
+    result[moduleId] = normalizeBuiltInSampleValue(moduleId, value);
+    consumed.add(lineIndex);
+  };
+
+  moduleLines.forEach((line, lineIndex) => {
+    const prefixedEntry = Object.entries(DIARY_COUNT_NARRATIVE_PREFIXES).find(([, prefix]) =>
+      line.startsWith(prefix)
+    );
+    if (!prefixedEntry) return;
+    assignLine(prefixedEntry[0], lineIndex, line);
+  });
+
+  const remainingModuleLines = moduleLines.filter((_, lineIndex) => !consumed.has(lineIndex));
+  const freeWriteSections = [...remainingModuleLines, ...sections.slice(1)].filter(Boolean);
+  result.freeWrite = freeWriteSections.join("\n\n").trim();
+}
+
 export function parseDiaryModules(
   content: string,
   moduleConfig: DiaryModuleDefinition[]
@@ -125,6 +205,7 @@ export function parseDiaryModules(
   moduleConfig.forEach((moduleDef) => {
     result[moduleDef.id] = normalizeBuiltInSampleValue(moduleDef.id, result[moduleDef.id]);
   });
+  fillPlainDiaryModules(result, raw, moduleConfig);
 
   return result;
 }
@@ -134,29 +215,26 @@ export function composeDiaryContent(
   moduleConfig: DiaryModuleDefinition[]
 ): string {
   const sections: string[] = [];
-  const storyLines: string[] = [];
+  const contentLines: string[] = [];
   const normalizedValues: Record<string, string> = {};
 
-  const appendSentence = (text: string) => {
+  const appendDiaryValue = (text: string) => {
     const cleaned = String(text || "").trim();
     if (!cleaned) return;
-    storyLines.push(/[。！？.!?]$/.test(cleaned) ? cleaned : cleaned + "。");
+    contentLines.push(cleaned);
   };
 
   moduleConfig.forEach((moduleDef) => {
-    const value = String(values[moduleDef.id] || "")
-      .replace(/\s*\n+\s*/g, " / ")
-      .trim();
+    const value = normalizeModuleValue(moduleDef.id, values[moduleDef.id]);
     normalizedValues[moduleDef.id] = value;
   });
 
-  if (normalizedValues.weather) appendSentence("今天的天气是" + normalizedValues.weather);
-  if (normalizedValues.mood) appendSentence("我今天的心情是" + normalizedValues.mood);
-  if (normalizedValues.todayThing) appendSentence(normalizedValues.todayThing);
-  if (normalizedValues.learnedThing) appendSentence(normalizedValues.learnedThing);
-  if (normalizedValues.happyThing) appendSentence(normalizedValues.happyThing);
-  if (normalizedValues.wantToSay) appendSentence(normalizedValues.wantToSay);
-  if (normalizedValues.comment) appendSentence("评语：" + normalizedValues.comment);
+  if (normalizedValues.weather) appendDiaryValue(normalizedValues.weather);
+  if (normalizedValues.mood) appendDiaryValue(normalizedValues.mood);
+  if (normalizedValues.todayThing) appendDiaryValue(normalizedValues.todayThing);
+  if (normalizedValues.learnedThing) appendDiaryValue(normalizedValues.learnedThing);
+  if (normalizedValues.happyThing) appendDiaryValue(normalizedValues.happyThing);
+  if (normalizedValues.wantToSay) appendDiaryValue(normalizedValues.wantToSay);
 
   moduleConfig.forEach((moduleDef) => {
     if (
@@ -173,13 +251,35 @@ export function composeDiaryContent(
       return;
     }
     if (!normalizedValues[moduleDef.id]) return;
-    appendSentence(moduleDef.label + "：" + normalizedValues[moduleDef.id]);
+    appendDiaryValue(normalizedValues[moduleDef.id]);
   });
 
-  if (storyLines.length) sections.push("### 今天的小日记\n" + storyLines.join("\n"));
+  if (contentLines.length) sections.push(contentLines.join("\n"));
   if (values.freeWrite && values.freeWrite.trim()) {
-    sections.push("### 自由记录\n" + values.freeWrite.trim());
+    sections.push(values.freeWrite.trim());
   }
 
   return sections.join("\n\n").trim();
+}
+
+export function composeDiaryCommentContent(values: DiaryModuleValues): string {
+  return normalizeModuleValue("comment", values.comment);
+}
+
+export function countDiaryCharacters(
+  values: DiaryModuleValues,
+  moduleConfig: DiaryModuleDefinition[]
+): number {
+  const countableValues: string[] = [];
+
+  moduleConfig.forEach((moduleDef) => {
+    if (DIARY_COUNT_EXCLUDED_MODULE_IDS.has(moduleDef.id)) return;
+    const value = normalizeCountableDiaryValue(moduleDef.id, values[moduleDef.id]);
+    if (value) countableValues.push(value);
+  });
+
+  const freeWrite = String(values.freeWrite || "").trim();
+  if (freeWrite) countableValues.push(freeWrite);
+
+  return countableValues.reduce((sum, value) => sum + Array.from(value).length, 0);
 }
