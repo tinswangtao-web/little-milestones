@@ -813,15 +813,23 @@
 
   .diary-quick-emoji-row {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 6px;
   }
 
   .diary-quick-btn {
     width: 100%;
-    height: 40px;
-    font-size: 1.2em;
+    min-height: 48px;
+    font-size: 0.82em;
     border-radius: 8px;
+  }
+
+  .diary-quick-btn-emoji {
+    font-size: 1.35em;
+  }
+
+  .diary-quick-btn-label {
+    font-size: 0.78em;
   }
 
   .diary-quick-custom-row {
@@ -974,6 +982,10 @@
   }
   .kid-score-value-overlay:has(.kid-score-emoji-fullpicker) {
     align-items: flex-end;
+  }
+  .kid-score-value-overlay.is-mobile-emoji-picker:has(.kid-score-emoji-fullpicker) {
+    align-items: flex-start;
+    padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
   .emoji-fp-grid {
     grid-template-columns: repeat(7, 1fr);
@@ -1203,6 +1215,61 @@
     min-height: 88px;
   }
 
+  .diary-preset-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .diary-preset-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .diary-preset-row {
+    grid-template-columns: 1fr;
+    gap: 5px;
+    padding: 6px 4px;
+  }
+
+  .diary-preset-emoji-btn {
+    width: 100%;
+    height: 38px;
+  }
+
+  .diary-preset-label-input {
+    min-height: 40px;
+    height: 40px;
+    padding: 0 4px;
+    text-align: center;
+    font-size: 0.78em;
+    border-radius: 8px;
+  }
+
+  .diary-small-record-compact {
+    grid-template-columns: 34px 40px minmax(0, 1fr) 38px;
+    gap: 6px;
+  }
+
+  .diary-small-record-details {
+    padding-left: 0;
+  }
+
+  .diary-small-record-name-input {
+    min-height: 38px;
+    height: 38px;
+    white-space: nowrap;
+  }
+
+  .diary-small-record-emoji-btn,
+  .diary-small-record-delete-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+  }
+
+  .diary-comment-settings-compact {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
   /* Stats cards mobile */
   .summary-card {
     padding: 12px 8px;
@@ -1286,12 +1353,13 @@
   }
 
   .diary-quick-btn {
-    height: 36px;
-    font-size: 1.1em;
+    min-height: 44px;
+    font-size: 0.78em;
   }
 
   .diary-quick-emoji-row {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
   }
 
   .diary-tool-btn {

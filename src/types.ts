@@ -36,6 +36,11 @@ export interface DiaryModuleValues {
   freeWrite?: string;
 }
 
+export interface DiaryQuickPreset {
+  emoji: string;
+  label: string;
+}
+
 export interface User {
   id: string;
   name: string;
@@ -45,6 +50,8 @@ export interface User {
   scoringRules: string;
   diaryTemplate: string;
   diaryModules: DiaryModuleDefinition[];
+  weatherPresets: DiaryQuickPreset[];
+  moodPresets: DiaryQuickPreset[];
   goals: UserGoals;
 }
 

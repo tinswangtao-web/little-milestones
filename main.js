@@ -1129,7 +1129,38 @@ function makeDefaultDiaryModules() {
       label: "\u6211\u8FD8\u60F3\u8BF4...",
       placeholder: "\u53EF\u4EE5\u5199\u60F3\u5BF9\u7238\u7238\u5988\u5988\u6216\u81EA\u5DF1\u8BF4\u7684\u8BDD",
       kind: "multi"
+    },
+    {
+      id: "comment",
+      emoji: "\u{1F4AC}",
+      label: "\u8BC4\u8BED",
+      placeholder: "\u53EF\u4EE5\u5199\u4ECA\u5929\u7684\u8BC4\u8BED\u6216\u53CD\u9988",
+      kind: "multi"
     }
+  ];
+}
+function makeDefaultWeatherPresets() {
+  return [
+    { emoji: "\u2600\uFE0F", label: "\u6674" },
+    { emoji: "\u26C5", label: "\u591A\u4E91" },
+    { emoji: "\u2601\uFE0F", label: "\u9634" },
+    { emoji: "\u{1F326}\uFE0F", label: "\u5C0F\u96E8" },
+    { emoji: "\u{1F327}\uFE0F", label: "\u5927\u96E8" },
+    { emoji: "\u26C8\uFE0F", label: "\u96F7\u96E8" },
+    { emoji: "\u{1F300}", label: "\u53F0\u98CE" },
+    { emoji: "\u{1F308}", label: "\u5F69\u8679" }
+  ];
+}
+function makeDefaultMoodPresets() {
+  return [
+    { emoji: "\u{1F60A}", label: "\u5F00\u5FC3" },
+    { emoji: "\u{1F604}", label: "\u5174\u594B" },
+    { emoji: "\u{1F60C}", label: "\u5E73\u9759" },
+    { emoji: "\u{1F60E}", label: "\u5F88\u68D2" },
+    { emoji: "\u{1F62E}", label: "\u60CA\u559C" },
+    { emoji: "\u{1F622}", label: "\u96BE\u8FC7" },
+    { emoji: "\u{1F620}", label: "\u751F\u6C14" },
+    { emoji: "\u{1F4AA}", label: "\u6709\u529B\u91CF" }
   ];
 }
 function makeDefaultUser() {
@@ -1142,6 +1173,8 @@ function makeDefaultUser() {
     scoringRules: "",
     diaryTemplate: DEFAULT_DIARY_TEMPLATE,
     diaryModules: makeDefaultDiaryModules(),
+    weatherPresets: makeDefaultWeatherPresets(),
+    moodPresets: makeDefaultMoodPresets(),
     goals: { daily: 10, weekly: 70, monthly: 300 }
   };
 }
@@ -2698,6 +2731,10 @@ function showEmojiPicker(callback, container) {
   }
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
+  const isMobilePicker = getMobilePlatform() !== "desktop";
+  if (isMobilePicker) {
+    overlay.addClass("is-mobile-emoji-picker");
+  }
   const popup = document.createElement("div");
   popup.className = "kid-score-emoji-fullpicker";
   const overlayStateId = "emoji-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
@@ -2874,9 +2911,11 @@ function showEmojiPicker(callback, container) {
     e.stopPropagation();
   });
   getOverlayMount(container).appendChild(overlay);
-  setTimeout(() => {
-    customInput.focus();
-  }, 50);
+  if (!isMobilePicker) {
+    setTimeout(() => {
+      customInput.focus();
+    }, 50);
+  }
 }
 
 // src/ui/diary-module-editor.ts
@@ -3037,8 +3076,9 @@ function createDiaryQuickGroup({
   quickCustomDrafts,
   updateQuickCustomDraft
 }) {
+  var _a;
   if (!moduleDef) return;
-  let customEmoji = defaults[0].e;
+  let customEmoji = ((_a = defaults[0]) == null ? void 0 : _a.emoji) || moduleDef.emoji || "\u{1F4DD}";
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
   group.dataset.moduleId = moduleDef.id;
   if (moduleDef.kind === "quick") {
@@ -3073,12 +3113,13 @@ function createDiaryQuickGroup({
   const emojiRow = group.createDiv({ cls: "diary-quick-emoji-row" });
   defaults.forEach((entry) => {
     const btn = emojiRow.createEl("button", {
-      cls: "diary-quick-btn",
-      text: entry.e
+      cls: "diary-quick-btn"
     });
-    btn.title = entry.l;
+    btn.createSpan({ cls: "diary-quick-btn-emoji", text: entry.emoji });
+    btn.createSpan({ cls: "diary-quick-btn-label", text: entry.label });
+    btn.title = entry.label;
     btn.onclick = () => {
-      valueInput.value = entry.e + " " + entry.l;
+      valueInput.value = entry.emoji + " " + entry.label;
       diaryModules[moduleDef.id] = valueInput.value.trim();
       updateDiaryModules(diaryModules);
       syncAndRefresh();
@@ -3147,15 +3188,6 @@ function ensureDefaultDiaryTemplate({
 function renderDesktopDiaryPanelLayout(panel) {
   panel.addClass("desktop-diary-panel");
   const topSplit = panel.createDiv({ cls: "diary-desktop-top" });
-  const moduleSection = topSplit.createDiv({
-    cls: "diary-module-section diary-module-section-desktop"
-  });
-  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
-  moduleSection.createEl("p", {
-    cls: "diary-module-hint",
-    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
-  });
-  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
   const quickSection = topSplit.createDiv({
     cls: "diary-module-section diary-quick-section diary-quick-section-desktop"
   });
@@ -3165,6 +3197,15 @@ function renderDesktopDiaryPanelLayout(panel) {
     text: "\u5148\u5FEB\u901F\u9009\u4E00\u9009\uFF0C\u518D\u8865\u4E00\u53E5\u81EA\u5DF1\u7684\u8BDD\u3002"
   });
   const quickRow = quickSection.createDiv({ cls: "diary-quick-row diary-quick-row-desktop" });
+  const moduleSection = topSplit.createDiv({
+    cls: "diary-module-section diary-module-section-desktop"
+  });
+  moduleSection.createEl("h4", { cls: "diary-module-title", text: "\u{1F9E9} \u6BCF\u5929\u5C0F\u8BB0\u5F55" });
+  moduleSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "\u5148\u9009\u5929\u6C14\u548C\u5FC3\u60C5\uFF0C\u518D\u7528\u77ED\u77ED\u7684\u53E5\u5B50\u8BB0\u4E00\u8BB0\u4ECA\u5929\u3002"
+  });
+  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
   const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap diary-textarea-wrap-desktop" });
   const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });
   freewriteHeader.createEl("h4", { cls: "diary-module-title", text: "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55" });
@@ -3382,27 +3423,11 @@ function buildDiaryPanel(options) {
       removeModule
     })
   );
-  const weatherEmojis = [
-    { e: "\u2600\uFE0F", l: "\u6674" },
-    { e: "\u26C5", l: "\u591A\u4E91" },
-    { e: "\u{1F327}\uFE0F", l: "\u96E8" },
-    { e: "\u{1F328}\uFE0F", l: "\u96EA" },
-    { e: "\u{1F32C}\uFE0F", l: "\u98CE" },
-    { e: "\u{1F324}\uFE0F", l: "\u6674\u8F6C\u591A\u4E91" }
-  ];
-  const moodEmojis = [
-    { e: "\u{1F60A}", l: "\u5F00\u5FC3" },
-    { e: "\u{1F60E}", l: "\u5F88\u68D2" },
-    { e: "\u{1F914}", l: "\u601D\u8003" },
-    { e: "\u{1F622}", l: "\u96BE\u8FC7" },
-    { e: "\u{1F620}", l: "\u751F\u6C14" },
-    { e: "\u{1F634}", l: "\u56F0" }
-  ];
   createDiaryQuickGroup({
     app,
     quickRow,
     moduleDef: weatherModule,
-    defaults: weatherEmojis,
+    defaults: plugin.currentUser.weatherPresets,
     diaryModules,
     moduleFields,
     updateDiaryModules,
@@ -3417,7 +3442,7 @@ function buildDiaryPanel(options) {
     app,
     quickRow,
     moduleDef: moodModule,
-    defaults: moodEmojis,
+    defaults: plugin.currentUser.moodPresets,
     diaryModules,
     moduleFields,
     updateDiaryModules,
@@ -5841,226 +5866,90 @@ function renderCategorySettings({
 
 // src/settings/diary-module-settings.ts
 var import_obsidian12 = require("obsidian");
-
-// src/settings/desktop-settings-sections.ts
-function renderDesktopDiaryModuleRowLayout(list) {
-  const row = list.createDiv({
-    cls: "diary-module-settings-row diary-module-settings-row-desktop"
-  });
-  const top = row.createDiv({
-    cls: "diary-module-settings-top diary-module-settings-top-desktop"
-  });
-  const main = top.createDiv({
-    cls: "diary-module-settings-main diary-module-settings-main-desktop"
-  });
-  const meta = top.createDiv({
-    cls: "diary-module-settings-meta diary-module-settings-meta-desktop"
-  });
-  const actions = top.createDiv({
-    cls: "diary-module-settings-actions diary-module-settings-actions-desktop"
-  });
-  const placeholderField = row.createDiv({
-    cls: "diary-module-settings-field diary-module-settings-field-desktop is-wide is-full-row"
-  });
-  return { row, top, main, meta, actions, placeholderField };
+var FIXED_DIARY_MODULE_IDS = /* @__PURE__ */ new Set(["weather", "mood", "comment"]);
+function cloneModule(moduleDef) {
+  return { ...moduleDef };
 }
-function renderDesktopItemSettingsRowLayout(itemsWrap) {
-  const wrap = itemsWrap.createDiv({
-    cls: "settings-item-wrap settings-item-wrap-desktop"
-  });
-  const row = wrap.createDiv({
-    cls: "settings-item-row-v2 settings-item-row-v2-desktop"
-  });
-  const noteRow = wrap.createDiv({
-    cls: "settings-item-note-row settings-item-note-row-desktop"
-  });
-  return { wrap, row, noteRow };
+function ensureDiaryModules(plugin) {
+  const defaults = makeDefaultDiaryModules();
+  const current = Array.isArray(plugin.currentUser.diaryModules) ? plugin.currentUser.diaryModules : [];
+  const byId = new Map(current.map((moduleDef) => [moduleDef.id, moduleDef]));
+  for (const fallback of defaults) {
+    if (!byId.has(fallback.id)) {
+      byId.set(fallback.id, cloneModule(fallback));
+    }
+  }
+  const weather = byId.get("weather");
+  const mood = byId.get("mood");
+  const comment = byId.get("comment");
+  const smallRecords = current.filter((moduleDef) => !FIXED_DIARY_MODULE_IDS.has(moduleDef.id));
+  plugin.currentUser.diaryModules = [weather, mood, ...smallRecords, comment];
 }
-
-// src/settings/mobile-settings-sections.ts
-function renderMobileDiaryModuleRowLayout(list) {
-  const row = list.createDiv({
-    cls: "diary-module-settings-row diary-module-settings-row-mobile"
-  });
-  const top = row.createDiv({
-    cls: "diary-module-settings-top diary-module-settings-top-mobile"
-  });
-  const main = top.createDiv({
-    cls: "diary-module-settings-main diary-module-settings-main-mobile"
-  });
-  const meta = top.createDiv({
-    cls: "diary-module-settings-meta diary-module-settings-meta-mobile"
-  });
-  const actions = top.createDiv({
-    cls: "diary-module-settings-actions diary-module-settings-actions-mobile"
-  });
-  const placeholderField = row.createDiv({
-    cls: "diary-module-settings-field diary-module-settings-field-mobile is-wide is-full-row"
-  });
-  return { row, top, main, meta, actions, placeholderField };
+function getSmallRecordModules(plugin) {
+  return plugin.currentUser.diaryModules.filter(
+    (moduleDef) => !FIXED_DIARY_MODULE_IDS.has(moduleDef.id)
+  );
 }
-function renderMobileItemSettingsRowLayout(itemsWrap) {
-  const wrap = itemsWrap.createDiv({
-    cls: "settings-item-wrap settings-item-wrap-mobile"
-  });
-  const row = wrap.createDiv({
-    cls: "settings-item-row-v2 settings-item-row-v2-mobile"
-  });
-  const noteRow = wrap.createDiv({
-    cls: "settings-item-note-row settings-item-note-row-mobile"
-  });
-  return { wrap, row, noteRow };
+function setSmallRecordOrder(plugin, orderedIds) {
+  const byId = new Map(plugin.currentUser.diaryModules.map((moduleDef) => [moduleDef.id, moduleDef]));
+  const weather = byId.get("weather");
+  const mood = byId.get("mood");
+  const comment = byId.get("comment");
+  const orderedSmallRecords = orderedIds.map((id) => byId.get(id)).filter((moduleDef) => !!moduleDef);
+  plugin.currentUser.diaryModules = [
+    ...weather ? [weather] : [],
+    ...mood ? [mood] : [],
+    ...orderedSmallRecords,
+    ...comment ? [comment] : []
+  ];
 }
-
-// src/settings/diary-module-settings.ts
+function ensurePresets(plugin) {
+  if (!Array.isArray(plugin.currentUser.weatherPresets) || plugin.currentUser.weatherPresets.length === 0) {
+    plugin.currentUser.weatherPresets = makeDefaultWeatherPresets();
+  }
+  if (!Array.isArray(plugin.currentUser.moodPresets) || plugin.currentUser.moodPresets.length === 0) {
+    plugin.currentUser.moodPresets = makeDefaultMoodPresets();
+  }
+}
 function renderDiaryModuleSettingsSection({
   plugin,
   containerEl,
   bindSettingsInput
 }) {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
+  const section = containerEl.createDiv({ cls: "kid-score-rules-section diary-settings-section" });
   const header = section.createDiv({ cls: "kid-score-rules-header" });
   const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
   header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F9E9} \u65E5\u8BB0\u6A21\u5757" });
   header.createSpan({
     cls: "kid-score-rules-desc",
-    text: "\u53EF\u4EE5\u81EA\u5B9A\u4E49\u663E\u793A\u5728\u6253\u5206\u9875\u7684\u5E38\u7528\u8BB0\u5F55\u6A21\u5757"
+    text: "\u5929\u6C14\u548C\u5FC3\u60C5 / \u5404\u9879\u5C0F\u8BB0\u5F55 / \u81EA\u7531\u8BB0\u5F55 / \u8BC4\u8BED"
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
+  const body = section.createDiv({ cls: "kid-score-rules-body diary-settings-body" });
   let isOpen = true;
-  const ensureDiaryModules = () => {
-    if (!Array.isArray(plugin.currentUser.diaryModules) || plugin.currentUser.diaryModules.length === 0) {
-      plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-    }
-  };
   const render = () => {
-    ensureDiaryModules();
+    ensureDiaryModules(plugin);
+    ensurePresets(plugin);
     body.empty();
-    const isTouchLayout = getMobilePlatform() !== "desktop";
-    const hint = body.createEl("p", {
-      cls: "kid-score-hint",
-      text: "\u4F60\u53EF\u4EE5\u4FEE\u6539\u6A21\u5757\u540D\u79F0\u548C\u63D0\u793A\u6587\u6848\uFF0C\u4E5F\u53EF\u4EE5\u65B0\u589E\u6216\u5220\u9664\u6A21\u5757\u3002\u5929\u6C14/\u5FC3\u60C5\u4F1A\u4FDD\u7559\u5FEB\u6377 emoji \u529F\u80FD\u3002"
+    renderPresetBlock({
+      plugin,
+      body,
+      bindSettingsInput,
+      render
     });
-    hint.style.marginBottom = "10px";
-    const list = body.createDiv({ cls: "diary-module-settings-list" });
-    plugin.currentUser.diaryModules.forEach((moduleDef, idx) => {
-      const layout = isTouchLayout ? renderMobileDiaryModuleRowLayout(list) : renderDesktopDiaryModuleRowLayout(list);
-      const { main, meta, actions: actions2, placeholderField } = layout;
-      const emojiField = main.createDiv({ cls: "diary-module-settings-field is-emoji" });
-      emojiField.createEl("label", {
-        cls: "diary-module-settings-field-label",
-        text: "\u6A21\u5757\u56FE\u6807"
-      });
-      createModuleEmojiField({
-        app: plugin.app,
-        host: emojiField,
-        emoji: moduleDef.emoji || "\u{1F4DD}",
-        onChange: async (emoji) => {
-          plugin.currentUser.diaryModules[idx].emoji = emoji;
-          await plugin.saveSettings();
-        },
-        containerEl
-      });
-      const labelField = main.createDiv({ cls: "diary-module-settings-field" });
-      labelField.createEl("label", {
-        cls: "diary-module-settings-field-label",
-        text: "\u6A21\u5757\u540D\u79F0"
-      });
-      const labelInput = createModuleLabelField({
-        host: labelField,
-        label: moduleDef.label || "",
-        inputClass: "diary-module-settings-input",
-        skipBindInputFocus: true,
-        onChange: async (label) => {
-          plugin.currentUser.diaryModules[idx].label = label || moduleDef.label || "\u65B0\u6A21\u5757";
-          await plugin.saveSettings();
-          render();
-        }
-      });
-      bindSettingsInput(labelInput);
-      placeholderField.createEl("label", {
-        cls: "diary-module-settings-field-label",
-        text: "\u63D0\u793A\u6587\u6848"
-      });
-      const placeholderInput = createModulePlaceholderField({
-        host: placeholderField,
-        placeholder: moduleDef.placeholder || "",
-        inputClass: "diary-module-settings-input is-wide diary-module-settings-textarea",
-        minHeight: 78,
-        skipBindInputFocus: true,
-        onChange: async (placeholder) => {
-          plugin.currentUser.diaryModules[idx].placeholder = placeholder;
-          await plugin.saveSettings();
-        }
-      });
-      bindSettingsInput(placeholderInput);
-      const kindField = meta.createDiv({ cls: "diary-module-settings-field" });
-      kindField.createEl("label", {
-        cls: "diary-module-settings-field-label",
-        text: "\u8BB0\u5F55\u5F62\u5F0F"
-      });
-      const kindSelect = kindField.createEl("select", {
-        cls: "diary-module-settings-select"
-      });
-      [
-        { value: "quick", label: "\u5355\u884C\u5FEB\u6377" },
-        { value: "multi", label: "\u591A\u884C\u8BB0\u5F55" }
-      ].forEach((optionDef) => {
-        const opt = kindSelect.createEl("option", {
-          text: optionDef.label,
-          value: optionDef.value
-        });
-        if ((moduleDef.kind || "multi") === optionDef.value) opt.selected = true;
-      });
-      kindSelect.onchange = async () => {
-        plugin.currentUser.diaryModules[idx].kind = kindSelect.value;
-        await plugin.saveSettings();
-      };
-      createModuleDeleteButton({
-        app: plugin.app,
-        host: actions2,
-        moduleLabel: moduleDef.label || "\u672A\u547D\u540D",
-        btnClass: "settings-delete-btn",
-        onDelete: async () => {
-          plugin.currentUser.diaryModules.splice(idx, 1);
-          await plugin.saveSettings();
-          render();
-        }
-      });
+    renderSmallRecordsBlock({
+      plugin,
+      body,
+      bindSettingsInput,
+      render,
+      isTouchLayout: getMobilePlatform() !== "desktop"
     });
-    const actions = body.createDiv({ cls: "kid-score-rules-actions" });
-    const addBtn = actions.createEl("button", {
-      cls: "mod-cta kid-score-rules-save-btn",
-      text: "\uFF0B \u65B0\u589E\u6A21\u5757"
+    renderFreeWriteBlock(body);
+    renderCommentBlock({
+      plugin,
+      body,
+      bindSettingsInput,
+      render
     });
-    addBtn.onclick = async () => {
-      plugin.currentUser.diaryModules.push({
-        id: "module_" + Date.now(),
-        emoji: "\u{1F4DD}",
-        label: "\u65B0\u6A21\u5757",
-        placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
-        kind: "multi"
-      });
-      await plugin.saveSettings();
-      render();
-    };
-    const resetBtn = actions.createEl("button", {
-      cls: "kid-score-rules-cancel-btn",
-      text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757"
-    });
-    resetBtn.onclick = async () => {
-      showConfirmModal(plugin.app, {
-        title: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757",
-        message: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757\u4F1A\u66FF\u6362\u5F53\u524D\u65E5\u8BB0\u6A21\u5757\u8BBE\u7F6E\uFF0C\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F",
-        isDestructive: true,
-        onConfirm: async () => {
-          plugin.currentUser.diaryModules = makeDefaultDiaryModules();
-          await plugin.saveSettings();
-          render();
-          new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
-        }
-      });
-    };
   };
   render();
   header.addEventListener("click", () => {
@@ -6068,6 +5957,400 @@ function renderDiaryModuleSettingsSection({
     toggle.textContent = isOpen ? "\u25BC" : "\u25B6";
     body.toggleClass("is-hidden", !isOpen);
   });
+}
+function createDiarySettingsBlock(body, title, desc) {
+  const block = body.createDiv({ cls: "diary-settings-block" });
+  const header = block.createDiv({ cls: "diary-settings-block-header" });
+  header.createEl("h4", { cls: "diary-settings-block-title", text: title });
+  header.createEl("p", { cls: "diary-settings-block-desc", text: desc });
+  return block;
+}
+function renderPresetBlock({
+  plugin,
+  body,
+  bindSettingsInput,
+  render
+}) {
+  const block = createDiarySettingsBlock(
+    body,
+    "\u{1F324}\uFE0F \u5929\u6C14\u548C\u5FC3\u60C5",
+    "\u7F16\u8F91\u6253\u5206\u9875\u91CC\u7684\u5FEB\u6377\u9884\u8BBE\uFF1B\u4E0D\u4F1A\u6539\u5199\u5386\u53F2\u65E5\u8BB0\u4E2D\u5DF2\u7ECF\u4FDD\u5B58\u7684\u5929\u6C14\u6216\u5FC3\u60C5\u3002"
+  );
+  const grid = block.createDiv({ cls: "diary-preset-settings-grid" });
+  renderPresetGroup({
+    plugin,
+    host: grid,
+    title: "\u5929\u6C14\u9884\u8BBE",
+    presets: plugin.currentUser.weatherPresets,
+    defaults: makeDefaultWeatherPresets(),
+    bindSettingsInput,
+    onReset: async () => {
+      plugin.currentUser.weatherPresets = makeDefaultWeatherPresets();
+      await plugin.saveSettings();
+      render();
+      new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u5929\u6C14\u9884\u8BBE");
+    }
+  });
+  renderPresetGroup({
+    plugin,
+    host: grid,
+    title: "\u5FC3\u60C5\u9884\u8BBE",
+    presets: plugin.currentUser.moodPresets,
+    defaults: makeDefaultMoodPresets(),
+    bindSettingsInput,
+    onReset: async () => {
+      plugin.currentUser.moodPresets = makeDefaultMoodPresets();
+      await plugin.saveSettings();
+      render();
+      new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u5FC3\u60C5\u9884\u8BBE");
+    }
+  });
+}
+function renderPresetGroup({
+  plugin,
+  host,
+  title,
+  presets,
+  defaults,
+  bindSettingsInput,
+  onReset
+}) {
+  const group = host.createDiv({ cls: "diary-preset-group" });
+  const top = group.createDiv({ cls: "diary-preset-group-header" });
+  top.createEl("h5", { cls: "diary-preset-title", text: title });
+  const resetBtn = top.createEl("button", {
+    cls: "kid-score-rules-cancel-btn diary-preset-reset-btn",
+    text: "\u6062\u590D\u9ED8\u8BA4"
+  });
+  resetBtn.type = "button";
+  resetBtn.onclick = () => {
+    showConfirmModal(plugin.app, {
+      title: "\u6062\u590D\u9ED8\u8BA4" + title,
+      message: "\u6062\u590D\u9ED8\u8BA4\u53EA\u4F1A\u91CD\u7F6E\u5FEB\u6377\u9884\u8BBE\uFF0C\u4E0D\u4F1A\u4FEE\u6539\u5386\u53F2\u65E5\u8BB0\u5185\u5BB9\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F",
+      isDestructive: false,
+      onConfirm: onReset
+    });
+  };
+  const list = group.createDiv({ cls: "diary-preset-list" });
+  defaults.forEach((fallback, index) => {
+    const preset = presets[index] || fallback;
+    const row = list.createDiv({ cls: "diary-preset-row" });
+    const emojiBtn = row.createEl("button", {
+      cls: "settings-emoji-btn diary-preset-emoji-btn",
+      text: preset.emoji || fallback.emoji
+    });
+    emojiBtn.type = "button";
+    emojiBtn.title = "\u4FEE\u6539\u9884\u8BBE\u56FE\u6807";
+    emojiBtn.onclick = () => {
+      showEmojiPicker(async (emoji) => {
+        var _a;
+        presets[index] = {
+          emoji,
+          label: ((_a = presets[index]) == null ? void 0 : _a.label) || fallback.label
+        };
+        await plugin.saveSettings();
+        emojiBtn.textContent = emoji;
+      }, host);
+    };
+    const labelInput = row.createEl("input", {
+      cls: "diary-preset-label-input",
+      type: "text"
+    });
+    labelInput.value = preset.label || fallback.label;
+    labelInput.placeholder = fallback.label;
+    bindSettingsInput(labelInput);
+    row.addEventListener("click", (event) => {
+      if (event.target === labelInput || event.target === emojiBtn) return;
+      labelInput.focus();
+    });
+    labelInput.onchange = async () => {
+      var _a;
+      presets[index] = {
+        emoji: ((_a = presets[index]) == null ? void 0 : _a.emoji) || fallback.emoji,
+        label: labelInput.value.trim() || fallback.label
+      };
+      await plugin.saveSettings();
+    };
+  });
+}
+function renderSmallRecordsBlock({
+  plugin,
+  body,
+  bindSettingsInput,
+  render,
+  isTouchLayout
+}) {
+  const block = createDiarySettingsBlock(
+    body,
+    "\u{1F9E9} \u5404\u9879\u5C0F\u8BB0\u5F55",
+    "\u8FD9\u4E9B\u5C0F\u6A21\u5757\u53EF\u62D6\u52A8\u6392\u5E8F\uFF1B\u6392\u5E8F\u53EA\u5F71\u54CD\u672C\u533A\u5757\uFF0C\u6253\u5206\u9875\u4F1A\u6309\u8FD9\u91CC\u7684\u987A\u5E8F\u5C55\u793A\u3002"
+  );
+  const list = block.createDiv({ cls: "diary-module-settings-list diary-small-records-list" });
+  const smallRecords = getSmallRecordModules(plugin);
+  if (smallRecords.length === 0) {
+    list.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u5C0F\u8BB0\u5F55\u6A21\u5757\u3002" });
+  }
+  const dragState = {
+    dragging: false,
+    dragId: "",
+    placeholder: null,
+    ghost: null,
+    rows: []
+  };
+  const getTargetIndex = (clientY) => {
+    for (let index = 0; index < dragState.rows.length; index++) {
+      const rect = dragState.rows[index].getBoundingClientRect();
+      if (clientY < rect.top + rect.height / 2) return index;
+    }
+    return dragState.rows.length;
+  };
+  const cleanupDrag = () => {
+    document.removeEventListener("pointermove", pointerMoveHandler);
+    document.removeEventListener("pointerup", pointerUpHandler);
+    document.removeEventListener("pointercancel", pointerCancelHandler);
+    if (dragState.ghost) dragState.ghost.remove();
+    if (dragState.placeholder) dragState.placeholder.remove();
+    dragState.ghost = null;
+    dragState.placeholder = null;
+    dragState.dragging = false;
+    document.body.style.userSelect = "";
+    document.body.style.webkitUserSelect = "";
+  };
+  const pointerMoveHandler = (e) => {
+    var _a;
+    if (!dragState.dragging) return;
+    if (dragState.ghost) dragState.ghost.style.top = e.clientY - 20 + "px";
+    const parent = (_a = dragState.rows[0]) == null ? void 0 : _a.parentElement;
+    if (!parent || !dragState.placeholder) return;
+    const targetIdx = getTargetIndex(e.clientY);
+    if (targetIdx >= dragState.rows.length) {
+      parent.appendChild(dragState.placeholder);
+    } else {
+      parent.insertBefore(dragState.placeholder, dragState.rows[targetIdx]);
+    }
+  };
+  const pointerUpHandler = async (e) => {
+    if (!dragState.dragging) return;
+    const fromIdx = smallRecords.findIndex((moduleDef) => moduleDef.id === dragState.dragId);
+    const targetIdx = getTargetIndex(e.clientY);
+    let insertIdx = targetIdx;
+    if (targetIdx > fromIdx) insertIdx--;
+    cleanupDrag();
+    if (fromIdx >= 0 && insertIdx >= 0 && fromIdx !== insertIdx) {
+      const ids = smallRecords.map((moduleDef) => moduleDef.id);
+      const [moved] = ids.splice(fromIdx, 1);
+      ids.splice(insertIdx, 0, moved);
+      setSmallRecordOrder(plugin, ids);
+      await plugin.saveSettings();
+    }
+    render();
+  };
+  const pointerCancelHandler = () => {
+    cleanupDrag();
+    render();
+  };
+  const startDrag = (moduleDef, row, clientY) => {
+    dragState.dragging = true;
+    dragState.dragId = moduleDef.id;
+    dragState.rows = Array.from(list.querySelectorAll(".diary-module-settings-row"));
+    const rect = row.getBoundingClientRect();
+    const ghost = row.cloneNode(true);
+    ghost.className = "diary-module-settings-row diary-module-settings-drag-ghost";
+    ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.88;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.22);background:var(--background-primary);border-radius:12px;";
+    document.body.appendChild(ghost);
+    dragState.ghost = ghost;
+    const placeholder = document.createElement("div");
+    placeholder.className = "diary-module-settings-drag-placeholder";
+    placeholder.style.height = rect.height + "px";
+    if (row.parentElement) row.parentElement.insertBefore(placeholder, row);
+    dragState.placeholder = placeholder;
+    row.style.display = "none";
+    document.body.style.userSelect = "none";
+    document.body.style.webkitUserSelect = "none";
+    document.addEventListener("pointermove", pointerMoveHandler);
+    document.addEventListener("pointerup", pointerUpHandler);
+    document.addEventListener("pointercancel", pointerCancelHandler);
+  };
+  smallRecords.forEach((moduleDef) => {
+    const row = list.createDiv({
+      cls: "diary-module-settings-row diary-small-record-row" + (isTouchLayout ? " diary-small-record-row-mobile" : " diary-small-record-row-desktop")
+    });
+    row.dataset.moduleId = moduleDef.id;
+    const compact = row.createDiv({ cls: "diary-small-record-compact" });
+    const handle = compact.createEl("span", {
+      cls: "settings-drag-handle diary-module-drag-handle",
+      text: "\u2630"
+    });
+    handle.title = "\u62D6\u52A8\u6392\u5E8F";
+    handle.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      startDrag(moduleDef, row, e.clientY);
+    });
+    createModuleEmojiField({
+      app: plugin.app,
+      host: compact,
+      emoji: moduleDef.emoji || "\u{1F4DD}",
+      onChange: async (emoji) => {
+        moduleDef.emoji = emoji;
+        await plugin.saveSettings();
+      },
+      containerEl: body,
+      btnClass: "diary-small-record-emoji-btn"
+    });
+    const labelInput = createModuleLabelField({
+      host: compact,
+      label: moduleDef.label || "",
+      inputClass: "diary-module-settings-input diary-small-record-name-input",
+      skipBindInputFocus: true,
+      onChange: async (label) => {
+        moduleDef.label = label || moduleDef.label || "\u65B0\u6A21\u5757";
+        await plugin.saveSettings();
+        render();
+      }
+    });
+    bindSettingsInput(labelInput);
+    const del = compact.createEl("button", {
+      cls: "diary-tool-btn diary-module-delete-btn settings-delete-btn diary-small-record-delete-btn",
+      text: "\u{1F5D1}"
+    });
+    del.type = "button";
+    del.title = "\u5220\u9664\u6A21\u5757";
+    del.onclick = () => {
+      showConfirmModal(plugin.app, {
+        title: "\u5220\u9664\u65E5\u8BB0\u6A21\u5757",
+        message: "\u786E\u5B9A\u5220\u9664\u65E5\u8BB0\u6A21\u5757\u300C" + (moduleDef.label || "\u672A\u547D\u540D") + "\u300D\u5417\uFF1F",
+        isDestructive: true,
+        onConfirm: async () => {
+          plugin.currentUser.diaryModules = plugin.currentUser.diaryModules.filter(
+            (item) => item.id !== moduleDef.id
+          );
+          await plugin.saveSettings();
+          render();
+        }
+      });
+    };
+    const details = row.createDiv({ cls: "diary-small-record-details" });
+    const placeholderField = details.createDiv({ cls: "diary-module-settings-field is-wide" });
+    placeholderField.createEl("label", {
+      cls: "diary-module-settings-field-label",
+      text: "\u63D0\u793A\u6587\u6848"
+    });
+    const placeholderInput = createModulePlaceholderField({
+      host: placeholderField,
+      placeholder: moduleDef.placeholder || "",
+      inputClass: "diary-module-settings-input is-wide diary-module-settings-textarea",
+      minHeight: 58,
+      skipBindInputFocus: true,
+      onChange: async (placeholder) => {
+        moduleDef.placeholder = placeholder;
+        await plugin.saveSettings();
+      }
+    });
+    bindSettingsInput(placeholderInput);
+  });
+  const actions = block.createDiv({ cls: "kid-score-rules-actions" });
+  const addBtn = actions.createEl("button", {
+    cls: "mod-cta kid-score-rules-save-btn",
+    text: "\uFF0B \u65B0\u589E\u5C0F\u8BB0\u5F55"
+  });
+  addBtn.onclick = async () => {
+    const newModule = {
+      id: "module_" + Date.now(),
+      emoji: "\u{1F4DD}",
+      label: "\u65B0\u6A21\u5757",
+      placeholder: "\u8FD9\u91CC\u5199\u4E00\u70B9\u4ECA\u5929\u7684\u8BB0\u5F55",
+      kind: "multi"
+    };
+    const commentIndex = plugin.currentUser.diaryModules.findIndex((moduleDef) => moduleDef.id === "comment");
+    plugin.currentUser.diaryModules.splice(
+      commentIndex >= 0 ? commentIndex : plugin.currentUser.diaryModules.length,
+      0,
+      newModule
+    );
+    await plugin.saveSettings();
+    render();
+  };
+  const resetBtn = actions.createEl("button", {
+    cls: "kid-score-rules-cancel-btn",
+    text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757"
+  });
+  resetBtn.onclick = () => {
+    showConfirmModal(plugin.app, {
+      title: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757",
+      message: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757\u4F1A\u66FF\u6362\u5F53\u524D\u5C0F\u8BB0\u5F55\u3001\u5929\u6C14/\u5FC3\u60C5\u6A21\u5757\u548C\u8BC4\u8BED\u8BBE\u7F6E\uFF0C\u4F46\u4E0D\u4F1A\u4FEE\u6539\u5386\u53F2\u65E5\u8BB0\u5185\u5BB9\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F",
+      isDestructive: true,
+      onConfirm: async () => {
+        plugin.currentUser.diaryModules = makeDefaultDiaryModules();
+        await plugin.saveSettings();
+        render();
+        new import_obsidian12.Notice("\u2705 \u5DF2\u6062\u590D\u9ED8\u8BA4\u65E5\u8BB0\u6A21\u5757");
+      }
+    });
+  };
+}
+function renderFreeWriteBlock(body) {
+  createDiarySettingsBlock(
+    body,
+    "\u270D\uFE0F \u81EA\u7531\u8BB0\u5F55",
+    "\u81EA\u7531\u8BB0\u5F55\u56FA\u5B9A\u663E\u793A\u5728\u5404\u9879\u5C0F\u8BB0\u5F55\u4E4B\u540E\uFF0C\u7528\u4E8E\u957F\u6587\u672C\u3001\u56FE\u7247\u3001\u89C6\u9891\u548C\u97F3\u9891\u8865\u5145\u3002"
+  );
+}
+function renderCommentBlock({
+  plugin,
+  body,
+  bindSettingsInput,
+  render
+}) {
+  const block = createDiarySettingsBlock(
+    body,
+    "\u{1F4AC} \u8BC4\u8BED",
+    "\u8BC4\u8BED\u56FA\u5B9A\u663E\u793A\u5728\u81EA\u7531\u8BB0\u5F55\u4E4B\u540E\uFF0C\u4F5C\u4E3A\u4FDD\u5B58\u524D\u7684\u6700\u540E\u8865\u5145\u6A21\u5757\u3002"
+  );
+  const commentModule = plugin.currentUser.diaryModules.find((moduleDef) => moduleDef.id === "comment");
+  if (!commentModule) return;
+  const row = block.createDiv({ cls: "diary-module-settings-row diary-comment-settings-row" });
+  const compact = row.createDiv({ cls: "diary-small-record-compact diary-comment-settings-compact" });
+  createModuleEmojiField({
+    app: plugin.app,
+    host: compact,
+    emoji: commentModule.emoji || "\u{1F4AC}",
+    onChange: async (emoji) => {
+      commentModule.emoji = emoji;
+      await plugin.saveSettings();
+    },
+    containerEl: body,
+    btnClass: "diary-small-record-emoji-btn"
+  });
+  const labelInput = createModuleLabelField({
+    host: compact,
+    label: commentModule.label || "\u8BC4\u8BED",
+    inputClass: "diary-module-settings-input diary-small-record-name-input",
+    skipBindInputFocus: true,
+    onChange: async (label) => {
+      commentModule.label = label || "\u8BC4\u8BED";
+      await plugin.saveSettings();
+      render();
+    }
+  });
+  bindSettingsInput(labelInput);
+  const details = row.createDiv({ cls: "diary-small-record-details" });
+  const placeholderField = details.createDiv({ cls: "diary-module-settings-field is-wide" });
+  placeholderField.createEl("label", {
+    cls: "diary-module-settings-field-label",
+    text: "\u63D0\u793A\u6587\u6848"
+  });
+  const placeholderInput = createModulePlaceholderField({
+    host: placeholderField,
+    placeholder: commentModule.placeholder || "",
+    inputClass: "diary-module-settings-input is-wide diary-module-settings-textarea",
+    minHeight: 58,
+    skipBindInputFocus: true,
+    onChange: async (placeholder) => {
+      commentModule.placeholder = placeholder;
+      await plugin.saveSettings();
+    }
+  });
+  bindSettingsInput(placeholderInput);
 }
 
 // src/settings/rules-settings-section.ts
@@ -6373,6 +6656,36 @@ function sortItemsByCategories(items, categories) {
 
 // src/settings/item-settings-list.ts
 var import_obsidian16 = require("obsidian");
+
+// src/settings/desktop-settings-sections.ts
+function renderDesktopItemSettingsRowLayout(itemsWrap) {
+  const wrap = itemsWrap.createDiv({
+    cls: "settings-item-wrap settings-item-wrap-desktop"
+  });
+  const row = wrap.createDiv({
+    cls: "settings-item-row-v2 settings-item-row-v2-desktop"
+  });
+  const noteRow = wrap.createDiv({
+    cls: "settings-item-note-row settings-item-note-row-desktop"
+  });
+  return { wrap, row, noteRow };
+}
+
+// src/settings/mobile-settings-sections.ts
+function renderMobileItemSettingsRowLayout(itemsWrap) {
+  const wrap = itemsWrap.createDiv({
+    cls: "settings-item-wrap settings-item-wrap-mobile"
+  });
+  const row = wrap.createDiv({
+    cls: "settings-item-row-v2 settings-item-row-v2-mobile"
+  });
+  const noteRow = wrap.createDiv({
+    cls: "settings-item-note-row settings-item-note-row-mobile"
+  });
+  return { wrap, row, noteRow };
+}
+
+// src/settings/item-settings-list.ts
 function renderItemSettingsList({
   plugin,
   itemsWrap,
@@ -7143,6 +7456,18 @@ function ensureUserDefaults(user) {
       return next;
     });
   }
+  const normalizedWeatherPresets = normalizeWeatherPresets(
+    user.weatherPresets,
+    makeDefaultWeatherPresets()
+  );
+  if (normalizedWeatherPresets.changed) changed = true;
+  user.weatherPresets = normalizedWeatherPresets.presets;
+  const normalizedMoodPresets = normalizeQuickPresets(
+    user.moodPresets,
+    makeDefaultMoodPresets()
+  );
+  if (normalizedMoodPresets.changed) changed = true;
+  user.moodPresets = normalizedMoodPresets.presets;
   if (!user.goals) {
     user.goals = { daily: 10, weekly: 70, monthly: 300 };
     changed = true;
@@ -7154,6 +7479,50 @@ function ensureUserDefaults(user) {
     }
   }
   return changed;
+}
+var LEGACY_WEATHER_DEFAULT_LABELS = /* @__PURE__ */ new Set([
+  "\u6674",
+  "\u6674\u8F6C\u591A\u4E91",
+  "\u591A\u4E91",
+  "\u9634",
+  "\u96E8",
+  "\u96F7\u96E8",
+  "\u96EA",
+  "\u6709\u98CE",
+  "\u96FE",
+  "\u5F69\u8679"
+]);
+function normalizeWeatherPresets(value, defaults) {
+  if (isLegacyDefaultWeatherPresetSet(value)) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+  return normalizeQuickPresets(value, defaults);
+}
+function isLegacyDefaultWeatherPresetSet(value) {
+  if (!Array.isArray(value) || value.length === 0) return false;
+  const labels = value.map((preset) => String((preset == null ? void 0 : preset.label) || "").trim());
+  const legacyLabelCount = labels.filter(
+    (label) => LEGACY_WEATHER_DEFAULT_LABELS.has(label)
+  ).length;
+  const hasSnow = labels.includes("\u96EA");
+  const hasLegacyOnlyLabel = labels.includes("\u6674\u8F6C\u591A\u4E91") || labels.includes("\u6709\u98CE") || labels.includes("\u96FE");
+  return hasSnow && legacyLabelCount >= 6 && (value.length > 8 || hasLegacyOnlyLabel);
+}
+function normalizeQuickPresets(value, defaults) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+  let changed = value.length !== defaults.length;
+  const next = defaults.map((fallback, index) => {
+    const preset = value[index];
+    const emoji = typeof (preset == null ? void 0 : preset.emoji) === "string" && preset.emoji.trim() ? preset.emoji.trim() : fallback.emoji;
+    const label = typeof (preset == null ? void 0 : preset.label) === "string" && preset.label.trim() ? preset.label.trim() : fallback.label;
+    if (!preset || emoji !== preset.emoji || label !== preset.label) {
+      changed = true;
+    }
+    return { emoji, label };
+  });
+  return { presets: next, changed };
 }
 
 // src/storage/day-data-store.ts

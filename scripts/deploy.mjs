@@ -6,8 +6,9 @@ import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, "..");
+// Override with env LITTLE_MILESTONES_VAULT_DIR if the vault lives elsewhere.
 const DEFAULT_VAULT_PLUGIN_DIR =
-  "/Users/tins-macmini/Documents/Obsidian Vault/.obsidian/plugins/little-milestones";
+  "/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones";
 const VAULT_PLUGIN_DIR =
   process.env.LITTLE_MILESTONES_VAULT_DIR || DEFAULT_VAULT_PLUGIN_DIR;
 const skipBuild = process.argv.includes("--no-build");

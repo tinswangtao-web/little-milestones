@@ -195,28 +195,11 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
       })
     );
 
-  const weatherEmojis = [
-    { e: "☀️", l: "晴" },
-    { e: "⛅", l: "多云" },
-    { e: "🌧️", l: "雨" },
-    { e: "🌨️", l: "雪" },
-    { e: "🌬️", l: "风" },
-    { e: "🌤️", l: "晴转多云" },
-  ];
-  const moodEmojis = [
-    { e: "😊", l: "开心" },
-    { e: "😎", l: "很棒" },
-    { e: "🤔", l: "思考" },
-    { e: "😢", l: "难过" },
-    { e: "😠", l: "生气" },
-    { e: "😴", l: "困" },
-  ];
-
   createDiaryQuickGroup({
     app,
     quickRow,
     moduleDef: weatherModule,
-    defaults: weatherEmojis,
+    defaults: plugin.currentUser.weatherPresets,
     diaryModules,
     moduleFields,
     updateDiaryModules,
@@ -231,7 +214,7 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
     app,
     quickRow,
     moduleDef: moodModule,
-    defaults: moodEmojis,
+    defaults: plugin.currentUser.moodPresets,
     diaryModules,
     moduleFields,
     updateDiaryModules,

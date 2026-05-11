@@ -5,16 +5,6 @@ export function renderDesktopDiaryPanelLayout(panel: HTMLElement): DiaryPanelLay
 
   const topSplit = panel.createDiv({ cls: "diary-desktop-top" });
 
-  const moduleSection = topSplit.createDiv({
-    cls: "diary-module-section diary-module-section-desktop",
-  });
-  moduleSection.createEl("h4", { cls: "diary-module-title", text: "🧩 每天小记录" });
-  moduleSection.createEl("p", {
-    cls: "diary-module-hint",
-    text: "先选天气和心情，再用短短的句子记一记今天。",
-  });
-  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
-
   const quickSection = topSplit.createDiv({
     cls: "diary-module-section diary-quick-section diary-quick-section-desktop",
   });
@@ -24,6 +14,16 @@ export function renderDesktopDiaryPanelLayout(panel: HTMLElement): DiaryPanelLay
     text: "先快速选一选，再补一句自己的话。",
   });
   const quickRow = quickSection.createDiv({ cls: "diary-quick-row diary-quick-row-desktop" });
+
+  const moduleSection = topSplit.createDiv({
+    cls: "diary-module-section diary-module-section-desktop",
+  });
+  moduleSection.createEl("h4", { cls: "diary-module-title", text: "🧩 每天小记录" });
+  moduleSection.createEl("p", {
+    cls: "diary-module-hint",
+    text: "先选天气和心情，再用短短的句子记一记今天。",
+  });
+  const moduleGrid = moduleSection.createDiv({ cls: "diary-module-grid" });
 
   const textareaWrap = panel.createDiv({ cls: "diary-textarea-wrap diary-textarea-wrap-desktop" });
   const freewriteHeader = textareaWrap.createDiv({ cls: "diary-freewrite-header" });

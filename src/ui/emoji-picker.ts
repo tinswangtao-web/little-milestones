@@ -4,6 +4,7 @@ import {
   getEmojiCategoryKeys,
   searchEmojis,
 } from "./emoji-picker-search";
+import { getMobilePlatform } from "../utils/platform";
 
 export function showEmojiPicker(
   callback: (emoji: string) => void,
@@ -19,6 +20,10 @@ export function showEmojiPicker(
 
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
+  const isMobilePicker = getMobilePlatform() !== "desktop";
+  if (isMobilePicker) {
+    overlay.addClass("is-mobile-emoji-picker");
+  }
 
   const popup = document.createElement("div");
   popup.className = "kid-score-emoji-fullpicker";
@@ -222,7 +227,9 @@ export function showEmojiPicker(
   });
 
   getOverlayMount(container).appendChild(overlay);
-  setTimeout(() => {
-    customInput.focus();
-  }, 50);
+  if (!isMobilePicker) {
+    setTimeout(() => {
+      customInput.focus();
+    }, 50);
+  }
 }

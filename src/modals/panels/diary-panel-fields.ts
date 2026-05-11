@@ -26,7 +26,7 @@ interface CreateDiaryQuickGroupOptions {
   app: App;
   quickRow: HTMLElement;
   moduleDef: DiaryModuleDefinition | undefined;
-  defaults: Array<{ e: string; l: string }>;
+  defaults: Array<{ emoji: string; label: string }>;
   diaryModules: DiaryModuleValues;
   moduleFields: Array<{ key: string; input: HTMLInputElement | HTMLTextAreaElement }>;
   updateDiaryModules: (values: DiaryModuleValues) => void;
@@ -157,7 +157,7 @@ export function createDiaryQuickGroup({
   updateQuickCustomDraft,
 }: CreateDiaryQuickGroupOptions): void {
   if (!moduleDef) return;
-  let customEmoji = defaults[0].e;
+  let customEmoji = defaults[0]?.emoji || moduleDef.emoji || "📝";
   const group = quickRow.createDiv({ cls: "diary-quick-group" });
   group.dataset.moduleId = moduleDef.id;
   // Built-in quick modules (weather/mood) only need a simple read-only header,
@@ -196,11 +196,12 @@ export function createDiaryQuickGroup({
   defaults.forEach((entry) => {
     const btn = emojiRow.createEl("button", {
       cls: "diary-quick-btn",
-      text: entry.e,
     });
-    btn.title = entry.l;
+    btn.createSpan({ cls: "diary-quick-btn-emoji", text: entry.emoji });
+    btn.createSpan({ cls: "diary-quick-btn-label", text: entry.label });
+    btn.title = entry.label;
     btn.onclick = () => {
-      valueInput.value = entry.e + " " + entry.l;
+      valueInput.value = entry.emoji + " " + entry.label;
       diaryModules[moduleDef.id] = valueInput.value.trim();
       updateDiaryModules(diaryModules);
       syncAndRefresh();

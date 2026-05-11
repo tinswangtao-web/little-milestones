@@ -1,9 +1,11 @@
-import type { PluginSettings, User } from "../types";
+import type { DiaryQuickPreset, PluginSettings, User } from "../types";
 import {
   DEFAULT_DIARY_TEMPLATE,
   DEFAULT_SETTINGS,
   makeDefaultDiaryModules,
+  makeDefaultMoodPresets,
   makeDefaultUser,
+  makeDefaultWeatherPresets,
 } from "../constants";
 
 type LoadedSettings = Partial<PluginSettings> & {
@@ -14,6 +16,8 @@ type LoadedSettings = Partial<PluginSettings> & {
   scoringRules?: string;
   diaryTemplate?: string;
   diaryModules?: User["diaryModules"];
+  weatherPresets?: User["weatherPresets"];
+  moodPresets?: User["moodPresets"];
 };
 
 export interface NormalizedSettingsResult {
@@ -161,6 +165,20 @@ function ensureUserDefaults(user: User): boolean {
       return next;
     });
   }
+  const normalizedWeatherPresets = normalizeWeatherPresets(
+    user.weatherPresets,
+    makeDefaultWeatherPresets()
+  );
+  if (normalizedWeatherPresets.changed) changed = true;
+  user.weatherPresets = normalizedWeatherPresets.presets;
+
+  const normalizedMoodPresets = normalizeQuickPresets(
+    user.moodPresets,
+    makeDefaultMoodPresets()
+  );
+  if (normalizedMoodPresets.changed) changed = true;
+  user.moodPresets = normalizedMoodPresets.presets;
+
   if (!user.goals) {
     user.goals = { daily: 10, weekly: 70, monthly: 300 };
     changed = true;
@@ -174,4 +192,74 @@ function ensureUserDefaults(user: User): boolean {
   }
 
   return changed;
+}
+
+const LEGACY_WEATHER_DEFAULT_LABELS = new Set([
+  "晴",
+  "晴转多云",
+  "多云",
+  "阴",
+  "雨",
+  "雷雨",
+  "雪",
+  "有风",
+  "雾",
+  "彩虹",
+]);
+
+function normalizeWeatherPresets(
+  value: DiaryQuickPreset[] | undefined,
+  defaults: DiaryQuickPreset[]
+): { presets: DiaryQuickPreset[]; changed: boolean } {
+  if (isLegacyDefaultWeatherPresetSet(value)) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+  return normalizeQuickPresets(value, defaults);
+}
+
+function isLegacyDefaultWeatherPresetSet(
+  value: DiaryQuickPreset[] | undefined
+): boolean {
+  if (!Array.isArray(value) || value.length === 0) return false;
+  const labels = value.map((preset) => String(preset?.label || "").trim());
+  const legacyLabelCount = labels.filter((label) =>
+    LEGACY_WEATHER_DEFAULT_LABELS.has(label)
+  ).length;
+  const hasSnow = labels.includes("雪");
+  const hasLegacyOnlyLabel =
+    labels.includes("晴转多云") || labels.includes("有风") || labels.includes("雾");
+
+  return (
+    hasSnow &&
+    legacyLabelCount >= 6 &&
+    (value.length > 8 || hasLegacyOnlyLabel)
+  );
+}
+
+function normalizeQuickPresets(
+  value: DiaryQuickPreset[] | undefined,
+  defaults: DiaryQuickPreset[]
+): { presets: DiaryQuickPreset[]; changed: boolean } {
+  if (!Array.isArray(value) || value.length === 0) {
+    return { presets: defaults.map((preset) => ({ ...preset })), changed: true };
+  }
+
+  let changed = value.length !== defaults.length;
+  const next = defaults.map((fallback, index) => {
+    const preset = value[index];
+    const emoji =
+      typeof preset?.emoji === "string" && preset.emoji.trim()
+        ? preset.emoji.trim()
+        : fallback.emoji;
+    const label =
+      typeof preset?.label === "string" && preset.label.trim()
+        ? preset.label.trim()
+        : fallback.label;
+    if (!preset || emoji !== preset.emoji || label !== preset.label) {
+      changed = true;
+    }
+    return { emoji, label };
+  });
+
+  return { presets: next, changed };
 }

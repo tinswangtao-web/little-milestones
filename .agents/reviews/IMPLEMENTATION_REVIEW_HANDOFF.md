@@ -2,33 +2,39 @@
 
 ## Current round goal
 
-用户原话目标：继续补最后一层，把 `agent-collaboration-kit` 里的状态字段命名和任务状态枚举彻底统一。
+用户原话目标：`验收。干第五组`
 
-本轮收口点：
-
-- 把 `status` 与 `awaiting` 的职责拆清：前者表示流程阶段，后者表示在等谁
-- 统一 `STATE.md`、任务卡模板、流程文档与 example 的状态枚举
-- 清掉旧的混合型状态命名（例如 `awaiting-fix` 一类）在通用模板里的推荐地位
+本轮处理的是 dirty 第 5 组：`2026-05-09-diary-module-order-presets-mobile-settings`。
 
 ## Architecture / approach summary（可选）
 
-- 不改协议主流程，只补一层“状态契约”。
-- 采用两条原则：
-  - `status` 只表示流程阶段
-  - `awaiting` 只表示在等谁
-- `idle` 只保留给 `STATE.md`，表示当前没有活跃任务；`none` 只保留给 `Next Task.status`。
+- 第 5 组不是杂项，属于已存在任务卡的日记模块业务改动。
+- Cursor 已在 2026-05-09 18:28 复审通过，No blocking issues。
+- 本轮没有改业务逻辑，只重新验证当前 dirty 状态，并把协议记录从第 4 组切回第 5 组。
 
 ## Changed file list
 
-- `agent-collaboration-kit/.agents/STATE.md`
-- `agent-collaboration-kit/.agents/tasks/_template.md`
-- `agent-collaboration-kit/.agents/README.md`
-- `agent-collaboration-kit/.agents/AGENT_RULES.md`
-- `agent-collaboration-kit/WORKFLOW.md`
-- `agent-collaboration-kit/examples/minimal-project/README.md`
-- `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md`
-- `agent-collaboration-kit/examples/minimal-project/.agents/tasks/2026-05-11-add-export-command.md`
-- `.agents/tasks/2026-05-11-agent-collaboration-kit-polish.md`
+业务 dirty 范围：
+
+- `src/constants.ts`
+- `src/types.ts`
+- `src/settings/normalize-settings.ts`
+- `src/settings/diary-module-settings.ts`
+- `src/modals/panels/desktop-diary-panel.ts`
+- `src/modals/panels/diary-panel.ts`
+- `src/modals/panels/diary-panel-fields.ts`
+- `src/ui/emoji-picker.ts`
+- `styles/02-popups.css`
+- `styles/04-diary.css`
+- `styles/06-settings.css`
+- `styles/07-mobile.css`
+- `styles.css`
+- `main.js`
+- `scripts/deploy.mjs`
+
+本轮协议记录更新：
+
+- `.agents/tasks/2026-05-09-diary-module-order-presets-mobile-settings.md`
 - `.agents/STATE.md`
 - `.agents/LOCK.md`
 - `.agents/log.md`
@@ -36,41 +42,34 @@
 
 ## User-visible behavior changes
 
-- 规则包内部现在明确规定：`status` 只写流程阶段，`awaiting` 只写等待对象
-- `STATE.md` 模板、任务卡模板、`WORKFLOW.md` 和 example 现在使用同一套推荐状态：
-  - `planned`
-  - `in-progress`
-  - `awaiting-review`
-  - `awaiting-user`
-  - `awaiting-deploy`
-  - `done`
-  - `cancelled`
-- example 里的 `Next Task.status` 已与模板统一为 `none`
+- `打分页` 与 `设置页` 日记模块顺序统一为：天气和心情 -> 各项小记录 -> 自由记录 -> 评语。
+- 天气/心情快捷预设可在设置页编辑并恢复默认。
+- 默认天气/心情为各 8 个，打分页按钮显示 emoji + 名称，布局为 4 列 x 2 行。
+- 各项小记录可在设置页拖动排序，打分页按设置顺序展示。
+- 移动端 emoji picker 靠近顶部，减少键盘遮挡。
+- `scripts/deploy.mjs` 默认 Vault 路径已指向用户当前 Vault：`/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones`。
 
 ## Verification already run
 
-- `git diff --check -- agent-collaboration-kit/ .agents/STATE.md .agents/LOCK.md .agents/log.md .agents/tasks/2026-05-11-agent-collaboration-kit-polish.md .agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`
-- `rg` 检查：`awaiting-fix`、`awaiting-user-feedback`、example 中的 ``status: n/a`` 已从规则包模板/示例中清掉
-- 逐文件人工核对：
-  - `agent-collaboration-kit/.agents/STATE.md`
-  - `agent-collaboration-kit/.agents/tasks/_template.md`
-  - `agent-collaboration-kit/.agents/README.md`
-  - `agent-collaboration-kit/WORKFLOW.md`
-  - `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md`
-  - `agent-collaboration-kit/examples/minimal-project/.agents/tasks/2026-05-11-add-export-command.md`
+- `npx tsc --noEmit`
+- `npm run build`
+- `node --check main.js`
+- `git diff --check -- main.js scripts/deploy.mjs src/constants.ts src/modals/panels/desktop-diary-panel.ts src/modals/panels/diary-panel-fields.ts src/modals/panels/diary-panel.ts src/settings/diary-module-settings.ts src/settings/normalize-settings.ts src/types.ts src/ui/emoji-picker.ts styles.css styles/02-popups.css styles/04-diary.css styles/06-settings.css styles/07-mobile.css`
 
 ## Known risks / open points
 
-- 本轮仍是 docs-only，没有运行构建或测试命令
-- `examples/minimal-project/` 仍是“同一任务不同阶段的样板集合”，不是单一时刻快照
-- 工作树中仍有大量插件业务代码相关未提交改动；review 时应只看本轮规则文档范围
+- 本组改动面较大，已按规则经过严格 Cursor review；当前仍需要用户在 Obsidian/Vault 中做最终手测。
+- 当前没有执行 Vault sync；同步需要用户明确授权。
+- 当前没有 commit；提交需要用户明确授权。
+- 工作树中第 4 组 `agent-collaboration-kit` 文档改动仍未提交，后续提交需分组 stage，避免混入。
 
 ## Strict Review AI review requested
 
-- `否`
+- `否`。Cursor 已复审通过；若用户要求，可再次 review 当前工作区。
 
 ## Suggested user acceptance steps
 
-1. 打开 `agent-collaboration-kit/.agents/STATE.md` 与 `.agents/tasks/_template.md`，确认 `status` / `awaiting` 的分工足够清楚
-2. 打开 `agent-collaboration-kit/WORKFLOW.md`，确认流程阶段与推荐状态流转对得上
-3. 打开 `agent-collaboration-kit/examples/minimal-project/.agents/STATE.md` 与任务卡，确认 example 也沿用了同一套状态口径
+1. 同步到 Vault 后打开设置页，确认天气预设为 `晴 / 多云 / 阴 / 小雨 / 大雨 / 雷雨 / 台风 / 彩虹`，且不再出现 `雪`。
+2. 在设置页拖动各项小记录排序，打开打分页确认顺序同步并能重开保持。
+3. 在桌面和手机打分页确认天气/心情按钮为 4 列 x 2 行，显示 emoji + 名称。
+4. 在手机设置页和打分页打开 emoji picker，确认弹层靠上且键盘不遮挡主要选择区。

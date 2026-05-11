@@ -1,4 +1,4 @@
-import type { PluginSettings, User, DiaryModuleDefinition } from "./types";
+import type { PluginSettings, User, DiaryModuleDefinition, DiaryQuickPreset } from "./types";
 
 export const DEFAULT_DIARY_TEMPLATE = `### 天气与心情
 天气：
@@ -73,6 +73,39 @@ export function makeDefaultDiaryModules(): DiaryModuleDefinition[] {
       placeholder: "可以写想对爸爸妈妈或自己说的话",
       kind: "multi",
     },
+    {
+      id: "comment",
+      emoji: "💬",
+      label: "评语",
+      placeholder: "可以写今天的评语或反馈",
+      kind: "multi",
+    },
+  ];
+}
+
+export function makeDefaultWeatherPresets(): DiaryQuickPreset[] {
+  return [
+    { emoji: "☀️", label: "晴" },
+    { emoji: "⛅", label: "多云" },
+    { emoji: "☁️", label: "阴" },
+    { emoji: "🌦️", label: "小雨" },
+    { emoji: "🌧️", label: "大雨" },
+    { emoji: "⛈️", label: "雷雨" },
+    { emoji: "🌀", label: "台风" },
+    { emoji: "🌈", label: "彩虹" },
+  ];
+}
+
+export function makeDefaultMoodPresets(): DiaryQuickPreset[] {
+  return [
+    { emoji: "😊", label: "开心" },
+    { emoji: "😄", label: "兴奋" },
+    { emoji: "😌", label: "平静" },
+    { emoji: "😎", label: "很棒" },
+    { emoji: "😮", label: "惊喜" },
+    { emoji: "😢", label: "难过" },
+    { emoji: "😠", label: "生气" },
+    { emoji: "💪", label: "有力量" },
   ];
 }
 
@@ -86,6 +119,8 @@ export function makeDefaultUser(): User {
     scoringRules: "",
     diaryTemplate: DEFAULT_DIARY_TEMPLATE,
     diaryModules: makeDefaultDiaryModules(),
+    weatherPresets: makeDefaultWeatherPresets(),
+    moodPresets: makeDefaultMoodPresets(),
     goals: { daily: 10, weekly: 70, monthly: 300 },
   };
 }

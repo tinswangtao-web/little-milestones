@@ -32,6 +32,16 @@
   margin-bottom: auto;
 }
 
+.kid-score-value-overlay.is-mobile-emoji-picker {
+  align-items: flex-start;
+  padding-top: max(8px, env(safe-area-inset-top, 0px));
+}
+
+.kid-score-value-overlay.is-mobile-emoji-picker .kid-score-emoji-fullpicker {
+  margin-top: 0;
+  margin-bottom: auto;
+}
+
 
 .value-popup-header {
   font-size: 1.15em;

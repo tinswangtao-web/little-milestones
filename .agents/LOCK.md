@@ -4,4 +4,4 @@
 - `scope`: none
 - `reason`: none
 - `expires-at`: none
-- `notes`: 2026-05-11 17:18 +0800 release by code-ai after docs-only status-contract cleanup round; awaiting user feedback or another review.
+- `notes`: 2026-05-11 22:26 +0800 release by code-ai after group 5 Vault sync and precommit validation; selective commit being created for group 5 only. No push requested.

@@ -3,9 +3,9 @@
 - **slug**: 2026-05-09-diary-module-order-presets-mobile-settings
 - **created**: 2026-05-09
 - **owner**: codex
-- **status**: cursor-rereview-passed-awaiting-user-acceptance
+- **status**: committed
 - **origin**: 用户要求新建任务卡，优化日记功能的模块顺序、天气心情预设、移动端图标选择体验、各项小记录排序、设置页移动端布局。
-- **sync-to-vault**: pending
+- **sync-to-vault**: done
 - **write-scope**: `src/constants.ts`, `src/types.ts`, `src/settings/normalize-settings.ts`, `src/settings/diary-module-settings.ts`, `src/settings/*settings-sections.ts`, `src/modals/panels/diary-panel.ts`, `src/modals/panels/diary-panel-fields.ts`, `src/ui/emoji-picker.ts`, `styles/02-popups.css`, `styles/04-diary.css`, `styles/06-settings.css`, `styles/07-mobile.css`, `styles.css`, `main.js`, `.agents/**`
 - **read-scope**: `src/**`, `styles/**`, `main.js`, `.agents/**`
 
@@ -28,6 +28,7 @@
 - [x] `npm run build`
 - [x] `node --check main.js`
 - [x] `git diff --check`（仅提示 `src/constants.ts` 历史 mixed EOL 会按 LF 规范化，无 whitespace error）
+- [x] 2026-05-11 22:15 +0800 重新验证：`npx tsc --noEmit`、`npm run build`、`node --check main.js`、目标文件 `git diff --check` 均通过。
 
 ## 风险与回滚
 
@@ -50,6 +51,8 @@
 - 2026-05-09 18:02 +0800：Cursor review 发现 1 个 P1：`normalizeQuickPresets()` 对旧 10 个天气预设只是按 index 截断为前 8 个，旧默认/旧设置里的“雪”仍可能保留，不能保证同步后用户看到新的深圳 8 个天气组合。布局、默认 8 个和打分页 emoji+名称实现代码核对通过；本地验证命令通过，仅有 `src/constants.ts` 既有 EOL warning。等待 Codex 修复旧预设迁移。
 - 2026-05-09 18:11 +0800：Codex 修复 Cursor P1：天气预设 normalize 改为先识别旧默认/近似默认天气集合，若包含“雪”且高度匹配旧默认标签，则整体迁移为新的深圳 8 个默认天气，而不是 index 截断；普通自定义 8 个天气预设保持不覆盖。验证构造旧 10 个含“雪”预设后输出 `晴,多云,阴,小雨,大雨,雷雨,台风,彩虹`，构造自定义 8 个后保持原值。已重跑 `npx tsc --noEmit`、`npm run build`、`node --check main.js`、`git diff --check`。
 - 2026-05-09 18:28 +0800：Cursor 复审通过，未发现 P0/P1。确认天气专用 normalize 会将含“雪”的旧默认/近似默认集合迁移为深圳 8 个默认天气，普通自定义 8 个天气预设保留；`main.js` 已包含迁移逻辑。Cursor 重跑 `npx tsc --noEmit`、`npm run build`、`node --check main.js`、`git diff --check` 通过，仅有 `src/constants.ts` 既有 EOL warning。等待用户验收或明确授权重新同步 Vault。
+- 2026-05-11 22:15 +0800：用户验收第 4 组后要求处理第 5 组。Codex 确认本组 dirty 对应本任务；未改业务逻辑，仅重跑 `npx tsc --noEmit`、`npm run build`、`node --check main.js`、目标文件 `git diff --check`，均通过。当前仍未同步用户新 Vault，未 commit。
+- 2026-05-11 22:26 +0800：用户明确授权“同步 +commit”。Codex 重跑 `npx tsc --noEmit`、`npm run build`、`node --check main.js`、目标文件 `git diff --check` 均通过；随后执行 `npm run deploy` 同步到当前 Vault，并准备选择性提交本任务文件；不 push，不混入 `agent-collaboration-kit` 文档包。
 
 ## Vault sync
 
@@ -57,3 +60,5 @@
 - 2026-05-09 17:19 +0800：Vault 实测后产生新的设置页/打分页天气心情布局修复，当前 workspace 已更新但 Vault 尚未重新同步；等待 review。
 - 2026-05-09 17:36 +0800：重新同步到 `/Users/tins-macmini/Documents/Obsidian Vault/.obsidian/plugins/little-milestones`；同步文件 `main.js`、`styles.css`、`manifest.json`；三文件 MATCH 校验通过。同步人：codex。
 - 2026-05-09 18:00 +0800：Vault 实测后产生新的 8 个预设与按钮显示修复，当前 workspace 已更新但 Vault 尚未重新同步；等待 review。
+- 2026-05-11 22:15 +0800：当前用户 Vault 已变更为 `/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones`，`scripts/deploy.mjs` 默认路径 dirty 中已指向新 Vault；本轮仅验证，未执行 Vault sync。
+- 2026-05-11 22:26 +0800：已同步到 `/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones`；同步文件 `main.js`、`styles.css`、`manifest.json`；`npm run deploy` 输出 `MATCH main.js 2ada6872a653`、`MATCH styles.css c0f5c6ca1bf5`、`MATCH manifest.json 6774609a403b`；同步后 `cmp` 再核对三文件均 MATCH。同步人：code-ai。
