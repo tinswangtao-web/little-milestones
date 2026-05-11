@@ -4328,7 +4328,7 @@ function renderMainTabs({
   isTouchLayout,
   activeTab = "score"
 }) {
-  const { scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout ? renderMobileMainTabsLayout(containerEl) : renderDesktopMainTabsLayout(containerEl);
+  const { tabs, scoreTab, diaryTab, scorePanel, diaryPanel } = isTouchLayout ? renderMobileMainTabsLayout(containerEl) : renderDesktopMainTabsLayout(containerEl);
   scoreTab.onclick = () => {
     scoreTab.addClass("is-active");
     diaryTab.removeClass("is-active");
@@ -4349,7 +4349,7 @@ function renderMainTabs({
     diaryPanel.removeClass("is-hidden");
     scorePanel.addClass("is-hidden");
   }
-  return { scorePanel, diaryPanel };
+  return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
 }
 function renderBottomActions({
   containerEl,
@@ -5163,7 +5163,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
         },
         isTouchLayout: this.isTouchOptimizedMode()
       });
-      const { scorePanel, diaryPanel } = renderMainTabs({
+      const { scoreTab, diaryTab, scorePanel, diaryPanel } = renderMainTabs({
         containerEl: contentEl,
         isTouchLayout: this.isTouchOptimizedMode(),
         activeTab: this.activeTab,
@@ -5180,6 +5180,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
           contentEl.scrollTop = 0;
         }
       });
+      this.bindMobileTabSwipe(scorePanel, diaryPanel, scoreTab, diaryTab);
       const renderedScorePanel = renderScorePanel({
         app: this.app,
         component: this,
@@ -5315,6 +5316,59 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   captureScoreScrollTop() {
     if (this.activeTab !== "score") return;
     this.pendingScoreScrollTop = this.contentEl.scrollTop;
+  }
+  bindMobileTabSwipe(scorePanel, diaryPanel, scoreTab, diaryTab) {
+    if (!this.isTouchOptimizedMode()) return;
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+    const shouldIgnoreSwipeTarget = (target) => {
+      if (!(target instanceof HTMLElement)) return true;
+      if (target.closest("input, textarea, select, button, a, [role='button']")) return true;
+      for (let el = target; el; el = el.parentElement) {
+        if (el.isContentEditable) return true;
+      }
+      return false;
+    };
+    const onPointerDown = (event) => {
+      if (event.pointerType === "mouse" || !event.isPrimary) return;
+      if (shouldIgnoreSwipeTarget(event.target)) return;
+      startX = event.clientX;
+      startY = event.clientY;
+      tracking = true;
+    };
+    const onPointerMove = (event) => {
+      if (!tracking) return;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (Math.abs(dy) > 18 && Math.abs(dy) > Math.abs(dx)) {
+        tracking = false;
+      }
+    };
+    const onPointerUp = (event) => {
+      if (!tracking) return;
+      tracking = false;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      if (Math.abs(dx) < 72) return;
+      if (Math.abs(dx) <= Math.abs(dy) * 1.35) return;
+      event.preventDefault();
+      event.stopPropagation();
+      if (dx < 0 && this.activeTab === "score") {
+        diaryTab.click();
+      } else if (dx > 0 && this.activeTab === "diary") {
+        scoreTab.click();
+      }
+    };
+    const onPointerCancel = () => {
+      tracking = false;
+    };
+    for (const panel of [scorePanel, diaryPanel]) {
+      panel.addEventListener("pointerdown", onPointerDown);
+      panel.addEventListener("pointermove", onPointerMove);
+      panel.addEventListener("pointerup", onPointerUp);
+      panel.addEventListener("pointercancel", onPointerCancel);
+    }
   }
   syncDiaryContent() {
     const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();

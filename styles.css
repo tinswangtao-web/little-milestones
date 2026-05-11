@@ -1286,6 +1286,7 @@ textarea.custom-form-name-input {
 
 .kid-score-tab-panel {
   /* visible by default */
+  touch-action: pan-y;
 }
 
 .kid-score-tab-panel.is-hidden {
@@ -3631,9 +3632,7 @@ textarea.custom-form-name-input {
 
   /* ── Main tabs ── */
   .kid-score-main-tabs {
-    position: sticky;
-    top: 0;
-    z-index: 3;
+    position: static;
     margin-top: 2px;
     background: var(--background-primary);
     border-radius: 10px;
@@ -3641,9 +3640,7 @@ textarea.custom-form-name-input {
   }
 
   .kid-score-main-tabs-mobile {
-    position: sticky;
-    top: 0;
-    z-index: 3;
+    position: static;
   }
 
   .kid-score-daily-modal {
