@@ -6,14 +6,17 @@ import {
   buildFrontmatter,
   buildGoalCallout,
   buildSummaryCallout,
+  buildWeeklySummary,
+  buildMonthlySummary,
 } from "./report-sections";
+import { USER_CONTENT_BOUNDARY_WRITE } from "../constants";
 
 export class MarkdownReportBuilder {
   build(report: DayReport): string {
     const diaryComment = composeDiaryCommentContent(report.diaryModules || {});
     const commentSection = diaryComment ? "\n\n## 💬 评语\n\n" + diaryComment + "\n" : "\n";
 
-    return (
+    let sections =
       buildFrontmatter(report) +
       "# 📋 " +
       report.dateStr +
@@ -23,7 +26,16 @@ export class MarkdownReportBuilder {
       buildSummaryCallout(report) +
       "\n" +
       buildGoalCallout(report) +
-      "\n" +
+      "\n";
+
+    if (report.weeklySummary) {
+      sections += buildWeeklySummary(report.weeklySummary) + "\n";
+    }
+    if (report.monthlySummary) {
+      sections += buildMonthlySummary(report.monthlySummary) + "\n";
+    }
+
+    sections +=
       "---\n" +
       buildCategoryTables(report) +
       buildCustomItemsCallout(report.customItems) +
@@ -33,7 +45,10 @@ export class MarkdownReportBuilder {
       " 字**\n\n" +
       "## 📝 今日日记\n\n" +
       (report.diaryContent || "") +
-      commentSection
-    );
+      commentSection;
+
+    sections += USER_CONTENT_BOUNDARY_WRITE;
+
+    return sections;
   }
 }

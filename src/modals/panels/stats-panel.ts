@@ -1,6 +1,6 @@
 import type KidScorePlugin from "../../main";
 import type { DayData, ScoreItem, StatsPeriod } from "../../types";
-import { countPositiveDateStreak, getStartOfWeekString } from "../../utils/date";
+import { countDateStreak, getStartOfWeekString } from "../../utils/date";
 
 function precomputeDoneCounts(
   items: ScoreItem[],
@@ -254,7 +254,7 @@ function isItemDone(item: ScoreItem, val: number): boolean {
 }
 
 function countPositiveStreak(filtered: DayData[]): number {
-  return countPositiveDateStreak(filtered);
+  return countDateStreak(filtered);
 }
 
 function drawBarChart(canvas: HTMLCanvasElement, data: DayData[]): void {

@@ -1,5 +1,5 @@
 import { stringifyYaml } from "obsidian";
-import type { CustomScoreItem, DayReport, ScoreItem } from "../types";
+import type { CustomScoreItem, DayReport, ScoreItem, WeekSummary, MonthSummary } from "../types";
 
 export function buildFrontmatter(report: DayReport): string {
   const scoresYaml = Object.fromEntries(
@@ -75,9 +75,7 @@ export function buildSummaryCallout(report: DayReport): string {
     report.grandDays +
     " 天 · 📊 日均 " +
     report.grandAvg +
-    " 分 · 🏁 连续 " +
-    report.streak +
-    " 天\n";
+    " 分\n";
   return summary;
 }
 
@@ -85,6 +83,7 @@ export function buildGoalCallout(report: DayReport): string {
   const dailyGoal = report.goals.daily || 10;
   const progress = report.total;
   const goalPct = clampPercent(Math.round((progress / dailyGoal) * 100));
+  const goalStatus = report.goalMet ? "🎉 目标已达成" : "⏳ 目标未达成";
   return (
     "> [!tip] 🎯 今日目标\n" +
     "> 得分进度 **" +
@@ -93,7 +92,12 @@ export function buildGoalCallout(report: DayReport): string {
     dailyGoal +
     "** · " +
     renderProgressBar(goalPct) +
-    "\n"
+    "\n" +
+    "> " +
+    goalStatus +
+    " · 🏁 连续达标 " +
+    report.streak +
+    " 天\n"
   );
 }
 
@@ -168,6 +172,54 @@ export function buildCustomItemsCallout(customItems: CustomScoreItem[]): string 
     }
   }
   return callout + "\n";
+}
+
+export function buildWeeklySummary(summary: WeekSummary): string {
+  const totalSign = summary.totalScore >= 0 ? "+" : "";
+  const avgSign = summary.avgScore >= 0 ? "+" : "";
+  return (
+    "> [!info] 📅 上周目标完成情况（" +
+    summary.weekStart +
+    " ~ " +
+    summary.weekEnd +
+    "）\n" +
+    "> - 📆 记录天数：" +
+    summary.daysRecorded +
+    " 天\n" +
+    "> - 🎯 达标天数：" +
+    summary.daysMetGoal +
+    " 天\n" +
+    "> - 📊 总得分：" +
+    totalSign +
+    summary.totalScore +
+    " 分 · 日均 " +
+    avgSign +
+    summary.avgScore +
+    " 分\n"
+  );
+}
+
+export function buildMonthlySummary(summary: MonthSummary): string {
+  const totalSign = summary.totalScore >= 0 ? "+" : "";
+  const avgSign = summary.avgScore >= 0 ? "+" : "";
+  return (
+    "> [!info] 📅 上月目标完成情况（" +
+    summary.month +
+    "）\n" +
+    "> - 📆 记录天数：" +
+    summary.daysRecorded +
+    " 天\n" +
+    "> - 🎯 达标天数：" +
+    summary.daysMetGoal +
+    " 天\n" +
+    "> - 📊 总得分：" +
+    totalSign +
+    summary.totalScore +
+    " 分 · 日均 " +
+    avgSign +
+    summary.avgScore +
+    " 分\n"
+  );
 }
 
 function renderCategoryRows(items: ScoreItem[], report: DayReport): string {

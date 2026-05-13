@@ -6,7 +6,7 @@ import {
   createModulePlaceholderField,
   createModuleDeleteButton,
 } from "../../ui/diary-module-editor";
-import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
+import { attachAutoResize, bindImeAwareInput, bindModalInputFocus } from "../../utils/dom";
 import type { DiaryModuleDefinition, DiaryModuleValues } from "../../types";
 
 interface CreateDiaryModuleFieldOptions {
@@ -130,7 +130,7 @@ export function createDiaryModuleField({
   input.placeholder = moduleDef.placeholder || "";
   input.value = diaryModules[moduleDef.id] || "";
   bindModalInputFocus(input);
-  input.addEventListener("input", () => {
+  bindImeAwareInput(input, () => {
     diaryModules[moduleDef.id] = input.value.trim();
     updateDiaryModules(diaryModules);
     syncAndRefresh();
@@ -184,7 +184,7 @@ export function createDiaryQuickGroup({
   valueInput.value = diaryModules[moduleDef.id] || "";
   valueInput.rows = 1;
   bindModalInputFocus(valueInput);
-  valueInput.addEventListener("input", () => {
+  bindImeAwareInput(valueInput, () => {
     diaryModules[moduleDef.id] = valueInput.value.trim();
     updateDiaryModules(diaryModules);
     syncAndRefresh();
@@ -234,7 +234,7 @@ export function createDiaryQuickGroup({
   textInput.value = quickCustomDrafts?.[moduleDef.id] || "";
   bindModalInputFocus(textInput);
   attachAutoResize(textInput, { minHeight: 72 });
-  textInput.addEventListener("input", () => {
+  bindImeAwareInput(textInput, () => {
     updateQuickCustomDraft?.(moduleDef.id, textInput.value);
   });
   const addBtn = customRow.createEl("button", {

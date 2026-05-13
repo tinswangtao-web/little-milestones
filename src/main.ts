@@ -1,4 +1,5 @@
-import { Plugin, normalizePath } from "obsidian";
+import { Plugin, TFile, normalizePath } from "obsidian";
+import { boundarySentinelHideExtension } from "./editor/boundary-sentinel-hide";
 import type { PluginSettings, DayData, CustomScoreItem, DiaryModuleValues } from "./types";
 import { DEFAULT_SETTINGS } from "./constants";
 import { DailyScoringModal } from "./modals/daily-scoring-modal";
@@ -6,6 +7,7 @@ import { StatsModal } from "./modals/stats-modal";
 import { KidScoreSettingTab } from "./settings/settings-tab";
 import { normalizePluginSettings } from "./settings/normalize-settings";
 import { DayDataStore, type DayDataReadOptions } from "./storage/day-data-store";
+import { getReportFolderSegments } from "./utils/date";
 import { getPlatformKey } from "./utils/platform";
 
 /*
@@ -112,6 +114,8 @@ export default class KidScorePlugin extends Plugin {
     });
 
     this.addSettingTab(new KidScoreSettingTab(this.app, this));
+
+    this.registerEditorExtension(boundarySentinelHideExtension);
   }
 
   async loadSettings() {
@@ -152,8 +156,28 @@ export default class KidScorePlugin extends Plugin {
     );
   }
 
-  filePath(dateStr: string): string {
+  legacyFilePath(dateStr: string): string {
     return normalizePath(this.currentUser.savePath + "/" + dateStr + ".md");
+  }
+
+  getReportFolderPath(dateStr: string): string {
+    return normalizePath(
+      [this.currentUser.savePath, ...getReportFolderSegments(dateStr)].join("/")
+    );
+  }
+
+  filePath(dateStr: string): string {
+    return normalizePath(this.getReportFolderPath(dateStr) + "/" + dateStr + ".md");
+  }
+
+  getReportPathCandidates(dateStr: string): string[] {
+    const legacyPath = this.legacyFilePath(dateStr);
+    const bucketedPath = this.filePath(dateStr);
+    return legacyPath === bucketedPath ? [legacyPath] : [legacyPath, bucketedPath];
+  }
+
+  getDayFile(dateStr: string): TFile | null {
+    return this.dayDataStore.getDayFile(dateStr);
   }
 
   async readDayData(

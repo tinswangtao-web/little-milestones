@@ -50,11 +50,14 @@ const DIARY_COUNT_NARRATIVE_PREFIXES: Record<string, string> = {
 };
 
 function normalizeModuleValue(moduleId: string, value: string | undefined): string {
+  const raw = String(value || "").trim();
+  // 评语等多行段落保留换行；单行快捷模块仍将 accidental 换行压成「 / 」以免版面漂移
+  if (moduleId === "comment") {
+    return normalizeBuiltInSampleValue(moduleId, raw);
+  }
   return normalizeBuiltInSampleValue(
     moduleId,
-    String(value || "")
-      .replace(/\s*\n+\s*/g, " / ")
-      .trim()
+    raw.replace(/\s*\n+\s*/g, " / ")
   );
 }
 

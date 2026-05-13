@@ -4729,3 +4729,9 @@ textarea.custom-form-name-input {
   }
 }
 
+/* Appendix sentinel: keep in file but hide the marker line(s) in CodeMirror (edit / Live Preview). */
+
+.markdown-source-view .cm-line.lm-boundary-sentinel-line {
+  display: none !important;
+}
+

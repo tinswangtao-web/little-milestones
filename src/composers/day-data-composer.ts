@@ -1,11 +1,50 @@
-import type { DayData, DayReport, ScoreItem, CustomScoreItem, DiaryModuleValues } from "../types";
+import type { DayData, DayReport, ScoreItem, CustomScoreItem, DiaryModuleValues, WeekSummary, MonthSummary } from "../types";
 import type KidScorePlugin from "../main";
 import { makeDefaultDiaryModules } from "../constants";
 import { countDiaryCharacters, parseDiaryModules } from "../diary/modules";
-import { countPositiveDateStreak, shiftDateString } from "../utils/date";
+import { countDateStreak, shiftDateString, isMonday, isLastDayOfMonth, getPreviousWeekBounds, getPreviousMonthBounds } from "../utils/date";
 
 export class DayDataComposer {
   constructor(private plugin: KidScorePlugin) {}
+
+  private buildWeeklySummary(
+    allScores: DayData[],
+    dateStr: string,
+    dailyGoal: number
+  ): WeekSummary | undefined {
+    const { start, end } = getPreviousWeekBounds(dateStr);
+    const days = allScores.filter((s) => s.date >= start && s.date <= end);
+    if (days.length === 0) return undefined;
+    const totalScore = days.reduce((sum, d) => sum + d.total, 0);
+    const daysMetGoal = days.filter((d) => d.total >= dailyGoal).length;
+    return {
+      weekStart: start,
+      weekEnd: end,
+      daysRecorded: days.length,
+      daysMetGoal,
+      totalScore,
+      avgScore: Math.round((totalScore / days.length) * 10) / 10,
+    };
+  }
+
+  private buildMonthlySummary(
+    allScores: DayData[],
+    dateStr: string,
+    dailyGoal: number
+  ): MonthSummary | undefined {
+    const { start, end, month } = getPreviousMonthBounds(dateStr);
+    const days = allScores.filter((s) => s.date >= start && s.date <= end);
+    if (days.length === 0) return undefined;
+    const totalScore = days.reduce((sum, d) => sum + d.total, 0);
+    const daysMetGoal = days.filter((d) => d.total >= dailyGoal).length;
+    return {
+      month,
+      daysRecorded: days.length,
+      daysMetGoal,
+      totalScore,
+      avgScore: Math.round((totalScore / days.length) * 10) / 10,
+    };
+  }
 
   async compose(
     dateStr: string,
@@ -67,13 +106,23 @@ export class DayDataComposer {
     const grandDays = cumulativeDays + 1;
     const grandAvg = grandDays > 0 ? Math.round((grandTotal / grandDays) * 10) / 10 : 0;
 
-    const streak = countPositiveDateStreak(
+    const dailyGoal = this.plugin.currentUser.goals?.daily || 10;
+    const goalMet = total >= dailyGoal;
+    const streak = countDateStreak(
       [
         ...allScores.filter((score) => score.date !== dateStr),
         { date: dateStr, total },
       ],
-      dateStr
+      dateStr,
+      dailyGoal - 1
     );
+
+    const weeklySummary = isMonday(dateStr)
+      ? this.buildWeeklySummary(allScores, dateStr, dailyGoal)
+      : undefined;
+    const monthlySummary = isLastDayOfMonth(dateStr)
+      ? this.buildMonthlySummary(allScores, dateStr, dailyGoal)
+      : undefined;
 
     const diaryText = diaryContent || "";
     const diaryModules =
@@ -114,6 +163,9 @@ export class DayDataComposer {
       grandDays,
       grandAvg,
       streak,
+      goalMet,
+      weeklySummary,
+      monthlySummary,
       hasYesterday: !!yesterdayData,
       yesterdayData,
       tags: {

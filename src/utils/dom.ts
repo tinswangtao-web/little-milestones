@@ -1,5 +1,22 @@
 import { getMobilePlatform, isIOS, isTouchDevice } from "./platform";
 
+/**
+ * Commits on normal input, but skips `input` while an IME composition is active
+ * so Latin buffer text (e.g. Pinyin) is not written into app state. Runs once on
+ * `compositionend` to capture the final committed characters.
+ */
+export function bindImeAwareInput(
+  el: HTMLInputElement | HTMLTextAreaElement,
+  onCommit: () => void
+): void {
+  const handler = (ev: Event) => {
+    if (ev instanceof InputEvent && ev.isComposing) return;
+    onCommit();
+  };
+  el.addEventListener("input", handler);
+  el.addEventListener("compositionend", () => onCommit());
+}
+
 export function getOverlayMount(containerEl?: HTMLElement): HTMLElement {
   return document.body.classList.contains("is-mobile")
     ? document.body

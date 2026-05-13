@@ -86,6 +86,23 @@ export type StatsPeriod = "week" | "month" | "all";
 
 // ─── Report Types ───────────────────────────────────────────────────────────
 
+export interface WeekSummary {
+  weekStart: string;
+  weekEnd: string;
+  daysRecorded: number;
+  daysMetGoal: number;
+  totalScore: number;
+  avgScore: number;
+}
+
+export interface MonthSummary {
+  month: string;
+  daysRecorded: number;
+  daysMetGoal: number;
+  totalScore: number;
+  avgScore: number;
+}
+
 export interface DayReport {
   dateStr: string;
   childName: string;
@@ -108,6 +125,9 @@ export interface DayReport {
   grandDays: number;
   grandAvg: number;
   streak: number;
+  goalMet: boolean;
+  weeklySummary?: WeekSummary;
+  monthlySummary?: MonthSummary;
 
   hasYesterday: boolean;
   yesterdayData: DayData | null;

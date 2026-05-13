@@ -72,12 +72,15 @@
   - 是否要求严格 review
   - 2～4 条用户验收步骤
 - 交接卡就绪后，**代码 AI** 只对用户说「可 review」；勿要求用户向 **Review AI** 粘贴代码、整份 diff 或截图。
+- **Review AI** 每次 review 结束后，除审查结论本体外，必须额外产出一段“给代码 AI / 下一步”的可执行文字：若有问题，写成可直接发送给代码 AI 的最小修复指令；若无明确修复项，写成可直接发送的下一步建议（如继续手测、同步 Vault、更新协议收口、准备提交等）。此要求适用于任何承担 review 角色的 AI。
 - 最终 commit 或 Vault 同步前，**代码 AI** 须填写或摘要 `.agents/reviews/PRECOMMIT_CHECKLIST.md`。
 - **Review AI** 输出建议包含：
   - 结论：可发布 / 需修复 / 建议回滚
   - Findings：P0 / P1 / P2
   - 建议修复顺序
   - 用户最小复测步骤
+  - 给代码 AI 的可转发指令（有修复项时）
+  - 或下一步建议（无阻塞问题时）
 - **Review AI** 正常审查使用 `.agents/reviews/REVIEW_OUTPUT_TEMPLATE.md` 作为固定输出模板。
 - 无阻塞问题时须写明 **No blocking issues**。
 - 以下情况在 commit 前必须经过**严格 review**：存储/composer/renderer 变更；移动端键盘/触摸/遮罩/返回逻辑变更；数据格式/迁移/保存路径变更；或改动超过 3 个文件。

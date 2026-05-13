@@ -1,10 +1,16 @@
-import { Notice, TFile, normalizePath, parseYaml } from "obsidian";
+import { MarkdownView, Notice, TFile, normalizePath, parseYaml } from "obsidian";
 import type { CustomScoreItem, DayData, DiaryModuleValues } from "../types";
 import type KidScorePlugin from "../main";
-import { DIARY_MARKER } from "../constants";
+import { DIARY_MARKER, makeDefaultDiaryModules, USER_CONTENT_BOUNDARY_MARKERS } from "../constants";
 import { DayDataComposer } from "../composers/day-data-composer";
+import { parseDiaryModules } from "../diary/modules";
 import { MarkdownReportBuilder } from "../renderers/report-builder";
-import { compareDateStrings, isValidDateString } from "../utils/date";
+import {
+  compareDateStrings,
+  isValidDateString,
+  getNextMonday,
+  getNextMonthLastDay,
+} from "../utils/date";
 
 type FrontmatterData = Record<string, unknown>;
 
@@ -36,16 +42,58 @@ export class DayDataStore {
     return options.preferFreshRead === true || Date.now() < this._freshReadUntil;
   }
 
+  /** Prefer current marker line; still recognize legacy %% block and HTML comment. */
+  private findUserContentBoundary(content: string): { index: number; length: number } | null {
+    let best: { index: number; length: number } | null = null;
+    for (const needle of USER_CONTENT_BOUNDARY_MARKERS) {
+      const idx = content.indexOf(needle);
+      if (idx === -1) continue;
+      if (!best || idx < best.index) best = { index: idx, length: needle.length };
+    }
+    return best;
+  }
+
+  private stripBoundaryForPrefixCompare(content: string): string {
+    const boundary = this.findUserContentBoundary(content);
+    return boundary ? content.slice(0, boundary.index).trimEnd() : content.trimEnd();
+  }
+
+  getDayFile(dateStr: string): TFile | null {
+    for (const candidatePath of this.plugin.getReportPathCandidates(dateStr)) {
+      const file = this.plugin.app.vault.getAbstractFileByPath(candidatePath);
+      if (file instanceof TFile) return file;
+    }
+    return null;
+  }
+
+  /**
+   * When the report is open in a Markdown tab, prefer the in-memory editor buffer so
+   * diary/评语 match what the user sees (avoids IME-vs-disk races on autosave).
+   */
+  private readOpenMarkdownEditorContent(file: TFile): string | null {
+    for (const leaf of this.plugin.app.workspace.getLeavesOfType("markdown")) {
+      const view = leaf.view;
+      if (view instanceof MarkdownView && view.file?.path === file.path) {
+        return view.editor.getValue();
+      }
+    }
+    return null;
+  }
+
+  private async readDayReportMarkdown(file: TFile): Promise<string> {
+    const live = this.readOpenMarkdownEditorContent(file);
+    if (live !== null) return live;
+    return this.plugin.app.vault.read(file);
+  }
+
   async readDayData(
     dateStr: string,
     options: DayDataReadOptions = { preferFreshRead: true }
   ): Promise<DayData | null> {
-    const file = this.plugin.app.vault.getAbstractFileByPath(
-      this.plugin.filePath(dateStr)
-    );
+    const file = this.getDayFile(dateStr);
     if (!(file instanceof TFile)) return null;
 
-    const content = await this.plugin.app.vault.read(file);
+    const content = await this.readDayReportMarkdown(file);
     const contentFrontmatter = this.readFrontmatterFromContent(content);
     const frontmatter = options.preferFreshRead
       ? contentFrontmatter || this.readFrontmatterFromCache(file)
@@ -58,9 +106,7 @@ export class DayDataStore {
     dateStr: string,
     options: DayDataReadOptions = {}
   ): Promise<DayData | null> {
-    const file = this.plugin.app.vault.getAbstractFileByPath(
-      this.plugin.filePath(dateStr)
-    );
+    const file = this.getDayFile(dateStr);
     if (!(file instanceof TFile)) return null;
 
     const preferFreshRead = this.shouldPreferFreshRead(options);
@@ -72,7 +118,7 @@ export class DayDataStore {
       }
     }
 
-    const content = await this.plugin.app.vault.read(file);
+    const content = await this.readDayReportMarkdown(file);
     const frontmatter = this.readFrontmatterFromContent(content);
     return frontmatter
       ? this.buildDayDataFromFrontmatter(frontmatter, dateStr)
@@ -87,30 +133,64 @@ export class DayDataStore {
     diaryModules?: DiaryModuleValues
   ): Promise<void> {
     try {
-      const composer = new DayDataComposer(this.plugin);
-      const builder = new MarkdownReportBuilder();
-      const report = await composer.compose(
+      await this.writeReport(
         dateStr,
         scores,
         customItems,
         diaryContent,
-        diaryModules
+        diaryModules,
+        true
       );
-      const fileContent = builder.build(report);
+      await this.rebuildBoundaryReports(dateStr);
+    } catch (error) {
+      console.error("[Little Milestones] saveDayData failed", error);
+      new Notice(
+        "❌ 保存失败：" +
+          (error instanceof Error ? error.message : String(error))
+      );
+      throw error;
+    }
+  }
 
-      await this.ensureFolder(this.plugin.currentUser.savePath);
+  private async writeReport(
+    dateStr: string,
+    scores: Record<string, number>,
+    customItems: CustomScoreItem[],
+    diaryContent: string,
+    diaryModules: DiaryModuleValues | undefined,
+    showNotice: boolean
+  ): Promise<void> {
+    const composer = new DayDataComposer(this.plugin);
+    const builder = new MarkdownReportBuilder();
+    const report = await composer.compose(
+      dateStr,
+      scores,
+      customItems,
+      diaryContent,
+      diaryModules
+    );
+    let fileContent = builder.build(report);
 
-      const filePath = this.plugin.filePath(dateStr);
-      const existing = this.plugin.app.vault.getAbstractFileByPath(filePath);
-      if (existing instanceof TFile) {
-        await this.plugin.app.vault.modify(existing, fileContent);
-      } else {
-        await this.plugin.app.vault.create(filePath, fileContent);
+    const existing = this.getDayFile(dateStr);
+    const targetFilePath = existing?.path || this.plugin.filePath(dateStr);
+    await this.ensureFolder(this.getParentDirPath(targetFilePath));
+
+    if (existing instanceof TFile) {
+      const existingContent = await this.plugin.app.vault.read(existing);
+      const { appendix } = await this.extractReportUserAppendix(existingContent, dateStr);
+      const trimmedAppendix = appendix.trimStart();
+      if (trimmedAppendix) {
+        fileContent += "\n" + trimmedAppendix;
       }
+      await this.plugin.app.vault.modify(existing, fileContent);
+    } else {
+      await this.plugin.app.vault.create(targetFilePath, fileContent);
+    }
 
-      this.invalidateCache();
-      this.markFreshReadWindow();
+    this.invalidateCache();
+    this.markFreshReadWindow();
 
+    if (showNotice) {
       const totalSign = report.total >= 0 ? "+" : "";
       const grandSign = report.grandTotal >= 0 ? "+" : "";
       new Notice(
@@ -123,14 +203,118 @@ export class DayDataStore {
           grandSign +
           report.grandTotal
       );
-    } catch (error) {
-      console.error("[Little Milestones] saveDayData failed", error);
-      new Notice(
-        "❌ 保存失败：" +
-          (error instanceof Error ? error.message : String(error))
-      );
-      throw error;
     }
+  }
+
+  private async rebuildBoundaryReports(changedDateStr: string): Promise<void> {
+    try {
+      const nextMonday = getNextMonday(changedDateStr);
+      if (nextMonday !== changedDateStr) {
+        await this.rebuildReportIfExists(nextMonday);
+      }
+      const nextMonthLastDay = getNextMonthLastDay(changedDateStr);
+      if (nextMonthLastDay !== changedDateStr) {
+        await this.rebuildReportIfExists(nextMonthLastDay);
+      }
+    } catch (error) {
+      console.error(
+        "[Little Milestones] rebuildBoundaryReports failed",
+        error
+      );
+    }
+  }
+
+  private async rebuildReportIfExists(dateStr: string): Promise<void> {
+    const file = this.getDayFile(dateStr);
+    if (!(file instanceof TFile)) return;
+
+    const existingContent = await this.plugin.app.vault.read(file);
+    const { appendix, appendixUnsafe } = await this.extractReportUserAppendix(
+      existingContent,
+      dateStr
+    );
+    if (appendixUnsafe) {
+      console.log(
+        `[Little Milestones] 跳过回写 ${dateStr}：无法安全识别用户内容`
+      );
+      return;
+    }
+
+    const dayData = await this.readDayData(dateStr, { preferFreshRead: true });
+    if (!dayData) return;
+
+    const composer = new DayDataComposer(this.plugin);
+    const builder = new MarkdownReportBuilder();
+    const report = await composer.compose(
+      dateStr,
+      dayData.scores,
+      dayData.customItems,
+      dayData.diaryContent || "",
+      dayData.diaryModules
+    );
+
+    let newContent = builder.build(report);
+    const trimmedAppendix = appendix.trimStart();
+    if (trimmedAppendix) {
+      newContent += "\n" + trimmedAppendix;
+    }
+
+    await this.plugin.app.vault.modify(file, newContent);
+  }
+
+  /**
+   * User-owned content after the managed boundary marker, or a legacy tail
+   * identified by extractUserAppendix. When `appendixUnsafe` is true, callers
+   * that must not clobber unknown user edits should skip the operation.
+   */
+  private async extractReportUserAppendix(
+    existingContent: string,
+    dateStr: string
+  ): Promise<{ appendix: string; appendixUnsafe: boolean }> {
+    const boundary = this.findUserContentBoundary(existingContent);
+    if (boundary) {
+      return {
+        appendix: existingContent.slice(boundary.index + boundary.length),
+        appendixUnsafe: false,
+      };
+    }
+    const extracted = await this.extractUserAppendix(existingContent, dateStr);
+    if (extracted === null) {
+      return { appendix: "", appendixUnsafe: true };
+    }
+    return { appendix: extracted, appendixUnsafe: false };
+  }
+
+  private async extractUserAppendix(
+    existingContent: string,
+    dateStr: string
+  ): Promise<string | null> {
+    const dayData = await this.readDayData(dateStr, { preferFreshRead: true });
+    if (!dayData) return null;
+
+    const composer = new DayDataComposer(this.plugin);
+    const builder = new MarkdownReportBuilder();
+    const report = await composer.compose(
+      dateStr,
+      dayData.scores,
+      dayData.customItems,
+      dayData.diaryContent || "",
+      dayData.diaryModules
+    );
+
+    const expectedContent = builder.build(report);
+    const expectedWithoutMarker = this.stripBoundaryForPrefixCompare(expectedContent);
+    const normalizedExisting = existingContent.trimEnd();
+
+    if (normalizedExisting === expectedWithoutMarker) {
+      return "";
+    }
+
+    if (normalizedExisting.startsWith(expectedWithoutMarker)) {
+      return normalizedExisting.slice(expectedWithoutMarker.length);
+    }
+
+    return null;
   }
 
   async renameUserInFiles(oldName: string, newName: string): Promise<void> {
@@ -195,7 +379,7 @@ export class DayDataStore {
     if (files.length === 0) return;
 
     const conflicts = files
-      .map((file) => normalizePath(newDir + "/" + file.name))
+      .map((file) => this.getMigratedFilePath(file.path, oldDir, newDir))
       .filter((targetPath) => {
         const existing = this.plugin.app.vault.getAbstractFileByPath(targetPath);
         return existing instanceof TFile;
@@ -206,12 +390,11 @@ export class DayDataStore {
       );
     }
 
-    await this.ensureFolder(newDir);
-
     let errorCount = 0;
     for (const file of files) {
       try {
-        const newFilePath = normalizePath(newDir + "/" + file.name);
+        const newFilePath = this.getMigratedFilePath(file.path, oldDir, newDir);
+        await this.ensureFolder(this.getParentDirPath(newFilePath));
         await this.plugin.app.vault.rename(file, newFilePath);
       } catch (error) {
         errorCount++;
@@ -252,13 +435,14 @@ export class DayDataStore {
         (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
       );
     const results: DayData[] = [];
+    const seenDates = new Set<string>();
 
     for (const file of files) {
       const dateStr = file.basename;
-      if (isValidDateString(dateStr)) {
-        const score = await this.readDaySummary(dateStr, { preferFreshRead });
-        if (score) results.push(score);
-      }
+      if (!isValidDateString(dateStr) || seenDates.has(dateStr)) continue;
+      seenDates.add(dateStr);
+      const score = await this.readDaySummary(dateStr, { preferFreshRead });
+      if (score) results.push(score);
     }
 
     const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
@@ -274,6 +458,11 @@ export class DayDataStore {
     const scores = this.normalizeScores(frontmatter.scores);
     const customItems = this.normalizeCustomItems(frontmatter.customItems, dateStr);
     const total = this.readTotal(frontmatter.total, scores, customItems);
+    const bodyDiaryContent =
+      content !== undefined ? this.extractDiaryContent(content) : null;
+    const bodyDiaryComment =
+      content !== undefined ? this.extractDiaryComment(content) : null;
+    const frontmatterDiaryModules = this.normalizeDiaryModules(frontmatter.diaryModules);
 
     return {
       schemaVersion: this.readSchemaVersion(frontmatter.schemaVersion),
@@ -282,8 +471,12 @@ export class DayDataStore {
       scores,
       customItems,
       total,
-      diaryModules: this.normalizeDiaryModules(frontmatter.diaryModules),
-      ...(content !== undefined ? { diaryContent: this.extractDiaryContent(content) } : {}),
+      diaryModules: this.mergeDiaryModulesForRead(
+        frontmatterDiaryModules,
+        bodyDiaryContent,
+        bodyDiaryComment
+      ),
+      ...(content !== undefined ? { diaryContent: bodyDiaryContent || "" } : {}),
     };
   }
 
@@ -347,6 +540,52 @@ export class DayDataStore {
     return Object.keys(result).length > 0 ? result : undefined;
   }
 
+  private mergeDiaryModulesForRead(
+    frontmatterDiaryModules: DiaryModuleValues | undefined,
+    bodyDiaryContent: string | null,
+    bodyDiaryComment: string | null
+  ): DiaryModuleValues | undefined {
+    const moduleConfig =
+      this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length
+        ? this.plugin.currentUser.diaryModules
+        : makeDefaultDiaryModules();
+    const knownModuleIds = new Set(moduleConfig.map((moduleDef) => moduleDef.id));
+    const result: DiaryModuleValues = {};
+
+    if (frontmatterDiaryModules) {
+      for (const [key, value] of Object.entries(frontmatterDiaryModules)) {
+        if (!knownModuleIds.has(key) && key !== "freeWrite" && key !== "comment") {
+          result[key] = value;
+        }
+      }
+    }
+
+    if (bodyDiaryContent !== null) {
+      const parsedDiaryModules = parseDiaryModules(bodyDiaryContent, moduleConfig);
+      for (const moduleDef of moduleConfig) {
+        result[moduleDef.id] = parsedDiaryModules[moduleDef.id] || "";
+      }
+      result.freeWrite = parsedDiaryModules.freeWrite || "";
+    } else if (frontmatterDiaryModules) {
+      for (const moduleDef of moduleConfig) {
+        if (frontmatterDiaryModules[moduleDef.id] !== undefined) {
+          result[moduleDef.id] = frontmatterDiaryModules[moduleDef.id];
+        }
+      }
+      if (frontmatterDiaryModules.freeWrite !== undefined) {
+        result.freeWrite = frontmatterDiaryModules.freeWrite;
+      }
+    }
+
+    if (bodyDiaryComment !== null) {
+      result.comment = bodyDiaryComment;
+    } else if (frontmatterDiaryModules?.comment !== undefined) {
+      result.comment = frontmatterDiaryModules.comment;
+    }
+
+    return Object.keys(result).length > 0 ? result : undefined;
+  }
+
   private normalizeCustomItem(
     rawItem: unknown,
     dateStr: string,
@@ -396,12 +635,12 @@ export class DayDataStore {
     return scoreTotal + customTotal;
   }
 
-  private extractDiaryContent(content: string): string {
-    const body = content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  private extractDiaryContent(content: string): string | null {
+    const body = this.stripFrontmatter(content);
     const diaryHeadingMatch = /^##\s*📝\s*今日日记\s*$/m.exec(body);
     if (diaryHeadingMatch?.index !== undefined) {
       const afterDiaryHeading = body.slice(diaryHeadingMatch.index + diaryHeadingMatch[0].length);
-      return this.stripDiaryCommentSection(afterDiaryHeading).trim();
+      return this.stripManagedSection(this.stripDiaryCommentSection(afterDiaryHeading)).trim();
     }
 
     const diaryIdx = body.indexOf(DIARY_MARKER);
@@ -409,16 +648,43 @@ export class DayDataStore {
       const diaryBody = body
         .slice(diaryIdx + DIARY_MARKER.length)
         .replace(/^##\s*📝\s*今日日记\s*\r?\n?/, "");
-      return this.stripDiaryCommentSection(diaryBody).trim();
+      return this.stripManagedSection(this.stripDiaryCommentSection(diaryBody)).trim();
     }
 
-    return "";
+    return null;
+  }
+
+  private extractDiaryComment(content: string): string | null {
+    const body = this.stripFrontmatter(content);
+    const commentHeadingMatch = /^##\s*💬\s*评语\s*$/m.exec(body);
+    if (commentHeadingMatch?.index === undefined) return null;
+    let rest = body.slice(commentHeadingMatch.index + commentHeadingMatch[0].length);
+    rest = this.truncateCommentBodyAtNextHeading(rest);
+    return this.stripManagedSection(rest).trim();
+  }
+
+  /** Stop before the next markdown H2 section so user-authored `## ...` after 评语 is not absorbed. */
+  private truncateCommentBodyAtNextHeading(rest: string): string {
+    const match = /\r?\n##\s/.exec(rest);
+    if (match?.index !== undefined) {
+      return rest.slice(0, match.index);
+    }
+    return rest;
   }
 
   private stripDiaryCommentSection(diaryBody: string): string {
     const commentHeadingMatch = /^##\s*💬\s*评语\s*$/m.exec(diaryBody);
     if (commentHeadingMatch?.index === undefined) return diaryBody;
     return diaryBody.slice(0, commentHeadingMatch.index);
+  }
+
+  private stripFrontmatter(content: string): string {
+    return content.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n?/, "");
+  }
+
+  private stripManagedSection(content: string): string {
+    const boundary = this.findUserContentBoundary(content);
+    return boundary ? content.slice(0, boundary.index) : content;
   }
 
   private readSchemaVersion(rawSchemaVersion: unknown): number | undefined {
@@ -434,6 +700,18 @@ export class DayDataStore {
     if (typeof value !== "string") return null;
     const trimmed = value.trim();
     return trimmed ? trimmed : null;
+  }
+
+  private getParentDirPath(filePath: string): string {
+    const normalized = normalizePath(filePath);
+    const lastSlashIndex = normalized.lastIndexOf("/");
+    if (lastSlashIndex <= 0) return "";
+    return normalized.slice(0, lastSlashIndex);
+  }
+
+  private getMigratedFilePath(filePath: string, oldDir: string, newDir: string): string {
+    const relativePath = filePath.slice(oldDir.length + 1);
+    return normalizePath(newDir + "/" + relativePath);
   }
 
   private async ensureFolder(dirPath: string): Promise<void> {

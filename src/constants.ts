@@ -139,4 +139,28 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 
 export const DIARY_MARKER = "<!-- DIARY_START -->";
 
+/** Preferred append marker for new writes. Usually hidden in reading view; editor shows as HTML comment. */
+export const USER_CONTENT_BOUNDARY_WRITE =
+  "\n\n<!-- LM:user-content-boundary -->\n";
+
+/** Legacy link-reference comment from earlier plugin builds. */
+export const LEGACY_USER_CONTENT_BOUNDARY_LINK_REF =
+  "\n\n[//]: # (lm-user-content-boundary)\n";
+
+/** Older plugin boundary (Obsidian %% block). */
+export const LEGACY_USER_CONTENT_BOUNDARY_BLOCK =
+  "\n%%\nLM:user-content-boundary\n%%\n";
+
+/** Bare HTML marker (legacy files without the standard surrounding newlines). */
+export const LEGACY_USER_CONTENT_BOUNDARY_HTML =
+  "<!-- LM:user-content-boundary -->";
+
+/** All boundary needles; `findUserContentBoundary` picks the earliest match index. */
+export const USER_CONTENT_BOUNDARY_MARKERS: readonly string[] = [
+  USER_CONTENT_BOUNDARY_WRITE,
+  LEGACY_USER_CONTENT_BOUNDARY_LINK_REF,
+  LEGACY_USER_CONTENT_BOUNDARY_BLOCK,
+  LEGACY_USER_CONTENT_BOUNDARY_HTML,
+] as const;
+
 export { EMOJI_DATA, EMOJI_SEARCH } from "./data/emoji-data";

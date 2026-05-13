@@ -77,9 +77,76 @@ export function dateDiffInDays(laterDateStr: string, earlierDateStr: string): nu
   return Math.round((later - earlier) / DAY_MS);
 }
 
-export function countPositiveDateStreak(
+export function getDayOfWeek(dateStr: string): number {
+  return parseDateString(dateStr).getDay();
+}
+
+export function isMonday(dateStr: string): boolean {
+  return getDayOfWeek(dateStr) === 1;
+}
+
+export function isLastDayOfMonth(dateStr: string): boolean {
+  const d = parseDateString(dateStr);
+  const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  return d.getDate() === lastDay;
+}
+
+export function getPreviousWeekBounds(dateStr: string): { start: string; end: string } {
+  const d = parseDateString(dateStr);
+  const weekdayIndex = (d.getDay() + 6) % 7;
+  const weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() - weekdayIndex);
+  const prevWeekEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() - 1);
+  const prevWeekStart = new Date(prevWeekEnd.getFullYear(), prevWeekEnd.getMonth(), prevWeekEnd.getDate() - 6);
+  return { start: formatLocalDate(prevWeekStart), end: formatLocalDate(prevWeekEnd) };
+}
+
+export function getPreviousMonthBounds(dateStr: string): { start: string; end: string; month: string } {
+  const d = parseDateString(dateStr);
+  const prevMonthEnd = new Date(d.getFullYear(), d.getMonth(), 0);
+  const prevMonthStart = new Date(prevMonthEnd.getFullYear(), prevMonthEnd.getMonth(), 1);
+  const month =
+    prevMonthStart.getFullYear() + "-" + String(prevMonthStart.getMonth() + 1).padStart(2, "0");
+  return { start: formatLocalDate(prevMonthStart), end: formatLocalDate(prevMonthEnd), month };
+}
+
+export function getNextMonday(dateStr: string): string {
+  const d = parseDateString(dateStr);
+  const day = d.getDay();
+  const daysUntilMonday = day === 1 ? 7 : day === 0 ? 1 : 8 - day;
+  d.setDate(d.getDate() + daysUntilMonday);
+  return formatLocalDate(d);
+}
+
+export function getNextMonthLastDay(dateStr: string): string {
+  const d = parseDateString(dateStr);
+  const nextMonthLast = new Date(d.getFullYear(), d.getMonth() + 2, 0);
+  return formatLocalDate(nextMonthLast);
+}
+
+export function getMonthWeekNumber(dateStr: string): number {
+  const d = parseDateString(dateStr);
+  const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+  const firstWeekdayIndex = (firstDayOfMonth.getDay() + 6) % 7;
+  return Math.floor((d.getDate() + firstWeekdayIndex - 1) / 7) + 1;
+}
+
+export function getMonthWeekLabel(dateStr: string): string {
+  return "第" + getMonthWeekNumber(dateStr) + "周";
+}
+
+export function getReportFolderSegments(dateStr: string): [string, string, string] {
+  const d = parseDateString(dateStr);
+  return [
+    String(d.getFullYear()),
+    pad2(d.getMonth() + 1),
+    getMonthWeekLabel(dateStr),
+  ];
+}
+
+export function countDateStreak(
   records: Array<{ date: string; total: number }>,
-  anchorDate?: string
+  anchorDate?: string,
+  threshold = 0
 ): number {
   if (!records.length && !anchorDate) return 0;
 
@@ -100,10 +167,17 @@ export function countPositiveDateStreak(
 
   let streak = 0;
   let cursor = currentDate;
-  while ((totalsByDate.get(cursor) || 0) > 0) {
+  while ((totalsByDate.get(cursor) || 0) > threshold) {
     streak++;
     cursor = shiftDateString(cursor, -1);
   }
 
   return streak;
+}
+
+export function countPositiveDateStreak(
+  records: Array<{ date: string; total: number }>,
+  anchorDate?: string
+): number {
+  return countDateStreak(records, anchorDate, 0);
 }

@@ -80,6 +80,7 @@
 
 - 结论：可发布 / 需修复 / 建议回滚；P0/P1/P2；风险；修复顺序；最小复测；无阻塞写 **No blocking issues**。
 - 模板：`.agents/reviews/REVIEW_OUTPUT_TEMPLATE.md`。
+- 每次 review 结束后，必须补 1 段“给代码 AI / 下一步”的可执行文字：有修复项时写成可直接转发给代码 AI 的修复指令；无阻塞问题时至少写成下一步建议或收口建议。
 - 以下须严格 review 后再由用户授权 commit：存储/composer/renderer、移动键盘/触摸/遮罩/返回、数据格式/迁移/保存路径、或 >3 文件。
 
 ## 对用户沟通（代码 AI）
@@ -105,6 +106,7 @@
 - 聚焦：明确缺陷、回归、遗漏需求、移动端/Obsidian 风险、验证缺口。
 - 输出结论：可发布 / 需修复 / 建议回滚；Findings：P0/P1/P2；风险；修复顺序；最小复测。
 - 使用 `.agents/reviews/REVIEW_OUTPUT_TEMPLATE.md`；无阻塞写 **No blocking issues**。
+- 审查结论后必须再给 1 段可直接发给代码 AI 的内容：有修复项时给最小修复指令；无阻塞问题时给下一步建议/测试建议。
 - 正常审查不重构、不代为改业务代码。
 - 写入仓库时通常只写 `.agents/reviews/**`；需占 `LOCK.md` 并更新 `STATE.md`、`log.md`、任务卡。
 - Vault 同步是单独步骤；仅主工作区可同步到 Vault；默认不用 worktree。

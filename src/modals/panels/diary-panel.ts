@@ -1,7 +1,7 @@
 import { MarkdownRenderer } from "obsidian";
 import type { App, Component } from "obsidian";
 import { normalizeDiaryModules } from "../../settings/normalize-settings";
-import { attachAutoResize, bindModalInputFocus } from "../../utils/dom";
+import { attachAutoResize, bindImeAwareInput, bindModalInputFocus } from "../../utils/dom";
 import type KidScorePlugin from "../../main";
 import type { DiaryModuleValues } from "../../types";
 import { countDiaryCharacters } from "../../diary/modules";
@@ -250,11 +250,11 @@ export function buildDiaryPanel(options: DiaryPanelBuilderOptions): DiaryPanelCo
   diaryTextarea.value = diaryModules.freeWrite || "";
   diaryTextarea.rows = 12;
   attachAutoResize(diaryTextarea, { minHeight: 220 });
-  diaryTextarea.oninput = () => {
+  bindImeAwareInput(diaryTextarea, () => {
     diaryModules.freeWrite = diaryTextarea!.value;
     updateDiaryModules(diaryModules);
     syncAndRefresh();
-  };
+  });
   diaryTextarea.addEventListener("focus", () => {
     requestAnimationFrame(() => {
       diaryTextarea!.scrollIntoView({ block: "nearest", behavior: "smooth" });

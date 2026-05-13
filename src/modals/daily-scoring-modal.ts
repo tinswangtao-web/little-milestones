@@ -45,6 +45,8 @@ interface DiaryDraftState {
   diaryContent: string;
   diaryModules: DiaryModuleValues;
   uiDrafts: DiaryUiDraftState;
+  /** Report vault file mtime when draft was saved; if file is newer, drop draft on reopen. */
+  sourceVaultMtime: number;
 }
 
 function cloneDiaryUiDrafts(value: DiaryUiDraftState | undefined): DiaryUiDraftState {
@@ -137,7 +139,11 @@ export class DailyScoringModal extends BaseMobileModal {
       this.diaryContent = pendingState?.diaryContent ?? state.diaryContent;
       this.diaryModules = pendingState?.diaryModules ?? state.diaryModules;
       this.diaryUiDrafts = cloneDiaryUiDrafts(pendingState?.diaryUiDrafts);
-      const diaryDraft = this.getDiaryDraft();
+      let diaryDraft = this.getDiaryDraft();
+      if (diaryDraft && this.shouldDiscardDiaryDraftForVaultUpdate(diaryDraft)) {
+        this.clearDiaryDraft();
+        diaryDraft = null;
+      }
       if (diaryDraft) {
         this.diaryContent = diaryDraft.diaryContent;
         this.diaryModules = { ...diaryDraft.diaryModules };
@@ -273,8 +279,7 @@ export class DailyScoringModal extends BaseMobileModal {
             );
             self.skipNextCloseDraftSave = true;
             self.clearDiaryDraft();
-            const filePath = self.plugin.filePath(self.dateStr);
-            const file = self.app.vault.getAbstractFileByPath(filePath);
+            const file = self.plugin.getDayFile(self.dateStr);
             self.close();
             if (file instanceof TFile) {
               await self.app.workspace.getLeaf(true).openFile(file, { active: true });
@@ -410,6 +415,21 @@ export class DailyScoringModal extends BaseMobileModal {
     return `${this.plugin.currentUser.id || this.plugin.settings.currentUserId || "default"}:${this.dateStr}`;
   }
 
+  /** Mtime of the on-disk day report for this date, or 0 if the file does not exist yet. */
+  private getDayReportVaultMtime(): number {
+    const file = this.plugin.getDayFile(this.dateStr);
+    return file?.stat?.mtime ?? 0;
+  }
+
+  /** If the vault file was modified after the draft was captured, the draft must not override readDayData. */
+  private shouldDiscardDiaryDraftForVaultUpdate(draft: DiaryDraftState): boolean {
+    const file = this.plugin.getDayFile(this.dateStr);
+    if (!file) return false;
+    const currentMtime = file.stat?.mtime ?? 0;
+    const draftMtime = draft.sourceVaultMtime ?? 0;
+    return currentMtime > draftMtime;
+  }
+
   private getDiaryDraft(): DiaryDraftState | null {
     const draft = DailyScoringModal.diaryDrafts.get(this.getDiaryDraftKey());
     if (!draft) return null;
@@ -417,6 +437,7 @@ export class DailyScoringModal extends BaseMobileModal {
       diaryContent: draft.diaryContent,
       diaryModules: { ...draft.diaryModules },
       uiDrafts: cloneDiaryUiDrafts(draft.uiDrafts),
+      sourceVaultMtime: draft.sourceVaultMtime ?? 0,
     };
   }
 
@@ -426,6 +447,7 @@ export class DailyScoringModal extends BaseMobileModal {
       diaryContent: this.diaryContent,
       diaryModules: { ...this.diaryModules },
       uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
+      sourceVaultMtime: this.getDayReportVaultMtime(),
     });
   }
 

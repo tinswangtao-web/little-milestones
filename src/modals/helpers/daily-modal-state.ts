@@ -1,6 +1,3 @@
-import { TFile } from "obsidian";
-import { makeDefaultDiaryModules } from "../../constants";
-import { parseDiaryModules } from "../../diary/modules";
 import type { CustomScoreItem, DayData, DiaryModuleValues } from "../../types";
 import type KidScorePlugin from "../../main";
 import { shiftDateString } from "../../utils/date";
@@ -20,8 +17,7 @@ export async function loadDailyModalState(
   dateStr: string
 ): Promise<DailyModalStateSnapshot> {
   const yesterdayStr = shiftDateString(dateStr, -1);
-  const todayFile = plugin.app.vault.getAbstractFileByPath(plugin.filePath(dateStr));
-  const hasExistingRecord = todayFile instanceof TFile;
+  const hasExistingRecord = plugin.getDayFile(dateStr) !== null;
 
   const existingToday = await plugin.readDayData(dateStr, { preferFreshRead: true });
   const yesterdayData = await plugin.readDayData(yesterdayStr, { preferFreshRead: true });
@@ -38,12 +34,7 @@ export async function loadDailyModalState(
 
   const customItems = existingToday?.customItems || [];
   const diaryContent = existingToday?.diaryContent || "";
-  const moduleConfig =
-    plugin.currentUser.diaryModules && plugin.currentUser.diaryModules.length
-      ? plugin.currentUser.diaryModules
-      : makeDefaultDiaryModules();
-  const diaryModules =
-    existingToday?.diaryModules || (diaryContent ? parseDiaryModules(diaryContent, moduleConfig) : {});
+  const diaryModules = existingToday?.diaryModules || {};
 
   return {
     hasExistingRecord,
