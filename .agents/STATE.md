@@ -1,15 +1,15 @@
 ## Current Task
 - `task`: 2026-05-18-fix-release-metadata-mismatch
-- `status`: in-progress
+- `status`: done
 - `last-actor`: code-ai
-- `last-commit`: 7433e4e
+- `last-commit`: eb22559
 - `active-workspace`: /Users/tins-macmini/Documents/AI Files/Obsidian-Plugins/obsidian-little-milestones
 - `legacy-worktree`: none
-- `owner`: code-ai
-- `write-scope`: .github/workflows/release.yml, .agents/**
-- `read-scope`: .github/workflows/release.yml, .agents/**
+- `owner`: none
+- `write-scope`: none
+- `read-scope`: none
 - `awaiting`: none
-- `handoff-note`: Fixing release metadata mismatch and workflows files to resolve audit warnings.
+- `handoff-note`: Successfully recreated 2.0.1 release assets on GitHub with correct kid-score ID and cleaned versions.json. All audit warnings fully resolved.
 - `vault-root` (user 2026-05-11): `/Users/tins-macmini/Documents/Tins'Vault` — default `npm run deploy` plugin dir is `scripts/deploy.mjs` → `.obsidian/plugins/kid-score` under that vault.
 
 ## Previous Task
