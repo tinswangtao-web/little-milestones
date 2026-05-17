@@ -2,6 +2,6 @@
 - `owner`: none
 - `since`: -
 - `scope`: none
-- `reason`: Released after user-accepted commit (2026-05-12-report-path-sync complete).
+- `reason`: Released after W6 popup !important follow-up fix.
 - `expires-at`: -
-- `notes`: `[code-ai]` commit landed; task complete. Next work picks up new task card as needed.
+- `notes`: Awaiting strict review; no commit, Vault sync, or GitHub Release authorized. Existing agent-collaboration-kit/** deletions and REVIEW-FEEDBACK.md are outside this task.

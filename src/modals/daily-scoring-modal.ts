@@ -57,6 +57,7 @@ function cloneDiaryUiDrafts(value: DiaryUiDraftState | undefined): DiaryUiDraftS
 
 export class DailyScoringModal extends BaseMobileModal {
   private static diaryDrafts = new Map<string, DiaryDraftState>();
+  private static readonly maxDiaryDrafts = 50;
 
   readonly modalType = "daily";
   private isRendering = false;
@@ -75,6 +76,7 @@ export class DailyScoringModal extends BaseMobileModal {
   private pendingDiaryScrollId: string | null = null;
   private pendingScoreScrollTop: number | null = null;
   private skipNextCloseDraftSave = false;
+  private mobileTabSwipeEvents: Component | null = null;
   private pendingRenderState:
     | {
         scores: Record<string, number>;
@@ -97,6 +99,7 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   onClose(): void {
+    this.clearMobileTabSwipeEvents();
     if (this.skipNextCloseDraftSave) {
       this.skipNextCloseDraftSave = false;
     } else {
@@ -119,6 +122,7 @@ export class DailyScoringModal extends BaseMobileModal {
     const self = this;
     try {
       const contentEl = this.contentEl;
+      this.clearMobileTabSwipeEvents();
       contentEl.empty();
       contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
       contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
@@ -394,12 +398,21 @@ export class DailyScoringModal extends BaseMobileModal {
       tracking = false;
     };
 
+    const swipeEvents = new Component();
+    swipeEvents.load();
+    this.mobileTabSwipeEvents = swipeEvents;
     for (const panel of [scorePanel, diaryPanel]) {
-      panel.addEventListener("pointerdown", onPointerDown);
-      panel.addEventListener("pointermove", onPointerMove);
-      panel.addEventListener("pointerup", onPointerUp);
-      panel.addEventListener("pointercancel", onPointerCancel);
+      swipeEvents.registerDomEvent(panel, "pointerdown", onPointerDown);
+      swipeEvents.registerDomEvent(panel, "pointermove", onPointerMove);
+      swipeEvents.registerDomEvent(panel, "pointerup", onPointerUp);
+      swipeEvents.registerDomEvent(panel, "pointercancel", onPointerCancel);
     }
+  }
+
+  private clearMobileTabSwipeEvents(): void {
+    if (!this.mobileTabSwipeEvents) return;
+    this.mobileTabSwipeEvents.unload();
+    this.mobileTabSwipeEvents = null;
   }
 
   syncDiaryContent() {
@@ -443,12 +456,19 @@ export class DailyScoringModal extends BaseMobileModal {
 
   private saveDiaryDraft(): void {
     this.syncDiaryContent();
-    DailyScoringModal.diaryDrafts.set(this.getDiaryDraftKey(), {
+    const key = this.getDiaryDraftKey();
+    DailyScoringModal.diaryDrafts.delete(key);
+    DailyScoringModal.diaryDrafts.set(key, {
       diaryContent: this.diaryContent,
       diaryModules: { ...this.diaryModules },
       uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
       sourceVaultMtime: this.getDayReportVaultMtime(),
     });
+    while (DailyScoringModal.diaryDrafts.size > DailyScoringModal.maxDiaryDrafts) {
+      const oldestKey = DailyScoringModal.diaryDrafts.keys().next().value;
+      if (!oldestKey) break;
+      DailyScoringModal.diaryDrafts.delete(oldestKey);
+    }
   }
 
   private clearDiaryDraft(): void {

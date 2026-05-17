@@ -4,6 +4,7 @@ import {
   getEmojiCategoryKeys,
   searchEmojis,
 } from "./emoji-picker-search";
+import { hasKidScoreOverlayId } from "../utils/history-state";
 import { getMobilePlatform } from "../utils/platform";
 
 export function showEmojiPicker(
@@ -20,6 +21,7 @@ export function showEmojiPicker(
 
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
+  overlay.addClass("is-emoji-picker");
   const isMobilePicker = getMobilePlatform() !== "desktop";
   if (isMobilePicker) {
     overlay.addClass("is-mobile-emoji-picker");
@@ -71,7 +73,7 @@ export function showEmojiPicker(
     }
     if (
       pushedHistoryState &&
-      (history.state as any)?.kidScoreOverlayId === overlayStateId
+      hasKidScoreOverlayId(history.state, overlayStateId)
     ) {
       history.back();
     }
@@ -204,7 +206,7 @@ export function showEmojiPicker(
   });
 
   const onPopstate = (e: PopStateEvent) => {
-    if ((e.state as any)?.kidScoreOverlayId === overlayStateId) return;
+    if (hasKidScoreOverlayId(e.state, overlayStateId)) return;
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);

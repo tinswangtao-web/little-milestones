@@ -113,7 +113,13 @@ export function renderUserSettingsSection({
     deleteModal.open();
   };
 
+  let cleanupUserBtns: (() => void)[] = [];
+
   const renderUserMgr = () => {
+    // Clean up previous gesture listeners before recreating buttons
+    cleanupUserBtns.forEach((cleanup) => cleanup());
+    cleanupUserBtns = [];
+
     userMgrWrap.empty();
     plugin.settings.users.forEach((user) => {
       const userBtn = userMgrWrap.createEl("button", {
@@ -122,7 +128,7 @@ export function renderUserSettingsSection({
           (user.id === plugin.settings.currentUserId ? " is-active" : ""),
         text: user.name,
       });
-      attachPressGesture({
+      const cleanup = attachPressGesture({
         element: userBtn,
         longPressMs: 600,
         isTouchMode: true,
@@ -136,6 +142,7 @@ export function renderUserSettingsSection({
           plugin.saveSettings().then(() => refresh());
         },
       });
+      cleanupUserBtns.push(cleanup);
     });
 
     const addUserBtn = userMgrWrap.createEl("button", {

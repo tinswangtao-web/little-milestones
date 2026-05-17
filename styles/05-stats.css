@@ -74,6 +74,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.88em;
+  cursor: pointer;
 }
 
 .completion-emoji { font-size: 1.1em; flex-shrink: 0; }
@@ -292,10 +293,6 @@
 
 .completion-row-wrap:last-child {
   border-bottom: none;
-}
-
-.completion-row {
-  cursor: pointer;
 }
 
 .sparkline-wrap {

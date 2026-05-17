@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from "builtin-modules";
+import { builtinModules } from "node:module";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -11,6 +11,7 @@ const prod = args.includes("production") || args.includes("--production");
 const watchMode = args.includes("--watch") || !prod;
 const outfileArg = args.find((arg) => arg.startsWith("--outfile="));
 const outfile = outfileArg ? outfileArg.slice("--outfile=".length) : "main.js";
+const builtins = Array.from(new Set([...builtinModules, ...builtinModules.map((m) => `node:${m}`)]));
 
 function buildStyles() {
   const styleDir = path.join(__dirname, "styles");

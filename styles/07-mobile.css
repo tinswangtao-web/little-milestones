@@ -163,7 +163,13 @@
     text-align: center;
   }
 
-  .completion-name { flex: 0 0 80px; font-size: 0.8em; }
+  .completion-name {
+    flex: 1 1 calc(100% - 28px);
+    min-width: 0;
+    font-size: 0.8em;
+    white-space: normal;
+    line-height: 1.35;
+  }
   .kid-score-tabs { flex-wrap: wrap; gap: 6px; }
   .kid-score-tab {
     flex: 1 1 calc(33.333% - 6px);
@@ -192,13 +198,6 @@
 
   .completion-emoji {
     margin-top: 2px;
-  }
-
-  .completion-name {
-    flex: 1 1 calc(100% - 28px);
-    min-width: 0;
-    white-space: normal;
-    line-height: 1.35;
   }
 
   .completion-bar-wrap {
@@ -338,6 +337,9 @@
   .kid-score-cat-row {
     flex-wrap: wrap;
     align-items: flex-start;
+    gap: 6px;
+    padding: 8px;
+    border-radius: 8px;
   }
 
   .kid-score-cat-row .settings-name-input {
@@ -931,7 +933,11 @@
   }
 
   /* ── Note row ── */
-  .settings-item-note-row { padding-left: 28px; }
+  .settings-item-note-row {
+    padding: 8px 0 0 28px;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
 
   /* ── Date navigation ── */
   .kid-score-date-nav {
@@ -980,10 +986,10 @@
     padding: 16px 12px calc(12px + env(safe-area-inset-bottom, 0px));
     max-height: 85vh;
   }
-  .kid-score-value-overlay:has(.kid-score-emoji-fullpicker) {
+  .kid-score-value-overlay.is-emoji-picker {
     align-items: flex-end;
   }
-  .kid-score-value-overlay.is-mobile-emoji-picker:has(.kid-score-emoji-fullpicker) {
+  .kid-score-value-overlay.is-emoji-picker.is-mobile-emoji-picker {
     align-items: flex-start;
     padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
@@ -1149,18 +1155,6 @@
     align-items: center;
     justify-content: center;
   }
-  .kid-score-cat-row {
-    gap: 6px;
-    padding: 8px;
-    border-radius: 8px;
-  }
-
-  .settings-item-note-row {
-    padding: 8px 0 0;
-    margin-bottom: 0;
-    border-bottom: none;
-  }
-
   .settings-item-note-row-mobile {
     padding: 8px 0 0;
     margin-bottom: 0;

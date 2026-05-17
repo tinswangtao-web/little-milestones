@@ -18,7 +18,7 @@ export function attachPressGesture({
   onDoubleTap,
   getDoubleTapThreshold,
   shouldIgnoreTarget,
-}: AttachPressGestureOptions): void {
+}: AttachPressGestureOptions): () => void {
   let pressTimer: ReturnType<typeof setTimeout> | null = null;
   let clickTimer: ReturnType<typeof setTimeout> | null = null;
   let isLongPress = false;
@@ -30,7 +30,7 @@ export function attachPressGesture({
   const ignoreTarget = (target: EventTarget | null) =>
     shouldIgnoreTarget ? shouldIgnoreTarget(target) : false;
 
-  element.addEventListener("pointerdown", (e) => {
+  const onPointerDown = (e: PointerEvent) => {
     if (ignoreTarget(e.target)) return;
     isLongPress = false;
     hasMoved = false;
@@ -43,16 +43,16 @@ export function attachPressGesture({
         onLongPress();
       }
     }, longPressMs);
-  });
+  };
 
-  element.addEventListener("pointermove", (e) => {
+  const onPointerMove = (e: PointerEvent) => {
     if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
       hasMoved = true;
       if (pressTimer) clearTimeout(pressTimer);
     }
-  });
+  };
 
-  element.addEventListener("pointerup", (e) => {
+  const onPointerUp = (e: PointerEvent) => {
     if (pressTimer) clearTimeout(pressTimer);
     if (ignoreTarget(e.target) || isLongPress || hasMoved) return;
 
@@ -90,19 +90,37 @@ export function attachPressGesture({
         lastTapAt = 0;
       }, threshold + 20);
     }
-  });
+  };
 
-  element.addEventListener("pointercancel", () => {
+  const onPointerCancel = () => {
     if (pressTimer) clearTimeout(pressTimer);
     hasMoved = true;
     lastTapAt = 0;
-  });
+  };
 
-  element.addEventListener("pointerleave", () => {
+  const onPointerLeave = () => {
     if (pressTimer) clearTimeout(pressTimer);
-  });
+  };
 
-  element.addEventListener("contextmenu", (e) => {
+  const onContextMenu = (e: MouseEvent) => {
     e.preventDefault();
-  });
+  };
+
+  element.addEventListener("pointerdown", onPointerDown);
+  element.addEventListener("pointermove", onPointerMove);
+  element.addEventListener("pointerup", onPointerUp);
+  element.addEventListener("pointercancel", onPointerCancel);
+  element.addEventListener("pointerleave", onPointerLeave);
+  element.addEventListener("contextmenu", onContextMenu);
+
+  return () => {
+    if (pressTimer) clearTimeout(pressTimer);
+    if (clickTimer) clearTimeout(clickTimer);
+    element.removeEventListener("pointerdown", onPointerDown);
+    element.removeEventListener("pointermove", onPointerMove);
+    element.removeEventListener("pointerup", onPointerUp);
+    element.removeEventListener("pointercancel", onPointerCancel);
+    element.removeEventListener("pointerleave", onPointerLeave);
+    element.removeEventListener("contextmenu", onContextMenu);
+  };
 }

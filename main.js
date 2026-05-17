@@ -1281,6 +1281,11 @@ function isAndroid() {
 function isTouchDevice() {
   return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 }
+function sanitizeDoubleTapThreshold(value, fallback) {
+  const n = parseInt(String(value), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(120, Math.min(600, n));
+}
 
 // src/utils/mobile-keyboard.ts
 function getKeyboardHeight(stableViewportHeight) {
@@ -2273,6 +2278,11 @@ var StatsModal = class extends BaseMobileModal {
   }
 };
 
+// src/utils/history-state.ts
+function hasKidScoreOverlayId(state, overlayStateId) {
+  return typeof state === "object" && state !== null && state.kidScoreOverlayId === overlayStateId;
+}
+
 // src/modals/popups/calendar-picker.ts
 function openCalendarPicker({
   currentDate,
@@ -2295,10 +2305,9 @@ function openCalendarPicker({
     grid.createEl("div", { cls: "cal-weekday", text: d });
   });
   const removeOverlay = () => {
-    var _a;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
-    if (pushedHistoryState && ((_a = history.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) {
+    if (pushedHistoryState && hasKidScoreOverlayId(history.state, overlayStateId)) {
       history.back();
     }
   };
@@ -2350,8 +2359,7 @@ function openCalendarPicker({
   popup.appendChild(cancelBtn);
   overlay.appendChild(popup);
   const onPopstate = (e) => {
-    var _a;
-    if (((_a = e.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) return;
+    if (hasKidScoreOverlayId(e.state, overlayStateId)) return;
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
@@ -2432,11 +2440,6 @@ function normalizeDiaryModules(value) {
     changed = true;
   }
   return { modules, changed };
-}
-function sanitizeDoubleTapThreshold(value, fallback) {
-  const n = parseInt(String(value), 10);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(120, Math.min(600, n));
 }
 function normalizePluginSettings(loaded) {
   const data = loaded || {};
@@ -3092,6 +3095,7 @@ function showEmojiPicker(callback, container) {
   }
   const overlay = document.createElement("div");
   overlay.className = "kid-score-value-overlay";
+  overlay.addClass("is-emoji-picker");
   const isMobilePicker = getMobilePlatform() !== "desktop";
   if (isMobilePicker) {
     overlay.addClass("is-mobile-emoji-picker");
@@ -3126,13 +3130,12 @@ function showEmojiPicker(callback, container) {
   };
   const onVVResize = () => adjustForKeyboard();
   const removeOverlay = () => {
-    var _a;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
     if (window.visualViewport) {
       window.visualViewport.removeEventListener("resize", onVVResize);
     }
-    if (pushedHistoryState && ((_a = history.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) {
+    if (pushedHistoryState && hasKidScoreOverlayId(history.state, overlayStateId)) {
       history.back();
     }
   };
@@ -3249,8 +3252,7 @@ function showEmojiPicker(callback, container) {
     }
   });
   const onPopstate = (e) => {
-    var _a;
-    if (((_a = e.state) == null ? void 0 : _a.kidScoreOverlayId) === overlayStateId) return;
+    if (hasKidScoreOverlayId(e.state, overlayStateId)) return;
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
@@ -4754,7 +4756,7 @@ function attachPressGesture({
   let startY = 0;
   let lastTapAt = 0;
   const ignoreTarget = (target) => shouldIgnoreTarget ? shouldIgnoreTarget(target) : false;
-  element.addEventListener("pointerdown", (e) => {
+  const onPointerDown = (e) => {
     if (ignoreTarget(e.target)) return;
     isLongPress = false;
     hasMoved = false;
@@ -4767,14 +4769,14 @@ function attachPressGesture({
         onLongPress();
       }
     }, longPressMs);
-  });
-  element.addEventListener("pointermove", (e) => {
+  };
+  const onPointerMove = (e) => {
     if (!hasMoved && (Math.abs(e.clientX - startX) > 8 || Math.abs(e.clientY - startY) > 8)) {
       hasMoved = true;
       if (pressTimer) clearTimeout(pressTimer);
     }
-  });
-  element.addEventListener("pointerup", (e) => {
+  };
+  const onPointerUp = (e) => {
     if (pressTimer) clearTimeout(pressTimer);
     if (ignoreTarget(e.target) || isLongPress || hasMoved) return;
     if (isTouchMode) {
@@ -4808,18 +4810,34 @@ function attachPressGesture({
         lastTapAt = 0;
       }, threshold + 20);
     }
-  });
-  element.addEventListener("pointercancel", () => {
+  };
+  const onPointerCancel = () => {
     if (pressTimer) clearTimeout(pressTimer);
     hasMoved = true;
     lastTapAt = 0;
-  });
-  element.addEventListener("pointerleave", () => {
+  };
+  const onPointerLeave = () => {
     if (pressTimer) clearTimeout(pressTimer);
-  });
-  element.addEventListener("contextmenu", (e) => {
+  };
+  const onContextMenu = (e) => {
     e.preventDefault();
-  });
+  };
+  element.addEventListener("pointerdown", onPointerDown);
+  element.addEventListener("pointermove", onPointerMove);
+  element.addEventListener("pointerup", onPointerUp);
+  element.addEventListener("pointercancel", onPointerCancel);
+  element.addEventListener("pointerleave", onPointerLeave);
+  element.addEventListener("contextmenu", onContextMenu);
+  return () => {
+    if (pressTimer) clearTimeout(pressTimer);
+    if (clickTimer) clearTimeout(clickTimer);
+    element.removeEventListener("pointerdown", onPointerDown);
+    element.removeEventListener("pointermove", onPointerMove);
+    element.removeEventListener("pointerup", onPointerUp);
+    element.removeEventListener("pointercancel", onPointerCancel);
+    element.removeEventListener("pointerleave", onPointerLeave);
+    element.removeEventListener("contextmenu", onContextMenu);
+  };
 }
 
 // src/modals/panels/desktop-score-sections.ts
@@ -5451,6 +5469,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     this.pendingDiaryScrollId = null;
     this.pendingScoreScrollTop = null;
     this.skipNextCloseDraftSave = false;
+    this.mobileTabSwipeEvents = null;
     this.pendingRenderState = null;
     this.enableKeyboardAdjustment = true;
     this.dateStr = initialDate || formatDate(0);
@@ -5460,6 +5479,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     this.renderModal();
   }
   onClose() {
+    this.clearMobileTabSwipeEvents();
     if (this.skipNextCloseDraftSave) {
       this.skipNextCloseDraftSave = false;
     } else {
@@ -5481,6 +5501,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     const self = this;
     try {
       const contentEl = this.contentEl;
+      this.clearMobileTabSwipeEvents();
       contentEl.empty();
       contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
       contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
@@ -5737,12 +5758,20 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     const onPointerCancel = () => {
       tracking = false;
     };
+    const swipeEvents = new import_obsidian8.Component();
+    swipeEvents.load();
+    this.mobileTabSwipeEvents = swipeEvents;
     for (const panel of [scorePanel, diaryPanel]) {
-      panel.addEventListener("pointerdown", onPointerDown);
-      panel.addEventListener("pointermove", onPointerMove);
-      panel.addEventListener("pointerup", onPointerUp);
-      panel.addEventListener("pointercancel", onPointerCancel);
+      swipeEvents.registerDomEvent(panel, "pointerdown", onPointerDown);
+      swipeEvents.registerDomEvent(panel, "pointermove", onPointerMove);
+      swipeEvents.registerDomEvent(panel, "pointerup", onPointerUp);
+      swipeEvents.registerDomEvent(panel, "pointercancel", onPointerCancel);
     }
+  }
+  clearMobileTabSwipeEvents() {
+    if (!this.mobileTabSwipeEvents) return;
+    this.mobileTabSwipeEvents.unload();
+    this.mobileTabSwipeEvents = null;
   }
   syncDiaryContent() {
     const moduleConfig = this.plugin.currentUser.diaryModules && this.plugin.currentUser.diaryModules.length ? this.plugin.currentUser.diaryModules : makeDefaultDiaryModules();
@@ -5780,12 +5809,19 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   }
   saveDiaryDraft() {
     this.syncDiaryContent();
-    _DailyScoringModal.diaryDrafts.set(this.getDiaryDraftKey(), {
+    const key = this.getDiaryDraftKey();
+    _DailyScoringModal.diaryDrafts.delete(key);
+    _DailyScoringModal.diaryDrafts.set(key, {
       diaryContent: this.diaryContent,
       diaryModules: { ...this.diaryModules },
       uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
       sourceVaultMtime: this.getDayReportVaultMtime()
     });
+    while (_DailyScoringModal.diaryDrafts.size > _DailyScoringModal.maxDiaryDrafts) {
+      const oldestKey = _DailyScoringModal.diaryDrafts.keys().next().value;
+      if (!oldestKey) break;
+      _DailyScoringModal.diaryDrafts.delete(oldestKey);
+    }
   }
   clearDiaryDraft() {
     _DailyScoringModal.diaryDrafts.delete(this.getDiaryDraftKey());
@@ -5978,6 +6014,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   }
 };
 _DailyScoringModal.diaryDrafts = /* @__PURE__ */ new Map();
+_DailyScoringModal.maxDiaryDrafts = 50;
 var DailyScoringModal = _DailyScoringModal;
 
 // src/settings/settings-tab.ts
@@ -7524,14 +7561,17 @@ function renderUserSettingsSection({
     }(app);
     deleteModal.open();
   };
+  let cleanupUserBtns = [];
   const renderUserMgr = () => {
+    cleanupUserBtns.forEach((cleanup) => cleanup());
+    cleanupUserBtns = [];
     userMgrWrap.empty();
     plugin.settings.users.forEach((user) => {
       const userBtn = userMgrWrap.createEl("button", {
         cls: "kid-score-user-btn" + (user.id === plugin.settings.currentUserId ? " is-active" : ""),
         text: user.name
       });
-      attachPressGesture({
+      const cleanup = attachPressGesture({
         element: userBtn,
         longPressMs: 600,
         isTouchMode: true,
@@ -7545,6 +7585,7 @@ function renderUserSettingsSection({
           plugin.saveSettings().then(() => refresh());
         }
       });
+      cleanupUserBtns.push(cleanup);
     });
     const addUserBtn = userMgrWrap.createEl("button", {
       cls: "kid-score-user-add-btn",
@@ -8567,6 +8608,8 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
     this.addSettingTab(new KidScoreSettingTab(this.app, this));
     this.registerEditorExtension(boundarySentinelHideExtension);
   }
+  onunload() {
+  }
   async loadSettings() {
     const { settings, changed } = normalizePluginSettings(await this.loadData());
     this.settings = settings;
@@ -8575,11 +8618,6 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
   async saveSettings() {
     await this.saveData(this.settings);
   }
-  sanitizeDoubleTapThreshold(value, fallback) {
-    const n = parseInt(String(value), 10);
-    if (!Number.isFinite(n)) return fallback;
-    return Math.max(120, Math.min(600, n));
-  }
   detectPlatformKey() {
     return getPlatformKey();
   }
@@ -8587,8 +8625,8 @@ var KidScorePlugin = class extends import_obsidian21.Plugin {
     const defaults = DEFAULT_SETTINGS.doubleTapThresholds;
     const cfg = this.settings.doubleTapThresholds || defaults;
     const key = this.detectPlatformKey();
-    const fb = this.sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
-    return this.sanitizeDoubleTapThreshold(
+    const fb = sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
+    return sanitizeDoubleTapThreshold(
       cfg[key],
       fb
     );

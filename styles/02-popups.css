@@ -158,7 +158,7 @@
   color: white;
 }
 
-.value-popup-input {
+.kid-score-value-overlay .kid-score-value-popup .value-popup-input {
   width: 80px;
   height: 44px;
   text-align: center;
@@ -170,9 +170,9 @@
   color: var(--text-normal);
   -moz-appearance: textfield;
   /* iOS/Android: ensure input is tappable and keyboard appears */
-  pointer-events: auto !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
+  pointer-events: auto;
+  -webkit-user-select: text;
+  user-select: text;
   touch-action: manipulation;
   position: relative;
   z-index: 1;
@@ -302,14 +302,14 @@
 }
 
 /* Force all inputs/textareas inside our custom modals to be tappable on Android/iOS */
-.kid-score-edit-modal input,
-.kid-score-edit-modal textarea,
-.kid-score-edit-modal select,
-.kid-score-import-modal input,
-.kid-score-import-modal textarea {
-  pointer-events: auto !important;
-  -webkit-user-select: text !important;
-  user-select: text !important;
+.modal.kid-score-edit-modal .modal-content input,
+.modal.kid-score-edit-modal .modal-content textarea,
+.modal.kid-score-edit-modal .modal-content select,
+.modal.kid-score-import-modal .modal-content input,
+.modal.kid-score-import-modal .modal-content textarea {
+  pointer-events: auto;
+  -webkit-user-select: text;
+  user-select: text;
   touch-action: manipulation;
   position: relative;
   z-index: 1;

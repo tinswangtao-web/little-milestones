@@ -12,6 +12,7 @@ import {
   makeDefaultUser,
   makeDefaultWeatherPresets,
 } from "../constants";
+import { sanitizeDoubleTapThreshold } from "../utils/platform";
 
 type LoadedSettings = Partial<PluginSettings> & {
   childName?: string;
@@ -93,15 +94,6 @@ export function normalizeDiaryModules(
   }
 
   return { modules, changed };
-}
-
-export function sanitizeDoubleTapThreshold(
-  value: unknown,
-  fallback: number
-): number {
-  const n = parseInt(String(value), 10);
-  if (!Number.isFinite(n)) return fallback;
-  return Math.max(120, Math.min(600, n));
 }
 
 export function normalizePluginSettings(

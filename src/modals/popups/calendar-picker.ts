@@ -1,4 +1,5 @@
 import { formatDate, parseDateString } from "../../utils/date";
+import { hasKidScoreOverlayId } from "../../utils/history-state";
 
 interface OpenCalendarPickerOptions {
   currentDate: string;
@@ -35,7 +36,7 @@ export function openCalendarPicker({
     window.removeEventListener("popstate", onPopstate);
     if (
       pushedHistoryState &&
-      (history.state as any)?.kidScoreOverlayId === overlayStateId
+      hasKidScoreOverlayId(history.state, overlayStateId)
     ) {
       history.back();
     }
@@ -103,7 +104,7 @@ export function openCalendarPicker({
     // When the user navigates "back" away from our pushed overlay state, `e.state`
     // becomes the previous history entry (not our overlay id). In that case we
     // should dismiss the overlay.
-    if ((e.state as any)?.kidScoreOverlayId === overlayStateId) return;
+    if (hasKidScoreOverlayId(e.state, overlayStateId)) return;
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);

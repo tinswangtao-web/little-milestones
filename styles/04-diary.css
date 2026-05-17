@@ -10,15 +10,15 @@
   flex-shrink: 0;
 }
 
-.kid-score-main-tab {
+.kid-score-daily-modal .kid-score-main-tab {
   flex: 1;
   /* Explicit height + flex layout so Obsidian Mobile theme can't collapse the button */
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: auto !important;
-  min-height: 44px !important;
-  padding: 10px 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  min-height: 44px;
+  padding: 10px 16px;
   line-height: 1.2;
   font-size: 0.95em;
   font-weight: 600;
@@ -31,7 +31,6 @@
   position: relative;
   box-sizing: border-box;
   white-space: nowrap;
-  line-height: 1.5;
 }
 
 .kid-score-main-tab.is-active {
@@ -107,6 +106,7 @@
 .diary-preview-btn {
   min-width: 88px;
   justify-content: center;
+  margin-left: auto;
 }
 
 .diary-module-section,
@@ -265,6 +265,7 @@
 
 .desktop-diary-panel .diary-module-grid {
   margin-bottom: 0;
+  grid-template-columns: 1fr;
 }
 
 .desktop-diary-panel .diary-quick-row {
@@ -274,11 +275,6 @@
 
 .desktop-diary-panel .diary-textarea-wrap {
   margin-top: 2px;
-}
-
-
-.desktop-diary-panel .diary-module-grid {
-  grid-template-columns: 1fr;
 }
 
 .desktop-diary-panel .diary-quick-emoji-row {
@@ -458,10 +454,6 @@
 }
 
 /* ─── Diary Preview ────────────────────────────────────────────────────────── */
-
-.diary-preview-btn {
-  margin-left: auto;
-}
 
 .diary-preview-wrap {
   min-height: 240px;

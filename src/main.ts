@@ -8,7 +8,7 @@ import { KidScoreSettingTab } from "./settings/settings-tab";
 import { normalizePluginSettings } from "./settings/normalize-settings";
 import { DayDataStore, type DayDataReadOptions } from "./storage/day-data-store";
 import { getReportFolderSegments } from "./utils/date";
-import { getPlatformKey } from "./utils/platform";
+import { getPlatformKey, sanitizeDoubleTapThreshold } from "./utils/platform";
 
 /*
  * MODULE_MAP — Quick reference for agents working on this codebase
@@ -118,6 +118,10 @@ export default class KidScorePlugin extends Plugin {
     this.registerEditorExtension(boundarySentinelHideExtension);
   }
 
+  onunload(): void {
+    // Registered Obsidian resources are disposed automatically.
+  }
+
   async loadSettings() {
     const { settings, changed } = normalizePluginSettings(await this.loadData());
     this.settings = settings;
@@ -128,12 +132,6 @@ export default class KidScorePlugin extends Plugin {
     await this.saveData(this.settings);
   }
 
-  sanitizeDoubleTapThreshold(value: unknown, fallback: number): number {
-    const n = parseInt(String(value), 10);
-    if (!Number.isFinite(n)) return fallback;
-    return Math.max(120, Math.min(600, n));
-  }
-
   detectPlatformKey(): string {
     return getPlatformKey();
   }
@@ -142,8 +140,8 @@ export default class KidScorePlugin extends Plugin {
     const defaults = DEFAULT_SETTINGS.doubleTapThresholds;
     const cfg = this.settings.doubleTapThresholds || defaults;
     const key = this.detectPlatformKey();
-    const fb = this.sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
-    return this.sanitizeDoubleTapThreshold(
+    const fb = sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
+    return sanitizeDoubleTapThreshold(
       (cfg as unknown as Record<string, number>)[key],
       fb
     );
