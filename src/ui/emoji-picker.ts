@@ -133,11 +133,9 @@ export function showEmojiPicker(
   let isComposing = false;
   customInput.addEventListener("compositionstart", () => {
     isComposing = true;
-    (customInput as HTMLInputElement & { composing?: boolean }).composing = true;
   });
   customInput.addEventListener("compositionend", () => {
     isComposing = false;
-    (customInput as HTMLInputElement & { composing?: boolean }).composing = false;
     doSearch();
   });
 
@@ -210,6 +208,9 @@ export function showEmojiPicker(
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onVVResize);
+    }
     pushedHistoryState = false;
   };
   history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");

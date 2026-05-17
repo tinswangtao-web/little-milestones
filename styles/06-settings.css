@@ -532,8 +532,6 @@
 .settings-note-input::placeholder {
   color: var(--text-faint);
 }
-.settings-note-input:focus {
-}
 
 /* ─── 打分规则区块 ───────────────────────────────────────────────────────────── */
 

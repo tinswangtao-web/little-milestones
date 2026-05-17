@@ -3187,11 +3187,9 @@ function showEmojiPicker(callback, container) {
   let isComposing = false;
   customInput.addEventListener("compositionstart", () => {
     isComposing = true;
-    customInput.composing = true;
   });
   customInput.addEventListener("compositionend", () => {
     isComposing = false;
-    customInput.composing = false;
     doSearch();
   });
   const doSearch = () => {
@@ -3256,6 +3254,9 @@ function showEmojiPicker(callback, container) {
     if (!overlay.isConnected) return;
     overlay.remove();
     window.removeEventListener("popstate", onPopstate);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", onVVResize);
+    }
     pushedHistoryState = false;
   };
   history.pushState({ kidScoreOverlay: true, kidScoreOverlayId: overlayStateId }, "");

@@ -44,8 +44,7 @@
   }
 
   /* ── Score cards ── */
-  
-  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+  .kid-score-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
@@ -1324,8 +1323,7 @@
 /* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
-  
-  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+  .kid-score-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
   }
@@ -1428,8 +1426,7 @@
 /* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
-  
-  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+  .kid-score-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 
