@@ -145,10 +145,8 @@ export default class KidScorePlugin extends Plugin {
     const cfg = this.settings.doubleTapThresholds || defaults;
     const key = this.detectPlatformKey();
     const fb = sanitizeDoubleTapThreshold(cfg.fallback, defaults.fallback);
-    return sanitizeDoubleTapThreshold(
-      (cfg as unknown as Record<string, number>)[key],
-      fb
-    );
+    const value = key in cfg ? cfg[key as keyof typeof cfg] : undefined;
+    return sanitizeDoubleTapThreshold(value, fb);
   }
 
   get currentUser() {

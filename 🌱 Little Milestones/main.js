@@ -5452,48 +5452,13 @@ function renderScorePanel({
   };
 }
 
-// src/modals/helpers/diary-draft-manager.ts
+// src/modals/daily-scoring-modal.ts
 function cloneDiaryUiDrafts(value) {
   return {
     quickCustomInputs: { ...(value == null ? void 0 : value.quickCustomInputs) || {} }
   };
 }
-var _DiaryDraftManager = class _DiaryDraftManager {
-  static get(key) {
-    var _a;
-    const draft = _DiaryDraftManager.drafts.get(key);
-    if (!draft) return null;
-    return {
-      diaryContent: draft.diaryContent,
-      diaryModules: { ...draft.diaryModules },
-      uiDrafts: cloneDiaryUiDrafts(draft.uiDrafts),
-      sourceVaultMtime: (_a = draft.sourceVaultMtime) != null ? _a : 0
-    };
-  }
-  static set(key, diaryContent, diaryModules, uiDrafts, sourceVaultMtime) {
-    _DiaryDraftManager.drafts.delete(key);
-    _DiaryDraftManager.drafts.set(key, {
-      diaryContent,
-      diaryModules: { ...diaryModules },
-      uiDrafts: cloneDiaryUiDrafts(uiDrafts),
-      sourceVaultMtime
-    });
-    while (_DiaryDraftManager.drafts.size > _DiaryDraftManager.maxDrafts) {
-      const oldestKey = _DiaryDraftManager.drafts.keys().next().value;
-      if (!oldestKey) break;
-      _DiaryDraftManager.drafts.delete(oldestKey);
-    }
-  }
-  static delete(key) {
-    _DiaryDraftManager.drafts.delete(key);
-  }
-};
-_DiaryDraftManager.drafts = /* @__PURE__ */ new Map();
-_DiaryDraftManager.maxDrafts = 50;
-var DiaryDraftManager = _DiaryDraftManager;
-
-// src/modals/daily-scoring-modal.ts
-var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
+var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   constructor(app, plugin, initialDate) {
     super(app, plugin);
     this.modalType = "daily";
@@ -5840,20 +5805,34 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     return currentMtime > draftMtime;
   }
   getDiaryDraft() {
-    return DiaryDraftManager.get(this.getDiaryDraftKey());
+    var _a;
+    const draft = _DailyScoringModal.diaryDrafts.get(this.getDiaryDraftKey());
+    if (!draft) return null;
+    return {
+      diaryContent: draft.diaryContent,
+      diaryModules: { ...draft.diaryModules },
+      uiDrafts: cloneDiaryUiDrafts(draft.uiDrafts),
+      sourceVaultMtime: (_a = draft.sourceVaultMtime) != null ? _a : 0
+    };
   }
   saveDiaryDraft() {
     this.syncDiaryContent();
-    DiaryDraftManager.set(
-      this.getDiaryDraftKey(),
-      this.diaryContent,
-      this.diaryModules,
-      this.diaryUiDrafts,
-      this.getDayReportVaultMtime()
-    );
+    const key = this.getDiaryDraftKey();
+    _DailyScoringModal.diaryDrafts.delete(key);
+    _DailyScoringModal.diaryDrafts.set(key, {
+      diaryContent: this.diaryContent,
+      diaryModules: { ...this.diaryModules },
+      uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
+      sourceVaultMtime: this.getDayReportVaultMtime()
+    });
+    while (_DailyScoringModal.diaryDrafts.size > _DailyScoringModal.maxDiaryDrafts) {
+      const oldestKey = _DailyScoringModal.diaryDrafts.keys().next().value;
+      if (!oldestKey) break;
+      _DailyScoringModal.diaryDrafts.delete(oldestKey);
+    }
   }
   clearDiaryDraft() {
-    DiaryDraftManager.delete(this.getDiaryDraftKey());
+    _DailyScoringModal.diaryDrafts.delete(this.getDiaryDraftKey());
   }
   insertTextAtCursor(text) {
     if (!this.diaryTextarea) return;
@@ -6042,6 +6021,9 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     });
   }
 };
+_DailyScoringModal.diaryDrafts = /* @__PURE__ */ new Map();
+_DailyScoringModal.maxDiaryDrafts = 50;
+var DailyScoringModal = _DailyScoringModal;
 
 // src/settings/settings-tab.ts
 var import_obsidian18 = require("obsidian");

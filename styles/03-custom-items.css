@@ -65,8 +65,8 @@
   font-weight: 700;
   white-space: nowrap;
 }
-.custom-points.pos { color: #16a34a; }
-.custom-points.neg { color: #dc2626; }
+.custom-points.pos { color: var(--lm-color-success-hover); }
+.custom-points.neg { color: var(--lm-color-danger); }
 
 .custom-delete-btn {
   background: transparent;

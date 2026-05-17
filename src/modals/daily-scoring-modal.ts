@@ -36,29 +36,9 @@ import {
 } from "./panels/score-items-panel";
 import { renderScorePanel } from "./panels/score-panel";
 import { composeDiaryContent } from "../diary/modules";
-
-interface DiaryUiDraftState {
-  quickCustomInputs: Record<string, string>;
-}
-
-interface DiaryDraftState {
-  diaryContent: string;
-  diaryModules: DiaryModuleValues;
-  uiDrafts: DiaryUiDraftState;
-  /** Report vault file mtime when draft was saved; if file is newer, drop draft on reopen. */
-  sourceVaultMtime: number;
-}
-
-function cloneDiaryUiDrafts(value: DiaryUiDraftState | undefined): DiaryUiDraftState {
-  return {
-    quickCustomInputs: { ...(value?.quickCustomInputs || {}) },
-  };
-}
+import { DiaryDraftManager, type DiaryDraftState, type DiaryUiDraftState, cloneDiaryUiDrafts } from "./helpers/diary-draft-manager";
 
 export class DailyScoringModal extends BaseMobileModal {
-  private static diaryDrafts = new Map<string, DiaryDraftState>();
-  private static readonly maxDiaryDrafts = 50;
-
   readonly modalType = "daily";
   private isRendering = false;
   private needsRerender = false;
@@ -444,35 +424,22 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   private getDiaryDraft(): DiaryDraftState | null {
-    const draft = DailyScoringModal.diaryDrafts.get(this.getDiaryDraftKey());
-    if (!draft) return null;
-    return {
-      diaryContent: draft.diaryContent,
-      diaryModules: { ...draft.diaryModules },
-      uiDrafts: cloneDiaryUiDrafts(draft.uiDrafts),
-      sourceVaultMtime: draft.sourceVaultMtime ?? 0,
-    };
+    return DiaryDraftManager.get(this.getDiaryDraftKey());
   }
 
   private saveDiaryDraft(): void {
     this.syncDiaryContent();
-    const key = this.getDiaryDraftKey();
-    DailyScoringModal.diaryDrafts.delete(key);
-    DailyScoringModal.diaryDrafts.set(key, {
-      diaryContent: this.diaryContent,
-      diaryModules: { ...this.diaryModules },
-      uiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
-      sourceVaultMtime: this.getDayReportVaultMtime(),
-    });
-    while (DailyScoringModal.diaryDrafts.size > DailyScoringModal.maxDiaryDrafts) {
-      const oldestKey = DailyScoringModal.diaryDrafts.keys().next().value;
-      if (!oldestKey) break;
-      DailyScoringModal.diaryDrafts.delete(oldestKey);
-    }
+    DiaryDraftManager.set(
+      this.getDiaryDraftKey(),
+      this.diaryContent,
+      this.diaryModules,
+      this.diaryUiDrafts,
+      this.getDayReportVaultMtime(),
+    );
   }
 
   private clearDiaryDraft(): void {
-    DailyScoringModal.diaryDrafts.delete(this.getDiaryDraftKey());
+    DiaryDraftManager.delete(this.getDiaryDraftKey());
   }
 
   insertTextAtCursor(text: string) {

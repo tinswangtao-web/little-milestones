@@ -3,6 +3,14 @@ import { isIOS, isAndroid } from "./platform";
 
 export type KeyboardCleanup = () => void;
 
+/** Type-safe access for vendor-prefixed / non-standard CSS properties */
+function getStyleProp(el: HTMLElement, prop: string): string {
+  return (el.style as unknown as Record<string, string>)[prop] || "";
+}
+function setStyleProp(el: HTMLElement, prop: string, value: string): void {
+  (el.style as unknown as Record<string, string>)[prop] = value;
+}
+
 function getKeyboardHeight(stableViewportHeight: number): number {
   if (!window.visualViewport) return 0;
   const vv = window.visualViewport;
@@ -85,11 +93,11 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     paddingBottom: contentEl.style.paddingBottom,
     scrollPaddingBottom: contentEl.style.scrollPaddingBottom,
     overscrollBehavior:
-      (contentEl.style as unknown as Record<string, string>)["overscrollBehavior"] || "",
+      getStyleProp(contentEl, "overscrollBehavior"),
     touchAction:
-      (contentEl.style as unknown as Record<string, string>)["touchAction"] || "",
+      getStyleProp(contentEl, "touchAction"),
     webkitOverflowScrolling:
-      (contentEl.style as unknown as Record<string, string>)["webkitOverflowScrolling"] || "",
+      getStyleProp(contentEl, "webkitOverflowScrolling"),
   };
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
@@ -118,13 +126,12 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   contentEl.style.overflowY = "auto";
   contentEl.style.position = "relative";
   contentEl.style.width = "100%";
-  (contentEl.style as unknown as Record<string, string>)["overscrollBehavior"] = "contain";
-  (contentEl.style as unknown as Record<string, string>)["touchAction"] = "pan-y";
+  setStyleProp(contentEl, "overscrollBehavior", "contain");
+  setStyleProp(contentEl, "touchAction", "pan-y");
   // iOS Safari: -webkit-overflow-scrolling:touch is a notorious source of scroll
   // lock bugs. For daily modal we skip it entirely; for others we keep it.
   if (!isDailyModal) {
-    (contentEl.style as unknown as Record<string, string>)["webkitOverflowScrolling"] =
-      "touch";
+    setStyleProp(contentEl, "webkitOverflowScrolling", "touch");
   }
 
   const ensureTargetVisible = (target: HTMLElement | null, extraBottom = 96) => {
@@ -403,11 +410,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     contentEl.style.width = previousContentStyles.width;
     contentEl.style.paddingBottom = previousContentStyles.paddingBottom;
     contentEl.style.scrollPaddingBottom = previousContentStyles.scrollPaddingBottom;
-    (contentEl.style as unknown as Record<string, string>)["overscrollBehavior"] =
-      previousContentStyles.overscrollBehavior;
-    (contentEl.style as unknown as Record<string, string>)["touchAction"] =
-      previousContentStyles.touchAction;
-    (contentEl.style as unknown as Record<string, string>)["webkitOverflowScrolling"] =
-      previousContentStyles.webkitOverflowScrolling;
+    setStyleProp(contentEl, "overscrollBehavior", previousContentStyles.overscrollBehavior);
+    setStyleProp(contentEl, "touchAction", previousContentStyles.touchAction);
+    setStyleProp(contentEl, "webkitOverflowScrolling", previousContentStyles.webkitOverflowScrolling);
   };
 }

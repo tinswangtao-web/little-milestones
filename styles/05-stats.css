@@ -95,8 +95,8 @@
   transition: width 0.4s ease;
 }
 
-.completion-bar.pos { background: #4ade80; }
-.completion-bar.neg { background: #f87171; }
+.completion-bar.pos { background: var(--lm-color-success-soft); }
+.completion-bar.neg { background: var(--lm-color-danger-soft); }
 
 .completion-rate {
   flex: 0 0 90px;
@@ -174,7 +174,7 @@
 }
 
 .daily-goal-bar.is-complete {
-  background: #4ade80;
+  background: var(--lm-color-success-soft);
 }
 
 /* ─── Stats Goal Card ────────────────────────────────────────────────────────── */
@@ -196,7 +196,7 @@
 }
 
 .summary-goal-bar.is-complete {
-  background: #4ade80;
+  background: var(--lm-color-success-soft);
 }
 
 /* ─── Calendar Picker ────────────────────────────────────────────────────────── */
@@ -282,7 +282,7 @@
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #4ade80;
+  background: var(--lm-color-success-soft);
 }
 
 /* ─── Sparkline trend ────────────────────────────────────────────────────────── */

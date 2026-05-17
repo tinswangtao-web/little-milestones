@@ -79,7 +79,7 @@
 .value-popup-del-btn {
   background: transparent;
   border: none;
-  color: #dc2626;
+  color: var(--lm-color-danger);
   font-size: 0.82em;
   cursor: pointer;
   padding: 4px 10px;
@@ -402,7 +402,7 @@
   font-size: 0.95em;
 }
 .custom-form-name-input.is-error {
-  border-color: #f87171;
+  border-color: var(--lm-color-danger-border);
   animation: little-milestones-shake 0.3s ease;
 }
 textarea.custom-form-name-input {
@@ -598,8 +598,8 @@ textarea.custom-form-name-input {
 }
 
 .confirm-modal-confirm.is-destructive {
-  background: #dc2626;
-  border-color: #dc2626;
+  background: var(--lm-color-danger);
+  border-color: var(--lm-color-danger);
 }
 .confirm-modal-confirm.is-destructive:hover {
   filter: brightness(1.15);

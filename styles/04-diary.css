@@ -43,7 +43,7 @@
 }
 
 .diary-tab-badge {
-  color: #f59e0b;
+  color: var(--lm-color-warning);
   font-size: 1.4em;
   line-height: 1;
   vertical-align: middle;
@@ -51,7 +51,7 @@
 }
 
 .little-milestones-main-tab.is-active .diary-tab-badge {
-  color: #fde68a;
+  color: var(--lm-color-warning-soft);
 }
 
 .little-milestones-tab-panel {
@@ -547,8 +547,8 @@
 }
 
 .little-milestones-past-banner {
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
+  background: var(--lm-color-warning-bg);
+  color: var(--lm-color-warning-text);
   padding: 8px 14px;
   border-radius: 8px;
   font-size: 0.9em;
