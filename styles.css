@@ -4,12 +4,14 @@
   --lm-color-success: var(--color-green, #22c55e);
   --lm-color-success-hover: var(--color-green-hover, #16a34a);
   --lm-color-success-soft: #4ade80;
+  /* Gradient tokens are intended for `background`, not `background-color`. */
   --lm-color-success-bg: linear-gradient(135deg, #dcfce7, #bbf7d0);
   --lm-color-success-border: #4ade80;
 
   /* Semantic colors — negative / danger */
   --lm-color-danger: var(--color-red, #dc2626);
   --lm-color-danger-soft: #f87171;
+  /* Gradient tokens are intended for `background`, not `background-color`. */
   --lm-color-danger-bg: linear-gradient(135deg, #fee2e2, #fecaca);
   --lm-color-danger-border: #f87171;
   --lm-color-danger-muted: #fca5a5;
@@ -17,6 +19,7 @@
   /* Semantic colors — warning / amber */
   --lm-color-warning: #f59e0b;
   --lm-color-warning-soft: #fde68a;
+  /* Gradient tokens are intended for `background`, not `background-color`. */
   --lm-color-warning-bg: linear-gradient(135deg, #fef3c7, #fde68a);
   --lm-color-warning-text: #92400e;
   --lm-color-warning-value: #b45309;

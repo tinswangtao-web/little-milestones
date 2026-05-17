@@ -2,11 +2,11 @@
 
 - **slug**: 2026-05-17-obsidian-review-remediation
 - **created**: 2026-05-17
-- **owner**: builder-ai
+- **owner**: code-ai
 - **status**: awaiting-review
 - **origin**: 用户要求按 `REVIEW-FEEDBACK.md` 与 architect 初步判断，做“官方审核整改第一轮”的最小实现。
 - **sync-to-vault**: n/a
-- **write-scope**: `manifest.json`, `package.json`, `package-lock.json`, `versions.json`, `README.md`, `esbuild.config.mjs`, `src/**`, `styles/**`, `styles.css`, `.agents/**`
+- **write-scope**: `manifest.json`, `package.json`, `package-lock.json`, `versions.json`, `README.md`, `esbuild.config.mjs`, `.gitignore`, `src/**`, `styles/**`, `styles.css`, `.agents/**`
 - **read-scope**: `REVIEW-FEEDBACK.md`, `manifest.json`, `package.json`, `package-lock.json`, `versions.json`, `README.md`, `esbuild.config.mjs`, `src/**`, `styles/**`, `.agents/**`
 
 ## 目标
@@ -22,6 +22,7 @@
 - [x] 窄修官方列出的 CSS lint warning：重复 `line-height`、`:has()`、同源重复 selector。
 - [x] 低风险代码质量项：复用 `sanitizeDoubleTapThreshold`、移除 4 处 `history.state as any`、限制日记草稿 Map、注册移动端 tab swipe DOM 事件、给 `attachPressGesture` 返回 cleanup、添加空 `onunload()`。
 - [x] 更新 `.agents/reviews/IMPLEMENTATION_REVIEW_HANDOFF.md`。
+- [x] 按 Architect Review F1-F5 修复：移除误提交的 `🌱 Little Milestones/`、加入 `.gitignore`、恢复 `versions.json` 历史映射、修正 `onunload()` 注释并补充 gradient token 用法说明。
 
 ## 非目标
 
@@ -50,3 +51,4 @@
 - 2026-05-17 12:38 +0800：新建任务卡并取得 `builder-ai` 写锁；确认本轮不触碰既有 `agent-collaboration-kit/**` 删除和未跟踪 `REVIEW-FEEDBACK.md`，不 commit、不同步 Vault、不创建 GitHub Release。
 - 2026-05-17 12:46 +0800：第一轮最小实现完成。已改 2.0.1 元数据、README 安装路径、`builtin-modules` 替换、官方点名 CSS 窄修、`sanitizeDoubleTapThreshold` 复用、history state 窄类型、日记草稿 50 条上限、移动 tab swipe 生命周期清理、`attachPressGesture` cleanup、空 `onunload()`；`npm run build`、`npx tsc --noEmit`、`node --check main.js`、`git diff --check` 均通过（`git diff --check` 仅提示 `styles/05-stats.css` CRLF 将来被 Git 触碰时转 LF，退出码 0）。未 commit、未同步 Vault、未创建 GitHub Release。等待严格 review。
 - 2026-05-17 12:54 +0800：按 architect 复查反馈补修 W6 遗漏项。`styles/02-popups.css` 中 `.value-popup-input` 与 edit/import modal input/textarea/select 两组选择器改为更具体 selector，并移除官方定位的 6 个 `!important`；运行 `npm run build` 更新 `styles.css`。`npm run build`、`npx tsc --noEmit`、`node --check main.js`、`git diff --check` 均通过（仍仅有 `styles/05-stats.css` CRLF 提示，退出码 0）；`rg` 确认 `pointer-events/user-select` 三项的 `!important` 在 `styles/02-popups.css` 与 `styles.css` 中无残留。未 commit、未同步 Vault。
+- 2026-05-17 21:24 +0800：按 Architect Review（commit `6b9bd08`）修复 F1-F5。`🌱 Little Milestones/` 已从 git 中删除，删除前按仓库规则备份到 `.ai-deletion-backups/2026-05-17-2124-release-assets-dir/`；`.gitignore` 加入该本地 release staging 目录；`manifest.json` 名称对齐为 `Little Milestones 🌱`；`versions.json` 恢复 `2.0.0` 映射；`src/main.ts` 注释改为 `DiaryDraftManager.drafts`；CSS gradient token 增加 `background` 用途注释。`npm run build`、`npx tsc --noEmit`、`node --check main.js`、`git diff --check` 均通过。未 commit、未同步 Vault、未创建 GitHub Release。

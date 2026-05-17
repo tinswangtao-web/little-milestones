@@ -6,3 +6,6 @@ node_modules/
 
 # Local AI deletion backups (see agent-collaboration-kit/BACKUP_AND_DELETION.md)
 .ai-deletion-backups/
+
+# Local release asset staging folder; GitHub Release assets live at repo root.
+🌱 Little Milestones/

@@ -122,7 +122,7 @@ export default class KidScorePlugin extends Plugin {
     // All DOM events, intervals, and editor extensions registered via
     // this.register* / this.registerDomEvent / this.registerInterval
     // are automatically disposed by the Plugin base class.
-    // Static caches (e.g. DailyScoringModal.diaryDrafts) are intentionally
+    // Static caches (e.g. DiaryDraftManager.drafts) are intentionally
     // preserved across plugin reloads so drafts survive a hot-reload cycle.
   }
 
