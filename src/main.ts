@@ -119,7 +119,11 @@ export default class KidScorePlugin extends Plugin {
   }
 
   onunload(): void {
-    // Registered Obsidian resources are disposed automatically.
+    // All DOM events, intervals, and editor extensions registered via
+    // this.register* / this.registerDomEvent / this.registerInterval
+    // are automatically disposed by the Plugin base class.
+    // Static caches (e.g. DailyScoringModal.diaryDrafts) are intentionally
+    // preserved across plugin reloads so drafts survive a hot-reload cycle.
   }
 
   async loadSettings() {
