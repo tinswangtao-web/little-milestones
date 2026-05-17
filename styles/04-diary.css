@@ -1,6 +1,6 @@
 /* ─── Main Tabs (打分 / 日记) ────────────────────────────────────────────────── */
 
-.kid-score-main-tabs {
+.little-milestones-main-tabs {
   display: flex;
   gap: 0;
   margin-bottom: 12px;
@@ -10,7 +10,7 @@
   flex-shrink: 0;
 }
 
-.kid-score-daily-modal .kid-score-main-tab {
+.little-milestones-daily-modal .little-milestones-main-tab {
   flex: 1;
   /* Explicit height + flex layout so Obsidian Mobile theme can't collapse the button */
   display: flex;
@@ -33,12 +33,12 @@
   white-space: nowrap;
 }
 
-.kid-score-main-tab.is-active {
+.little-milestones-main-tab.is-active {
   background: var(--interactive-accent);
   color: white;
 }
 
-.kid-score-main-tab:not(.is-active):hover {
+.little-milestones-main-tab:not(.is-active):hover {
   background: var(--background-modifier-hover);
 }
 
@@ -50,16 +50,16 @@
   margin-left: 4px;
 }
 
-.kid-score-main-tab.is-active .diary-tab-badge {
+.little-milestones-main-tab.is-active .diary-tab-badge {
   color: #fde68a;
 }
 
-.kid-score-tab-panel {
+.little-milestones-tab-panel {
   /* visible by default */
   touch-action: pan-y;
 }
 
-.kid-score-tab-panel.is-hidden {
+.little-milestones-tab-panel.is-hidden {
   display: none;
 }
 
@@ -473,7 +473,7 @@
 
 /* ─── Date Navigation ──────────────────────────────────────────────────────── */
 
-.kid-score-date-nav {
+.little-milestones-date-nav {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -546,7 +546,7 @@
   opacity: 0.7;
 }
 
-.kid-score-past-banner {
+.little-milestones-past-banner {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   color: #92400e;
   padding: 8px 14px;

@@ -42,7 +42,7 @@ A daily record plugin for kids — behavior scoring, diary, diet & activity trac
 
 ### Manual Installation
 1. Download the latest release from GitHub
-2. Extract the files to your vault's `.obsidian/plugins/kid-score` folder
+2. Extract the files to your vault's `.obsidian/plugins/little-milestones` folder
 3. Enable the plugin in Obsidian settings
 
 ## Getting Started

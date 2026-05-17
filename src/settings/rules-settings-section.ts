@@ -12,37 +12,37 @@ export function renderRulesSettingsSection({
   containerEl,
   bindSettingsInput,
 }: RenderRulesSettingsSectionOptions): void {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const section = containerEl.createDiv({ cls: "little-milestones-rules-section" });
+  const header = section.createDiv({ cls: "little-milestones-rules-header" });
   const toggle = header.createEl("span", {
-    cls: "kid-score-rules-toggle",
+    cls: "little-milestones-rules-toggle",
     text: "▶",
   });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "📋 打分规则" });
+  header.createEl("span", { cls: "little-milestones-rules-title", text: "📋 打分规则" });
   header.createSpan({
-    cls: "kid-score-rules-desc",
+    cls: "little-milestones-rules-desc",
     text: "修改后同步到打分页",
   });
   const editBtn = header.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
+    cls: "little-milestones-rules-edit-btn",
     text: "✏️",
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
-  const view = body.createDiv({ cls: "kid-score-rules-view" });
-  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const body = section.createDiv({ cls: "little-milestones-rules-body" });
+  const view = body.createDiv({ cls: "little-milestones-rules-view" });
+  const edit = body.createDiv({ cls: "little-milestones-rules-edit is-hidden" });
   const textarea = edit.createEl("textarea", {
-    cls: "kid-score-rules-textarea",
+    cls: "little-milestones-rules-textarea",
   });
   textarea.placeholder = "例如：\n- 完成作业 +2\n- 主动收拾玩具 +1\n- 乱发脾气 -2";
   bindSettingsInput(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";
-  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = edit.createDiv({ cls: "little-milestones-rules-actions" });
   const saveBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "保存规则",
   });
   const cancelBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "取消",
   });
 
@@ -53,7 +53,7 @@ export function renderRulesSettingsSection({
       MarkdownRenderer.render(plugin.app, text, view, "", plugin);
     } else {
       view.createEl("p", {
-        cls: "kid-score-rules-empty",
+        cls: "little-milestones-rules-empty",
         text: "暂无规则，点击 ✏️ 添加打分规则",
       });
     }

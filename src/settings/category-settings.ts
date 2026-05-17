@@ -22,18 +22,18 @@ export function renderCategorySettings({
   const shell = isTouchLayout
     ? renderMobileSettingsSectionShell(
         containerEl,
-        "kid-score-category-section",
+        "little-milestones-category-section",
         "📁 分类管理",
         "可拖拽排序，项目会按分类分组显示"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
-        "kid-score-category-section",
+        "little-milestones-category-section",
         "📁 分类管理",
         "可拖拽排序，项目会按分类分组显示"
       );
 
-  const catWrap = shell.body.createDiv({ cls: "kid-score-cat-list" });
+  const catWrap = shell.body.createDiv({ cls: "little-milestones-cat-list" });
   const renderCategories = () =>
     renderCategorySettingsList({
       plugin,

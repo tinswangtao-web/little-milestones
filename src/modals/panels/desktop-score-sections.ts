@@ -5,7 +5,7 @@ export function renderDesktopScoreCategoryLayout(
   withHeader: boolean
 ): ScoreCategoryLayoutRefs {
   const section = container.createDiv({
-    cls: "kid-score-category-section kid-score-category-section-desktop",
+    cls: "little-milestones-category-section little-milestones-category-section-desktop",
   });
   let header: HTMLElement | null = null;
   let titleHost = section;
@@ -13,18 +13,18 @@ export function renderDesktopScoreCategoryLayout(
 
   if (withHeader) {
     header = section.createDiv({
-      cls: "kid-score-cat-header kid-score-cat-header-desktop",
+      cls: "little-milestones-cat-header little-milestones-cat-header-desktop",
     });
     titleHost = header.createDiv({
-      cls: "kid-score-cat-title-host kid-score-cat-title-host-desktop",
+      cls: "little-milestones-cat-title-host little-milestones-cat-title-host-desktop",
     });
     addButtonHost = header.createDiv({
-      cls: "kid-score-cat-action-host kid-score-cat-action-host-desktop",
+      cls: "little-milestones-cat-action-host little-milestones-cat-action-host-desktop",
     });
   }
 
   const grid = section.createDiv({
-    cls: "kid-score-grid kid-score-grid-desktop",
+    cls: "little-milestones-grid little-milestones-grid-desktop",
   });
   return { section, header, titleHost, addButtonHost, grid };
 }
@@ -33,13 +33,13 @@ export function renderDesktopCustomItemRowLayout(
   container: HTMLElement
 ): CustomItemRowLayoutRefs {
   const wrap = container.createDiv({
-    cls: "kid-score-custom-wrap kid-score-custom-wrap-desktop",
+    cls: "little-milestones-custom-wrap little-milestones-custom-wrap-desktop",
   });
   const row = wrap.createDiv({
-    cls: "kid-score-custom-row kid-score-custom-row-desktop",
+    cls: "little-milestones-custom-row little-milestones-custom-row-desktop",
   });
   const main = row.createDiv({
-    cls: "kid-score-custom-main kid-score-custom-main-desktop",
+    cls: "little-milestones-custom-main little-milestones-custom-main-desktop",
   });
   return { wrap, row, main };
 }

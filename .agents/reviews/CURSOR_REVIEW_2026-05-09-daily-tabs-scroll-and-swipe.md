@@ -37,7 +37,7 @@ No blocking issues.
   - `node --check main.js`
   - `git diff --check`
 - 备注：`git diff --check` 仅输出 `src/constants.ts` 既有 CRLF -> LF warning。
-- 生成产物核对：`main.js` 已包含 `bindMobileTabSwipe()`；`styles.css` 中 `.kid-score-main-tabs` / `.kid-score-main-tabs-mobile` 为 `position: static`。
+- 生成产物核对：`main.js` 已包含 `bindMobileTabSwipe()`；`styles.css` 中 `.little-milestones-main-tabs` / `.little-milestones-main-tabs-mobile` 为 `position: static`。
 
 ## 6) 核对结果
 

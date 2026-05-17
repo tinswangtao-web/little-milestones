@@ -18,7 +18,7 @@
 - 折叠/展开，有规则时默认展开
 - 支持 Markdown 渲染预览
 - 点击 ✏️ 进入编辑模式，支持保存到 `settings.scoringRules`
-- 相关 CSS class：`.kid-score-rules-*`
+- 相关 CSS class：`.little-milestones-rules-*`
 
 ### 2. 打分项长按编辑功能
 - 位置：`main.js` → `DailyScoringModal.showCustomValuePopup()`

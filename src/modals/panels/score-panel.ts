@@ -37,7 +37,7 @@ export function renderScorePanel({
 }: RenderScorePanelOptions) {
   if (plugin.currentUser.items.length === 0) {
     scorePanel.createEl("div", {
-      cls: "kid-score-empty",
+      cls: "little-milestones-empty",
       text: "⚠️ 还没有设置打分项目，请先在插件设置中添加！",
     });
     return null;
@@ -55,7 +55,7 @@ export function renderScorePanel({
   if (yesterdayData) {
     const ySign = yesterdayData.total >= 0 ? "+" : "";
     scorePanel.createDiv({
-      cls: "kid-score-yesterday-banner",
+      cls: "little-milestones-yesterday-banner",
       text: "📊 昨天（" + yesterdayData.date + "）总分：" + ySign + yesterdayData.total + " 分",
     });
   }
@@ -80,16 +80,16 @@ export function renderScorePanel({
   });
 
   if (catRendered) {
-    layout.sections.createEl("hr", { cls: "kid-score-divider" });
+    layout.sections.createEl("hr", { cls: "little-milestones-divider" });
   }
   layout.customSection.createEl("h3", {
     text: "📌 临时事项",
-    cls: "kid-score-section-title",
+    cls: "little-milestones-section-title",
   });
   renderCustomItems();
   const addCustomBtn = layout.customSection.createEl("button", {
     text: "＋ 添加临时加减分",
-    cls: "kid-score-add-custom-btn",
+    cls: "little-milestones-add-custom-btn",
   });
   addCustomBtn.onclick = () => onAddCustom();
 

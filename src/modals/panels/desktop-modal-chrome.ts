@@ -4,11 +4,11 @@ export function renderDesktopDailyHeaderLayout(
   containerEl: HTMLElement,
   title: string
 ): DailyHeaderLayoutRefs {
-  const header = containerEl.createDiv({ cls: "kid-score-header kid-score-header-desktop" });
+  const header = containerEl.createDiv({ cls: "little-milestones-header little-milestones-header-desktop" });
   header.createEl("h2", { text: title });
-  const dateNav = header.createDiv({ cls: "kid-score-date-nav kid-score-date-nav-desktop" });
+  const dateNav = header.createDiv({ cls: "little-milestones-date-nav little-milestones-date-nav-desktop" });
   const userSwitcher = containerEl.createDiv({
-    cls: "kid-score-user-switcher kid-score-user-switcher-desktop",
+    cls: "little-milestones-user-switcher little-milestones-user-switcher-desktop",
   });
   return { header, dateNav, userSwitcher };
 }
@@ -16,14 +16,14 @@ export function renderDesktopDailyHeaderLayout(
 export function renderDesktopBottomActionsLayout(
   containerEl: HTMLElement
 ): BottomActionsLayoutRefs {
-  const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-desktop" });
+  const actions = containerEl.createDiv({ cls: "little-milestones-actions little-milestones-actions-desktop" });
   const saveBtn = actions.createEl("button", {
     text: "💾 保存记录",
-    cls: "mod-cta kid-score-save-btn",
+    cls: "mod-cta little-milestones-save-btn",
   });
   const statsBtn = actions.createEl("button", {
     text: "📊 查看统计",
-    cls: "kid-score-stats-btn",
+    cls: "little-milestones-stats-btn",
   });
   return { actions, saveBtn, statsBtn };
 }

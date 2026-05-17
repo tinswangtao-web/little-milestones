@@ -124,7 +124,7 @@ export class DailyScoringModal extends BaseMobileModal {
       const contentEl = this.contentEl;
       this.clearMobileTabSwipeEvents();
       contentEl.empty();
-      contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+      contentEl.addClass("little-milestones-modal", "little-milestones-daily-modal");
       contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
 
       this.scores = {};
@@ -546,7 +546,7 @@ export class DailyScoringModal extends BaseMobileModal {
   }
 
   refreshCardByItem(item: ScoreItem) {
-    const card = this.contentEl.querySelector<HTMLElement>('.kid-score-card[data-item-id="' + item.id + '"]');
+    const card = this.contentEl.querySelector<HTMLElement>('.little-milestones-card[data-item-id="' + item.id + '"]');
     if (!card) return;
     refreshScoreCard(card, item, this.scores[item.id] || 0);
   }

@@ -5,7 +5,7 @@
 /* ── Phone (≤480px) ────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   /* ── Modal shell ── */
-  .kid-score-modal {
+  .little-milestones-modal {
     padding: 6px;
     max-height: 90vh;
     overflow-y: auto;
@@ -15,14 +15,14 @@
     flex-direction: column;
   }
 
-  .kid-score-header h2 {
+  .little-milestones-header h2 {
     margin-bottom: 6px;
     font-size: 1.12em;
     line-height: 1.3;
   }
 
   /* Prevent body scroll when modal open */
-  .kid-score-modal .modal-content {
+  .little-milestones-modal .modal-content {
     overscroll-behavior: contain;
     flex: 1 1 auto;
     min-height: 0;
@@ -34,27 +34,27 @@
   }
 
   /* ── Focus visibility above virtual keyboard ── */
-  .kid-score-modal input,
-  .kid-score-modal textarea,
-  .kid-score-modal .custom-form-name-input,
-  .kid-score-modal .value-popup-input,
-  .kid-score-modal .date-nav-display,
-  .kid-score-modal .kid-score-rules-textarea {
+  .little-milestones-modal input,
+  .little-milestones-modal textarea,
+  .little-milestones-modal .custom-form-name-input,
+  .little-milestones-modal .value-popup-input,
+  .little-milestones-modal .date-nav-display,
+  .little-milestones-modal .little-milestones-rules-textarea {
     scroll-margin-bottom: 120px;
   }
 
   /* ── Score cards ── */
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
-  .kid-score-grid-mobile {
+  .little-milestones-grid-mobile {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 80px;
     padding: 18px 8px 12px;
     /* Larger tap target */
@@ -63,13 +63,13 @@
     touch-action: pan-y;
   }
 
-  .kid-score-card-content-mobile {
+  .little-milestones-card-content-mobile {
     gap: 2px;
   }
-  .kid-score-card-more-btn {
+  .little-milestones-card-more-btn {
     display: inline-flex;
   }
-  .kid-score-card-mobile.is-deducted-active::after {
+  .little-milestones-card-mobile.is-deducted-active::after {
     top: 6px;
     right: auto;
     left: 6px;
@@ -79,13 +79,13 @@
   .card-points { font-size: 0.75em; }
 
   /* ── Stats / Summary ── */
-  .kid-score-summary-cards {
+  .little-milestones-summary-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
   /* ── Bottom actions ── */
-  .kid-score-actions {
+  .little-milestones-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -95,28 +95,28 @@
     z-index: 3;
   }
 
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     padding: 14px 10px;
     font-size: 1em;
     border-radius: 12px;
   }
 
-  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-save-btn,
-  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-stats-btn {
+  .little-milestones-actions-mobile:not(.is-preview-mode) .little-milestones-save-btn,
+  .little-milestones-actions-mobile:not(.is-preview-mode) .little-milestones-stats-btn {
     grid-row: 1;
     grid-column: auto;
     width: 100%;
   }
 
-  .kid-score-stats-btn {
+  .little-milestones-stats-btn {
     grid-column: auto;
     grid-row: 1;
   }
 
-  .kid-score-add-item-btn,
-  .kid-score-rules-edit-btn,
+  .little-milestones-add-item-btn,
+  .little-milestones-rules-edit-btn,
   .custom-edit-btn,
   .custom-delete-btn {
     min-width: 36px;
@@ -124,8 +124,8 @@
     border-radius: 10px;
   }
 
-  .kid-score-yesterday-banner,
-  .kid-score-past-banner {
+  .little-milestones-yesterday-banner,
+  .little-milestones-past-banner {
     margin-bottom: 8px;
     padding: 8px 10px;
     font-size: 0.8em;
@@ -133,32 +133,32 @@
     border-radius: 10px;
   }
 
-  .kid-score-meta-bar-mobile {
+  .little-milestones-meta-bar-mobile {
     gap: 8px;
   }
 
-  .kid-score-cat-header-mobile {
+  .little-milestones-cat-header-mobile {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
     margin-bottom: 10px;
   }
 
-  .kid-score-cat-title-host-mobile,
-  .kid-score-cat-action-host-mobile {
+  .little-milestones-cat-title-host-mobile,
+  .little-milestones-cat-action-host-mobile {
     width: 100%;
   }
 
-  .kid-score-cat-action-host-mobile {
+  .little-milestones-cat-action-host-mobile {
     justify-content: flex-end;
     padding-bottom: 2px;
   }
 
-  .kid-score-total-display-mobile {
+  .little-milestones-total-display-mobile {
     order: 1;
   }
 
-  .kid-score-hint-mobile {
+  .little-milestones-hint-mobile {
     order: 2;
     text-align: center;
   }
@@ -170,23 +170,23 @@
     white-space: normal;
     line-height: 1.35;
   }
-  .kid-score-tabs { flex-wrap: wrap; gap: 6px; }
-  .kid-score-tab {
+  .little-milestones-tabs { flex-wrap: wrap; gap: 6px; }
+  .little-milestones-tab {
     flex: 1 1 calc(33.333% - 6px);
     min-height: 44px;
     padding: 10px 12px;
     font-size: 0.92em;
     border-radius: 12px;
   }
-  .kid-score-stats-modal {
+  .little-milestones-stats-modal {
     padding: 4px;
     max-height: 90vh;
     overflow-y: auto;
   }
-  .kid-score-stats-actions {
+  .little-milestones-stats-actions {
     margin: 6px 0 12px;
   }
-  .kid-score-stats-back-btn {
+  .little-milestones-stats-back-btn {
     width: 100%;
   }
 
@@ -212,24 +212,24 @@
     font-size: 0.8em;
   }
 
-  .kid-score-chart-wrap,
-  .kid-score-month-table-wrap {
+  .little-milestones-chart-wrap,
+  .little-milestones-month-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
   }
 
-  .kid-score-chart {
+  .little-milestones-chart {
     min-width: 480px;
     margin-bottom: 16px;
   }
 
-  .kid-score-month-table {
+  .little-milestones-month-table {
     min-width: 360px;
   }
 
   /* ── Calendar picker ── */
-  .kid-score-calendar-popup {
+  .little-milestones-calendar-popup {
     width: min(356px, calc(100vw - 32px));
     max-width: calc(100vw - 32px);
     padding: 14px;
@@ -237,34 +237,34 @@
     overflow: hidden;
   }
 
-  .kid-score-calendar-popup .cal-header {
+  .little-milestones-calendar-popup .cal-header {
     margin-bottom: 8px;
   }
 
-  .kid-score-calendar-popup .cal-nav-btn {
+  .little-milestones-calendar-popup .cal-nav-btn {
     width: 36px;
     height: 36px;
     padding: 0;
     font-size: 0.82em;
   }
 
-  .kid-score-calendar-popup .cal-month-label {
+  .little-milestones-calendar-popup .cal-month-label {
     font-size: 0.95em;
   }
 
-  .kid-score-calendar-popup .cal-grid {
+  .little-milestones-calendar-popup .cal-grid {
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 4px;
     width: 100%;
   }
 
-  .kid-score-calendar-popup .cal-weekday {
+  .little-milestones-calendar-popup .cal-weekday {
     min-width: 0;
     font-size: 0.68em;
     padding: 3px 0;
   }
 
-  .kid-score-calendar-popup .cal-day {
+  .little-milestones-calendar-popup .cal-day {
     min-width: 0;
     min-height: 40px;
     width: 100%;
@@ -274,17 +274,17 @@
     font-size: 0.78em;
   }
 
-  .kid-score-calendar-popup .cal-day.is-future {
+  .little-milestones-calendar-popup .cal-day.is-future {
     opacity: 0.45;
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  .kid-score-calendar-popup .cal-day.is-future .cal-day-inner {
+  .little-milestones-calendar-popup .cal-day.is-future .cal-day-inner {
     color: var(--text-muted);
   }
 
-  .kid-score-calendar-popup .value-popup-cancel {
+  .little-milestones-calendar-popup .value-popup-cancel {
     min-height: 42px;
     font-size: 0.92em;
   }
@@ -294,16 +294,16 @@
     gap: 6px;
   }
 
-  .kid-score-settings .setting-item {
+  .little-milestones-settings .setting-item {
     display: block;
     padding: 12px 0;
   }
 
-  .kid-score-settings .setting-item-info {
+  .little-milestones-settings .setting-item-info {
     margin-bottom: 8px;
   }
 
-  .kid-score-settings .setting-item-control {
+  .little-milestones-settings .setting-item-control {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -311,30 +311,30 @@
     justify-content: flex-start;
   }
 
-  .kid-score-settings .setting-item-control input[type="text"],
-  .kid-score-settings .setting-item-control textarea,
-  .kid-score-settings .setting-item-control select {
+  .little-milestones-settings .setting-item-control input[type="text"],
+  .little-milestones-settings .setting-item-control textarea,
+  .little-milestones-settings .setting-item-control select {
     width: 100%;
   }
 
-  .kid-score-settings .setting-item button {
+  .little-milestones-settings .setting-item button {
     min-height: 44px;
   }
 
-  .kid-score-settings-actions-mobile .setting-item {
+  .little-milestones-settings-actions-mobile .setting-item {
     padding: 10px 0;
   }
 
-  .kid-score-settings-actions-mobile .setting-item-control {
+  .little-milestones-settings-actions-mobile .setting-item-control {
     width: 100%;
   }
 
-  .kid-score-goals-grid {
+  .little-milestones-goals-grid {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  .kid-score-cat-row {
+  .little-milestones-cat-row {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
@@ -342,7 +342,7 @@
     border-radius: 8px;
   }
 
-  .kid-score-cat-row .settings-name-input {
+  .little-milestones-cat-row .settings-name-input {
     min-width: 0;
     width: 100%;
   }
@@ -360,12 +360,12 @@
   }
 
   /* ── Popups & forms ── */
-  .kid-score-value-overlay {
+  .little-milestones-value-overlay {
     padding: 12px;
     align-items: flex-end; /* slide up from bottom on mobile */
   }
 
-  .kid-score-value-popup {
+  .little-milestones-value-popup {
     min-width: auto;
     max-width: 100%;
     width: 100%;
@@ -432,25 +432,25 @@
     border-radius: 6px;
   }
 
-  .kid-score-edit-modal .custom-form-main-row {
+  .little-milestones-edit-modal .custom-form-main-row {
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-label {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-label {
     flex: 0 0 100%;
     margin-bottom: 2px;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-emoji-input {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-emoji-input {
     flex: 0 0 56px;
     width: 56px;
     height: 52px;
     font-size: 1.8em;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .diary-tool-btn {
+  .little-milestones-edit-modal .custom-form-main-row .diary-tool-btn {
     flex: 0 0 56px;
     width: 56px;
     min-width: 56px;
@@ -458,17 +458,17 @@
     padding: 0;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-name-input {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-name-input {
     flex: 1 1 100%;
     min-width: 0;
     margin-top: 4px;
   }
 
-  .kid-score-edit-modal .custom-form-category-row {
+  .little-milestones-edit-modal .custom-form-category-row {
     margin-bottom: 18px;
   }
 
-  .kid-score-edit-modal .value-popup-actions {
+  .little-milestones-edit-modal .value-popup-actions {
     margin-top: 24px;
     position: static;
   }
@@ -488,7 +488,7 @@
   }
 
   /* ── Emoji picker ── */
-  .kid-score-emoji-picker {
+  .little-milestones-emoji-picker {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -510,7 +510,7 @@
     padding: 6px;
   }
 
-  .kid-score-custom-row {
+  .little-milestones-custom-row {
     gap: 6px;
     padding: 10px;
     min-height: 48px;
@@ -518,13 +518,13 @@
     align-items: flex-start;
   }
 
-  .kid-score-custom-main {
+  .little-milestones-custom-main {
     align-items: flex-start;
     flex-wrap: wrap;
     row-gap: 4px;
   }
 
-  .kid-score-custom-row-mobile {
+  .little-milestones-custom-row-mobile {
     gap: 6px;
     padding: 10px;
     min-height: 48px;
@@ -532,7 +532,7 @@
     align-items: flex-start;
   }
 
-  .kid-score-custom-main-mobile {
+  .little-milestones-custom-main-mobile {
     align-items: flex-start;
     flex-wrap: wrap;
     row-gap: 4px;
@@ -563,7 +563,7 @@
     justify-content: center;
   }
 
-  .kid-score-add-custom-btn {
+  .little-milestones-add-custom-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -574,15 +574,15 @@
     line-height: 1.5;
   }
 
-  .kid-score-custom-section-mobile {
+  .little-milestones-custom-section-mobile {
     margin-bottom: 10px;
   }
 
-  .kid-score-custom-section-mobile .kid-score-add-custom-btn {
+  .little-milestones-custom-section-mobile .little-milestones-add-custom-btn {
     margin-bottom: 0;
   }
 
-  .kid-score-cumulative-banner {
+  .little-milestones-cumulative-banner {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-start;
@@ -604,13 +604,13 @@
   }
 
   /* ── User switcher ── */
-  .kid-score-user-switcher {
+  .little-milestones-user-switcher {
     gap: 6px;
     margin-bottom: 8px;
     flex-wrap: wrap;
     padding-bottom: 0;
   }
-  .kid-score-user-btn {
+  .little-milestones-user-btn {
     flex-shrink: 0;
     padding: 10px 12px;
     font-size: 0.92em;
@@ -618,10 +618,10 @@
     border-radius: 999px;
     line-height: 1.35;
   }
-  .kid-score-user-btn-mobile {
+  .little-milestones-user-btn-mobile {
     flex-shrink: 0;
   }
-  .kid-score-user-add-btn {
+  .little-milestones-user-add-btn {
     flex-shrink: 0;
     padding: 10px 12px;
     font-size: 0.92em;
@@ -631,7 +631,7 @@
   }
 
   /* ── Main tabs ── */
-  .kid-score-main-tabs {
+  .little-milestones-main-tabs {
     position: static;
     margin-top: 2px;
     background: var(--background-primary);
@@ -639,20 +639,20 @@
     overflow: hidden;
   }
 
-  .kid-score-main-tabs-mobile {
+  .little-milestones-main-tabs-mobile {
     position: static;
   }
 
-  .kid-score-daily-modal {
+  .little-milestones-daily-modal {
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
-  .kid-score-daily-modal.is-diary-tab-active::after {
+  .little-milestones-daily-modal.is-diary-tab-active::after {
     content: "";
     display: block;
     flex: 0 0 min(50vh, 320px);
   }
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     padding: 14px 10px;
     font-size: 1.05em;
     min-height: 48px;
@@ -663,7 +663,7 @@
     line-height: 1.5;
   }
 
-  .kid-score-main-tab-mobile {
+  .little-milestones-main-tab-mobile {
     min-height: 48px;
   }
 
@@ -870,13 +870,13 @@
   }
 
   /* ── Section titles ── */
-  .kid-score-section-title {
+  .little-milestones-section-title {
     font-size: 0.88em;
     margin: 12px 0 6px;
   }
 
   /* ── Total display ── */
-  .kid-score-total-display {
+  .little-milestones-total-display {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -889,12 +889,12 @@
     line-height: 1.35;
   }
 
-  .kid-score-empty {
+  .little-milestones-empty {
     padding: 18px 14px;
     font-size: 0.88em;
   }
 
-  .kid-score-custom-empty {
+  .little-milestones-custom-empty {
     font-size: 0.82em;
     padding: 12px 10px;
   }
@@ -916,7 +916,7 @@
   }
 
   /* ── Hint text ── */
-  .kid-score-hint {
+  .little-milestones-hint {
     font-size: 0.78em;
     margin-bottom: 8px;
   }
@@ -940,7 +940,7 @@
   }
 
   /* ── Date navigation ── */
-  .kid-score-date-nav {
+  .little-milestones-date-nav {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
     gap: 6px;
@@ -973,12 +973,12 @@
     border-radius: 20px;
     font-size: 0.85em;
   }
-  .kid-score-past-banner {
+  .little-milestones-past-banner {
     font-size: 0.8em;
   }
 
   /* ── Full emoji picker ── */
-  .kid-score-emoji-fullpicker {
+  .little-milestones-emoji-fullpicker {
     min-width: auto;
     max-width: 100%;
     width: 100%;
@@ -986,10 +986,10 @@
     padding: 16px 12px calc(12px + env(safe-area-inset-bottom, 0px));
     max-height: 85vh;
   }
-  .kid-score-value-overlay.is-emoji-picker {
+  .little-milestones-value-overlay.is-emoji-picker {
     align-items: flex-end;
   }
-  .kid-score-value-overlay.is-emoji-picker.is-mobile-emoji-picker {
+  .little-milestones-value-overlay.is-emoji-picker.is-mobile-emoji-picker {
     align-items: flex-start;
     padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
@@ -1014,63 +1014,63 @@
     border-radius: 8px;
   }
 
-  .kid-score-modal.is-mobile-ios .date-nav-display,
-  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
-  .kid-score-modal.is-mobile-ios .custom-form-name-input,
-  .kid-score-modal.is-mobile-ios .value-popup-input {
+  .little-milestones-modal.is-mobile-ios .date-nav-display,
+  .little-milestones-modal.is-mobile-ios .little-milestones-rules-textarea,
+  .little-milestones-modal.is-mobile-ios .custom-form-name-input,
+  .little-milestones-modal.is-mobile-ios .value-popup-input {
     font-size: 16px;
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-card {
+  .little-milestones-modal.is-mobile-android .little-milestones-card {
     transition: border-color 0.08s ease, transform 0.08s ease, background 0.08s ease;
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-card:active {
+  .little-milestones-modal.is-mobile-android .little-milestones-card:active {
     transform: scale(0.98);
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-main-tab:active,
-  .kid-score-modal.is-mobile-android .diary-tool-btn:active,
-  .kid-score-modal.is-mobile-android .value-popup-adjust:active {
+  .little-milestones-modal.is-mobile-android .little-milestones-main-tab:active,
+  .little-milestones-modal.is-mobile-android .diary-tool-btn:active,
+  .little-milestones-modal.is-mobile-android .value-popup-adjust:active {
     transform: scale(0.98);
   }
 
   /* ── Rules section ── */
-  .kid-score-rules-section {
+  .little-milestones-rules-section {
     margin-bottom: 10px;
     border-radius: 12px;
   }
 
-  .kid-score-rules-header {
+  .little-milestones-rules-header {
     gap: 6px;
     padding: 9px 10px;
   }
 
-  .kid-score-rules-title {
+  .little-milestones-rules-title {
     font-size: 0.84em;
   }
 
-  .kid-score-rules-body {
+  .little-milestones-rules-body {
     padding: 10px;
   }
 
-  .kid-score-rules-view {
+  .little-milestones-rules-view {
     font-size: 0.82em;
     line-height: 1.5;
   }
 
-  .kid-score-rules-textarea {
+  .little-milestones-rules-textarea {
     min-height: 100px;
     font-size: 0.84em;
   }
 
-  .kid-score-rules-actions {
+  .little-milestones-rules-actions {
     margin-top: 10px;
     justify-content: stretch;
   }
 
-  .kid-score-rules-save-btn,
-  .kid-score-rules-cancel-btn {
+  .little-milestones-rules-save-btn,
+  .little-milestones-rules-cancel-btn {
     flex: 1;
     min-height: 40px;
   }
@@ -1283,7 +1283,7 @@
   }
 
   /* Grand banner mobile */
-  .kid-score-grand-banner {
+  .little-milestones-grand-banner {
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
@@ -1323,12 +1323,12 @@
 /* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
   }
 
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 68px;
     padding: 18px 4px 8px;
   }
@@ -1337,12 +1337,12 @@
   .card-name { font-size: 0.72em; }
   .card-points { font-size: 0.7em; }
 
-  .kid-score-summary-cards {
+  .little-milestones-summary-cards {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
 
-  .kid-score-emoji-picker {
+  .little-milestones-emoji-picker {
     grid-template-columns: repeat(6, 1fr);
   }
 
@@ -1361,14 +1361,14 @@
     font-size: 0.78em;
   }
 
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     padding: 14px 10px;
     font-size: 1.05em;
     min-height: 48px;
     height: auto;
   }
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     padding: 14px 16px;
     font-size: 1.05em;
     min-height: 48px;
@@ -1418,7 +1418,7 @@
     min-height: 36px;
   }
 
-  .kid-score-chart {
+  .little-milestones-chart {
     min-width: 420px;
   }
 }
@@ -1426,16 +1426,16 @@
 /* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .kid-score-value-overlay {
+  .little-milestones-value-overlay {
     align-items: center;
   }
 
   /* Touch-friendly card sizing */
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 80px;
     padding: 18px 8px 12px;
     -webkit-tap-highlight-color: transparent;
@@ -1443,13 +1443,13 @@
   }
 
   /* Larger tap targets for tabs and buttons */
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     min-height: 48px;
     padding: 14px 10px;
   }
 
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     min-height: 42px;
     padding: 10px 12px;
   }
@@ -1465,18 +1465,18 @@
   }
 
   /* Bottom actions sizing */
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     padding: 14px 10px;
     border-radius: 12px;
   }
 
   /* Prevent iOS zoom on inputs */
-  .kid-score-modal.is-mobile-ios .date-nav-display,
-  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
-  .kid-score-modal.is-mobile-ios .custom-form-name-input,
-  .kid-score-modal.is-mobile-ios .value-popup-input {
+  .little-milestones-modal.is-mobile-ios .date-nav-display,
+  .little-milestones-modal.is-mobile-ios .little-milestones-rules-textarea,
+  .little-milestones-modal.is-mobile-ios .custom-form-name-input,
+  .little-milestones-modal.is-mobile-ios .value-popup-input {
     font-size: 16px;
   }
 }
@@ -1485,14 +1485,14 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
   /* Critical touch rules for large tablets */
-  .kid-score-card {
+  .little-milestones-card {
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-y;
   }
 
-  .kid-score-main-tab,
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-main-tab,
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     min-height: 44px;
   }
 
@@ -1500,8 +1500,8 @@
     min-height: 44px;
   }
 
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     border-radius: 12px;
   }

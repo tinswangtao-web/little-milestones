@@ -28,25 +28,25 @@ export function renderUserSettingsSection({
   const shell = isTouchLayout
     ? renderMobileSettingsSectionShell(
         containerEl,
-        "kid-score-settings-users-section",
+        "little-milestones-settings-users-section",
         "👥 用户管理",
         "点击用户名切换，长按用户名可删除该用户。"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
-        "kid-score-settings-users-section",
+        "little-milestones-settings-users-section",
         "👥 用户管理",
         "点击用户名切换，长按用户名可删除该用户。"
       );
 
-  const userMgrWrap = shell.body.createDiv({ cls: "kid-score-settings-users" });
+  const userMgrWrap = shell.body.createDiv({ cls: "little-milestones-settings-users" });
 
   const showUserDeleteConfirm = (user: ReturnType<typeof makeDefaultUser>) => {
     const deleteModal = new (class extends Modal {
       _kbCleanup?: ReturnType<typeof setupModalKeyboard>;
       onOpen() {
         this.titleEl.setText("⚠️ 删除用户");
-        this.modalEl.addClass("kid-score-edit-modal");
+        this.modalEl.addClass("little-milestones-edit-modal");
         this._kbCleanup = setupModalKeyboard(this);
         const content = this.contentEl;
         content.createDiv({
@@ -124,7 +124,7 @@ export function renderUserSettingsSection({
     plugin.settings.users.forEach((user) => {
       const userBtn = userMgrWrap.createEl("button", {
         cls:
-          "kid-score-user-btn" +
+          "little-milestones-user-btn" +
           (user.id === plugin.settings.currentUserId ? " is-active" : ""),
         text: user.name,
       });
@@ -146,7 +146,7 @@ export function renderUserSettingsSection({
     });
 
     const addUserBtn = userMgrWrap.createEl("button", {
-      cls: "kid-score-user-add-btn",
+      cls: "little-milestones-user-add-btn",
       text: "＋ 添加用户",
     });
     addUserBtn.onclick = async () => {

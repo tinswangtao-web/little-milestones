@@ -39,7 +39,7 @@
 ## 实现记录
 
 - 2026-05-08 12:35 +0800：Codex 完成 4 项实现；未新增持久化路径，继续复用日记草稿 map。`src/constants.ts` 仍显示历史行尾 dirty，但本轮不将其纳入改动文件清单。
-- 新增打分项由 `AddItemModal` 回传新 item id，`DailyScoringModal` 重渲染后滚动到对应 `.kid-score-card[data-item-id]`。
+- 新增打分项由 `AddItemModal` 回传新 item id，`DailyScoringModal` 重渲染后滚动到对应 `.little-milestones-card[data-item-id]`。
 - 评语模块在日记面板打开时补齐到 `wantToSay` 后方，值进入 `diaryModules.comment`，由既有草稿保存和 compose/parse 路径处理。
 - 移动端日记 tab 增加底部半屏 spacer，键盘打开时 daily modal 使用更大的 `extraBottom`。
 - 统计页支持可选返回按钮，从打分页进入时保存草稿、关闭 daily、打开 stats；点击返回后按原日期/页签重开 daily。

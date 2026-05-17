@@ -19,18 +19,18 @@ export function renderGoalSettingsSection({
   const shell = isTouchLayout
     ? renderMobileSettingsSectionShell(
         containerEl,
-        "kid-score-goals-section",
+        "little-milestones-goals-section",
         "🎯 每日目标",
         "以最终得分为统计标准（含加分、减分和临时事项）"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
-        "kid-score-goals-section",
+        "little-milestones-goals-section",
         "🎯 每日目标",
         "以最终得分为统计标准（含加分、减分和临时事项）"
       );
 
-  const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
+  const goalsGrid = shell.body.createDiv({ cls: "little-milestones-goals-grid" });
   const goalFields: Array<{ key: "daily" | "weekly" | "monthly"; label: string }> = [
     { key: "daily", label: "每日目标" },
     { key: "weekly", label: "每周目标" },
@@ -38,9 +38,9 @@ export function renderGoalSettingsSection({
   ];
 
   for (const goalField of goalFields) {
-    const cell = goalsGrid.createDiv({ cls: "kid-score-goal-cell" });
+    const cell = goalsGrid.createDiv({ cls: "little-milestones-goal-cell" });
     cell.createEl("label", { text: goalField.label });
-    const input = cell.createEl("input", { cls: "kid-score-goal-input" });
+    const input = cell.createEl("input", { cls: "little-milestones-goal-input" });
     input.type = "number";
     input.min = "1";
     input.value = String(plugin.currentUser.goals[goalField.key] || 1);

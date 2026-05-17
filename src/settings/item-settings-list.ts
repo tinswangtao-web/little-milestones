@@ -164,7 +164,7 @@ export function renderItemSettingsList({
 
     if (plugin.currentUser.items.length === 0) {
       itemsWrap.createEl("p", {
-        cls: "kid-score-hint",
+        cls: "little-milestones-hint",
         text: "还没有项目，点击下方添加！",
       });
       return;

@@ -23,7 +23,7 @@ export class KidScoreSettingTab extends PluginSettingTab {
     const containerEl = this.containerEl;
     const isTouchLayout = getMobilePlatform() !== "desktop";
     containerEl.empty();
-    containerEl.addClass("kid-score-settings");
+    containerEl.addClass("little-milestones-settings");
     const bindSettingsInput = (input: HTMLElement | null) => {
       bindModalInputFocus(input, {
         manualTouchFocus: false,

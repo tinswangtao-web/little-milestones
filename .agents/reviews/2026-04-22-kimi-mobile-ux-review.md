@@ -14,8 +14,8 @@
   - `src/modals/popups/quick-custom-modal.ts:19`
   - `src/modals/popups/edit-custom-modal.ts:20`
   - `src/modals/popups/add-custom-modal.ts:18`
-- **问题**: 这些 modal 的 `onOpen()` 都是先 `super.onOpen()`，再 `this.modalEl.addClass("kid-score-edit-modal")`。`BaseMobileModal.onOpen()` 会调用 `setupModalKeyboard()`，而 `setupModalKeyboard` 内部通过 `mEl.classList.contains("kid-score-edit-modal")` 判断 `isEditModal`。由于 class 还没加，`isEditModal` 永远是 `false`，导致 `updateModalLift()` 中的 iOS 专用键盘顶起逻辑完全跳过。用户在编辑项目/临时事项时，键盘直接覆盖输入框。
-- **修复建议**: 在所有子 modal 中，先 `this.modalEl.addClass("kid-score-edit-modal")`，再调用 `super.onOpen()`。`EditItemModal` 已经是正确的顺序，其他需要统一。
+- **问题**: 这些 modal 的 `onOpen()` 都是先 `super.onOpen()`，再 `this.modalEl.addClass("little-milestones-edit-modal")`。`BaseMobileModal.onOpen()` 会调用 `setupModalKeyboard()`，而 `setupModalKeyboard` 内部通过 `mEl.classList.contains("little-milestones-edit-modal")` 判断 `isEditModal`。由于 class 还没加，`isEditModal` 永远是 `false`，导致 `updateModalLift()` 中的 iOS 专用键盘顶起逻辑完全跳过。用户在编辑项目/临时事项时，键盘直接覆盖输入框。
+- **修复建议**: 在所有子 modal 中，先 `this.modalEl.addClass("little-milestones-edit-modal")`，再调用 `super.onOpen()`。`EditItemModal` 已经是正确的顺序，其他需要统一。
 - **状态**: ❌ 未修复
 
 ### C2: `DailyScoringModal` 主页面禁用了键盘调整，日记 Tab 输入框完全被键盘遮挡
@@ -137,8 +137,8 @@
 1. **编辑 modal 的 drag gesture 动态边界** (`attachModalDragGesture`) — 上下拖动有 `minOffset` / `maxOffset` 限制，不会拖出视口。
 2. **设置页新增项目滚动保持** (`item-settings-list.ts:150,360-364`) — 非新增时保存 `scrollTop`，新增时 `scrollIntoView`，实现较为完善。
 3. **移动端 textarea 自增高** — `diary-panel-fields.ts`、`edit-item-modal.ts`、`add-custom-modal.ts` 中的 `attachAutoResize` 工作正常，避免了内部滚动条。
-4. **底部操作按钮 sticky + safe-area** — `.kid-score-actions` 在移动端有 `env(safe-area-inset-bottom)` 处理，不会被 Home Indicator 挡住。
-5. **Popup 移动端 bottom-sheet 化** — `.kid-score-value-popup` 在移动端改为从底部滑出，符合 iOS 用户习惯。
+4. **底部操作按钮 sticky + safe-area** — `.little-milestones-actions` 在移动端有 `env(safe-area-inset-bottom)` 处理，不会被 Home Indicator 挡住。
+5. **Popup 移动端 bottom-sheet 化** — `.little-milestones-value-popup` 在移动端改为从底部滑出，符合 iOS 用户习惯。
 6. **font-size: 16px 防止 iOS 缩放** — 多处输入框已设 `font-size: 16px`，正确阻止了 iOS 聚焦时的页面缩放。
 
 ---

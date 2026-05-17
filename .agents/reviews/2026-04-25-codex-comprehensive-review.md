@@ -31,7 +31,7 @@
 - `id`: R4
 - `severity`: medium
 - `summary`: Mobile modal behavior is split between CSS and runtime style mutation
-- `details`: `styles/07-mobile.css` declares core scroll/layout behavior for `.kid-score-modal` and `.modal-content`, while `setupModalKeyboard()` later rewrites many of the same properties (`display`, `overflow`, `height`, `flex`, `paddingBottom`, `webkitOverflowScrolling`) at runtime. The plugin currently builds and type-checks cleanly, but this duplication makes keyboard/scroll regressions hard to predict and explains why mobile fixes have required many narrow follow-up passes.
+- `details`: `styles/07-mobile.css` declares core scroll/layout behavior for `.little-milestones-modal` and `.modal-content`, while `setupModalKeyboard()` later rewrites many of the same properties (`display`, `overflow`, `height`, `flex`, `paddingBottom`, `webkitOverflowScrolling`) at runtime. The plugin currently builds and type-checks cleanly, but this duplication makes keyboard/scroll regressions hard to predict and explains why mobile fixes have required many narrow follow-up passes.
 - `suggested-fix`: Define a clearer contract: keep baseline structure in CSS, move keyboard-mode overrides behind dedicated classes or a smaller style surface, and avoid having both CSS and JS own the same layout primitives.
 - `resolved`: no
 

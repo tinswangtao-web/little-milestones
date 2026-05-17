@@ -80,7 +80,7 @@ export function renderDailyHeader({
   if (!isToday) {
     todayBtn.onclick = onGoToday;
     containerEl.createDiv({
-      cls: "kid-score-past-banner",
+      cls: "little-milestones-past-banner",
       text: "📅 正在编辑 " + dateStr + " 的记录",
     });
   }
@@ -89,7 +89,7 @@ export function renderDailyHeader({
   const cumulativeDays = allScores.length;
   if (cumulativeDays > 0) {
     const cSign = cumulativeTotal >= 0 ? "+" : "";
-    const cumDiv = containerEl.createDiv({ cls: "kid-score-cumulative-banner" });
+    const cumDiv = containerEl.createDiv({ cls: "little-milestones-cumulative-banner" });
     cumDiv.createSpan({ cls: "cumulative-label", text: "🎖️ 历史累计" });
     cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " 分" });
     cumDiv.createSpan({ cls: "cumulative-days", text: "共 " + cumulativeDays + " 天" });
@@ -98,8 +98,8 @@ export function renderDailyHeader({
   plugin.settings.users.forEach((u) => {
     const uBtn = userSwitcher.createEl("button", {
       cls:
-        "kid-score-user-btn " +
-        (isTouchLayout ? "kid-score-user-btn-mobile" : "kid-score-user-btn-desktop") +
+        "little-milestones-user-btn " +
+        (isTouchLayout ? "little-milestones-user-btn-mobile" : "little-milestones-user-btn-desktop") +
         (u.id === plugin.settings.currentUserId ? " is-active" : ""),
       text: u.name,
     });

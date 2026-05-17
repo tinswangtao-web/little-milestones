@@ -66,15 +66,15 @@ export function renderDiaryModuleSettingsSection({
   containerEl,
   bindSettingsInput,
 }: RenderDiaryModuleSettingsOptions): void {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section diary-settings-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
-  const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "▼" });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "🧩 日记模块" });
+  const section = containerEl.createDiv({ cls: "little-milestones-rules-section diary-settings-section" });
+  const header = section.createDiv({ cls: "little-milestones-rules-header" });
+  const toggle = header.createEl("span", { cls: "little-milestones-rules-toggle", text: "▼" });
+  header.createEl("span", { cls: "little-milestones-rules-title", text: "🧩 日记模块" });
   header.createSpan({
-    cls: "kid-score-rules-desc",
+    cls: "little-milestones-rules-desc",
     text: "天气和心情 / 各项小记录 / 自由记录 / 评语",
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body diary-settings-body" });
+  const body = section.createDiv({ cls: "little-milestones-rules-body diary-settings-body" });
   let isOpen = true;
 
   const render = () => {
@@ -198,7 +198,7 @@ function renderPresetGroup({
   const top = group.createDiv({ cls: "diary-preset-group-header" });
   top.createEl("h5", { cls: "diary-preset-title", text: title });
   const resetBtn = top.createEl("button", {
-    cls: "kid-score-rules-cancel-btn diary-preset-reset-btn",
+    cls: "little-milestones-rules-cancel-btn diary-preset-reset-btn",
     text: "恢复默认",
   });
   resetBtn.type = "button";
@@ -275,7 +275,7 @@ function renderSmallRecordsBlock({
   const smallRecords = getSmallRecordModules(plugin);
 
   if (smallRecords.length === 0) {
-    list.createEl("p", { cls: "kid-score-hint", text: "还没有小记录模块。" });
+    list.createEl("p", { cls: "little-milestones-hint", text: "还没有小记录模块。" });
   }
 
   const dragState = {
@@ -456,9 +456,9 @@ function renderSmallRecordsBlock({
     bindSettingsInput(placeholderInput);
   });
 
-  const actions = block.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = block.createDiv({ cls: "little-milestones-rules-actions" });
   const addBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "＋ 新增小记录",
   });
   addBtn.onclick = async () => {
@@ -480,7 +480,7 @@ function renderSmallRecordsBlock({
   };
 
   const resetBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "恢复默认模块",
   });
   resetBtn.onclick = () => {

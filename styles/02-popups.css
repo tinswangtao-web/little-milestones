@@ -1,6 +1,6 @@
 /* ─── Long Press Value Popup ────────────────────────────────────────────────── */
 
-.kid-score-value-overlay {
+.little-milestones-value-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -11,7 +11,7 @@
   padding: 16px;
 }
 
-.kid-score-value-popup {
+.little-milestones-value-popup {
   background: var(--background-primary);
   border-radius: 14px;
   padding: 20px;
@@ -19,25 +19,25 @@
   max-width: 340px;
   width: 100%;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-  animation: kid-score-popup-in 0.15s ease-out;
+  animation: little-milestones-popup-in 0.15s ease-out;
 }
 
-.kid-score-value-overlay.is-keyboard-open {
+.little-milestones-value-overlay.is-keyboard-open {
   align-items: flex-start;
   padding-top: max(8px, env(safe-area-inset-top, 0px));
 }
 
-.kid-score-value-overlay.is-keyboard-open .kid-score-value-popup {
+.little-milestones-value-overlay.is-keyboard-open .little-milestones-value-popup {
   margin-top: 0;
   margin-bottom: auto;
 }
 
-.kid-score-value-overlay.is-mobile-emoji-picker {
+.little-milestones-value-overlay.is-mobile-emoji-picker {
   align-items: flex-start;
   padding-top: max(8px, env(safe-area-inset-top, 0px));
 }
 
-.kid-score-value-overlay.is-mobile-emoji-picker .kid-score-emoji-fullpicker {
+.little-milestones-value-overlay.is-mobile-emoji-picker .little-milestones-emoji-fullpicker {
   margin-top: 0;
   margin-bottom: auto;
 }
@@ -158,7 +158,7 @@
   color: white;
 }
 
-.kid-score-value-overlay .kid-score-value-popup .value-popup-input {
+.little-milestones-value-overlay .little-milestones-value-popup .value-popup-input {
   width: 80px;
   height: 44px;
   text-align: center;
@@ -221,14 +221,14 @@
 
 /* ─── Custom Item Form (popup) ──────────────────────────────────────────────── */
 
-.kid-score-custom-form {
+.little-milestones-custom-form {
   max-width: 360px;
 }
 
 /* Modal wrapper for edit/add forms (replaces fixed overlay for Android keyboard) */
 
 /* ── Constrain modal to a sensible width so there's no huge whitespace ── */
-.modal.kid-score-edit-modal {
+.modal.little-milestones-edit-modal {
   width: 90vw;
   max-width: 460px;
   min-width: 280px;
@@ -241,16 +241,16 @@
   will-change: transform;
 }
 
-.modal.kid-score-edit-modal.is-dragging-position {
+.modal.little-milestones-edit-modal.is-dragging-position {
   transition: none;
 }
 
-.modal.kid-score-edit-modal.is-settling-position {
+.modal.little-milestones-edit-modal.is-settling-position {
   transition: transform 0.22s ease;
 }
 
-.kid-score-edit-modal .modal-content,
-.kid-score-import-modal .modal-content {
+.little-milestones-edit-modal .modal-content,
+.little-milestones-import-modal .modal-content {
   padding: 16px 20px 20px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -260,21 +260,21 @@
 }
 
 /* Form fills the modal content area (remove the 360px cap from the generic rule) */
-.kid-score-edit-modal .kid-score-custom-form {
+.little-milestones-edit-modal .little-milestones-custom-form {
   max-width: none;
   width: 100%;
   box-sizing: border-box;
 }
 
 /* Labels wide enough for "默认分值" (4 CJK chars) without wrapping */
-.kid-score-edit-modal .custom-form-label {
+.little-milestones-edit-modal .custom-form-label {
   flex: 0 0 auto;
   min-width: 56px;
   white-space: nowrap;
 }
 
 /* Buttons fill full row width */
-.kid-score-edit-modal .value-popup-actions {
+.little-milestones-edit-modal .value-popup-actions {
   margin-top: 16px;
   display: flex;
   gap: 10px;
@@ -290,23 +290,23 @@
   );
   z-index: 2;
 }
-.kid-score-edit-modal .value-popup-cancel,
-.kid-score-edit-modal .value-popup-confirm {
+.little-milestones-edit-modal .value-popup-cancel,
+.little-milestones-edit-modal .value-popup-confirm {
   flex: 1;
 }
 
-.kid-score-edit-modal .value-popup-hint {
+.little-milestones-edit-modal .value-popup-hint {
   margin-bottom: 12px;
   font-size: 0.85em;
   color: var(--text-muted);
 }
 
 /* Force all inputs/textareas inside our custom modals to be tappable on Android/iOS */
-.modal.kid-score-edit-modal .modal-content input,
-.modal.kid-score-edit-modal .modal-content textarea,
-.modal.kid-score-edit-modal .modal-content select,
-.modal.kid-score-import-modal .modal-content input,
-.modal.kid-score-import-modal .modal-content textarea {
+.modal.little-milestones-edit-modal .modal-content input,
+.modal.little-milestones-edit-modal .modal-content textarea,
+.modal.little-milestones-edit-modal .modal-content select,
+.modal.little-milestones-import-modal .modal-content input,
+.modal.little-milestones-import-modal .modal-content textarea {
   pointer-events: auto;
   -webkit-user-select: text;
   user-select: text;
@@ -316,8 +316,8 @@
 }
 
 /* Ensure flex layout is not overridden by Obsidian theme inside modals */
-.modal.kid-score-edit-modal .modal-content .custom-form-row,
-.modal.kid-score-import-modal .modal-content .custom-form-row {
+.modal.little-milestones-edit-modal .modal-content .custom-form-row,
+.modal.little-milestones-import-modal .modal-content .custom-form-row {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -340,7 +340,7 @@
   min-width: 0;
 }
 
-.modal.kid-score-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
+.modal.little-milestones-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
   flex: 0 0 auto;
   margin-left: 0;
   min-width: 36px;
@@ -403,7 +403,7 @@
 }
 .custom-form-name-input.is-error {
   border-color: #f87171;
-  animation: kid-score-shake 0.3s ease;
+  animation: little-milestones-shake 0.3s ease;
 }
 textarea.custom-form-name-input {
   min-height: 52px;
@@ -415,7 +415,7 @@ textarea.custom-form-name-input {
   overflow: hidden;
 }
 
-.kid-score-edit-modal textarea.custom-form-name-input {
+.little-milestones-edit-modal textarea.custom-form-name-input {
   max-height: min(38vh, 260px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -433,7 +433,7 @@ textarea.custom-form-name-input {
 
 /* ─── Full Emoji Picker (iOS-like) ─────────────────────────────────────────── */
 
-.kid-score-emoji-fullpicker {
+.little-milestones-emoji-fullpicker {
   background: var(--background-primary);
   border-radius: 14px;
   padding: 16px;
@@ -441,7 +441,7 @@ textarea.custom-form-name-input {
   max-width: 420px;
   width: 90vw;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-  animation: kid-score-popup-in 0.15s ease-out;
+  animation: little-milestones-popup-in 0.15s ease-out;
   max-height: 80vh;
   display: flex;
   flex-direction: column;

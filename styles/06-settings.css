@@ -1,64 +1,64 @@
 /* ─── Settings ───────────────────────────────────────────────────────────────── */
 
-.kid-score-settings {
+.little-milestones-settings {
   overflow-x: hidden;
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
 
-.kid-score-settings,
-.kid-score-settings * {
+.little-milestones-settings,
+.little-milestones-settings * {
   box-sizing: border-box;
 }
 
-.kid-score-settings .setting-item-control,
-.kid-score-settings-items,
-.kid-score-cat-list {
+.little-milestones-settings .setting-item-control,
+.little-milestones-settings-items,
+.little-milestones-cat-list {
   overflow-x: clip;
 }
 
-.kid-score-settings h3 {
+.little-milestones-settings h3 {
   margin: 20px 0 8px;
 }
 
-.kid-score-settings-section {
+.little-milestones-settings-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.kid-score-settings-section-desktop {
+.little-milestones-settings-section-desktop {
   margin-bottom: 18px;
 }
 
-.kid-score-settings-section-body {
+.little-milestones-settings-section-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.kid-score-category-section .kid-score-cat-list,
-.kid-score-import-export-section .setting-item {
+.little-milestones-category-section .little-milestones-cat-list,
+.little-milestones-import-export-section .setting-item {
   width: 100%;
 }
 
-.kid-score-item-management-section .kid-score-settings-items,
-.kid-score-item-management-section .kid-score-settings-actions {
+.little-milestones-item-management-section .little-milestones-settings-items,
+.little-milestones-item-management-section .little-milestones-settings-actions {
   width: 100%;
 }
 
-.kid-score-settings-actions {
+.little-milestones-settings-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.kid-score-settings-actions .setting-item {
+.little-milestones-settings-actions .setting-item {
   width: 100%;
 }
 
-.kid-score-settings-actions-desktop .setting-item {
+.little-milestones-settings-actions-desktop .setting-item {
   padding: 10px 0;
 }
 
@@ -95,7 +95,7 @@
 }
 .settings-emoji-btn:hover { background: var(--background-modifier-hover); }
 
-.kid-score-emoji-picker {
+.little-milestones-emoji-picker {
   position: absolute;
   top: 40px;
   left: 0;
@@ -246,7 +246,7 @@
 
 /* ─── User Switcher ─────────────────────────────────────────────────────────── */
 
-.kid-score-user-switcher {
+.little-milestones-user-switcher {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -254,7 +254,7 @@
   flex-shrink: 0;
 }
 
-.vertical-tab-content .kid-score-settings-users .kid-score-user-btn {
+.vertical-tab-content .little-milestones-settings-users .little-milestones-user-btn {
   display: inline-flex;
   align-items: center;
   height: auto;
@@ -272,16 +272,16 @@
   line-height: 1.5;
   box-sizing: border-box;
 }
-.kid-score-user-btn:hover {
+.little-milestones-user-btn:hover {
   background: var(--background-modifier-hover);
 }
-.kid-score-user-btn.is-active {
+.little-milestones-user-btn.is-active {
   background: var(--interactive-accent);
   color: white;
 }
 
 /* Settings page user list */
-.kid-score-settings-users {
+.little-milestones-settings-users {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -291,7 +291,7 @@
   border-radius: 8px;
 }
 
-.kid-score-user-add-btn {
+.little-milestones-user-add-btn {
   padding: 6px 14px;
   border-radius: 20px;
   border: 1.5px dashed var(--interactive-accent);
@@ -302,19 +302,19 @@
   opacity: 0.7;
   transition: opacity 0.15s;
 }
-.kid-score-user-add-btn:hover {
+.little-milestones-user-add-btn:hover {
   opacity: 1;
 }
 
 /* ─── Goals settings ─────────────────────────────────────────────────────────── */
 
-.kid-score-goals-section {
+.little-milestones-goals-section {
   padding: 12px;
   background: var(--background-secondary);
   border-radius: 10px;
 }
 
-.kid-score-goals-grid {
+.little-milestones-goals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
   gap: 10px;
@@ -322,19 +322,19 @@
   min-width: 0;
 }
 
-.kid-score-goal-cell {
+.little-milestones-goal-cell {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
 }
 
-.kid-score-goal-cell label {
+.little-milestones-goal-cell label {
   font-size: 0.8em;
   color: var(--text-muted);
 }
 
-.kid-score-goal-input {
+.little-milestones-goal-input {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
@@ -349,14 +349,14 @@
 
 /* ─── Category Management (Settings) ──────────────────────────────────────── */
 
-.kid-score-cat-list {
+.little-milestones-cat-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 10px;
 }
 
-.kid-score-cat-row {
+.little-milestones-cat-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -366,13 +366,13 @@
   border: 1px solid var(--background-modifier-border);
 }
 
-.kid-score-cat-row .settings-name-input {
+.little-milestones-cat-row .settings-name-input {
   flex: 1;
 }
 
 /* ─── Category Divider ─────────────────────────────────────────────────────── */
 
-.kid-score-divider {
+.little-milestones-divider {
   border: none;
   border-top: 1px solid var(--background-modifier-border);
   margin: 16px 0 4px;
@@ -535,14 +535,14 @@
 
 /* ─── 打分规则区块 ───────────────────────────────────────────────────────────── */
 
-.kid-score-rules-section {
+.little-milestones-rules-section {
   border: 1px solid var(--background-modifier-border);
   border-radius: 10px;
   margin-bottom: 12px;
   overflow: hidden;
 }
 
-.kid-score-rules-header {
+.little-milestones-rules-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -552,25 +552,25 @@
   user-select: none;
   transition: background 0.15s;
 }
-.kid-score-rules-header:hover {
+.little-milestones-rules-header:hover {
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-toggle {
+.little-milestones-rules-toggle {
   font-size: 0.7em;
   color: var(--text-muted);
   width: 12px;
   flex-shrink: 0;
 }
 
-.kid-score-rules-title {
+.little-milestones-rules-title {
   flex: 0 1 auto;
   font-size: 0.9em;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.kid-score-rules-desc {
+.little-milestones-rules-desc {
   font-size: 0.78em;
   color: var(--text-muted);
   margin-left: auto;
@@ -580,22 +580,22 @@
   flex-shrink: 1;
 }
 
-.kid-score-section-header {
+.little-milestones-section-header {
   display: flex;
   align-items: baseline;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 6px;
 }
-.kid-score-section-header h3 {
+.little-milestones-section-header h3 {
   margin: 0;
 }
-.kid-score-section-header .kid-score-section-desc {
+.little-milestones-section-header .little-milestones-section-desc {
   font-size: 0.78em;
   color: var(--text-muted);
 }
 
-.kid-score-rules-edit-btn {
+.little-milestones-rules-edit-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -606,40 +606,40 @@
   transition: opacity 0.15s, background 0.15s;
   flex-shrink: 0;
 }
-.kid-score-rules-edit-btn:hover {
+.little-milestones-rules-edit-btn:hover {
   opacity: 1;
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-body {
+.little-milestones-rules-body {
   padding: 12px 14px;
   border-top: 1px solid var(--background-modifier-border);
 }
-.kid-score-rules-body.is-hidden {
+.little-milestones-rules-body.is-hidden {
   display: none;
 }
 
-.kid-score-rules-view {
+.little-milestones-rules-view {
   font-size: 0.88em;
   line-height: 1.6;
   color: var(--text-normal);
 }
-.kid-score-rules-view.is-hidden {
+.little-milestones-rules-view.is-hidden {
   display: none;
 }
-.kid-score-rules-view p,
-.kid-score-rules-view ul,
-.kid-score-rules-view ol {
+.little-milestones-rules-view p,
+.little-milestones-rules-view ul,
+.little-milestones-rules-view ol {
   margin: 4px 0;
 }
-.kid-score-rules-view h1,
-.kid-score-rules-view h2,
-.kid-score-rules-view h3 {
+.little-milestones-rules-view h1,
+.little-milestones-rules-view h2,
+.little-milestones-rules-view h3 {
   font-size: 0.95em;
   margin: 8px 0 4px;
 }
 
-.kid-score-rules-empty {
+.little-milestones-rules-empty {
   color: var(--text-muted);
   font-size: 0.88em;
   text-align: center;
@@ -647,11 +647,11 @@
   padding: 4px 0;
 }
 
-.kid-score-rules-edit.is-hidden {
+.little-milestones-rules-edit.is-hidden {
   display: none;
 }
 
-.kid-score-rules-textarea {
+.little-milestones-rules-textarea {
   width: 100%;
   min-height: 120px;
   border: 1px solid var(--background-modifier-border);
@@ -665,24 +665,24 @@
   box-sizing: border-box;
   font-family: var(--font-text);
 }
-.kid-score-rules-textarea:focus {
+.little-milestones-rules-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
-.kid-score-rules-actions {
+.little-milestones-rules-actions {
   display: flex;
   gap: 8px;
   margin-top: 8px;
   justify-content: flex-end;
 }
 
-.kid-score-rules-save-btn {
+.little-milestones-rules-save-btn {
   font-size: 0.88em;
   padding: 6px 14px;
 }
 
-.kid-score-rules-cancel-btn {
+.little-milestones-rules-cancel-btn {
   background: none;
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
@@ -692,13 +692,13 @@
   color: var(--text-muted);
   transition: background 0.15s;
 }
-.kid-score-rules-cancel-btn:hover {
+.little-milestones-rules-cancel-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 /* ─── Config Import / Export ────────────────────────────────────────────────── */
 
-.kid-score-import-popup {
+.little-milestones-import-popup {
   width: min(480px, 94vw);
   max-height: 80vh;
   overflow-y: auto;
@@ -706,13 +706,13 @@
 }
 
 /* Tab bar */
-.kid-score-import-tabs {
+.little-milestones-import-tabs {
   display: flex;
   gap: 0;
   border-bottom: 1.5px solid var(--background-modifier-border);
   margin-bottom: 12px;
 }
-.kid-score-import-tab {
+.little-milestones-import-tab {
   flex: 1;
   padding: 8px 6px;
   background: none;
@@ -724,17 +724,17 @@
   margin-bottom: -1.5px;
   transition: color 0.15s, border-color 0.15s;
 }
-.kid-score-import-tab.is-active {
+.little-milestones-import-tab.is-active {
   color: var(--interactive-accent);
   border-bottom-color: var(--interactive-accent);
   font-weight: 600;
 }
 
 /* Panel visibility */
-.kid-score-import-panel.is-hidden { display: none; }
+.little-milestones-import-panel.is-hidden { display: none; }
 
 /* File list */
-.kid-score-import-file-list {
+.little-milestones-import-file-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -744,7 +744,7 @@
   border-radius: 8px;
   padding: 4px 8px;
 }
-.kid-score-import-file-row {
+.little-milestones-import-file-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -753,9 +753,9 @@
   cursor: pointer;
   transition: background 0.12s;
 }
-.kid-score-import-file-row:hover { background: var(--background-modifier-hover); }
-.kid-score-import-file-row input[type="radio"] { accent-color: var(--interactive-accent); flex-shrink: 0; }
-.kid-score-import-file-meta {
+.little-milestones-import-file-row:hover { background: var(--background-modifier-hover); }
+.little-milestones-import-file-row input[type="radio"] { accent-color: var(--interactive-accent); flex-shrink: 0; }
+.little-milestones-import-file-meta {
   font-size: 0.72em;
   color: var(--text-faint);
   overflow: hidden;
@@ -765,7 +765,7 @@
 }
 
 /* Paste textarea */
-.kid-score-import-textarea {
+.little-milestones-import-textarea {
   width: 100%;
   height: 120px;
   font-family: var(--font-monospace);
@@ -778,25 +778,25 @@
   background: var(--background-secondary);
   color: var(--text-normal);
 }
-.kid-score-import-textarea:focus {
+.little-milestones-import-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
 /* Preview / field selector */
-.kid-score-import-preview {
+.little-milestones-import-preview {
   background: var(--background-secondary);
   border-radius: 8px;
   padding: 10px 12px;
   margin-top: 10px;
   border: 1px solid var(--background-modifier-border);
 }
-.kid-score-import-fields {
+.little-milestones-import-fields {
   font-size: 0.85em;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
-.kid-score-import-check-row {
+.little-milestones-import-check-row {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -805,7 +805,7 @@
   cursor: pointer;
   user-select: none;
 }
-.kid-score-import-check-row input[type="checkbox"] { accent-color: var(--interactive-accent); }
+.little-milestones-import-check-row input[type="checkbox"] { accent-color: var(--interactive-accent); }
 
 /* Disabled confirm button */
 .value-popup-confirm:disabled {

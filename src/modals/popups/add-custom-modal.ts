@@ -16,11 +16,11 @@ export class AddCustomModal extends BaseMobileModal {
   }
 
   onOpen(): void {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("📌 添加临时事项");
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
     c.createEl("div", { cls: "value-popup-hint", text: "可填写备注，记录本次加/扣分原因" });
 
     const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });

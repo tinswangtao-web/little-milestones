@@ -1,14 +1,14 @@
 /* ─── Custom Items ──────────────────────────────────────────────────────────── */
 
-.kid-score-custom-items {
+.little-milestones-custom-items {
   margin-bottom: 10px;
 }
 
-.kid-score-custom-wrap {
+.little-milestones-custom-wrap {
   margin-bottom: 6px;
 }
 
-.kid-score-custom-row {
+.little-milestones-custom-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -21,7 +21,7 @@
   -webkit-user-select: none;
 }
 
-.kid-score-custom-main {
+.little-milestones-custom-main {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -36,7 +36,7 @@
   font-style: italic;
 }
 
-.kid-score-custom-empty {
+.little-milestones-custom-empty {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.85em;
@@ -123,7 +123,7 @@
   border-color: var(--interactive-accent);
 }
 
-.kid-score-add-custom-btn {
+.little-milestones-add-custom-btn {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -137,7 +137,7 @@
   transition: all 0.15s;
   margin-bottom: 8px;
 }
-.kid-score-add-custom-btn:hover {
+.little-milestones-add-custom-btn:hover {
   border-color: var(--interactive-accent);
   color: var(--interactive-accent);
   background: var(--background-secondary);

@@ -104,11 +104,11 @@ export function renderCategorySettingsList({
     dragState.dragging = true;
     dragState.dragIdx = idx;
     dragState.rows = Array.from(
-      catWrap.querySelectorAll(".kid-score-cat-row")
+      catWrap.querySelectorAll(".little-milestones-cat-row")
     ) as HTMLElement[];
     const rect = row.getBoundingClientRect();
     const ghost = row.cloneNode(true) as HTMLElement;
-    ghost.className = "kid-score-cat-row settings-drag-ghost";
+    ghost.className = "little-milestones-cat-row settings-drag-ghost";
     ghost.style.cssText =
       "position:fixed;left:" +
       rect.left +
@@ -142,7 +142,7 @@ export function renderCategorySettingsList({
     const categories = plugin.currentUser.categories || [];
 
     for (let idx = 0; idx < categories.length; idx++) {
-      const row = catWrap.createDiv({ cls: "kid-score-cat-row" });
+      const row = catWrap.createDiv({ cls: "little-milestones-cat-row" });
       const handle = row.createEl("span", {
         cls: "settings-drag-handle",
         text: "☰",

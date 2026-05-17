@@ -32,7 +32,7 @@
 
 ## Verification
 - [x] Desktop scoring modal scroll: tabs have no desktop sticky/fixed rule in this task's CSS/code path.
-- [x] Mobile scoring modal scroll: removed sticky positioning from `.kid-score-main-tabs` / `.kid-score-main-tabs-mobile`.
+- [x] Mobile scoring modal scroll: removed sticky positioning from `.little-milestones-main-tabs` / `.little-milestones-main-tabs-mobile`.
 - [x] Mobile horizontal swipe switches `打分` / `日记` through the existing tab button handlers.
 - [x] Switching tabs by swipe preserves entered score and diary state by reusing the current in-memory modal state and existing `syncDiaryContent()` tab-switch path.
 - [x] Horizontal activity inside inputs/textareas/selects/contenteditable starts ignored by the swipe handler.

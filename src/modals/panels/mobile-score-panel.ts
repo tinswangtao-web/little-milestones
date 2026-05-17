@@ -2,25 +2,25 @@ import type { ScorePanelLayoutRefs } from "./score-panel-layout";
 
 export function renderMobileScorePanelLayout(scorePanel: HTMLElement): ScorePanelLayoutRefs {
   const itemsContainer = scorePanel.createDiv({
-    cls: "kid-score-items kid-score-items-mobile",
+    cls: "little-milestones-items little-milestones-items-mobile",
   });
   const metaBar = itemsContainer.createDiv({
-    cls: "kid-score-meta-bar kid-score-meta-bar-mobile",
+    cls: "little-milestones-meta-bar little-milestones-meta-bar-mobile",
   });
   const totalDisplay = metaBar.createDiv({
-    cls: "kid-score-total-display kid-score-total-display-mobile",
+    cls: "little-milestones-total-display little-milestones-total-display-mobile",
   });
   const hint = metaBar.createDiv({
-    cls: "kid-score-hint kid-score-hint-mobile",
+    cls: "little-milestones-hint little-milestones-hint-mobile",
   });
   const sections = itemsContainer.createDiv({
-    cls: "kid-score-sections kid-score-sections-mobile",
+    cls: "little-milestones-sections little-milestones-sections-mobile",
   });
   const customSection = sections.createDiv({
-    cls: "kid-score-custom-section kid-score-custom-section-mobile",
+    cls: "little-milestones-custom-section little-milestones-custom-section-mobile",
   });
   const customItemsContainer = customSection.createDiv({
-    cls: "kid-score-custom-items",
+    cls: "little-milestones-custom-items",
   });
   return {
     itemsContainer,

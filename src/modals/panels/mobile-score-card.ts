@@ -2,10 +2,10 @@ import type { ScoreCardLayoutRefs } from "./score-card-layout";
 
 export function renderMobileScoreCardLayout(grid: HTMLElement, cardClassName: string): ScoreCardLayoutRefs {
   const card = grid.createDiv({
-    cls: `kid-score-card kid-score-card-mobile ${cardClassName}`.trim(),
+    cls: `little-milestones-card little-milestones-card-mobile ${cardClassName}`.trim(),
   });
   const content = card.createDiv({
-    cls: "kid-score-card-content kid-score-card-content-mobile",
+    cls: "little-milestones-card-content little-milestones-card-content-mobile",
   });
   const emoji = content.createDiv({
     cls: "card-emoji card-emoji-mobile",

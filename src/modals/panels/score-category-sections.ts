@@ -27,18 +27,18 @@ export function renderScoreCategorySections({
     const items = plugin.currentUser.items.filter((item) => item.category === category);
     if (items.length === 0) continue;
     if (catRendered) {
-      container.createEl("hr", { cls: "kid-score-divider" });
+      container.createEl("hr", { cls: "little-milestones-divider" });
     }
     const layout = isTouchLayout
       ? renderMobileScoreCategoryLayout(container, true)
       : renderDesktopScoreCategoryLayout(container, true);
     layout.titleHost.createEl("h3", {
       text: category,
-      cls: "kid-score-section-title",
+      cls: "little-milestones-section-title",
     });
     const addItemBtn = (layout.addButtonHost || layout.titleHost).createEl("button", {
       text: "+",
-      cls: "kid-score-add-item-btn",
+      cls: "little-milestones-add-item-btn",
     });
     addItemBtn.onclick = () => onAddItem(category);
     for (const item of items) {
@@ -52,12 +52,12 @@ export function renderScoreCategorySections({
   );
   if (uncategorized.length > 0) {
     if (catRendered) {
-      container.createEl("hr", { cls: "kid-score-divider" });
+      container.createEl("hr", { cls: "little-milestones-divider" });
     }
     const layout = isTouchLayout
       ? renderMobileScoreCategoryLayout(container, false)
       : renderDesktopScoreCategoryLayout(container, false);
-    layout.titleHost.createEl("h3", { text: "其他", cls: "kid-score-section-title" });
+    layout.titleHost.createEl("h3", { text: "其他", cls: "little-milestones-section-title" });
     for (const item of uncategorized) {
       renderScoreCard(item, layout.grid, yesterdayData);
     }

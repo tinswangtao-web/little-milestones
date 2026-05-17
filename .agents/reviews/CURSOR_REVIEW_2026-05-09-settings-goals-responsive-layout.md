@@ -40,9 +40,9 @@ No blocking issues.
 
 ## 6) 核对结果
 
-- 设置页 `每日目标`：`.kid-score-goals-grid` 已改为 `auto-fit` 自适应列，目标输入框和 cell 都有 `min-width: 0` / `width: 100%`，窄宽度下不应继续横向撑破容器。
-- 移动端设置页：仍保留 `.kid-score-goals-grid { grid-template-columns: 1fr; }` 的移动端覆盖。
-- 移动端打分页：只给 `.kid-score-custom-section-mobile` 增加轻量 `margin-bottom`，并清掉移动端按钮自身底部 margin，未改临时加减分逻辑或桌面按钮布局。
+- 设置页 `每日目标`：`.little-milestones-goals-grid` 已改为 `auto-fit` 自适应列，目标输入框和 cell 都有 `min-width: 0` / `width: 100%`，窄宽度下不应继续横向撑破容器。
+- 移动端设置页：仍保留 `.little-milestones-goals-grid { grid-template-columns: 1fr; }` 的移动端覆盖。
+- 移动端打分页：只给 `.little-milestones-custom-section-mobile` 增加轻量 `margin-bottom`，并清掉移动端按钮自身底部 margin，未改临时加减分逻辑或桌面按钮布局。
 - 插件名称：`manifest.json` `name` 为 `🌱 Little Milestones`，`id` 仍为 `little-milestones`，`version` 仍为 `2.0.0`。
 - 侧边栏图标：`src/main.ts` 和 `main.js` 都使用 `addRibbonIcon("sprout", ...)`，不再使用 `star`；点击回调仍打开打分页。
 
@@ -121,9 +121,9 @@ No blocking issues.
 
 ### 核对结果
 
-- `styles/07-mobile.css` 只在移动端修改 `.kid-score-cat-header-mobile` 和 `.kid-score-cat-action-host-mobile`。
-- `.kid-score-cat-header-mobile` 增加 `margin-bottom: 10px`，让分类标题行/右侧 `+` 按钮与下方卡片网格拉开。
-- `.kid-score-cat-action-host-mobile` 增加 `padding-bottom: 2px`，给右侧 `+` 按钮容器轻量缓冲。
+- `styles/07-mobile.css` 只在移动端修改 `.little-milestones-cat-header-mobile` 和 `.little-milestones-cat-action-host-mobile`。
+- `.little-milestones-cat-header-mobile` 增加 `margin-bottom: 10px`，让分类标题行/右侧 `+` 按钮与下方卡片网格拉开。
+- `.little-milestones-cat-action-host-mobile` 增加 `padding-bottom: 2px`，给右侧 `+` 按钮容器轻量缓冲。
 - 没有改新增打分项点击逻辑；没有改桌面分类 header 规则；之前临时加减分按钮间距修复仍保留。
 - `styles.css` 已包含对应规则。
 

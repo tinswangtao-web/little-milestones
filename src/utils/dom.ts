@@ -81,7 +81,7 @@ export function bindModalInputFocus(
 
   const setIOSKeyboardFocusState = (on: boolean) => {
     if (!platformIsIOS) return;
-    const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
+    const modal = input.closest(".little-milestones-edit-modal, .little-milestones-import-modal");
     const scroller = input.closest(".modal-content") as HTMLElement | null;
     if (!modal || !scroller) return;
     modal.classList.toggle("has-ios-keyboard-focus", on);
@@ -143,8 +143,8 @@ export function bindModalInputFocus(
       if (
         active &&
         active.closest &&
-        active.closest(".kid-score-edit-modal, .kid-score-import-modal") ===
-          input.closest(".kid-score-edit-modal, .kid-score-import-modal")
+        active.closest(".little-milestones-edit-modal, .little-milestones-import-modal") ===
+          input.closest(".little-milestones-edit-modal, .little-milestones-import-modal")
       ) {
         return;
       }

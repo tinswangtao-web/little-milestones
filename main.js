@@ -1361,9 +1361,9 @@ function setupModalKeyboard(modal) {
   };
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
-  const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  const isEditModal = mEl.classList.contains("little-milestones-edit-modal");
   const isDailyModal = modal.modalType === "daily";
-  const requiresFullKeyboardHeight = !!mEl.querySelector(".kid-score-custom-form");
+  const requiresFullKeyboardHeight = !!mEl.querySelector(".little-milestones-custom-form");
   let stableViewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
   let isManualAdjusting = false;
   let layoutTimer = null;
@@ -1390,7 +1390,7 @@ function setupModalKeyboard(modal) {
     const currentTop = targetRect.top - contentRect.top + contentEl.scrollTop;
     let currentBottom = currentTop + targetRect.height;
     if (isDailyModal && target.classList.contains("diary-textarea")) {
-      const actions = contentEl.querySelector(".kid-score-actions");
+      const actions = contentEl.querySelector(".little-milestones-actions");
       if (actions) {
         const actionsRect = actions.getBoundingClientRect();
         const actionsBottom = actionsRect.bottom - contentRect.top + contentEl.scrollTop;
@@ -1555,8 +1555,8 @@ function setupModalKeyboard(modal) {
   };
   window.addEventListener("resize", onWinResize);
   mEl.addEventListener("focusin", onFocusIn);
-  mEl.addEventListener("kid-score:manual-drag-start", onManualDragStart);
-  mEl.addEventListener("kid-score:manual-drag-end", onManualDragEnd);
+  mEl.addEventListener("little-milestones:manual-drag-start", onManualDragStart);
+  mEl.addEventListener("little-milestones:manual-drag-end", onManualDragEnd);
   flushLayout();
   return () => {
     if (layoutTimer !== null) {
@@ -1573,8 +1573,8 @@ function setupModalKeyboard(modal) {
     }
     window.removeEventListener("resize", onWinResize);
     mEl.removeEventListener("focusin", onFocusIn);
-    mEl.removeEventListener("kid-score:manual-drag-start", onManualDragStart);
-    mEl.removeEventListener("kid-score:manual-drag-end", onManualDragEnd);
+    mEl.removeEventListener("little-milestones:manual-drag-start", onManualDragStart);
+    mEl.removeEventListener("little-milestones:manual-drag-end", onManualDragEnd);
     cEl.style.position = previousContainerStyles.position;
     cEl.style.top = previousContainerStyles.top;
     cEl.style.left = previousContainerStyles.left;
@@ -1671,7 +1671,7 @@ function attachModalDragGesture(modal) {
     updateBounds();
     dragging = true;
     modalEl.classList.add("is-dragging-position");
-    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-start"));
+    modalEl.dispatchEvent(new CustomEvent("little-milestones:manual-drag-start"));
   };
   const onTouchMove = (e) => {
     if (!dragging || !e.touches || e.touches.length !== 1) return;
@@ -1684,7 +1684,7 @@ function attachModalDragGesture(modal) {
     if (!dragging) return;
     dragging = false;
     modalEl.classList.remove("is-dragging-position");
-    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-end"));
+    modalEl.dispatchEvent(new CustomEvent("little-milestones:manual-drag-end"));
   };
   modalEl.addEventListener("touchstart", onTouchStart, { passive: false });
   modalEl.addEventListener("touchmove", onTouchMove, { passive: false });
@@ -1720,7 +1720,7 @@ var BaseMobileModal = class extends import_obsidian.Modal {
       "is-mobile-android",
       this.mobilePlatform === "android"
     );
-    this.titleEl.addClass("kid-score-modal-title");
+    this.titleEl.addClass("little-milestones-modal-title");
     if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
       this._kbCleanup = setupModalKeyboard2(this);
     }
@@ -1946,7 +1946,7 @@ function renderStatsPanel(statsBody, plugin, allScores, period) {
   statsBody.empty();
   const filtered = filterScores(period, allScores);
   if (!filtered.length) {
-    statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "kid-score-empty" });
+    statsBody.createEl("p", { text: "\u6682\u65E0\u6570\u636E \u{1F4ED}", cls: "little-milestones-empty" });
     return;
   }
   const total = filtered.reduce((sum, record) => sum + record.total, 0);
@@ -1956,7 +1956,7 @@ function renderStatsPanel(statsBody, plugin, allScores, period) {
   const positiveDays = filtered.filter((record) => record.total > 0).length;
   const negativeDays = filtered.filter((record) => record.total < 0).length;
   const currentUser = plugin.currentUser;
-  const cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
+  const cards = statsBody.createDiv({ cls: "little-milestones-summary-cards" });
   renderSummaryCard(cards, "\u7D2F\u8BA1\u603B\u5206", (total >= 0 ? "+" : "") + total, true);
   renderSummaryCard(cards, "\u65E5\u5747\u5206", (avg >= 0 ? "+" : "") + avg);
   renderSummaryCard(cards, "\u6700\u9AD8\u5355\u65E5", "+" + max);
@@ -1972,8 +1972,8 @@ function renderStatsPanel(statsBody, plugin, allScores, period) {
     renderItemCompletion(statsBody, currentUser.items, filtered, doneCounts);
   }
   statsBody.createEl("h3", { text: "\u6BCF\u65E5\u5F97\u5206\u8D8B\u52BF", cls: "stats-section-title" });
-  const chartWrap = statsBody.createDiv({ cls: "kid-score-chart-wrap" });
-  const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
+  const chartWrap = statsBody.createDiv({ cls: "little-milestones-chart-wrap" });
+  const canvas = chartWrap.createEl("canvas", { cls: "little-milestones-chart" });
   canvas.width = 540;
   canvas.height = 200;
   requestAnimationFrame(() => {
@@ -2038,7 +2038,7 @@ function renderCategoryCompletion(statsBody, items, categories, filtered, doneCo
     categoryStats[category].completed += doneCounts.get(item.id) || 0;
   }
   statsBody.createEl("h3", { text: "\u5206\u7C7B\u5B8C\u6210\u7387", cls: "stats-section-title" });
-  const list = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const list = statsBody.createDiv({ cls: "little-milestones-item-completion" });
   Object.entries(categoryStats).forEach(([category, stats]) => {
     const rate = Math.round(stats.completed / (stats.total * filtered.length) * 100);
     const row = list.createDiv({ cls: "completion-row" });
@@ -2052,7 +2052,7 @@ function renderCategoryCompletion(statsBody, items, categories, filtered, doneCo
 }
 function renderItemCompletion(statsBody, items, filtered, doneCounts) {
   statsBody.createEl("h3", { text: "\u5404\u9879\u76EE\u5B8C\u6210\u7387", cls: "stats-section-title" });
-  const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const itemList = statsBody.createDiv({ cls: "little-milestones-item-completion" });
   const sortedFiltered = filtered.slice().sort((a, b) => a.date.localeCompare(b.date));
   for (const item of items) {
     const itemHistory = sortedFiltered.map((day) => day.scores[item.id] || 0);
@@ -2099,8 +2099,8 @@ function renderMonthlySummary(statsBody, filtered) {
     if (!byMonth[month]) byMonth[month] = [];
     byMonth[month].push(day.total);
   }
-  const wrap = statsBody.createDiv({ cls: "kid-score-month-table-wrap" });
-  const table = wrap.createEl("table", { cls: "kid-score-month-table" });
+  const wrap = statsBody.createDiv({ cls: "little-milestones-month-table-wrap" });
+  const table = wrap.createEl("table", { cls: "little-milestones-month-table" });
   const th = table.createEl("thead").createEl("tr");
   ["\u6708\u4EFD", "\u5929\u6570", "\u603B\u5206", "\u65E5\u5747"].forEach((header) => {
     th.createEl("th", { text: header });
@@ -2212,12 +2212,12 @@ var StatsModal = class extends BaseMobileModal {
     super.onOpen();
     const contentEl = this.contentEl;
     contentEl.empty();
-    contentEl.addClass("kid-score-modal", "kid-score-stats-modal");
+    contentEl.addClass("little-milestones-modal", "little-milestones-stats-modal");
     contentEl.createEl("h2", { text: "\u{1F4CA} " + this.plugin.currentUser.name + " \u7684\u6253\u5206\u7EDF\u8BA1" });
     if (this.options.onBack) {
-      const backBar = contentEl.createDiv({ cls: "kid-score-stats-actions" });
+      const backBar = contentEl.createDiv({ cls: "little-milestones-stats-actions" });
       const backBtn = backBar.createEl("button", {
-        cls: "diary-tool-btn kid-score-stats-back-btn",
+        cls: "diary-tool-btn little-milestones-stats-back-btn",
         text: this.options.backLabel || "\u2190 \u8FD4\u56DE\u4E0A\u4E00\u9875"
       });
       backBtn.onclick = () => {
@@ -2228,7 +2228,7 @@ var StatsModal = class extends BaseMobileModal {
     }
     const allScores = await this.plugin.getAllScores();
     if (allScores.length === 0) {
-      contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "kid-score-empty" });
+      contentEl.createEl("p", { text: "\u{1F4ED} \u6682\u65E0\u6570\u636E", cls: "little-milestones-empty" });
       return;
     }
     const grandTotal = allScores.reduce((s, r) => s + r.total, 0);
@@ -2236,7 +2236,7 @@ var StatsModal = class extends BaseMobileModal {
     const grandAvg = Math.round(grandTotal / grandDays);
     const gtSign = grandTotal >= 0 ? "+" : "";
     const gaSign = grandAvg >= 0 ? "+" : "";
-    const grandBanner = contentEl.createDiv({ cls: "kid-score-grand-banner" });
+    const grandBanner = contentEl.createDiv({ cls: "little-milestones-grand-banner" });
     const gl = grandBanner.createDiv({ cls: "grand-left" });
     gl.createDiv({ cls: "grand-total-value", text: gtSign + grandTotal });
     gl.createDiv({ cls: "grand-total-label", text: "\u5386\u53F2\u7D2F\u8BA1\u603B\u5206" });
@@ -2244,8 +2244,8 @@ var StatsModal = class extends BaseMobileModal {
     gr.createDiv({ text: "\u{1F4C5} \u8BB0\u5F55 " + grandDays + " \u5929", cls: "grand-stat" });
     gr.createDiv({ text: "\u{1F4C8} \u65E5\u5747 " + gaSign + grandAvg + " \u5206", cls: "grand-stat" });
     gr.createDiv({ text: "\u{1F5D3}\uFE0F \u8D77\u59CB " + allScores[0].date, cls: "grand-stat" });
-    const tabs = contentEl.createDiv({ cls: "kid-score-tabs" });
-    const statsBody = contentEl.createDiv({ cls: "kid-score-stats-body" });
+    const tabs = contentEl.createDiv({ cls: "little-milestones-tabs" });
+    const statsBody = contentEl.createDiv({ cls: "little-milestones-stats-body" });
     const periods = [
       { label: "\u672C\u5468", key: "week" },
       { label: "\u672C\u6708", key: "month" },
@@ -2259,11 +2259,11 @@ var StatsModal = class extends BaseMobileModal {
       ((period) => {
         const tab = tabs.createEl("button", {
           text: period.label,
-          cls: "kid-score-tab " + (period.key === activePeriod ? "is-active" : "")
+          cls: "little-milestones-tab " + (period.key === activePeriod ? "is-active" : "")
         });
         tab.onclick = () => {
           activePeriod = period.key;
-          tabs.querySelectorAll(".kid-score-tab").forEach((t) => {
+          tabs.querySelectorAll(".little-milestones-tab").forEach((t) => {
             t.removeClass("is-active");
           });
           tab.addClass("is-active");
@@ -2290,9 +2290,9 @@ function openCalendarPicker({
   onSelect
 }) {
   const overlay = document.createElement("div");
-  overlay.className = "kid-score-value-overlay";
+  overlay.className = "little-milestones-value-overlay";
   const popup = document.createElement("div");
-  popup.className = "kid-score-calendar-popup";
+  popup.className = "little-milestones-calendar-popup";
   let viewDate = parseDateString(currentDate);
   const overlayStateId = "calendar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
   let pushedHistoryState = false;
@@ -2673,7 +2673,7 @@ function bindModalInputFocus(input, options = {}) {
   }
   const setIOSKeyboardFocusState = (on) => {
     if (!platformIsIOS) return;
-    const modal = input.closest(".kid-score-edit-modal, .kid-score-import-modal");
+    const modal = input.closest(".little-milestones-edit-modal, .little-milestones-import-modal");
     const scroller = input.closest(".modal-content");
     if (!modal || !scroller) return;
     modal.classList.toggle("has-ios-keyboard-focus", on);
@@ -2730,7 +2730,7 @@ function bindModalInputFocus(input, options = {}) {
     if (!platformIsIOS) return;
     setTimeout(() => {
       const active = document.activeElement;
-      if (active && active.closest && active.closest(".kid-score-edit-modal, .kid-score-import-modal") === input.closest(".kid-score-edit-modal, .kid-score-import-modal")) {
+      if (active && active.closest && active.closest(".little-milestones-edit-modal, .little-milestones-import-modal") === input.closest(".little-milestones-edit-modal, .little-milestones-import-modal")) {
         return;
       }
       setIOSKeyboardFocusState(false);
@@ -3094,14 +3094,14 @@ function showEmojiPicker(callback, container) {
     activeInput.blur();
   }
   const overlay = document.createElement("div");
-  overlay.className = "kid-score-value-overlay";
+  overlay.className = "little-milestones-value-overlay";
   overlay.addClass("is-emoji-picker");
   const isMobilePicker = getMobilePlatform() !== "desktop";
   if (isMobilePicker) {
     overlay.addClass("is-mobile-emoji-picker");
   }
   const popup = document.createElement("div");
-  popup.className = "kid-score-emoji-fullpicker";
+  popup.className = "little-milestones-emoji-fullpicker";
   const overlayStateId = "emoji-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
   let pushedHistoryState = false;
   const header = document.createElement("div");
@@ -3913,11 +3913,11 @@ var AddCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u{1F4CC} \u6DFB\u52A0\u4E34\u65F6\u4E8B\u9879");
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
     c.createEl("div", { cls: "value-popup-hint", text: "\u53EF\u586B\u5199\u5907\u6CE8\uFF0C\u8BB0\u5F55\u672C\u6B21\u52A0/\u6263\u5206\u539F\u56E0" });
     const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });
     mainRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
@@ -3988,11 +3988,11 @@ var AddItemModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u2795 \u65B0\u589E\u6253\u5206\u9879 \xB7 " + this.category);
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
     const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });
     mainRow.createSpan({ cls: "custom-form-label", text: "\u540D\u79F0" });
     const emojiInput = mainRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
@@ -4080,7 +4080,7 @@ var AttachFileModal = class extends BaseMobileModal {
   onOpen() {
     super.onOpen();
     this.titleEl.setText("\u{1F4CE} \u63D2\u5165" + this.label);
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     const c = this.contentEl;
     c.createEl("div", {
       cls: "value-popup-hint",
@@ -4122,11 +4122,11 @@ var EditCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u4E34\u65F6\u4E8B\u9879");
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
     const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });
     mainRow.createSpan({ cls: "custom-form-label", text: "\u4E8B\u9879" });
     const emojiInput = mainRow.createEl("input", { type: "text", cls: "custom-form-emoji-input" });
@@ -4197,11 +4197,11 @@ var EditItemModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("\u270F\uFE0F \u7F16\u8F91\u9879\u76EE");
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
     const mainRow = document.createElement("div");
     mainRow.className = "custom-form-row custom-form-main-row";
     mainRow.appendChild(Object.assign(document.createElement("span"), { className: "custom-form-label", textContent: "\u540D\u79F0" }));
@@ -4327,7 +4327,7 @@ var QuickCustomModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
     const c = this.contentEl;
@@ -4371,7 +4371,7 @@ var ScoreItemModal = class extends BaseMobileModal {
     this.enableManualDragAdjustment = true;
   }
   onOpen() {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
     const c = this.contentEl;
@@ -4538,46 +4538,46 @@ var import_obsidian6 = require("obsidian");
 
 // src/modals/panels/desktop-modal-chrome.ts
 function renderDesktopDailyHeaderLayout(containerEl, title) {
-  const header = containerEl.createDiv({ cls: "kid-score-header kid-score-header-desktop" });
+  const header = containerEl.createDiv({ cls: "little-milestones-header little-milestones-header-desktop" });
   header.createEl("h2", { text: title });
-  const dateNav = header.createDiv({ cls: "kid-score-date-nav kid-score-date-nav-desktop" });
+  const dateNav = header.createDiv({ cls: "little-milestones-date-nav little-milestones-date-nav-desktop" });
   const userSwitcher = containerEl.createDiv({
-    cls: "kid-score-user-switcher kid-score-user-switcher-desktop"
+    cls: "little-milestones-user-switcher little-milestones-user-switcher-desktop"
   });
   return { header, dateNav, userSwitcher };
 }
 function renderDesktopBottomActionsLayout(containerEl) {
-  const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-desktop" });
+  const actions = containerEl.createDiv({ cls: "little-milestones-actions little-milestones-actions-desktop" });
   const saveBtn = actions.createEl("button", {
     text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
-    cls: "mod-cta kid-score-save-btn"
+    cls: "mod-cta little-milestones-save-btn"
   });
   const statsBtn = actions.createEl("button", {
     text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
-    cls: "kid-score-stats-btn"
+    cls: "little-milestones-stats-btn"
   });
   return { actions, saveBtn, statsBtn };
 }
 
 // src/modals/panels/mobile-modal-chrome.ts
 function renderMobileDailyHeaderLayout(containerEl, title) {
-  const header = containerEl.createDiv({ cls: "kid-score-header kid-score-header-mobile" });
+  const header = containerEl.createDiv({ cls: "little-milestones-header little-milestones-header-mobile" });
   header.createEl("h2", { text: title });
-  const dateNav = header.createDiv({ cls: "kid-score-date-nav kid-score-date-nav-mobile" });
+  const dateNav = header.createDiv({ cls: "little-milestones-date-nav little-milestones-date-nav-mobile" });
   const userSwitcher = containerEl.createDiv({
-    cls: "kid-score-user-switcher kid-score-user-switcher-mobile"
+    cls: "little-milestones-user-switcher little-milestones-user-switcher-mobile"
   });
   return { header, dateNav, userSwitcher };
 }
 function renderMobileBottomActionsLayout(containerEl) {
-  const actions = containerEl.createDiv({ cls: "kid-score-actions kid-score-actions-mobile" });
+  const actions = containerEl.createDiv({ cls: "little-milestones-actions little-milestones-actions-mobile" });
   const saveBtn = actions.createEl("button", {
     text: "\u{1F4BE} \u4FDD\u5B58\u8BB0\u5F55",
-    cls: "mod-cta kid-score-save-btn"
+    cls: "mod-cta little-milestones-save-btn"
   });
   const statsBtn = actions.createEl("button", {
     text: "\u{1F4CA} \u67E5\u770B\u7EDF\u8BA1",
-    cls: "kid-score-stats-btn"
+    cls: "little-milestones-stats-btn"
   });
   return { actions, saveBtn, statsBtn };
 }
@@ -4585,21 +4585,21 @@ function renderMobileBottomActionsLayout(containerEl) {
 // src/modals/panels/desktop-tabs.ts
 function renderDesktopMainTabsLayout(containerEl) {
   const tabs = containerEl.createDiv({
-    cls: "kid-score-main-tabs kid-score-main-tabs-desktop"
+    cls: "little-milestones-main-tabs little-milestones-main-tabs-desktop"
   });
   const scoreTab = tabs.createEl("button", {
     text: "\u2B50 \u6253\u5206",
-    cls: "kid-score-main-tab kid-score-main-tab-desktop is-active"
+    cls: "little-milestones-main-tab little-milestones-main-tab-desktop is-active"
   });
   const diaryTab = tabs.createEl("button", {
     text: "\u{1F4DD} \u65E5\u8BB0",
-    cls: "kid-score-main-tab kid-score-main-tab-desktop"
+    cls: "little-milestones-main-tab little-milestones-main-tab-desktop"
   });
   const scorePanel = containerEl.createDiv({
-    cls: "kid-score-tab-panel kid-score-tab-panel-desktop"
+    cls: "little-milestones-tab-panel little-milestones-tab-panel-desktop"
   });
   const diaryPanel = containerEl.createDiv({
-    cls: "kid-score-tab-panel kid-score-tab-panel-desktop is-hidden"
+    cls: "little-milestones-tab-panel little-milestones-tab-panel-desktop is-hidden"
   });
   return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
 }
@@ -4607,21 +4607,21 @@ function renderDesktopMainTabsLayout(containerEl) {
 // src/modals/panels/mobile-tabs.ts
 function renderMobileMainTabsLayout(containerEl) {
   const tabs = containerEl.createDiv({
-    cls: "kid-score-main-tabs kid-score-main-tabs-mobile"
+    cls: "little-milestones-main-tabs little-milestones-main-tabs-mobile"
   });
   const scoreTab = tabs.createEl("button", {
     text: "\u2B50 \u6253\u5206",
-    cls: "kid-score-main-tab kid-score-main-tab-mobile is-active"
+    cls: "little-milestones-main-tab little-milestones-main-tab-mobile is-active"
   });
   const diaryTab = tabs.createEl("button", {
     text: "\u{1F4DD} \u65E5\u8BB0",
-    cls: "kid-score-main-tab kid-score-main-tab-mobile"
+    cls: "little-milestones-main-tab little-milestones-main-tab-mobile"
   });
   const scorePanel = containerEl.createDiv({
-    cls: "kid-score-tab-panel kid-score-tab-panel-mobile"
+    cls: "little-milestones-tab-panel little-milestones-tab-panel-mobile"
   });
   const diaryPanel = containerEl.createDiv({
-    cls: "kid-score-tab-panel kid-score-tab-panel-mobile is-hidden"
+    cls: "little-milestones-tab-panel little-milestones-tab-panel-mobile is-hidden"
   });
   return { tabs, scoreTab, diaryTab, scorePanel, diaryPanel };
 }
@@ -4666,7 +4666,7 @@ function renderDailyHeader({
   if (!isToday) {
     todayBtn.onclick = onGoToday;
     containerEl.createDiv({
-      cls: "kid-score-past-banner",
+      cls: "little-milestones-past-banner",
       text: "\u{1F4C5} \u6B63\u5728\u7F16\u8F91 " + dateStr + " \u7684\u8BB0\u5F55"
     });
   }
@@ -4674,14 +4674,14 @@ function renderDailyHeader({
   const cumulativeDays = allScores.length;
   if (cumulativeDays > 0) {
     const cSign = cumulativeTotal >= 0 ? "+" : "";
-    const cumDiv = containerEl.createDiv({ cls: "kid-score-cumulative-banner" });
+    const cumDiv = containerEl.createDiv({ cls: "little-milestones-cumulative-banner" });
     cumDiv.createSpan({ cls: "cumulative-label", text: "\u{1F396}\uFE0F \u5386\u53F2\u7D2F\u8BA1" });
     cumDiv.createSpan({ cls: "cumulative-value", text: cSign + cumulativeTotal + " \u5206" });
     cumDiv.createSpan({ cls: "cumulative-days", text: "\u5171 " + cumulativeDays + " \u5929" });
   }
   plugin.settings.users.forEach((u) => {
     const uBtn = userSwitcher.createEl("button", {
-      cls: "kid-score-user-btn " + (isTouchLayout ? "kid-score-user-btn-mobile" : "kid-score-user-btn-desktop") + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
+      cls: "little-milestones-user-btn " + (isTouchLayout ? "little-milestones-user-btn-mobile" : "little-milestones-user-btn-desktop") + (u.id === plugin.settings.currentUserId ? " is-active" : ""),
       text: u.name
     });
     if (plugin.settings.users.length > 1) {
@@ -4844,36 +4844,36 @@ function attachPressGesture({
 // src/modals/panels/desktop-score-sections.ts
 function renderDesktopScoreCategoryLayout(container, withHeader) {
   const section = container.createDiv({
-    cls: "kid-score-category-section kid-score-category-section-desktop"
+    cls: "little-milestones-category-section little-milestones-category-section-desktop"
   });
   let header = null;
   let titleHost = section;
   let addButtonHost = null;
   if (withHeader) {
     header = section.createDiv({
-      cls: "kid-score-cat-header kid-score-cat-header-desktop"
+      cls: "little-milestones-cat-header little-milestones-cat-header-desktop"
     });
     titleHost = header.createDiv({
-      cls: "kid-score-cat-title-host kid-score-cat-title-host-desktop"
+      cls: "little-milestones-cat-title-host little-milestones-cat-title-host-desktop"
     });
     addButtonHost = header.createDiv({
-      cls: "kid-score-cat-action-host kid-score-cat-action-host-desktop"
+      cls: "little-milestones-cat-action-host little-milestones-cat-action-host-desktop"
     });
   }
   const grid = section.createDiv({
-    cls: "kid-score-grid kid-score-grid-desktop"
+    cls: "little-milestones-grid little-milestones-grid-desktop"
   });
   return { section, header, titleHost, addButtonHost, grid };
 }
 function renderDesktopCustomItemRowLayout(container) {
   const wrap = container.createDiv({
-    cls: "kid-score-custom-wrap kid-score-custom-wrap-desktop"
+    cls: "little-milestones-custom-wrap little-milestones-custom-wrap-desktop"
   });
   const row = wrap.createDiv({
-    cls: "kid-score-custom-row kid-score-custom-row-desktop"
+    cls: "little-milestones-custom-row little-milestones-custom-row-desktop"
   });
   const main = row.createDiv({
-    cls: "kid-score-custom-main kid-score-custom-main-desktop"
+    cls: "little-milestones-custom-main little-milestones-custom-main-desktop"
   });
   return { wrap, row, main };
 }
@@ -4881,36 +4881,36 @@ function renderDesktopCustomItemRowLayout(container) {
 // src/modals/panels/mobile-score-sections.ts
 function renderMobileScoreCategoryLayout(container, withHeader) {
   const section = container.createDiv({
-    cls: "kid-score-category-section kid-score-category-section-mobile"
+    cls: "little-milestones-category-section little-milestones-category-section-mobile"
   });
   let header = null;
   let titleHost = section;
   let addButtonHost = null;
   if (withHeader) {
     header = section.createDiv({
-      cls: "kid-score-cat-header kid-score-cat-header-mobile"
+      cls: "little-milestones-cat-header little-milestones-cat-header-mobile"
     });
     titleHost = header.createDiv({
-      cls: "kid-score-cat-title-host kid-score-cat-title-host-mobile"
+      cls: "little-milestones-cat-title-host little-milestones-cat-title-host-mobile"
     });
     addButtonHost = header.createDiv({
-      cls: "kid-score-cat-action-host kid-score-cat-action-host-mobile"
+      cls: "little-milestones-cat-action-host little-milestones-cat-action-host-mobile"
     });
   }
   const grid = section.createDiv({
-    cls: "kid-score-grid kid-score-grid-mobile"
+    cls: "little-milestones-grid little-milestones-grid-mobile"
   });
   return { section, header, titleHost, addButtonHost, grid };
 }
 function renderMobileCustomItemRowLayout(container) {
   const wrap = container.createDiv({
-    cls: "kid-score-custom-wrap kid-score-custom-wrap-mobile"
+    cls: "little-milestones-custom-wrap little-milestones-custom-wrap-mobile"
   });
   const row = wrap.createDiv({
-    cls: "kid-score-custom-row kid-score-custom-row-mobile"
+    cls: "little-milestones-custom-row little-milestones-custom-row-mobile"
   });
   const main = row.createDiv({
-    cls: "kid-score-custom-main kid-score-custom-main-mobile"
+    cls: "little-milestones-custom-main little-milestones-custom-main-mobile"
   });
   return { wrap, row, main };
 }
@@ -4918,10 +4918,10 @@ function renderMobileCustomItemRowLayout(container) {
 // src/modals/panels/desktop-score-card.ts
 function renderDesktopScoreCardLayout(grid, cardClassName) {
   const card = grid.createDiv({
-    cls: `kid-score-card kid-score-card-desktop ${cardClassName}`.trim()
+    cls: `little-milestones-card little-milestones-card-desktop ${cardClassName}`.trim()
   });
   const content = card.createDiv({
-    cls: "kid-score-card-content kid-score-card-content-desktop"
+    cls: "little-milestones-card-content little-milestones-card-content-desktop"
   });
   const emoji = content.createDiv({
     cls: "card-emoji card-emoji-desktop"
@@ -4944,10 +4944,10 @@ function renderDesktopScoreCardLayout(grid, cardClassName) {
 // src/modals/panels/mobile-score-card.ts
 function renderMobileScoreCardLayout(grid, cardClassName) {
   const card = grid.createDiv({
-    cls: `kid-score-card kid-score-card-mobile ${cardClassName}`.trim()
+    cls: `little-milestones-card little-milestones-card-mobile ${cardClassName}`.trim()
   });
   const content = card.createDiv({
-    cls: "kid-score-card-content kid-score-card-content-mobile"
+    cls: "little-milestones-card-content little-milestones-card-content-mobile"
   });
   const emoji = content.createDiv({
     cls: "card-emoji card-emoji-mobile"
@@ -4989,7 +4989,7 @@ function renderScoreCard({
   const { card, emoji, name, noteHost, points, yesterday } = layout;
   card.dataset.itemId = item.id;
   const moreBtn = card.createEl("button", {
-    cls: "kid-score-card-more-btn",
+    cls: "little-milestones-card-more-btn",
     text: "\u22EF"
   });
   moreBtn.setAttribute("aria-label", "\u8C03\u6574\u5206\u503C");
@@ -5057,7 +5057,7 @@ function renderCustomItemsList({
 }) {
   container.empty();
   if (customItems.length === 0) {
-    container.createDiv({ cls: "kid-score-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" });
+    container.createDiv({ cls: "little-milestones-custom-empty", text: "\u6682\u65E0\u4E34\u65F6\u4E8B\u9879" });
     return;
   }
   for (let i = 0; i < customItems.length; i++) {
@@ -5118,25 +5118,25 @@ var import_obsidian7 = require("obsidian");
 // src/modals/panels/desktop-rules-section.ts
 function renderDesktopRulesSectionLayout(container) {
   const section = container.createDiv({
-    cls: "kid-score-rules-section kid-score-rules-section-desktop"
+    cls: "little-milestones-rules-section little-milestones-rules-section-desktop"
   });
   const header = section.createDiv({
-    cls: "kid-score-rules-header kid-score-rules-header-desktop"
+    cls: "little-milestones-rules-header little-milestones-rules-header-desktop"
   });
   const titleHost = header.createDiv({
-    cls: "kid-score-rules-title-host kid-score-rules-title-host-desktop"
+    cls: "little-milestones-rules-title-host little-milestones-rules-title-host-desktop"
   });
   const actionHost = header.createDiv({
-    cls: "kid-score-rules-action-host kid-score-rules-action-host-desktop"
+    cls: "little-milestones-rules-action-host little-milestones-rules-action-host-desktop"
   });
   const body = section.createDiv({
-    cls: "kid-score-rules-body kid-score-rules-body-desktop"
+    cls: "little-milestones-rules-body little-milestones-rules-body-desktop"
   });
   const view = body.createDiv({
-    cls: "kid-score-rules-view kid-score-rules-view-desktop"
+    cls: "little-milestones-rules-view little-milestones-rules-view-desktop"
   });
   const edit = body.createDiv({
-    cls: "kid-score-rules-edit kid-score-rules-edit-desktop is-hidden"
+    cls: "little-milestones-rules-edit little-milestones-rules-edit-desktop is-hidden"
   });
   return { section, header, titleHost, actionHost, body, view, edit };
 }
@@ -5144,25 +5144,25 @@ function renderDesktopRulesSectionLayout(container) {
 // src/modals/panels/mobile-rules-section.ts
 function renderMobileRulesSectionLayout(container) {
   const section = container.createDiv({
-    cls: "kid-score-rules-section kid-score-rules-section-mobile"
+    cls: "little-milestones-rules-section little-milestones-rules-section-mobile"
   });
   const header = section.createDiv({
-    cls: "kid-score-rules-header kid-score-rules-header-mobile"
+    cls: "little-milestones-rules-header little-milestones-rules-header-mobile"
   });
   const titleHost = header.createDiv({
-    cls: "kid-score-rules-title-host kid-score-rules-title-host-mobile"
+    cls: "little-milestones-rules-title-host little-milestones-rules-title-host-mobile"
   });
   const actionHost = header.createDiv({
-    cls: "kid-score-rules-action-host kid-score-rules-action-host-mobile"
+    cls: "little-milestones-rules-action-host little-milestones-rules-action-host-mobile"
   });
   const body = section.createDiv({
-    cls: "kid-score-rules-body kid-score-rules-body-mobile"
+    cls: "little-milestones-rules-body little-milestones-rules-body-mobile"
   });
   const view = body.createDiv({
-    cls: "kid-score-rules-view kid-score-rules-view-mobile"
+    cls: "little-milestones-rules-view little-milestones-rules-view-mobile"
   });
   const edit = body.createDiv({
-    cls: "kid-score-rules-edit kid-score-rules-edit-mobile is-hidden"
+    cls: "little-milestones-rules-edit little-milestones-rules-edit-mobile is-hidden"
   });
   return { section, header, titleHost, actionHost, body, view, edit };
 }
@@ -5179,24 +5179,24 @@ function renderRulesSection({
   const layout = isTouchLayout ? renderMobileRulesSectionLayout(container) : renderDesktopRulesSectionLayout(container);
   const { section, header, titleHost, actionHost, body, view, edit } = layout;
   const toggle = titleHost.createEl("span", {
-    cls: "kid-score-rules-toggle",
+    cls: "little-milestones-rules-toggle",
     text: "\u25B6"
   });
-  titleHost.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  titleHost.createEl("span", { cls: "little-milestones-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
   const editBtn = actionHost.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
+    cls: "little-milestones-rules-edit-btn",
     text: "\u270F\uFE0F"
   });
-  const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+  const textarea = edit.createEl("textarea", { cls: "little-milestones-rules-textarea" });
   bindModalInputFocus(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";
-  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = edit.createDiv({ cls: "little-milestones-rules-actions" });
   const saveBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "\u4FDD\u5B58\u89C4\u5219"
   });
   const cancelBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "\u53D6\u6D88"
   });
   const renderView = () => {
@@ -5206,7 +5206,7 @@ function renderRulesSection({
       import_obsidian7.MarkdownRenderer.render(app, text, view, "", component);
     } else {
       view.createEl("p", {
-        cls: "kid-score-rules-empty",
+        cls: "little-milestones-rules-empty",
         text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
       });
     }
@@ -5274,16 +5274,16 @@ function renderScoreCategorySections({
     const items = plugin.currentUser.items.filter((item) => item.category === category);
     if (items.length === 0) continue;
     if (catRendered) {
-      container.createEl("hr", { cls: "kid-score-divider" });
+      container.createEl("hr", { cls: "little-milestones-divider" });
     }
     const layout = isTouchLayout ? renderMobileScoreCategoryLayout(container, true) : renderDesktopScoreCategoryLayout(container, true);
     layout.titleHost.createEl("h3", {
       text: category,
-      cls: "kid-score-section-title"
+      cls: "little-milestones-section-title"
     });
     const addItemBtn = (layout.addButtonHost || layout.titleHost).createEl("button", {
       text: "+",
-      cls: "kid-score-add-item-btn"
+      cls: "little-milestones-add-item-btn"
     });
     addItemBtn.onclick = () => onAddItem(category);
     for (const item of items) {
@@ -5296,10 +5296,10 @@ function renderScoreCategorySections({
   );
   if (uncategorized.length > 0) {
     if (catRendered) {
-      container.createEl("hr", { cls: "kid-score-divider" });
+      container.createEl("hr", { cls: "little-milestones-divider" });
     }
     const layout = isTouchLayout ? renderMobileScoreCategoryLayout(container, false) : renderDesktopScoreCategoryLayout(container, false);
-    layout.titleHost.createEl("h3", { text: "\u5176\u4ED6", cls: "kid-score-section-title" });
+    layout.titleHost.createEl("h3", { text: "\u5176\u4ED6", cls: "little-milestones-section-title" });
     for (const item of uncategorized) {
       renderScoreCard2(item, layout.grid, yesterdayData);
     }
@@ -5311,25 +5311,25 @@ function renderScoreCategorySections({
 // src/modals/panels/desktop-score-panel.ts
 function renderDesktopScorePanelLayout(scorePanel) {
   const itemsContainer = scorePanel.createDiv({
-    cls: "kid-score-items kid-score-items-desktop"
+    cls: "little-milestones-items little-milestones-items-desktop"
   });
   const metaBar = itemsContainer.createDiv({
-    cls: "kid-score-meta-bar kid-score-meta-bar-desktop"
+    cls: "little-milestones-meta-bar little-milestones-meta-bar-desktop"
   });
   const hint = metaBar.createDiv({
-    cls: "kid-score-hint kid-score-hint-desktop"
+    cls: "little-milestones-hint little-milestones-hint-desktop"
   });
   const totalDisplay = metaBar.createDiv({
-    cls: "kid-score-total-display kid-score-total-display-desktop"
+    cls: "little-milestones-total-display little-milestones-total-display-desktop"
   });
   const sections = itemsContainer.createDiv({
-    cls: "kid-score-sections kid-score-sections-desktop"
+    cls: "little-milestones-sections little-milestones-sections-desktop"
   });
   const customSection = sections.createDiv({
-    cls: "kid-score-custom-section kid-score-custom-section-desktop"
+    cls: "little-milestones-custom-section little-milestones-custom-section-desktop"
   });
   const customItemsContainer = customSection.createDiv({
-    cls: "kid-score-custom-items"
+    cls: "little-milestones-custom-items"
   });
   return {
     itemsContainer,
@@ -5345,25 +5345,25 @@ function renderDesktopScorePanelLayout(scorePanel) {
 // src/modals/panels/mobile-score-panel.ts
 function renderMobileScorePanelLayout(scorePanel) {
   const itemsContainer = scorePanel.createDiv({
-    cls: "kid-score-items kid-score-items-mobile"
+    cls: "little-milestones-items little-milestones-items-mobile"
   });
   const metaBar = itemsContainer.createDiv({
-    cls: "kid-score-meta-bar kid-score-meta-bar-mobile"
+    cls: "little-milestones-meta-bar little-milestones-meta-bar-mobile"
   });
   const totalDisplay = metaBar.createDiv({
-    cls: "kid-score-total-display kid-score-total-display-mobile"
+    cls: "little-milestones-total-display little-milestones-total-display-mobile"
   });
   const hint = metaBar.createDiv({
-    cls: "kid-score-hint kid-score-hint-mobile"
+    cls: "little-milestones-hint little-milestones-hint-mobile"
   });
   const sections = itemsContainer.createDiv({
-    cls: "kid-score-sections kid-score-sections-mobile"
+    cls: "little-milestones-sections little-milestones-sections-mobile"
   });
   const customSection = sections.createDiv({
-    cls: "kid-score-custom-section kid-score-custom-section-mobile"
+    cls: "little-milestones-custom-section little-milestones-custom-section-mobile"
   });
   const customItemsContainer = customSection.createDiv({
-    cls: "kid-score-custom-items"
+    cls: "little-milestones-custom-items"
   });
   return {
     itemsContainer,
@@ -5393,7 +5393,7 @@ function renderScorePanel({
 }) {
   if (plugin.currentUser.items.length === 0) {
     scorePanel.createEl("div", {
-      cls: "kid-score-empty",
+      cls: "little-milestones-empty",
       text: "\u26A0\uFE0F \u8FD8\u6CA1\u6709\u8BBE\u7F6E\u6253\u5206\u9879\u76EE\uFF0C\u8BF7\u5148\u5728\u63D2\u4EF6\u8BBE\u7F6E\u4E2D\u6DFB\u52A0\uFF01"
     });
     return null;
@@ -5409,7 +5409,7 @@ function renderScorePanel({
   if (yesterdayData) {
     const ySign = yesterdayData.total >= 0 ? "+" : "";
     scorePanel.createDiv({
-      cls: "kid-score-yesterday-banner",
+      cls: "little-milestones-yesterday-banner",
       text: "\u{1F4CA} \u6628\u5929\uFF08" + yesterdayData.date + "\uFF09\u603B\u5206\uFF1A" + ySign + yesterdayData.total + " \u5206"
     });
   }
@@ -5427,16 +5427,16 @@ function renderScorePanel({
     onAddItem
   });
   if (catRendered) {
-    layout.sections.createEl("hr", { cls: "kid-score-divider" });
+    layout.sections.createEl("hr", { cls: "little-milestones-divider" });
   }
   layout.customSection.createEl("h3", {
     text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879",
-    cls: "kid-score-section-title"
+    cls: "little-milestones-section-title"
   });
   renderCustomItems();
   const addCustomBtn = layout.customSection.createEl("button", {
     text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
-    cls: "kid-score-add-custom-btn"
+    cls: "little-milestones-add-custom-btn"
   });
   addCustomBtn.onclick = () => onAddCustom();
   return {
@@ -5504,7 +5504,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
       const contentEl = this.contentEl;
       this.clearMobileTabSwipeEvents();
       contentEl.empty();
-      contentEl.addClass("kid-score-modal", "kid-score-daily-modal");
+      contentEl.addClass("little-milestones-modal", "little-milestones-daily-modal");
       contentEl.toggleClass("is-diary-tab-active", this.activeTab === "diary");
       this.scores = {};
       this.customItems = [];
@@ -5894,7 +5894,7 @@ var _DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
     });
   }
   refreshCardByItem(item) {
-    const card = this.contentEl.querySelector('.kid-score-card[data-item-id="' + item.id + '"]');
+    const card = this.contentEl.querySelector('.little-milestones-card[data-item-id="' + item.id + '"]');
     if (!card) return;
     refreshScoreCard(card, item, this.scores[item.id] || 0);
   }
@@ -6027,15 +6027,15 @@ var import_obsidian10 = require("obsidian");
 // src/settings/desktop-settings-shells.ts
 function renderDesktopSettingsSectionShell(containerEl, sectionClassName, titleText, hintText) {
   const section = containerEl.createDiv({
-    cls: `kid-score-settings-section kid-score-settings-section-desktop ${sectionClassName}`.trim()
+    cls: `little-milestones-settings-section little-milestones-settings-section-desktop ${sectionClassName}`.trim()
   });
   const title = section.createEl("h3", { text: titleText });
   const hint = hintText ? section.createEl("p", {
-    cls: "kid-score-hint",
+    cls: "little-milestones-hint",
     text: hintText
   }) : null;
   const body = section.createDiv({
-    cls: "kid-score-settings-section-body kid-score-settings-section-body-desktop"
+    cls: "little-milestones-settings-section-body little-milestones-settings-section-body-desktop"
   });
   return { section, title, hint, body };
 }
@@ -6043,15 +6043,15 @@ function renderDesktopSettingsSectionShell(containerEl, sectionClassName, titleT
 // src/settings/mobile-settings-shells.ts
 function renderMobileSettingsSectionShell(containerEl, sectionClassName, titleText, hintText) {
   const section = containerEl.createDiv({
-    cls: `kid-score-settings-section kid-score-settings-section-mobile ${sectionClassName}`.trim()
+    cls: `little-milestones-settings-section little-milestones-settings-section-mobile ${sectionClassName}`.trim()
   });
   const title = section.createEl("h3", { text: titleText });
   const hint = hintText ? section.createEl("p", {
-    cls: "kid-score-hint",
+    cls: "little-milestones-hint",
     text: hintText
   }) : null;
   const body = section.createDiv({
-    cls: "kid-score-settings-section-body kid-score-settings-section-body-mobile"
+    cls: "little-milestones-settings-section-body little-milestones-settings-section-body-mobile"
   });
   return { section, title, hint, body };
 }
@@ -6142,11 +6142,11 @@ function renderCategorySettingsList({
     dragState.dragging = true;
     dragState.dragIdx = idx;
     dragState.rows = Array.from(
-      catWrap.querySelectorAll(".kid-score-cat-row")
+      catWrap.querySelectorAll(".little-milestones-cat-row")
     );
     const rect = row.getBoundingClientRect();
     const ghost = row.cloneNode(true);
-    ghost.className = "kid-score-cat-row settings-drag-ghost";
+    ghost.className = "little-milestones-cat-row settings-drag-ghost";
     ghost.style.cssText = "position:fixed;left:" + rect.left + "px;top:" + (clientY - 20) + "px;width:" + rect.width + "px;z-index:10000;opacity:0.85;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.2);background:var(--background-primary);border-radius:8px;";
     document.body.appendChild(ghost);
     dragState.ghost = ghost;
@@ -6167,7 +6167,7 @@ function renderCategorySettingsList({
     dragState.rows = [];
     const categories = plugin.currentUser.categories || [];
     for (let idx = 0; idx < categories.length; idx++) {
-      const row = catWrap.createDiv({ cls: "kid-score-cat-row" });
+      const row = catWrap.createDiv({ cls: "little-milestones-cat-row" });
       const handle = row.createEl("span", {
         cls: "settings-drag-handle",
         text: "\u2630"
@@ -6234,16 +6234,16 @@ function renderCategorySettings({
   const isTouchLayout = getMobilePlatform() !== "desktop";
   const shell = isTouchLayout ? renderMobileSettingsSectionShell(
     containerEl,
-    "kid-score-category-section",
+    "little-milestones-category-section",
     "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406",
     "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
-    "kid-score-category-section",
+    "little-milestones-category-section",
     "\u{1F4C1} \u5206\u7C7B\u7BA1\u7406",
     "\u53EF\u62D6\u62FD\u6392\u5E8F\uFF0C\u9879\u76EE\u4F1A\u6309\u5206\u7C7B\u5206\u7EC4\u663E\u793A"
   );
-  const catWrap = shell.body.createDiv({ cls: "kid-score-cat-list" });
+  const catWrap = shell.body.createDiv({ cls: "little-milestones-cat-list" });
   const renderCategories = () => renderCategorySettingsList({
     plugin,
     catWrap,
@@ -6307,15 +6307,15 @@ function renderDiaryModuleSettingsSection({
   containerEl,
   bindSettingsInput
 }) {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section diary-settings-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
-  const toggle = header.createEl("span", { cls: "kid-score-rules-toggle", text: "\u25BC" });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F9E9} \u65E5\u8BB0\u6A21\u5757" });
+  const section = containerEl.createDiv({ cls: "little-milestones-rules-section diary-settings-section" });
+  const header = section.createDiv({ cls: "little-milestones-rules-header" });
+  const toggle = header.createEl("span", { cls: "little-milestones-rules-toggle", text: "\u25BC" });
+  header.createEl("span", { cls: "little-milestones-rules-title", text: "\u{1F9E9} \u65E5\u8BB0\u6A21\u5757" });
   header.createSpan({
-    cls: "kid-score-rules-desc",
+    cls: "little-milestones-rules-desc",
     text: "\u5929\u6C14\u548C\u5FC3\u60C5 / \u5404\u9879\u5C0F\u8BB0\u5F55 / \u81EA\u7531\u8BB0\u5F55 / \u8BC4\u8BED"
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body diary-settings-body" });
+  const body = section.createDiv({ cls: "little-milestones-rules-body diary-settings-body" });
   let isOpen = true;
   const render = () => {
     if (ensureDiaryModules(plugin)) {
@@ -6412,7 +6412,7 @@ function renderPresetGroup({
   const top = group.createDiv({ cls: "diary-preset-group-header" });
   top.createEl("h5", { cls: "diary-preset-title", text: title });
   const resetBtn = top.createEl("button", {
-    cls: "kid-score-rules-cancel-btn diary-preset-reset-btn",
+    cls: "little-milestones-rules-cancel-btn diary-preset-reset-btn",
     text: "\u6062\u590D\u9ED8\u8BA4"
   });
   resetBtn.type = "button";
@@ -6481,7 +6481,7 @@ function renderSmallRecordsBlock({
   const list = block.createDiv({ cls: "diary-module-settings-list diary-small-records-list" });
   const smallRecords = getSmallRecordModules(plugin);
   if (smallRecords.length === 0) {
-    list.createEl("p", { cls: "kid-score-hint", text: "\u8FD8\u6CA1\u6709\u5C0F\u8BB0\u5F55\u6A21\u5757\u3002" });
+    list.createEl("p", { cls: "little-milestones-hint", text: "\u8FD8\u6CA1\u6709\u5C0F\u8BB0\u5F55\u6A21\u5757\u3002" });
   }
   const dragState = {
     dragging: false,
@@ -6641,9 +6641,9 @@ function renderSmallRecordsBlock({
     });
     bindSettingsInput(placeholderInput);
   });
-  const actions = block.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = block.createDiv({ cls: "little-milestones-rules-actions" });
   const addBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "\uFF0B \u65B0\u589E\u5C0F\u8BB0\u5F55"
   });
   addBtn.onclick = async () => {
@@ -6664,7 +6664,7 @@ function renderSmallRecordsBlock({
     render();
   };
   const resetBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "\u6062\u590D\u9ED8\u8BA4\u6A21\u5757"
   });
   resetBtn.onclick = () => {
@@ -6753,37 +6753,37 @@ function renderRulesSettingsSection({
   containerEl,
   bindSettingsInput
 }) {
-  const section = containerEl.createDiv({ cls: "kid-score-rules-section" });
-  const header = section.createDiv({ cls: "kid-score-rules-header" });
+  const section = containerEl.createDiv({ cls: "little-milestones-rules-section" });
+  const header = section.createDiv({ cls: "little-milestones-rules-header" });
   const toggle = header.createEl("span", {
-    cls: "kid-score-rules-toggle",
+    cls: "little-milestones-rules-toggle",
     text: "\u25B6"
   });
-  header.createEl("span", { cls: "kid-score-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
+  header.createEl("span", { cls: "little-milestones-rules-title", text: "\u{1F4CB} \u6253\u5206\u89C4\u5219" });
   header.createSpan({
-    cls: "kid-score-rules-desc",
+    cls: "little-milestones-rules-desc",
     text: "\u4FEE\u6539\u540E\u540C\u6B65\u5230\u6253\u5206\u9875"
   });
   const editBtn = header.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
+    cls: "little-milestones-rules-edit-btn",
     text: "\u270F\uFE0F"
   });
-  const body = section.createDiv({ cls: "kid-score-rules-body" });
-  const view = body.createDiv({ cls: "kid-score-rules-view" });
-  const edit = body.createDiv({ cls: "kid-score-rules-edit is-hidden" });
+  const body = section.createDiv({ cls: "little-milestones-rules-body" });
+  const view = body.createDiv({ cls: "little-milestones-rules-view" });
+  const edit = body.createDiv({ cls: "little-milestones-rules-edit is-hidden" });
   const textarea = edit.createEl("textarea", {
-    cls: "kid-score-rules-textarea"
+    cls: "little-milestones-rules-textarea"
   });
   textarea.placeholder = "\u4F8B\u5982\uFF1A\n- \u5B8C\u6210\u4F5C\u4E1A +2\n- \u4E3B\u52A8\u6536\u62FE\u73A9\u5177 +1\n- \u4E71\u53D1\u813E\u6C14 -2";
   bindSettingsInput(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";
-  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = edit.createDiv({ cls: "little-milestones-rules-actions" });
   const saveBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "\u4FDD\u5B58\u89C4\u5219"
   });
   const cancelBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "\u53D6\u6D88"
   });
   const renderView = () => {
@@ -6793,7 +6793,7 @@ function renderRulesSettingsSection({
       import_obsidian12.MarkdownRenderer.render(plugin.app, text, view, "", plugin);
     } else {
       view.createEl("p", {
-        cls: "kid-score-rules-empty",
+        cls: "little-milestones-rules-empty",
         text: "\u6682\u65E0\u89C4\u5219\uFF0C\u70B9\u51FB \u270F\uFE0F \u6DFB\u52A0\u6253\u5206\u89C4\u5219"
       });
     }
@@ -6851,7 +6851,7 @@ function renderContentSettingsSections({
   bindSettingsInput,
   isTouchLayout
 }) {
-  const shell = isTouchLayout ? renderMobileSettingsSectionShell(containerEl, "kid-score-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E") : renderDesktopSettingsSectionShell(containerEl, "kid-score-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E");
+  const shell = isTouchLayout ? renderMobileSettingsSectionShell(containerEl, "little-milestones-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E") : renderDesktopSettingsSectionShell(containerEl, "little-milestones-content-section", "\u{1F9F1} \u5185\u5BB9\u8BBE\u7F6E");
   renderRulesSettingsSection({
     plugin,
     containerEl: shell.body,
@@ -6874,25 +6874,25 @@ function renderGoalSettingsSection({
 }) {
   const shell = isTouchLayout ? renderMobileSettingsSectionShell(
     containerEl,
-    "kid-score-goals-section",
+    "little-milestones-goals-section",
     "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
     "\u4EE5\u6700\u7EC8\u5F97\u5206\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u3001\u51CF\u5206\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
-    "kid-score-goals-section",
+    "little-milestones-goals-section",
     "\u{1F3AF} \u6BCF\u65E5\u76EE\u6807",
     "\u4EE5\u6700\u7EC8\u5F97\u5206\u4E3A\u7EDF\u8BA1\u6807\u51C6\uFF08\u542B\u52A0\u5206\u3001\u51CF\u5206\u548C\u4E34\u65F6\u4E8B\u9879\uFF09"
   );
-  const goalsGrid = shell.body.createDiv({ cls: "kid-score-goals-grid" });
+  const goalsGrid = shell.body.createDiv({ cls: "little-milestones-goals-grid" });
   const goalFields = [
     { key: "daily", label: "\u6BCF\u65E5\u76EE\u6807" },
     { key: "weekly", label: "\u6BCF\u5468\u76EE\u6807" },
     { key: "monthly", label: "\u6BCF\u6708\u76EE\u6807" }
   ];
   for (const goalField of goalFields) {
-    const cell = goalsGrid.createDiv({ cls: "kid-score-goal-cell" });
+    const cell = goalsGrid.createDiv({ cls: "little-milestones-goal-cell" });
     cell.createEl("label", { text: goalField.label });
-    const input = cell.createEl("input", { cls: "kid-score-goal-input" });
+    const input = cell.createEl("input", { cls: "little-milestones-goal-input" });
     input.type = "number";
     input.min = "1";
     input.value = String(plugin.currentUser.goals[goalField.key] || 1);
@@ -6918,11 +6918,11 @@ function renderImportExportSettings({
   const isTouchLayout = getMobilePlatform() !== "desktop";
   const shell = isTouchLayout ? renderMobileSettingsSectionShell(
     containerEl,
-    "kid-score-import-export-section",
+    "little-milestones-import-export-section",
     "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
-    "kid-score-import-export-section",
+    "little-milestones-import-export-section",
     "\u{1F4E6} \u5BFC\u51FA / \u5BFC\u5165\u914D\u7F6E"
   );
   new import_obsidian14.Setting(shell.body).setName("\u5BFC\u51FA\u6253\u5206\u9879\u914D\u7F6E").setDesc("\u5C06\u6240\u6709\u5206\u7C7B\u548C\u6253\u5206\u9879\u5BFC\u51FA\u4E3A JSON \u6587\u4EF6").addButton((btn) => {
@@ -7197,7 +7197,7 @@ function renderItemSettingsList({
     dragState.rows = [];
     if (plugin.currentUser.items.length === 0) {
       itemsWrap.createEl("p", {
-        cls: "kid-score-hint",
+        cls: "little-milestones-hint",
         text: "\u8FD8\u6CA1\u6709\u9879\u76EE\uFF0C\u70B9\u51FB\u4E0B\u65B9\u6DFB\u52A0\uFF01"
       });
       return;
@@ -7425,16 +7425,16 @@ function renderItemSettings({
   let pendingScrollItemId = null;
   const shell = isTouchLayout ? renderMobileSettingsSectionShell(
     containerEl,
-    "kid-score-item-management-section",
+    "little-milestones-item-management-section",
     "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406",
     "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00 emoji \u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
-    "kid-score-item-management-section",
+    "little-milestones-item-management-section",
     "\u{1F4DD} \u6253\u5206\u9879\u76EE\u7BA1\u7406",
     "\u70B9\u51FB\u8868\u60C5\u6309\u94AE\u6253\u5F00 emoji \u9009\u62E9\u5668\u3002\u6309\u4F4F \u2630 \u62D6\u52A8\u6392\u5E8F\u3002"
   );
-  const itemsWrap = shell.body.createDiv({ cls: "kid-score-settings-items" });
+  const itemsWrap = shell.body.createDiv({ cls: "little-milestones-settings-items" });
   const renderItems = () => renderItemSettingsList({
     plugin,
     itemsWrap,
@@ -7446,7 +7446,7 @@ function renderItemSettings({
   });
   renderItems();
   const actionsHost = shell.body.createDiv({
-    cls: "kid-score-settings-actions " + (isTouchLayout ? "kid-score-settings-actions-mobile" : "kid-score-settings-actions-desktop")
+    cls: "little-milestones-settings-actions " + (isTouchLayout ? "little-milestones-settings-actions-mobile" : "little-milestones-settings-actions-desktop")
   });
   new import_obsidian16.Setting(actionsHost).setName("\u6DFB\u52A0\u65B0\u9879\u76EE").addButton(
     (btn) => btn.setButtonText("\uFF0B \u6DFB\u52A0\u9879\u76EE").setCta().onClick(async () => {
@@ -7487,21 +7487,21 @@ function renderUserSettingsSection({
 }) {
   const shell = isTouchLayout ? renderMobileSettingsSectionShell(
     containerEl,
-    "kid-score-settings-users-section",
+    "little-milestones-settings-users-section",
     "\u{1F465} \u7528\u6237\u7BA1\u7406",
     "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
   ) : renderDesktopSettingsSectionShell(
     containerEl,
-    "kid-score-settings-users-section",
+    "little-milestones-settings-users-section",
     "\u{1F465} \u7528\u6237\u7BA1\u7406",
     "\u70B9\u51FB\u7528\u6237\u540D\u5207\u6362\uFF0C\u957F\u6309\u7528\u6237\u540D\u53EF\u5220\u9664\u8BE5\u7528\u6237\u3002"
   );
-  const userMgrWrap = shell.body.createDiv({ cls: "kid-score-settings-users" });
+  const userMgrWrap = shell.body.createDiv({ cls: "little-milestones-settings-users" });
   const showUserDeleteConfirm = (user) => {
     const deleteModal = new class extends import_obsidian17.Modal {
       onOpen() {
         this.titleEl.setText("\u26A0\uFE0F \u5220\u9664\u7528\u6237");
-        this.modalEl.addClass("kid-score-edit-modal");
+        this.modalEl.addClass("little-milestones-edit-modal");
         this._kbCleanup = setupModalKeyboard2(this);
         const content = this.contentEl;
         content.createDiv({
@@ -7569,7 +7569,7 @@ function renderUserSettingsSection({
     userMgrWrap.empty();
     plugin.settings.users.forEach((user) => {
       const userBtn = userMgrWrap.createEl("button", {
-        cls: "kid-score-user-btn" + (user.id === plugin.settings.currentUserId ? " is-active" : ""),
+        cls: "little-milestones-user-btn" + (user.id === plugin.settings.currentUserId ? " is-active" : ""),
         text: user.name
       });
       const cleanup = attachPressGesture({
@@ -7589,7 +7589,7 @@ function renderUserSettingsSection({
       cleanupUserBtns.push(cleanup);
     });
     const addUserBtn = userMgrWrap.createEl("button", {
-      cls: "kid-score-user-add-btn",
+      cls: "little-milestones-user-add-btn",
       text: "\uFF0B \u6DFB\u52A0\u7528\u6237"
     });
     addUserBtn.onclick = async () => {
@@ -7673,7 +7673,7 @@ var KidScoreSettingTab = class extends import_obsidian18.PluginSettingTab {
     const containerEl = this.containerEl;
     const isTouchLayout = getMobilePlatform() !== "desktop";
     containerEl.empty();
-    containerEl.addClass("kid-score-settings");
+    containerEl.addClass("little-milestones-settings");
     const bindSettingsInput = (input) => {
       bindModalInputFocus(input, {
         manualTouchFocus: false,

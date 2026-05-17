@@ -21,13 +21,13 @@ export class StatsModal extends BaseMobileModal {
     super.onOpen();
     const contentEl = this.contentEl;
     contentEl.empty();
-    contentEl.addClass("kid-score-modal", "kid-score-stats-modal");
+    contentEl.addClass("little-milestones-modal", "little-milestones-stats-modal");
 
     contentEl.createEl("h2", { text: "📊 " + this.plugin.currentUser.name + " 的打分统计" });
     if (this.options.onBack) {
-      const backBar = contentEl.createDiv({ cls: "kid-score-stats-actions" });
+      const backBar = contentEl.createDiv({ cls: "little-milestones-stats-actions" });
       const backBtn = backBar.createEl("button", {
-        cls: "diary-tool-btn kid-score-stats-back-btn",
+        cls: "diary-tool-btn little-milestones-stats-back-btn",
         text: this.options.backLabel || "← 返回上一页",
       });
       backBtn.onclick = () => {
@@ -38,7 +38,7 @@ export class StatsModal extends BaseMobileModal {
     }
     const allScores = await this.plugin.getAllScores();
     if (allScores.length === 0) {
-      contentEl.createEl("p", { text: "📭 暂无数据", cls: "kid-score-empty" });
+      contentEl.createEl("p", { text: "📭 暂无数据", cls: "little-milestones-empty" });
       return;
     }
 
@@ -48,7 +48,7 @@ export class StatsModal extends BaseMobileModal {
     const gtSign = grandTotal >= 0 ? "+" : "";
     const gaSign = grandAvg >= 0 ? "+" : "";
 
-    const grandBanner = contentEl.createDiv({ cls: "kid-score-grand-banner" });
+    const grandBanner = contentEl.createDiv({ cls: "little-milestones-grand-banner" });
     const gl = grandBanner.createDiv({ cls: "grand-left" });
     gl.createDiv({ cls: "grand-total-value", text: gtSign + grandTotal });
     gl.createDiv({ cls: "grand-total-label", text: "历史累计总分" });
@@ -57,8 +57,8 @@ export class StatsModal extends BaseMobileModal {
     gr.createDiv({ text: "📈 日均 " + gaSign + grandAvg + " 分", cls: "grand-stat" });
     gr.createDiv({ text: "🗓️ 起始 " + allScores[0].date, cls: "grand-stat" });
 
-    const tabs = contentEl.createDiv({ cls: "kid-score-tabs" });
-    const statsBody = contentEl.createDiv({ cls: "kid-score-stats-body" });
+    const tabs = contentEl.createDiv({ cls: "little-milestones-tabs" });
+    const statsBody = contentEl.createDiv({ cls: "little-milestones-stats-body" });
     const periods = [
       { label: "本周", key: "week" as StatsPeriod },
       { label: "本月", key: "month" as StatsPeriod },
@@ -74,11 +74,11 @@ export class StatsModal extends BaseMobileModal {
       ((period) => {
         const tab = tabs.createEl("button", {
           text: period.label,
-          cls: "kid-score-tab " + (period.key === activePeriod ? "is-active" : ""),
+          cls: "little-milestones-tab " + (period.key === activePeriod ? "is-active" : ""),
         });
         tab.onclick = () => {
           activePeriod = period.key;
-          tabs.querySelectorAll(".kid-score-tab").forEach((t) => {
+          tabs.querySelectorAll(".little-milestones-tab").forEach((t) => {
             t.removeClass("is-active");
           });
           tab.addClass("is-active");

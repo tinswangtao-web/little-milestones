@@ -7,17 +7,17 @@ export function renderDesktopSettingsSectionShell(
   hintText?: string
 ): SettingsSectionShellRefs {
   const section = containerEl.createDiv({
-    cls: `kid-score-settings-section kid-score-settings-section-desktop ${sectionClassName}`.trim(),
+    cls: `little-milestones-settings-section little-milestones-settings-section-desktop ${sectionClassName}`.trim(),
   });
   const title = section.createEl("h3", { text: titleText });
   const hint = hintText
     ? section.createEl("p", {
-        cls: "kid-score-hint",
+        cls: "little-milestones-hint",
         text: hintText,
       })
     : null;
   const body = section.createDiv({
-    cls: "kid-score-settings-section-body kid-score-settings-section-body-desktop",
+    cls: "little-milestones-settings-section-body little-milestones-settings-section-body-desktop",
   });
   return { section, title, hint, body };
 }

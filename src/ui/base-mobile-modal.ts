@@ -28,7 +28,7 @@ export abstract class BaseMobileModal extends Modal {
       "is-mobile-android",
       this.mobilePlatform === "android"
     );
-    this.titleEl.addClass("kid-score-modal-title");
+    this.titleEl.addClass("little-milestones-modal-title");
     if (this.enableKeyboardAdjustment && this.mobilePlatform !== "desktop") {
       this._kbCleanup = setupModalKeyboard(this);
     }

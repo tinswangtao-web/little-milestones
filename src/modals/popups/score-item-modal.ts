@@ -22,7 +22,7 @@ export class ScoreItemModal extends BaseMobileModal {
   }
 
   onOpen(): void {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText(this.item.emoji + " " + this.item.name);
     const c = this.contentEl;

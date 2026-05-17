@@ -19,7 +19,7 @@ export class AttachFileModal extends BaseMobileModal {
   onOpen(): void {
     super.onOpen();
     this.titleEl.setText("📎 插入" + this.label);
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     const c = this.contentEl;
     c.createEl("div", {
       cls: "value-popup-hint",

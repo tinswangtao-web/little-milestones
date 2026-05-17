@@ -93,9 +93,9 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   };
   const platformIsIOS = isIOS();
   const platformIsAndroid = isAndroid();
-  const isEditModal = mEl.classList.contains("kid-score-edit-modal");
+  const isEditModal = mEl.classList.contains("little-milestones-edit-modal");
   const isDailyModal = (modal as { modalType?: string }).modalType === "daily";
-  const requiresFullKeyboardHeight = !!mEl.querySelector(".kid-score-custom-form");
+  const requiresFullKeyboardHeight = !!mEl.querySelector(".little-milestones-custom-form");
   let stableViewportHeight = window.visualViewport
     ? window.visualViewport.height
     : window.innerHeight;
@@ -134,7 +134,7 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     const currentTop = targetRect.top - contentRect.top + contentEl.scrollTop;
     let currentBottom = currentTop + targetRect.height;
     if (isDailyModal && target.classList.contains("diary-textarea")) {
-      const actions = contentEl.querySelector<HTMLElement>(".kid-score-actions");
+      const actions = contentEl.querySelector<HTMLElement>(".little-milestones-actions");
       if (actions) {
         const actionsRect = actions.getBoundingClientRect();
         const actionsBottom = actionsRect.bottom - contentRect.top + contentEl.scrollTop;
@@ -340,8 +340,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
   };
   window.addEventListener("resize", onWinResize);
   mEl.addEventListener("focusin", onFocusIn);
-  mEl.addEventListener("kid-score:manual-drag-start", onManualDragStart as EventListener);
-  mEl.addEventListener("kid-score:manual-drag-end", onManualDragEnd as EventListener);
+  mEl.addEventListener("little-milestones:manual-drag-start", onManualDragStart as EventListener);
+  mEl.addEventListener("little-milestones:manual-drag-end", onManualDragEnd as EventListener);
 
   // Initial layout
   flushLayout();
@@ -361,8 +361,8 @@ export function setupModalKeyboard(modal: Modal): KeyboardCleanup {
     }
     window.removeEventListener("resize", onWinResize);
     mEl.removeEventListener("focusin", onFocusIn);
-    mEl.removeEventListener("kid-score:manual-drag-start", onManualDragStart as EventListener);
-    mEl.removeEventListener("kid-score:manual-drag-end", onManualDragEnd as EventListener);
+    mEl.removeEventListener("little-milestones:manual-drag-start", onManualDragStart as EventListener);
+    mEl.removeEventListener("little-milestones:manual-drag-end", onManualDragEnd as EventListener);
     cEl.style.position = previousContainerStyles.position;
     cEl.style.top = previousContainerStyles.top;
     cEl.style.left = previousContainerStyles.left;

@@ -23,18 +23,18 @@ export function renderItemSettings({
   const shell = isTouchLayout
     ? renderMobileSettingsSectionShell(
         containerEl,
-        "kid-score-item-management-section",
+        "little-milestones-item-management-section",
         "📝 打分项目管理",
         "点击表情按钮打开 emoji 选择器。按住 ☰ 拖动排序。"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
-        "kid-score-item-management-section",
+        "little-milestones-item-management-section",
         "📝 打分项目管理",
         "点击表情按钮打开 emoji 选择器。按住 ☰ 拖动排序。"
       );
 
-  const itemsWrap = shell.body.createDiv({ cls: "kid-score-settings-items" });
+  const itemsWrap = shell.body.createDiv({ cls: "little-milestones-settings-items" });
   const renderItems = () =>
     renderItemSettingsList({
       plugin,
@@ -50,10 +50,10 @@ export function renderItemSettings({
 
   const actionsHost = shell.body.createDiv({
     cls:
-      "kid-score-settings-actions " +
+      "little-milestones-settings-actions " +
       (isTouchLayout
-        ? "kid-score-settings-actions-mobile"
-        : "kid-score-settings-actions-desktop"),
+        ? "little-milestones-settings-actions-mobile"
+        : "little-milestones-settings-actions-desktop"),
   });
 
   new Setting(actionsHost)

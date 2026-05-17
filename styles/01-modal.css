@@ -1,38 +1,38 @@
 /* ─── 打分 Modal ─────────────────────────────────────────────────────────────── */
 
-.kid-score-modal {
+.little-milestones-modal {
   padding: 8px;
   max-width: 560px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.kid-score-header h2 {
+.little-milestones-header h2 {
   margin: 0 0 4px;
   font-size: 1.3em;
 }
 
-.kid-score-header-desktop {
+.little-milestones-header-desktop {
   display: grid;
   gap: 6px;
 }
 
-.kid-score-user-switcher-desktop {
+.little-milestones-user-switcher-desktop {
   margin-top: 8px;
 }
 
-.kid-score-user-btn-desktop {
+.little-milestones-user-btn-desktop {
   padding: 8px 12px;
 }
 
-.kid-score-date {
+.little-milestones-date {
   color: var(--text-muted);
   font-size: 0.9em;
   margin: 0 0 12px;
 }
 
 /* Cumulative banner (daily modal) */
-.kid-score-cumulative-banner {
+.little-milestones-cumulative-banner {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -46,7 +46,7 @@
 .cumulative-days  { font-size: 0.78em; color: #92400e; white-space: nowrap; }
 
 /* Grand cumulative banner (stats modal) */
-.kid-score-grand-banner {
+.little-milestones-grand-banner {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -62,7 +62,7 @@
 .grand-right { display: flex; flex-direction: column; gap: 4px; }
 .grand-stat { font-size: 0.85em; opacity: 0.9; }
 
-.kid-score-yesterday-banner {
+.little-milestones-yesterday-banner {
   background: var(--background-secondary);
   border-left: 3px solid var(--color-blue, #3b82f6);
   padding: 6px 12px;
@@ -72,117 +72,117 @@
   margin-bottom: 12px;
 }
 
-.kid-score-hint {
+.little-milestones-hint {
   color: var(--text-muted);
   font-size: 0.82em;
   margin: 0 0 12px;
   text-align: center;
 }
 
-.kid-score-meta-bar {
+.little-milestones-meta-bar {
   display: grid;
   gap: 12px;
   margin: 0 0 12px;
 }
 
-.kid-score-meta-bar-desktop {
+.little-milestones-meta-bar-desktop {
   grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
   align-items: center;
 }
 
-.kid-score-meta-bar-mobile {
+.little-milestones-meta-bar-mobile {
   grid-template-columns: 1fr;
   align-items: stretch;
 }
 
-.kid-score-hint-desktop {
+.little-milestones-hint-desktop {
   margin: 0;
   text-align: left;
 }
 
-.kid-score-hint-mobile {
+.little-milestones-hint-mobile {
   margin: 0;
 }
 
-.kid-score-total-display-desktop,
-.kid-score-total-display-mobile {
+.little-milestones-total-display-desktop,
+.little-milestones-total-display-mobile {
   margin: 0;
 }
 
-.kid-score-sections {
+.little-milestones-sections {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-category-section {
+.little-milestones-category-section {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-custom-section {
+.little-milestones-custom-section {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-cat-header-desktop {
+.little-milestones-cat-header-desktop {
   justify-content: space-between;
 }
 
-.kid-score-cat-title-host,
-.kid-score-cat-action-host {
+.little-milestones-cat-title-host,
+.little-milestones-cat-action-host {
   display: flex;
   align-items: center;
 }
 
-.kid-score-cat-action-host-desktop {
+.little-milestones-cat-action-host-desktop {
   justify-content: flex-end;
 }
 
-.kid-score-main-tabs-desktop {
+.little-milestones-main-tabs-desktop {
   display: flex;
   gap: 10px;
   margin: 10px 0 14px;
 }
 
-.kid-score-main-tab-desktop {
+.little-milestones-main-tab-desktop {
   min-height: 42px;
 }
 
-.kid-score-tab-panel-desktop {
+.little-milestones-tab-panel-desktop {
   display: block;
 }
 
-.kid-score-rules-header-desktop {
+.little-milestones-rules-header-desktop {
   align-items: center;
   justify-content: space-between;
 }
 
-.kid-score-rules-title-host,
-.kid-score-rules-action-host {
+.little-milestones-rules-title-host,
+.little-milestones-rules-action-host {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kid-score-grid-desktop {
+.little-milestones-grid-desktop {
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
 }
 
-.kid-score-custom-row-desktop {
+.little-milestones-custom-row-desktop {
   align-items: center;
 }
 
-.kid-score-custom-main-desktop {
+.little-milestones-custom-main-desktop {
   align-items: center;
 }
 
-.kid-score-cat-header {
+.little-milestones-cat-header {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kid-score-section-title {
+.little-milestones-section-title {
   font-size: 0.95em;
   color: var(--text-muted);
   margin: 16px 0 8px;
@@ -191,7 +191,7 @@
   flex: 1;
 }
 
-.kid-score-add-item-btn {
+.little-milestones-add-item-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -207,13 +207,13 @@
   flex-shrink: 0;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.kid-score-add-item-btn:hover {
+.little-milestones-add-item-btn:hover {
   border-color: var(--interactive-accent);
   color: var(--interactive-accent);
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-edit-btn,
+.little-milestones-rules-edit-btn,
 .custom-edit-btn,
 .custom-delete-btn {
   display: inline-flex;
@@ -225,14 +225,14 @@
 
 /* ─── Score Cards Grid ───────────────────────────────────────────────────────── */
 
-.kid-score-grid {
+.little-milestones-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 10px;
   margin-bottom: 8px;
 }
 
-.kid-score-card {
+.little-milestones-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -254,7 +254,7 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.kid-score-card-content {
+.little-milestones-card-content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,7 +263,7 @@
   min-width: 0;
 }
 
-.kid-score-card-content-desktop {
+.little-milestones-card-content-desktop {
   gap: 2px;
 }
 
@@ -272,7 +272,7 @@
   min-width: 0;
 }
 
-.kid-score-card-more-btn {
+.little-milestones-card-more-btn {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -292,48 +292,48 @@
   z-index: 1;
 }
 
-.kid-score-card-more-btn:hover {
+.little-milestones-card-more-btn:hover {
   color: var(--text-normal);
   background: var(--background-primary);
 }
 
-.kid-score-card:hover {
+.little-milestones-card:hover {
   border-color: var(--interactive-accent);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-.kid-score-card:active {
+.little-milestones-card:active {
   -webkit-transform: scale(0.97);
   transform: scale(0.97);
   box-shadow: none;
 }
 
-.kid-score-card.is-earned {
+.little-milestones-card.is-earned {
   background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   border-color: #4ade80;
   box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
 }
 
-.kid-score-card.is-negative.is-earned {
+.little-milestones-card.is-negative.is-earned {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   border-color: #f87171;
   box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
 }
 
-.kid-score-card.is-negative {
+.little-milestones-card.is-negative {
   border-color: #fca5a5;
   background: rgba(252, 165, 165, 0.05);
 }
 
-.kid-score-card.is-deducted-active {
+.little-milestones-card.is-deducted-active {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   border-color: #f87171;
   box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
 }
 
-.kid-score-card.is-deducted-active::after {
+.little-milestones-card.is-deducted-active::after {
   content: "⭕";
   position: absolute;
   top: 4px;
@@ -410,7 +410,7 @@
 }
 /* ─── Total + Actions ────────────────────────────────────────────────────────── */
 
-.kid-score-total-display {
+.little-milestones-total-display {
   text-align: center;
   font-size: 1.2em;
   font-weight: 700;
@@ -421,29 +421,29 @@
   color: var(--interactive-accent);
 }
 
-.kid-score-actions {
+.little-milestones-actions {
   display: flex;
   gap: 10px;
   justify-content: center;
 }
 
-.kid-score-actions-desktop {
+.little-milestones-actions-desktop {
   align-items: center;
 }
 
-.kid-score-save-btn {
+.little-milestones-save-btn {
   flex: 1;
   padding: 10px;
   font-size: 1em;
   font-weight: 600;
 }
 
-.kid-score-stats-btn {
+.little-milestones-stats-btn {
   padding: 10px 18px;
   font-size: 1em;
 }
 
-.kid-score-empty {
+.little-milestones-empty {
   text-align: center;
   color: var(--text-muted);
   padding: 24px 16px;

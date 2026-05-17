@@ -18,8 +18,8 @@ export function renderContentSettingsSections({
   isTouchLayout,
 }: RenderContentSettingsSectionsOptions) {
   const shell = isTouchLayout
-    ? renderMobileSettingsSectionShell(containerEl, "kid-score-content-section", "🧱 内容设置")
-    : renderDesktopSettingsSectionShell(containerEl, "kid-score-content-section", "🧱 内容设置");
+    ? renderMobileSettingsSectionShell(containerEl, "little-milestones-content-section", "🧱 内容设置")
+    : renderDesktopSettingsSectionShell(containerEl, "little-milestones-content-section", "🧱 内容设置");
 
   renderRulesSettingsSection({
     plugin,

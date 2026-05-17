@@ -54,7 +54,7 @@ export function renderScoreCard({
   const { card, emoji, name, noteHost, points, yesterday } = layout;
   card.dataset.itemId = item.id;
   const moreBtn = card.createEl("button", {
-    cls: "kid-score-card-more-btn",
+    cls: "little-milestones-card-more-btn",
     text: "⋯",
   });
   moreBtn.setAttribute("aria-label", "调整分值");
@@ -139,7 +139,7 @@ export function renderCustomItemsList({
 }: RenderCustomItemsOptions) {
   container.empty();
   if (customItems.length === 0) {
-    container.createDiv({ cls: "kid-score-custom-empty", text: "暂无临时事项" });
+    container.createDiv({ cls: "little-milestones-custom-empty", text: "暂无临时事项" });
     return;
   }
 

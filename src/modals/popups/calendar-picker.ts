@@ -13,9 +13,9 @@ export function openCalendarPicker({
   onSelect,
 }: OpenCalendarPickerOptions) {
   const overlay = document.createElement("div");
-  overlay.className = "kid-score-value-overlay";
+  overlay.className = "little-milestones-value-overlay";
   const popup = document.createElement("div");
-  popup.className = "kid-score-calendar-popup";
+  popup.className = "little-milestones-calendar-popup";
 
   let viewDate = parseDateString(currentDate);
   const overlayStateId = "calendar-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);

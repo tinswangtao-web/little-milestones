@@ -17,7 +17,7 @@
 
 - [x] `manifest.json` 名称改为官方现有名称 `Little Milestones 🌱`，版本准备到 `2.0.1`。
 - [x] `package.json` / `package-lock.json` / `versions.json` 准备 `2.0.1` 发布元数据。
-- [x] README 手动安装路径改为 `.obsidian/plugins/kid-score`。
+- [x] README 手动安装路径改为 `.obsidian/plugins/little-milestones`。
 - [x] 移除 `builtin-modules` 依赖，改用 Node 内置 `node:module`。
 - [x] 窄修官方列出的 CSS lint warning：重复 `line-height`、`:has()`、同源重复 selector。
 - [x] 低风险代码质量项：复用 `sanitizeDoubleTapThreshold`、移除 4 处 `history.state as any`、限制日记草稿 Map、注册移动端 tab swipe DOM 事件、给 `attachPressGesture` 返回 cleanup、添加空 `onunload()`。

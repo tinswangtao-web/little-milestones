@@ -7,17 +7,17 @@ export function renderMobileSettingsSectionShell(
   hintText?: string
 ): SettingsSectionShellRefs {
   const section = containerEl.createDiv({
-    cls: `kid-score-settings-section kid-score-settings-section-mobile ${sectionClassName}`.trim(),
+    cls: `little-milestones-settings-section little-milestones-settings-section-mobile ${sectionClassName}`.trim(),
   });
   const title = section.createEl("h3", { text: titleText });
   const hint = hintText
     ? section.createEl("p", {
-        cls: "kid-score-hint",
+        cls: "little-milestones-hint",
         text: hintText,
       })
     : null;
   const body = section.createDiv({
-    cls: "kid-score-settings-section-body kid-score-settings-section-body-mobile",
+    cls: "little-milestones-settings-section-body little-milestones-settings-section-body-mobile",
   });
   return { section, title, hint, body };
 }

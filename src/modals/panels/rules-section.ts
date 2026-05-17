@@ -26,24 +26,24 @@ export function renderRulesSection({
     : renderDesktopRulesSectionLayout(container);
   const { section, header, titleHost, actionHost, body, view, edit } = layout;
   const toggle = titleHost.createEl("span", {
-    cls: "kid-score-rules-toggle",
+    cls: "little-milestones-rules-toggle",
     text: "▶",
   });
-  titleHost.createEl("span", { cls: "kid-score-rules-title", text: "📋 打分规则" });
+  titleHost.createEl("span", { cls: "little-milestones-rules-title", text: "📋 打分规则" });
   const editBtn = actionHost.createEl("button", {
-    cls: "kid-score-rules-edit-btn",
+    cls: "little-milestones-rules-edit-btn",
     text: "✏️",
   });
-  const textarea = edit.createEl("textarea", { cls: "kid-score-rules-textarea" });
+  const textarea = edit.createEl("textarea", { cls: "little-milestones-rules-textarea" });
   bindModalInputFocus(textarea);
   textarea.value = plugin.currentUser.scoringRules || "";
-  const actions = edit.createDiv({ cls: "kid-score-rules-actions" });
+  const actions = edit.createDiv({ cls: "little-milestones-rules-actions" });
   const saveBtn = actions.createEl("button", {
-    cls: "mod-cta kid-score-rules-save-btn",
+    cls: "mod-cta little-milestones-rules-save-btn",
     text: "保存规则",
   });
   const cancelBtn = actions.createEl("button", {
-    cls: "kid-score-rules-cancel-btn",
+    cls: "little-milestones-rules-cancel-btn",
     text: "取消",
   });
 
@@ -54,7 +54,7 @@ export function renderRulesSection({
       MarkdownRenderer.render(app, text, view, "", component);
     } else {
       view.createEl("p", {
-        cls: "kid-score-rules-empty",
+        cls: "little-milestones-rules-empty",
         text: "暂无规则，点击 ✏️ 添加打分规则",
       });
     }

@@ -26,7 +26,7 @@ export function renderStatsPanel(
   statsBody.empty();
   const filtered = filterScores(period, allScores);
   if (!filtered.length) {
-    statsBody.createEl("p", { text: "暂无数据 📭", cls: "kid-score-empty" });
+    statsBody.createEl("p", { text: "暂无数据 📭", cls: "little-milestones-empty" });
     return;
   }
 
@@ -38,7 +38,7 @@ export function renderStatsPanel(
   const negativeDays = filtered.filter((record) => record.total < 0).length;
   const currentUser = plugin.currentUser;
 
-  const cards = statsBody.createDiv({ cls: "kid-score-summary-cards" });
+  const cards = statsBody.createDiv({ cls: "little-milestones-summary-cards" });
   renderSummaryCard(cards, "累计总分", (total >= 0 ? "+" : "") + total, true);
   renderSummaryCard(cards, "日均分", (avg >= 0 ? "+" : "") + avg);
   renderSummaryCard(cards, "最高单日", "+" + max);
@@ -57,8 +57,8 @@ export function renderStatsPanel(
   }
 
   statsBody.createEl("h3", { text: "每日得分趋势", cls: "stats-section-title" });
-  const chartWrap = statsBody.createDiv({ cls: "kid-score-chart-wrap" });
-  const canvas = chartWrap.createEl("canvas", { cls: "kid-score-chart" });
+  const chartWrap = statsBody.createDiv({ cls: "little-milestones-chart-wrap" });
+  const canvas = chartWrap.createEl("canvas", { cls: "little-milestones-chart" });
   canvas.width = 540;
   canvas.height = 200;
   requestAnimationFrame(() => {
@@ -154,7 +154,7 @@ function renderCategoryCompletion(
   }
 
   statsBody.createEl("h3", { text: "分类完成率", cls: "stats-section-title" });
-  const list = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const list = statsBody.createDiv({ cls: "little-milestones-item-completion" });
   Object.entries(categoryStats).forEach(([category, stats]) => {
     const rate = Math.round((stats.completed / (stats.total * filtered.length)) * 100);
     const row = list.createDiv({ cls: "completion-row" });
@@ -174,7 +174,7 @@ function renderItemCompletion(
   doneCounts: Map<string, number>
 ): void {
   statsBody.createEl("h3", { text: "各项目完成率", cls: "stats-section-title" });
-  const itemList = statsBody.createDiv({ cls: "kid-score-item-completion" });
+  const itemList = statsBody.createDiv({ cls: "little-milestones-item-completion" });
   const sortedFiltered = filtered
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -228,8 +228,8 @@ function renderMonthlySummary(statsBody: HTMLElement, filtered: DayData[]): void
     byMonth[month].push(day.total);
   }
 
-  const wrap = statsBody.createDiv({ cls: "kid-score-month-table-wrap" });
-  const table = wrap.createEl("table", { cls: "kid-score-month-table" });
+  const wrap = statsBody.createDiv({ cls: "little-milestones-month-table-wrap" });
+  const table = wrap.createEl("table", { cls: "little-milestones-month-table" });
   const th = table.createEl("thead").createEl("tr");
   ["月份", "天数", "总分", "日均"].forEach((header) => {
     th.createEl("th", { text: header });

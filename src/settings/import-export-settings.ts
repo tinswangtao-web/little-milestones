@@ -20,12 +20,12 @@ export function renderImportExportSettings({
   const shell = isTouchLayout
     ? renderMobileSettingsSectionShell(
         containerEl,
-        "kid-score-import-export-section",
+        "little-milestones-import-export-section",
         "📦 导出 / 导入配置"
       )
     : renderDesktopSettingsSectionShell(
         containerEl,
-        "kid-score-import-export-section",
+        "little-milestones-import-export-section",
         "📦 导出 / 导入配置"
       );
 

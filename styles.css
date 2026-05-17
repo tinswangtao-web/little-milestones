@@ -20,20 +20,20 @@ button,
   50% { transform: scale(1.1); opacity: 0.8; }
   100% { transform: scale(1); opacity: 1; }
 }
-@keyframes kid-score-popup-in {
+@keyframes little-milestones-popup-in {
   from { -webkit-transform: scale(0.92); transform: scale(0.92); opacity: 0; }
   to { -webkit-transform: scale(1); transform: scale(1); opacity: 1; }
 }
-@-webkit-keyframes kid-score-popup-in {
+@-webkit-keyframes little-milestones-popup-in {
   from { -webkit-transform: scale(0.92); opacity: 0; }
   to { -webkit-transform: scale(1); opacity: 1; }
 }
-@keyframes kid-score-shake {
+@keyframes little-milestones-shake {
   0%, 100% { -webkit-transform: translateX(0); transform: translateX(0); }
   25% { -webkit-transform: translateX(-4px); transform: translateX(-4px); }
   75% { -webkit-transform: translateX(4px); transform: translateX(4px); }
 }
-@-webkit-keyframes kid-score-shake {
+@-webkit-keyframes little-milestones-shake {
   0%, 100% { -webkit-transform: translateX(0); }
   25% { -webkit-transform: translateX(-4px); }
   75% { -webkit-transform: translateX(4px); }
@@ -41,39 +41,39 @@ button,
 
 /* ─── 打分 Modal ─────────────────────────────────────────────────────────────── */
 
-.kid-score-modal {
+.little-milestones-modal {
   padding: 8px;
   max-width: 560px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.kid-score-header h2 {
+.little-milestones-header h2 {
   margin: 0 0 4px;
   font-size: 1.3em;
 }
 
-.kid-score-header-desktop {
+.little-milestones-header-desktop {
   display: grid;
   gap: 6px;
 }
 
-.kid-score-user-switcher-desktop {
+.little-milestones-user-switcher-desktop {
   margin-top: 8px;
 }
 
-.kid-score-user-btn-desktop {
+.little-milestones-user-btn-desktop {
   padding: 8px 12px;
 }
 
-.kid-score-date {
+.little-milestones-date {
   color: var(--text-muted);
   font-size: 0.9em;
   margin: 0 0 12px;
 }
 
 /* Cumulative banner (daily modal) */
-.kid-score-cumulative-banner {
+.little-milestones-cumulative-banner {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -87,7 +87,7 @@ button,
 .cumulative-days  { font-size: 0.78em; color: #92400e; white-space: nowrap; }
 
 /* Grand cumulative banner (stats modal) */
-.kid-score-grand-banner {
+.little-milestones-grand-banner {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -103,7 +103,7 @@ button,
 .grand-right { display: flex; flex-direction: column; gap: 4px; }
 .grand-stat { font-size: 0.85em; opacity: 0.9; }
 
-.kid-score-yesterday-banner {
+.little-milestones-yesterday-banner {
   background: var(--background-secondary);
   border-left: 3px solid var(--color-blue, #3b82f6);
   padding: 6px 12px;
@@ -113,117 +113,117 @@ button,
   margin-bottom: 12px;
 }
 
-.kid-score-hint {
+.little-milestones-hint {
   color: var(--text-muted);
   font-size: 0.82em;
   margin: 0 0 12px;
   text-align: center;
 }
 
-.kid-score-meta-bar {
+.little-milestones-meta-bar {
   display: grid;
   gap: 12px;
   margin: 0 0 12px;
 }
 
-.kid-score-meta-bar-desktop {
+.little-milestones-meta-bar-desktop {
   grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
   align-items: center;
 }
 
-.kid-score-meta-bar-mobile {
+.little-milestones-meta-bar-mobile {
   grid-template-columns: 1fr;
   align-items: stretch;
 }
 
-.kid-score-hint-desktop {
+.little-milestones-hint-desktop {
   margin: 0;
   text-align: left;
 }
 
-.kid-score-hint-mobile {
+.little-milestones-hint-mobile {
   margin: 0;
 }
 
-.kid-score-total-display-desktop,
-.kid-score-total-display-mobile {
+.little-milestones-total-display-desktop,
+.little-milestones-total-display-mobile {
   margin: 0;
 }
 
-.kid-score-sections {
+.little-milestones-sections {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-category-section {
+.little-milestones-category-section {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-custom-section {
+.little-milestones-custom-section {
   display: flex;
   flex-direction: column;
 }
 
-.kid-score-cat-header-desktop {
+.little-milestones-cat-header-desktop {
   justify-content: space-between;
 }
 
-.kid-score-cat-title-host,
-.kid-score-cat-action-host {
+.little-milestones-cat-title-host,
+.little-milestones-cat-action-host {
   display: flex;
   align-items: center;
 }
 
-.kid-score-cat-action-host-desktop {
+.little-milestones-cat-action-host-desktop {
   justify-content: flex-end;
 }
 
-.kid-score-main-tabs-desktop {
+.little-milestones-main-tabs-desktop {
   display: flex;
   gap: 10px;
   margin: 10px 0 14px;
 }
 
-.kid-score-main-tab-desktop {
+.little-milestones-main-tab-desktop {
   min-height: 42px;
 }
 
-.kid-score-tab-panel-desktop {
+.little-milestones-tab-panel-desktop {
   display: block;
 }
 
-.kid-score-rules-header-desktop {
+.little-milestones-rules-header-desktop {
   align-items: center;
   justify-content: space-between;
 }
 
-.kid-score-rules-title-host,
-.kid-score-rules-action-host {
+.little-milestones-rules-title-host,
+.little-milestones-rules-action-host {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kid-score-grid-desktop {
+.little-milestones-grid-desktop {
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
 }
 
-.kid-score-custom-row-desktop {
+.little-milestones-custom-row-desktop {
   align-items: center;
 }
 
-.kid-score-custom-main-desktop {
+.little-milestones-custom-main-desktop {
   align-items: center;
 }
 
-.kid-score-cat-header {
+.little-milestones-cat-header {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.kid-score-section-title {
+.little-milestones-section-title {
   font-size: 0.95em;
   color: var(--text-muted);
   margin: 16px 0 8px;
@@ -232,7 +232,7 @@ button,
   flex: 1;
 }
 
-.kid-score-add-item-btn {
+.little-milestones-add-item-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -248,13 +248,13 @@ button,
   flex-shrink: 0;
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
-.kid-score-add-item-btn:hover {
+.little-milestones-add-item-btn:hover {
   border-color: var(--interactive-accent);
   color: var(--interactive-accent);
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-edit-btn,
+.little-milestones-rules-edit-btn,
 .custom-edit-btn,
 .custom-delete-btn {
   display: inline-flex;
@@ -266,14 +266,14 @@ button,
 
 /* ─── Score Cards Grid ───────────────────────────────────────────────────────── */
 
-.kid-score-grid {
+.little-milestones-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 10px;
   margin-bottom: 8px;
 }
 
-.kid-score-card {
+.little-milestones-card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -295,7 +295,7 @@ button,
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-.kid-score-card-content {
+.little-milestones-card-content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -304,7 +304,7 @@ button,
   min-width: 0;
 }
 
-.kid-score-card-content-desktop {
+.little-milestones-card-content-desktop {
   gap: 2px;
 }
 
@@ -313,7 +313,7 @@ button,
   min-width: 0;
 }
 
-.kid-score-card-more-btn {
+.little-milestones-card-more-btn {
   position: absolute;
   top: 6px;
   right: 6px;
@@ -333,48 +333,48 @@ button,
   z-index: 1;
 }
 
-.kid-score-card-more-btn:hover {
+.little-milestones-card-more-btn:hover {
   color: var(--text-normal);
   background: var(--background-primary);
 }
 
-.kid-score-card:hover {
+.little-milestones-card:hover {
   border-color: var(--interactive-accent);
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-.kid-score-card:active {
+.little-milestones-card:active {
   -webkit-transform: scale(0.97);
   transform: scale(0.97);
   box-shadow: none;
 }
 
-.kid-score-card.is-earned {
+.little-milestones-card.is-earned {
   background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   border-color: #4ade80;
   box-shadow: 0 4px 12px rgba(74, 222, 128, 0.2);
 }
 
-.kid-score-card.is-negative.is-earned {
+.little-milestones-card.is-negative.is-earned {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   border-color: #f87171;
   box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
 }
 
-.kid-score-card.is-negative {
+.little-milestones-card.is-negative {
   border-color: #fca5a5;
   background: rgba(252, 165, 165, 0.05);
 }
 
-.kid-score-card.is-deducted-active {
+.little-milestones-card.is-deducted-active {
   background: linear-gradient(135deg, #fee2e2, #fecaca);
   border-color: #f87171;
   box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
 }
 
-.kid-score-card.is-deducted-active::after {
+.little-milestones-card.is-deducted-active::after {
   content: "⭕";
   position: absolute;
   top: 4px;
@@ -451,7 +451,7 @@ button,
 }
 /* ─── Total + Actions ────────────────────────────────────────────────────────── */
 
-.kid-score-total-display {
+.little-milestones-total-display {
   text-align: center;
   font-size: 1.2em;
   font-weight: 700;
@@ -462,29 +462,29 @@ button,
   color: var(--interactive-accent);
 }
 
-.kid-score-actions {
+.little-milestones-actions {
   display: flex;
   gap: 10px;
   justify-content: center;
 }
 
-.kid-score-actions-desktop {
+.little-milestones-actions-desktop {
   align-items: center;
 }
 
-.kid-score-save-btn {
+.little-milestones-save-btn {
   flex: 1;
   padding: 10px;
   font-size: 1em;
   font-weight: 600;
 }
 
-.kid-score-stats-btn {
+.little-milestones-stats-btn {
   padding: 10px 18px;
   font-size: 1em;
 }
 
-.kid-score-empty {
+.little-milestones-empty {
   text-align: center;
   color: var(--text-muted);
   padding: 24px 16px;
@@ -496,7 +496,7 @@ button,
 
 /* ─── Long Press Value Popup ────────────────────────────────────────────────── */
 
-.kid-score-value-overlay {
+.little-milestones-value-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -507,7 +507,7 @@ button,
   padding: 16px;
 }
 
-.kid-score-value-popup {
+.little-milestones-value-popup {
   background: var(--background-primary);
   border-radius: 14px;
   padding: 20px;
@@ -515,25 +515,25 @@ button,
   max-width: 340px;
   width: 100%;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-  animation: kid-score-popup-in 0.15s ease-out;
+  animation: little-milestones-popup-in 0.15s ease-out;
 }
 
-.kid-score-value-overlay.is-keyboard-open {
+.little-milestones-value-overlay.is-keyboard-open {
   align-items: flex-start;
   padding-top: max(8px, env(safe-area-inset-top, 0px));
 }
 
-.kid-score-value-overlay.is-keyboard-open .kid-score-value-popup {
+.little-milestones-value-overlay.is-keyboard-open .little-milestones-value-popup {
   margin-top: 0;
   margin-bottom: auto;
 }
 
-.kid-score-value-overlay.is-mobile-emoji-picker {
+.little-milestones-value-overlay.is-mobile-emoji-picker {
   align-items: flex-start;
   padding-top: max(8px, env(safe-area-inset-top, 0px));
 }
 
-.kid-score-value-overlay.is-mobile-emoji-picker .kid-score-emoji-fullpicker {
+.little-milestones-value-overlay.is-mobile-emoji-picker .little-milestones-emoji-fullpicker {
   margin-top: 0;
   margin-bottom: auto;
 }
@@ -654,7 +654,7 @@ button,
   color: white;
 }
 
-.kid-score-value-overlay .kid-score-value-popup .value-popup-input {
+.little-milestones-value-overlay .little-milestones-value-popup .value-popup-input {
   width: 80px;
   height: 44px;
   text-align: center;
@@ -717,14 +717,14 @@ button,
 
 /* ─── Custom Item Form (popup) ──────────────────────────────────────────────── */
 
-.kid-score-custom-form {
+.little-milestones-custom-form {
   max-width: 360px;
 }
 
 /* Modal wrapper for edit/add forms (replaces fixed overlay for Android keyboard) */
 
 /* ── Constrain modal to a sensible width so there's no huge whitespace ── */
-.modal.kid-score-edit-modal {
+.modal.little-milestones-edit-modal {
   width: 90vw;
   max-width: 460px;
   min-width: 280px;
@@ -737,16 +737,16 @@ button,
   will-change: transform;
 }
 
-.modal.kid-score-edit-modal.is-dragging-position {
+.modal.little-milestones-edit-modal.is-dragging-position {
   transition: none;
 }
 
-.modal.kid-score-edit-modal.is-settling-position {
+.modal.little-milestones-edit-modal.is-settling-position {
   transition: transform 0.22s ease;
 }
 
-.kid-score-edit-modal .modal-content,
-.kid-score-import-modal .modal-content {
+.little-milestones-edit-modal .modal-content,
+.little-milestones-import-modal .modal-content {
   padding: 16px 20px 20px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -756,21 +756,21 @@ button,
 }
 
 /* Form fills the modal content area (remove the 360px cap from the generic rule) */
-.kid-score-edit-modal .kid-score-custom-form {
+.little-milestones-edit-modal .little-milestones-custom-form {
   max-width: none;
   width: 100%;
   box-sizing: border-box;
 }
 
 /* Labels wide enough for "默认分值" (4 CJK chars) without wrapping */
-.kid-score-edit-modal .custom-form-label {
+.little-milestones-edit-modal .custom-form-label {
   flex: 0 0 auto;
   min-width: 56px;
   white-space: nowrap;
 }
 
 /* Buttons fill full row width */
-.kid-score-edit-modal .value-popup-actions {
+.little-milestones-edit-modal .value-popup-actions {
   margin-top: 16px;
   display: flex;
   gap: 10px;
@@ -786,23 +786,23 @@ button,
   );
   z-index: 2;
 }
-.kid-score-edit-modal .value-popup-cancel,
-.kid-score-edit-modal .value-popup-confirm {
+.little-milestones-edit-modal .value-popup-cancel,
+.little-milestones-edit-modal .value-popup-confirm {
   flex: 1;
 }
 
-.kid-score-edit-modal .value-popup-hint {
+.little-milestones-edit-modal .value-popup-hint {
   margin-bottom: 12px;
   font-size: 0.85em;
   color: var(--text-muted);
 }
 
 /* Force all inputs/textareas inside our custom modals to be tappable on Android/iOS */
-.modal.kid-score-edit-modal .modal-content input,
-.modal.kid-score-edit-modal .modal-content textarea,
-.modal.kid-score-edit-modal .modal-content select,
-.modal.kid-score-import-modal .modal-content input,
-.modal.kid-score-import-modal .modal-content textarea {
+.modal.little-milestones-edit-modal .modal-content input,
+.modal.little-milestones-edit-modal .modal-content textarea,
+.modal.little-milestones-edit-modal .modal-content select,
+.modal.little-milestones-import-modal .modal-content input,
+.modal.little-milestones-import-modal .modal-content textarea {
   pointer-events: auto;
   -webkit-user-select: text;
   user-select: text;
@@ -812,8 +812,8 @@ button,
 }
 
 /* Ensure flex layout is not overridden by Obsidian theme inside modals */
-.modal.kid-score-edit-modal .modal-content .custom-form-row,
-.modal.kid-score-import-modal .modal-content .custom-form-row {
+.modal.little-milestones-edit-modal .modal-content .custom-form-row,
+.modal.little-milestones-import-modal .modal-content .custom-form-row {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -836,7 +836,7 @@ button,
   min-width: 0;
 }
 
-.modal.kid-score-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
+.modal.little-milestones-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
   flex: 0 0 auto;
   margin-left: 0;
   min-width: 36px;
@@ -899,7 +899,7 @@ button,
 }
 .custom-form-name-input.is-error {
   border-color: #f87171;
-  animation: kid-score-shake 0.3s ease;
+  animation: little-milestones-shake 0.3s ease;
 }
 textarea.custom-form-name-input {
   min-height: 52px;
@@ -911,7 +911,7 @@ textarea.custom-form-name-input {
   overflow: hidden;
 }
 
-.kid-score-edit-modal textarea.custom-form-name-input {
+.little-milestones-edit-modal textarea.custom-form-name-input {
   max-height: min(38vh, 260px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -929,7 +929,7 @@ textarea.custom-form-name-input {
 
 /* ─── Full Emoji Picker (iOS-like) ─────────────────────────────────────────── */
 
-.kid-score-emoji-fullpicker {
+.little-milestones-emoji-fullpicker {
   background: var(--background-primary);
   border-radius: 14px;
   padding: 16px;
@@ -937,7 +937,7 @@ textarea.custom-form-name-input {
   max-width: 420px;
   width: 90vw;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-  animation: kid-score-popup-in 0.15s ease-out;
+  animation: little-milestones-popup-in 0.15s ease-out;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
@@ -1103,15 +1103,15 @@ textarea.custom-form-name-input {
 
 /* ─── Custom Items ──────────────────────────────────────────────────────────── */
 
-.kid-score-custom-items {
+.little-milestones-custom-items {
   margin-bottom: 10px;
 }
 
-.kid-score-custom-wrap {
+.little-milestones-custom-wrap {
   margin-bottom: 6px;
 }
 
-.kid-score-custom-row {
+.little-milestones-custom-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1124,7 +1124,7 @@ textarea.custom-form-name-input {
   -webkit-user-select: none;
 }
 
-.kid-score-custom-main {
+.little-milestones-custom-main {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1139,7 +1139,7 @@ textarea.custom-form-name-input {
   font-style: italic;
 }
 
-.kid-score-custom-empty {
+.little-milestones-custom-empty {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.85em;
@@ -1226,7 +1226,7 @@ textarea.custom-form-name-input {
   border-color: var(--interactive-accent);
 }
 
-.kid-score-add-custom-btn {
+.little-milestones-add-custom-btn {
   display: block;
   width: 100%;
   padding: 10px 12px;
@@ -1240,7 +1240,7 @@ textarea.custom-form-name-input {
   transition: all 0.15s;
   margin-bottom: 8px;
 }
-.kid-score-add-custom-btn:hover {
+.little-milestones-add-custom-btn:hover {
   border-color: var(--interactive-accent);
   color: var(--interactive-accent);
   background: var(--background-secondary);
@@ -1249,7 +1249,7 @@ textarea.custom-form-name-input {
 
 /* ─── Main Tabs (打分 / 日记) ────────────────────────────────────────────────── */
 
-.kid-score-main-tabs {
+.little-milestones-main-tabs {
   display: flex;
   gap: 0;
   margin-bottom: 12px;
@@ -1259,7 +1259,7 @@ textarea.custom-form-name-input {
   flex-shrink: 0;
 }
 
-.kid-score-daily-modal .kid-score-main-tab {
+.little-milestones-daily-modal .little-milestones-main-tab {
   flex: 1;
   /* Explicit height + flex layout so Obsidian Mobile theme can't collapse the button */
   display: flex;
@@ -1282,12 +1282,12 @@ textarea.custom-form-name-input {
   white-space: nowrap;
 }
 
-.kid-score-main-tab.is-active {
+.little-milestones-main-tab.is-active {
   background: var(--interactive-accent);
   color: white;
 }
 
-.kid-score-main-tab:not(.is-active):hover {
+.little-milestones-main-tab:not(.is-active):hover {
   background: var(--background-modifier-hover);
 }
 
@@ -1299,16 +1299,16 @@ textarea.custom-form-name-input {
   margin-left: 4px;
 }
 
-.kid-score-main-tab.is-active .diary-tab-badge {
+.little-milestones-main-tab.is-active .diary-tab-badge {
   color: #fde68a;
 }
 
-.kid-score-tab-panel {
+.little-milestones-tab-panel {
   /* visible by default */
   touch-action: pan-y;
 }
 
-.kid-score-tab-panel.is-hidden {
+.little-milestones-tab-panel.is-hidden {
   display: none;
 }
 
@@ -1722,7 +1722,7 @@ textarea.custom-form-name-input {
 
 /* ─── Date Navigation ──────────────────────────────────────────────────────── */
 
-.kid-score-date-nav {
+.little-milestones-date-nav {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1795,7 +1795,7 @@ textarea.custom-form-name-input {
   opacity: 0.7;
 }
 
-.kid-score-past-banner {
+.little-milestones-past-banner {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   color: #92400e;
   padding: 8px 14px;
@@ -1808,18 +1808,18 @@ textarea.custom-form-name-input {
 
 /* ─── Stats Modal ────────────────────────────────────────────────────────────── */
 
-.kid-score-stats-modal {
+.little-milestones-stats-modal {
   max-width: 600px;
   padding: 8px;
 }
 
-.kid-score-tabs {
+.little-milestones-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.kid-score-tab {
+.little-milestones-tab {
   padding: 6px 18px;
   border-radius: 20px;
   border: 1px solid var(--background-modifier-border);
@@ -1829,13 +1829,13 @@ textarea.custom-form-name-input {
   transition: all 0.15s;
 }
 
-.kid-score-tab.is-active {
+.little-milestones-tab.is-active {
   background: var(--interactive-accent);
   color: white;
   border-color: var(--interactive-accent);
 }
 
-.kid-score-summary-cards {
+.little-milestones-summary-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -1870,7 +1870,7 @@ textarea.custom-form-name-input {
 }
 
 /* Completion rates */
-.kid-score-item-completion {
+.little-milestones-item-completion {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1914,7 +1914,7 @@ textarea.custom-form-name-input {
 }
 
 /* Chart */
-.kid-score-chart {
+.little-milestones-chart {
   display: block;
   width: 100%;
   height: auto;
@@ -1923,29 +1923,29 @@ textarea.custom-form-name-input {
   margin-bottom: 20px;
 }
 
-.kid-score-chart-wrap {
+.little-milestones-chart-wrap {
   width: 100%;
 }
 
 /* Month table */
-.kid-score-month-table-wrap {
+.little-milestones-month-table-wrap {
   width: 100%;
 }
 
-.kid-score-month-table {
+.little-milestones-month-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88em;
 }
 
-.kid-score-month-table th,
-.kid-score-month-table td {
+.little-milestones-month-table th,
+.little-milestones-month-table td {
   padding: 6px 12px;
   border-bottom: 1px solid var(--background-modifier-border);
   text-align: left;
 }
 
-.kid-score-month-table th {
+.little-milestones-month-table th {
   background: var(--background-secondary);
   font-weight: 600;
   color: var(--text-muted);
@@ -2009,7 +2009,7 @@ textarea.custom-form-name-input {
 
 /* ─── Calendar Picker ────────────────────────────────────────────────────────── */
 
-.kid-score-calendar-popup {
+.little-milestones-calendar-popup {
   background: var(--background-primary);
   border-radius: 12px;
   padding: 16px;
@@ -2123,65 +2123,65 @@ textarea.custom-form-name-input {
 
 /* ─── Settings ───────────────────────────────────────────────────────────────── */
 
-.kid-score-settings {
+.little-milestones-settings {
   overflow-x: hidden;
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }
 
-.kid-score-settings,
-.kid-score-settings * {
+.little-milestones-settings,
+.little-milestones-settings * {
   box-sizing: border-box;
 }
 
-.kid-score-settings .setting-item-control,
-.kid-score-settings-items,
-.kid-score-cat-list {
+.little-milestones-settings .setting-item-control,
+.little-milestones-settings-items,
+.little-milestones-cat-list {
   overflow-x: clip;
 }
 
-.kid-score-settings h3 {
+.little-milestones-settings h3 {
   margin: 20px 0 8px;
 }
 
-.kid-score-settings-section {
+.little-milestones-settings-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.kid-score-settings-section-desktop {
+.little-milestones-settings-section-desktop {
   margin-bottom: 18px;
 }
 
-.kid-score-settings-section-body {
+.little-milestones-settings-section-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.kid-score-category-section .kid-score-cat-list,
-.kid-score-import-export-section .setting-item {
+.little-milestones-category-section .little-milestones-cat-list,
+.little-milestones-import-export-section .setting-item {
   width: 100%;
 }
 
-.kid-score-item-management-section .kid-score-settings-items,
-.kid-score-item-management-section .kid-score-settings-actions {
+.little-milestones-item-management-section .little-milestones-settings-items,
+.little-milestones-item-management-section .little-milestones-settings-actions {
   width: 100%;
 }
 
-.kid-score-settings-actions {
+.little-milestones-settings-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.kid-score-settings-actions .setting-item {
+.little-milestones-settings-actions .setting-item {
   width: 100%;
 }
 
-.kid-score-settings-actions-desktop .setting-item {
+.little-milestones-settings-actions-desktop .setting-item {
   padding: 10px 0;
 }
 
@@ -2218,7 +2218,7 @@ textarea.custom-form-name-input {
 }
 .settings-emoji-btn:hover { background: var(--background-modifier-hover); }
 
-.kid-score-emoji-picker {
+.little-milestones-emoji-picker {
   position: absolute;
   top: 40px;
   left: 0;
@@ -2369,7 +2369,7 @@ textarea.custom-form-name-input {
 
 /* ─── User Switcher ─────────────────────────────────────────────────────────── */
 
-.kid-score-user-switcher {
+.little-milestones-user-switcher {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -2377,7 +2377,7 @@ textarea.custom-form-name-input {
   flex-shrink: 0;
 }
 
-.vertical-tab-content .kid-score-settings-users .kid-score-user-btn {
+.vertical-tab-content .little-milestones-settings-users .little-milestones-user-btn {
   display: inline-flex;
   align-items: center;
   height: auto;
@@ -2395,16 +2395,16 @@ textarea.custom-form-name-input {
   line-height: 1.5;
   box-sizing: border-box;
 }
-.kid-score-user-btn:hover {
+.little-milestones-user-btn:hover {
   background: var(--background-modifier-hover);
 }
-.kid-score-user-btn.is-active {
+.little-milestones-user-btn.is-active {
   background: var(--interactive-accent);
   color: white;
 }
 
 /* Settings page user list */
-.kid-score-settings-users {
+.little-milestones-settings-users {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
@@ -2414,7 +2414,7 @@ textarea.custom-form-name-input {
   border-radius: 8px;
 }
 
-.kid-score-user-add-btn {
+.little-milestones-user-add-btn {
   padding: 6px 14px;
   border-radius: 20px;
   border: 1.5px dashed var(--interactive-accent);
@@ -2425,19 +2425,19 @@ textarea.custom-form-name-input {
   opacity: 0.7;
   transition: opacity 0.15s;
 }
-.kid-score-user-add-btn:hover {
+.little-milestones-user-add-btn:hover {
   opacity: 1;
 }
 
 /* ─── Goals settings ─────────────────────────────────────────────────────────── */
 
-.kid-score-goals-section {
+.little-milestones-goals-section {
   padding: 12px;
   background: var(--background-secondary);
   border-radius: 10px;
 }
 
-.kid-score-goals-grid {
+.little-milestones-goals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
   gap: 10px;
@@ -2445,19 +2445,19 @@ textarea.custom-form-name-input {
   min-width: 0;
 }
 
-.kid-score-goal-cell {
+.little-milestones-goal-cell {
   display: flex;
   flex-direction: column;
   gap: 4px;
   min-width: 0;
 }
 
-.kid-score-goal-cell label {
+.little-milestones-goal-cell label {
   font-size: 0.8em;
   color: var(--text-muted);
 }
 
-.kid-score-goal-input {
+.little-milestones-goal-input {
   width: 100%;
   min-width: 0;
   box-sizing: border-box;
@@ -2472,14 +2472,14 @@ textarea.custom-form-name-input {
 
 /* ─── Category Management (Settings) ──────────────────────────────────────── */
 
-.kid-score-cat-list {
+.little-milestones-cat-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 10px;
 }
 
-.kid-score-cat-row {
+.little-milestones-cat-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2489,13 +2489,13 @@ textarea.custom-form-name-input {
   border: 1px solid var(--background-modifier-border);
 }
 
-.kid-score-cat-row .settings-name-input {
+.little-milestones-cat-row .settings-name-input {
   flex: 1;
 }
 
 /* ─── Category Divider ─────────────────────────────────────────────────────── */
 
-.kid-score-divider {
+.little-milestones-divider {
   border: none;
   border-top: 1px solid var(--background-modifier-border);
   margin: 16px 0 4px;
@@ -2658,14 +2658,14 @@ textarea.custom-form-name-input {
 
 /* ─── 打分规则区块 ───────────────────────────────────────────────────────────── */
 
-.kid-score-rules-section {
+.little-milestones-rules-section {
   border: 1px solid var(--background-modifier-border);
   border-radius: 10px;
   margin-bottom: 12px;
   overflow: hidden;
 }
 
-.kid-score-rules-header {
+.little-milestones-rules-header {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2675,25 +2675,25 @@ textarea.custom-form-name-input {
   user-select: none;
   transition: background 0.15s;
 }
-.kid-score-rules-header:hover {
+.little-milestones-rules-header:hover {
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-toggle {
+.little-milestones-rules-toggle {
   font-size: 0.7em;
   color: var(--text-muted);
   width: 12px;
   flex-shrink: 0;
 }
 
-.kid-score-rules-title {
+.little-milestones-rules-title {
   flex: 0 1 auto;
   font-size: 0.9em;
   font-weight: 600;
   white-space: nowrap;
 }
 
-.kid-score-rules-desc {
+.little-milestones-rules-desc {
   font-size: 0.78em;
   color: var(--text-muted);
   margin-left: auto;
@@ -2703,22 +2703,22 @@ textarea.custom-form-name-input {
   flex-shrink: 1;
 }
 
-.kid-score-section-header {
+.little-milestones-section-header {
   display: flex;
   align-items: baseline;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 6px;
 }
-.kid-score-section-header h3 {
+.little-milestones-section-header h3 {
   margin: 0;
 }
-.kid-score-section-header .kid-score-section-desc {
+.little-milestones-section-header .little-milestones-section-desc {
   font-size: 0.78em;
   color: var(--text-muted);
 }
 
-.kid-score-rules-edit-btn {
+.little-milestones-rules-edit-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -2729,40 +2729,40 @@ textarea.custom-form-name-input {
   transition: opacity 0.15s, background 0.15s;
   flex-shrink: 0;
 }
-.kid-score-rules-edit-btn:hover {
+.little-milestones-rules-edit-btn:hover {
   opacity: 1;
   background: var(--background-modifier-hover);
 }
 
-.kid-score-rules-body {
+.little-milestones-rules-body {
   padding: 12px 14px;
   border-top: 1px solid var(--background-modifier-border);
 }
-.kid-score-rules-body.is-hidden {
+.little-milestones-rules-body.is-hidden {
   display: none;
 }
 
-.kid-score-rules-view {
+.little-milestones-rules-view {
   font-size: 0.88em;
   line-height: 1.6;
   color: var(--text-normal);
 }
-.kid-score-rules-view.is-hidden {
+.little-milestones-rules-view.is-hidden {
   display: none;
 }
-.kid-score-rules-view p,
-.kid-score-rules-view ul,
-.kid-score-rules-view ol {
+.little-milestones-rules-view p,
+.little-milestones-rules-view ul,
+.little-milestones-rules-view ol {
   margin: 4px 0;
 }
-.kid-score-rules-view h1,
-.kid-score-rules-view h2,
-.kid-score-rules-view h3 {
+.little-milestones-rules-view h1,
+.little-milestones-rules-view h2,
+.little-milestones-rules-view h3 {
   font-size: 0.95em;
   margin: 8px 0 4px;
 }
 
-.kid-score-rules-empty {
+.little-milestones-rules-empty {
   color: var(--text-muted);
   font-size: 0.88em;
   text-align: center;
@@ -2770,11 +2770,11 @@ textarea.custom-form-name-input {
   padding: 4px 0;
 }
 
-.kid-score-rules-edit.is-hidden {
+.little-milestones-rules-edit.is-hidden {
   display: none;
 }
 
-.kid-score-rules-textarea {
+.little-milestones-rules-textarea {
   width: 100%;
   min-height: 120px;
   border: 1px solid var(--background-modifier-border);
@@ -2788,24 +2788,24 @@ textarea.custom-form-name-input {
   box-sizing: border-box;
   font-family: var(--font-text);
 }
-.kid-score-rules-textarea:focus {
+.little-milestones-rules-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
-.kid-score-rules-actions {
+.little-milestones-rules-actions {
   display: flex;
   gap: 8px;
   margin-top: 8px;
   justify-content: flex-end;
 }
 
-.kid-score-rules-save-btn {
+.little-milestones-rules-save-btn {
   font-size: 0.88em;
   padding: 6px 14px;
 }
 
-.kid-score-rules-cancel-btn {
+.little-milestones-rules-cancel-btn {
   background: none;
   border: 1px solid var(--background-modifier-border);
   border-radius: 6px;
@@ -2815,13 +2815,13 @@ textarea.custom-form-name-input {
   color: var(--text-muted);
   transition: background 0.15s;
 }
-.kid-score-rules-cancel-btn:hover {
+.little-milestones-rules-cancel-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
 }
 /* ─── Config Import / Export ────────────────────────────────────────────────── */
 
-.kid-score-import-popup {
+.little-milestones-import-popup {
   width: min(480px, 94vw);
   max-height: 80vh;
   overflow-y: auto;
@@ -2829,13 +2829,13 @@ textarea.custom-form-name-input {
 }
 
 /* Tab bar */
-.kid-score-import-tabs {
+.little-milestones-import-tabs {
   display: flex;
   gap: 0;
   border-bottom: 1.5px solid var(--background-modifier-border);
   margin-bottom: 12px;
 }
-.kid-score-import-tab {
+.little-milestones-import-tab {
   flex: 1;
   padding: 8px 6px;
   background: none;
@@ -2847,17 +2847,17 @@ textarea.custom-form-name-input {
   margin-bottom: -1.5px;
   transition: color 0.15s, border-color 0.15s;
 }
-.kid-score-import-tab.is-active {
+.little-milestones-import-tab.is-active {
   color: var(--interactive-accent);
   border-bottom-color: var(--interactive-accent);
   font-weight: 600;
 }
 
 /* Panel visibility */
-.kid-score-import-panel.is-hidden { display: none; }
+.little-milestones-import-panel.is-hidden { display: none; }
 
 /* File list */
-.kid-score-import-file-list {
+.little-milestones-import-file-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -2867,7 +2867,7 @@ textarea.custom-form-name-input {
   border-radius: 8px;
   padding: 4px 8px;
 }
-.kid-score-import-file-row {
+.little-milestones-import-file-row {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -2876,9 +2876,9 @@ textarea.custom-form-name-input {
   cursor: pointer;
   transition: background 0.12s;
 }
-.kid-score-import-file-row:hover { background: var(--background-modifier-hover); }
-.kid-score-import-file-row input[type="radio"] { accent-color: var(--interactive-accent); flex-shrink: 0; }
-.kid-score-import-file-meta {
+.little-milestones-import-file-row:hover { background: var(--background-modifier-hover); }
+.little-milestones-import-file-row input[type="radio"] { accent-color: var(--interactive-accent); flex-shrink: 0; }
+.little-milestones-import-file-meta {
   font-size: 0.72em;
   color: var(--text-faint);
   overflow: hidden;
@@ -2888,7 +2888,7 @@ textarea.custom-form-name-input {
 }
 
 /* Paste textarea */
-.kid-score-import-textarea {
+.little-milestones-import-textarea {
   width: 100%;
   height: 120px;
   font-family: var(--font-monospace);
@@ -2901,25 +2901,25 @@ textarea.custom-form-name-input {
   background: var(--background-secondary);
   color: var(--text-normal);
 }
-.kid-score-import-textarea:focus {
+.little-milestones-import-textarea:focus {
   outline: none;
   border-color: var(--interactive-accent);
 }
 
 /* Preview / field selector */
-.kid-score-import-preview {
+.little-milestones-import-preview {
   background: var(--background-secondary);
   border-radius: 8px;
   padding: 10px 12px;
   margin-top: 10px;
   border: 1px solid var(--background-modifier-border);
 }
-.kid-score-import-fields {
+.little-milestones-import-fields {
   font-size: 0.85em;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
-.kid-score-import-check-row {
+.little-milestones-import-check-row {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2928,7 +2928,7 @@ textarea.custom-form-name-input {
   cursor: pointer;
   user-select: none;
 }
-.kid-score-import-check-row input[type="checkbox"] { accent-color: var(--interactive-accent); }
+.little-milestones-import-check-row input[type="checkbox"] { accent-color: var(--interactive-accent); }
 
 /* Disabled confirm button */
 .value-popup-confirm:disabled {
@@ -3208,7 +3208,7 @@ textarea.custom-form-name-input {
 /* ── Phone (≤480px) ────────────────────────────────────────────────────────── */
 @media (max-width: 480px) {
   /* ── Modal shell ── */
-  .kid-score-modal {
+  .little-milestones-modal {
     padding: 6px;
     max-height: 90vh;
     overflow-y: auto;
@@ -3218,14 +3218,14 @@ textarea.custom-form-name-input {
     flex-direction: column;
   }
 
-  .kid-score-header h2 {
+  .little-milestones-header h2 {
     margin-bottom: 6px;
     font-size: 1.12em;
     line-height: 1.3;
   }
 
   /* Prevent body scroll when modal open */
-  .kid-score-modal .modal-content {
+  .little-milestones-modal .modal-content {
     overscroll-behavior: contain;
     flex: 1 1 auto;
     min-height: 0;
@@ -3237,27 +3237,27 @@ textarea.custom-form-name-input {
   }
 
   /* ── Focus visibility above virtual keyboard ── */
-  .kid-score-modal input,
-  .kid-score-modal textarea,
-  .kid-score-modal .custom-form-name-input,
-  .kid-score-modal .value-popup-input,
-  .kid-score-modal .date-nav-display,
-  .kid-score-modal .kid-score-rules-textarea {
+  .little-milestones-modal input,
+  .little-milestones-modal textarea,
+  .little-milestones-modal .custom-form-name-input,
+  .little-milestones-modal .value-popup-input,
+  .little-milestones-modal .date-nav-display,
+  .little-milestones-modal .little-milestones-rules-textarea {
     scroll-margin-bottom: 120px;
   }
 
   /* ── Score cards ── */
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
-  .kid-score-grid-mobile {
+  .little-milestones-grid-mobile {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 80px;
     padding: 18px 8px 12px;
     /* Larger tap target */
@@ -3266,13 +3266,13 @@ textarea.custom-form-name-input {
     touch-action: pan-y;
   }
 
-  .kid-score-card-content-mobile {
+  .little-milestones-card-content-mobile {
     gap: 2px;
   }
-  .kid-score-card-more-btn {
+  .little-milestones-card-more-btn {
     display: inline-flex;
   }
-  .kid-score-card-mobile.is-deducted-active::after {
+  .little-milestones-card-mobile.is-deducted-active::after {
     top: 6px;
     right: auto;
     left: 6px;
@@ -3282,13 +3282,13 @@ textarea.custom-form-name-input {
   .card-points { font-size: 0.75em; }
 
   /* ── Stats / Summary ── */
-  .kid-score-summary-cards {
+  .little-milestones-summary-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
   /* ── Bottom actions ── */
-  .kid-score-actions {
+  .little-milestones-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -3298,28 +3298,28 @@ textarea.custom-form-name-input {
     z-index: 3;
   }
 
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     padding: 14px 10px;
     font-size: 1em;
     border-radius: 12px;
   }
 
-  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-save-btn,
-  .kid-score-actions-mobile:not(.is-preview-mode) .kid-score-stats-btn {
+  .little-milestones-actions-mobile:not(.is-preview-mode) .little-milestones-save-btn,
+  .little-milestones-actions-mobile:not(.is-preview-mode) .little-milestones-stats-btn {
     grid-row: 1;
     grid-column: auto;
     width: 100%;
   }
 
-  .kid-score-stats-btn {
+  .little-milestones-stats-btn {
     grid-column: auto;
     grid-row: 1;
   }
 
-  .kid-score-add-item-btn,
-  .kid-score-rules-edit-btn,
+  .little-milestones-add-item-btn,
+  .little-milestones-rules-edit-btn,
   .custom-edit-btn,
   .custom-delete-btn {
     min-width: 36px;
@@ -3327,8 +3327,8 @@ textarea.custom-form-name-input {
     border-radius: 10px;
   }
 
-  .kid-score-yesterday-banner,
-  .kid-score-past-banner {
+  .little-milestones-yesterday-banner,
+  .little-milestones-past-banner {
     margin-bottom: 8px;
     padding: 8px 10px;
     font-size: 0.8em;
@@ -3336,32 +3336,32 @@ textarea.custom-form-name-input {
     border-radius: 10px;
   }
 
-  .kid-score-meta-bar-mobile {
+  .little-milestones-meta-bar-mobile {
     gap: 8px;
   }
 
-  .kid-score-cat-header-mobile {
+  .little-milestones-cat-header-mobile {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
     margin-bottom: 10px;
   }
 
-  .kid-score-cat-title-host-mobile,
-  .kid-score-cat-action-host-mobile {
+  .little-milestones-cat-title-host-mobile,
+  .little-milestones-cat-action-host-mobile {
     width: 100%;
   }
 
-  .kid-score-cat-action-host-mobile {
+  .little-milestones-cat-action-host-mobile {
     justify-content: flex-end;
     padding-bottom: 2px;
   }
 
-  .kid-score-total-display-mobile {
+  .little-milestones-total-display-mobile {
     order: 1;
   }
 
-  .kid-score-hint-mobile {
+  .little-milestones-hint-mobile {
     order: 2;
     text-align: center;
   }
@@ -3373,23 +3373,23 @@ textarea.custom-form-name-input {
     white-space: normal;
     line-height: 1.35;
   }
-  .kid-score-tabs { flex-wrap: wrap; gap: 6px; }
-  .kid-score-tab {
+  .little-milestones-tabs { flex-wrap: wrap; gap: 6px; }
+  .little-milestones-tab {
     flex: 1 1 calc(33.333% - 6px);
     min-height: 44px;
     padding: 10px 12px;
     font-size: 0.92em;
     border-radius: 12px;
   }
-  .kid-score-stats-modal {
+  .little-milestones-stats-modal {
     padding: 4px;
     max-height: 90vh;
     overflow-y: auto;
   }
-  .kid-score-stats-actions {
+  .little-milestones-stats-actions {
     margin: 6px 0 12px;
   }
-  .kid-score-stats-back-btn {
+  .little-milestones-stats-back-btn {
     width: 100%;
   }
 
@@ -3415,24 +3415,24 @@ textarea.custom-form-name-input {
     font-size: 0.8em;
   }
 
-  .kid-score-chart-wrap,
-  .kid-score-month-table-wrap {
+  .little-milestones-chart-wrap,
+  .little-milestones-month-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 4px;
   }
 
-  .kid-score-chart {
+  .little-milestones-chart {
     min-width: 480px;
     margin-bottom: 16px;
   }
 
-  .kid-score-month-table {
+  .little-milestones-month-table {
     min-width: 360px;
   }
 
   /* ── Calendar picker ── */
-  .kid-score-calendar-popup {
+  .little-milestones-calendar-popup {
     width: min(356px, calc(100vw - 32px));
     max-width: calc(100vw - 32px);
     padding: 14px;
@@ -3440,34 +3440,34 @@ textarea.custom-form-name-input {
     overflow: hidden;
   }
 
-  .kid-score-calendar-popup .cal-header {
+  .little-milestones-calendar-popup .cal-header {
     margin-bottom: 8px;
   }
 
-  .kid-score-calendar-popup .cal-nav-btn {
+  .little-milestones-calendar-popup .cal-nav-btn {
     width: 36px;
     height: 36px;
     padding: 0;
     font-size: 0.82em;
   }
 
-  .kid-score-calendar-popup .cal-month-label {
+  .little-milestones-calendar-popup .cal-month-label {
     font-size: 0.95em;
   }
 
-  .kid-score-calendar-popup .cal-grid {
+  .little-milestones-calendar-popup .cal-grid {
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 4px;
     width: 100%;
   }
 
-  .kid-score-calendar-popup .cal-weekday {
+  .little-milestones-calendar-popup .cal-weekday {
     min-width: 0;
     font-size: 0.68em;
     padding: 3px 0;
   }
 
-  .kid-score-calendar-popup .cal-day {
+  .little-milestones-calendar-popup .cal-day {
     min-width: 0;
     min-height: 40px;
     width: 100%;
@@ -3477,17 +3477,17 @@ textarea.custom-form-name-input {
     font-size: 0.78em;
   }
 
-  .kid-score-calendar-popup .cal-day.is-future {
+  .little-milestones-calendar-popup .cal-day.is-future {
     opacity: 0.45;
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  .kid-score-calendar-popup .cal-day.is-future .cal-day-inner {
+  .little-milestones-calendar-popup .cal-day.is-future .cal-day-inner {
     color: var(--text-muted);
   }
 
-  .kid-score-calendar-popup .value-popup-cancel {
+  .little-milestones-calendar-popup .value-popup-cancel {
     min-height: 42px;
     font-size: 0.92em;
   }
@@ -3497,16 +3497,16 @@ textarea.custom-form-name-input {
     gap: 6px;
   }
 
-  .kid-score-settings .setting-item {
+  .little-milestones-settings .setting-item {
     display: block;
     padding: 12px 0;
   }
 
-  .kid-score-settings .setting-item-info {
+  .little-milestones-settings .setting-item-info {
     margin-bottom: 8px;
   }
 
-  .kid-score-settings .setting-item-control {
+  .little-milestones-settings .setting-item-control {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
@@ -3514,30 +3514,30 @@ textarea.custom-form-name-input {
     justify-content: flex-start;
   }
 
-  .kid-score-settings .setting-item-control input[type="text"],
-  .kid-score-settings .setting-item-control textarea,
-  .kid-score-settings .setting-item-control select {
+  .little-milestones-settings .setting-item-control input[type="text"],
+  .little-milestones-settings .setting-item-control textarea,
+  .little-milestones-settings .setting-item-control select {
     width: 100%;
   }
 
-  .kid-score-settings .setting-item button {
+  .little-milestones-settings .setting-item button {
     min-height: 44px;
   }
 
-  .kid-score-settings-actions-mobile .setting-item {
+  .little-milestones-settings-actions-mobile .setting-item {
     padding: 10px 0;
   }
 
-  .kid-score-settings-actions-mobile .setting-item-control {
+  .little-milestones-settings-actions-mobile .setting-item-control {
     width: 100%;
   }
 
-  .kid-score-goals-grid {
+  .little-milestones-goals-grid {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 
-  .kid-score-cat-row {
+  .little-milestones-cat-row {
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 6px;
@@ -3545,7 +3545,7 @@ textarea.custom-form-name-input {
     border-radius: 8px;
   }
 
-  .kid-score-cat-row .settings-name-input {
+  .little-milestones-cat-row .settings-name-input {
     min-width: 0;
     width: 100%;
   }
@@ -3563,12 +3563,12 @@ textarea.custom-form-name-input {
   }
 
   /* ── Popups & forms ── */
-  .kid-score-value-overlay {
+  .little-milestones-value-overlay {
     padding: 12px;
     align-items: flex-end; /* slide up from bottom on mobile */
   }
 
-  .kid-score-value-popup {
+  .little-milestones-value-popup {
     min-width: auto;
     max-width: 100%;
     width: 100%;
@@ -3635,25 +3635,25 @@ textarea.custom-form-name-input {
     border-radius: 6px;
   }
 
-  .kid-score-edit-modal .custom-form-main-row {
+  .little-milestones-edit-modal .custom-form-main-row {
     flex-wrap: wrap;
     gap: 6px;
     align-items: center;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-label {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-label {
     flex: 0 0 100%;
     margin-bottom: 2px;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-emoji-input {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-emoji-input {
     flex: 0 0 56px;
     width: 56px;
     height: 52px;
     font-size: 1.8em;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .diary-tool-btn {
+  .little-milestones-edit-modal .custom-form-main-row .diary-tool-btn {
     flex: 0 0 56px;
     width: 56px;
     min-width: 56px;
@@ -3661,17 +3661,17 @@ textarea.custom-form-name-input {
     padding: 0;
   }
 
-  .kid-score-edit-modal .custom-form-main-row .custom-form-name-input {
+  .little-milestones-edit-modal .custom-form-main-row .custom-form-name-input {
     flex: 1 1 100%;
     min-width: 0;
     margin-top: 4px;
   }
 
-  .kid-score-edit-modal .custom-form-category-row {
+  .little-milestones-edit-modal .custom-form-category-row {
     margin-bottom: 18px;
   }
 
-  .kid-score-edit-modal .value-popup-actions {
+  .little-milestones-edit-modal .value-popup-actions {
     margin-top: 24px;
     position: static;
   }
@@ -3691,7 +3691,7 @@ textarea.custom-form-name-input {
   }
 
   /* ── Emoji picker ── */
-  .kid-score-emoji-picker {
+  .little-milestones-emoji-picker {
     position: fixed;
     top: auto;
     bottom: 0;
@@ -3713,7 +3713,7 @@ textarea.custom-form-name-input {
     padding: 6px;
   }
 
-  .kid-score-custom-row {
+  .little-milestones-custom-row {
     gap: 6px;
     padding: 10px;
     min-height: 48px;
@@ -3721,13 +3721,13 @@ textarea.custom-form-name-input {
     align-items: flex-start;
   }
 
-  .kid-score-custom-main {
+  .little-milestones-custom-main {
     align-items: flex-start;
     flex-wrap: wrap;
     row-gap: 4px;
   }
 
-  .kid-score-custom-row-mobile {
+  .little-milestones-custom-row-mobile {
     gap: 6px;
     padding: 10px;
     min-height: 48px;
@@ -3735,7 +3735,7 @@ textarea.custom-form-name-input {
     align-items: flex-start;
   }
 
-  .kid-score-custom-main-mobile {
+  .little-milestones-custom-main-mobile {
     align-items: flex-start;
     flex-wrap: wrap;
     row-gap: 4px;
@@ -3766,7 +3766,7 @@ textarea.custom-form-name-input {
     justify-content: center;
   }
 
-  .kid-score-add-custom-btn {
+  .little-milestones-add-custom-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3777,15 +3777,15 @@ textarea.custom-form-name-input {
     line-height: 1.5;
   }
 
-  .kid-score-custom-section-mobile {
+  .little-milestones-custom-section-mobile {
     margin-bottom: 10px;
   }
 
-  .kid-score-custom-section-mobile .kid-score-add-custom-btn {
+  .little-milestones-custom-section-mobile .little-milestones-add-custom-btn {
     margin-bottom: 0;
   }
 
-  .kid-score-cumulative-banner {
+  .little-milestones-cumulative-banner {
     flex-wrap: wrap;
     align-items: baseline;
     justify-content: flex-start;
@@ -3807,13 +3807,13 @@ textarea.custom-form-name-input {
   }
 
   /* ── User switcher ── */
-  .kid-score-user-switcher {
+  .little-milestones-user-switcher {
     gap: 6px;
     margin-bottom: 8px;
     flex-wrap: wrap;
     padding-bottom: 0;
   }
-  .kid-score-user-btn {
+  .little-milestones-user-btn {
     flex-shrink: 0;
     padding: 10px 12px;
     font-size: 0.92em;
@@ -3821,10 +3821,10 @@ textarea.custom-form-name-input {
     border-radius: 999px;
     line-height: 1.35;
   }
-  .kid-score-user-btn-mobile {
+  .little-milestones-user-btn-mobile {
     flex-shrink: 0;
   }
-  .kid-score-user-add-btn {
+  .little-milestones-user-add-btn {
     flex-shrink: 0;
     padding: 10px 12px;
     font-size: 0.92em;
@@ -3834,7 +3834,7 @@ textarea.custom-form-name-input {
   }
 
   /* ── Main tabs ── */
-  .kid-score-main-tabs {
+  .little-milestones-main-tabs {
     position: static;
     margin-top: 2px;
     background: var(--background-primary);
@@ -3842,20 +3842,20 @@ textarea.custom-form-name-input {
     overflow: hidden;
   }
 
-  .kid-score-main-tabs-mobile {
+  .little-milestones-main-tabs-mobile {
     position: static;
   }
 
-  .kid-score-daily-modal {
+  .little-milestones-daily-modal {
     padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
-  .kid-score-daily-modal.is-diary-tab-active::after {
+  .little-milestones-daily-modal.is-diary-tab-active::after {
     content: "";
     display: block;
     flex: 0 0 min(50vh, 320px);
   }
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     padding: 14px 10px;
     font-size: 1.05em;
     min-height: 48px;
@@ -3866,7 +3866,7 @@ textarea.custom-form-name-input {
     line-height: 1.5;
   }
 
-  .kid-score-main-tab-mobile {
+  .little-milestones-main-tab-mobile {
     min-height: 48px;
   }
 
@@ -4073,13 +4073,13 @@ textarea.custom-form-name-input {
   }
 
   /* ── Section titles ── */
-  .kid-score-section-title {
+  .little-milestones-section-title {
     font-size: 0.88em;
     margin: 12px 0 6px;
   }
 
   /* ── Total display ── */
-  .kid-score-total-display {
+  .little-milestones-total-display {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -4092,12 +4092,12 @@ textarea.custom-form-name-input {
     line-height: 1.35;
   }
 
-  .kid-score-empty {
+  .little-milestones-empty {
     padding: 18px 14px;
     font-size: 0.88em;
   }
 
-  .kid-score-custom-empty {
+  .little-milestones-custom-empty {
     font-size: 0.82em;
     padding: 12px 10px;
   }
@@ -4119,7 +4119,7 @@ textarea.custom-form-name-input {
   }
 
   /* ── Hint text ── */
-  .kid-score-hint {
+  .little-milestones-hint {
     font-size: 0.78em;
     margin-bottom: 8px;
   }
@@ -4143,7 +4143,7 @@ textarea.custom-form-name-input {
   }
 
   /* ── Date navigation ── */
-  .kid-score-date-nav {
+  .little-milestones-date-nav {
     display: grid;
     grid-template-columns: 40px minmax(0, 1fr) 40px 40px;
     gap: 6px;
@@ -4176,12 +4176,12 @@ textarea.custom-form-name-input {
     border-radius: 20px;
     font-size: 0.85em;
   }
-  .kid-score-past-banner {
+  .little-milestones-past-banner {
     font-size: 0.8em;
   }
 
   /* ── Full emoji picker ── */
-  .kid-score-emoji-fullpicker {
+  .little-milestones-emoji-fullpicker {
     min-width: auto;
     max-width: 100%;
     width: 100%;
@@ -4189,10 +4189,10 @@ textarea.custom-form-name-input {
     padding: 16px 12px calc(12px + env(safe-area-inset-bottom, 0px));
     max-height: 85vh;
   }
-  .kid-score-value-overlay.is-emoji-picker {
+  .little-milestones-value-overlay.is-emoji-picker {
     align-items: flex-end;
   }
-  .kid-score-value-overlay.is-emoji-picker.is-mobile-emoji-picker {
+  .little-milestones-value-overlay.is-emoji-picker.is-mobile-emoji-picker {
     align-items: flex-start;
     padding-top: max(8px, env(safe-area-inset-top, 0px));
   }
@@ -4217,63 +4217,63 @@ textarea.custom-form-name-input {
     border-radius: 8px;
   }
 
-  .kid-score-modal.is-mobile-ios .date-nav-display,
-  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
-  .kid-score-modal.is-mobile-ios .custom-form-name-input,
-  .kid-score-modal.is-mobile-ios .value-popup-input {
+  .little-milestones-modal.is-mobile-ios .date-nav-display,
+  .little-milestones-modal.is-mobile-ios .little-milestones-rules-textarea,
+  .little-milestones-modal.is-mobile-ios .custom-form-name-input,
+  .little-milestones-modal.is-mobile-ios .value-popup-input {
     font-size: 16px;
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-card {
+  .little-milestones-modal.is-mobile-android .little-milestones-card {
     transition: border-color 0.08s ease, transform 0.08s ease, background 0.08s ease;
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-card:active {
+  .little-milestones-modal.is-mobile-android .little-milestones-card:active {
     transform: scale(0.98);
   }
 
-  .kid-score-modal.is-mobile-android .kid-score-main-tab:active,
-  .kid-score-modal.is-mobile-android .diary-tool-btn:active,
-  .kid-score-modal.is-mobile-android .value-popup-adjust:active {
+  .little-milestones-modal.is-mobile-android .little-milestones-main-tab:active,
+  .little-milestones-modal.is-mobile-android .diary-tool-btn:active,
+  .little-milestones-modal.is-mobile-android .value-popup-adjust:active {
     transform: scale(0.98);
   }
 
   /* ── Rules section ── */
-  .kid-score-rules-section {
+  .little-milestones-rules-section {
     margin-bottom: 10px;
     border-radius: 12px;
   }
 
-  .kid-score-rules-header {
+  .little-milestones-rules-header {
     gap: 6px;
     padding: 9px 10px;
   }
 
-  .kid-score-rules-title {
+  .little-milestones-rules-title {
     font-size: 0.84em;
   }
 
-  .kid-score-rules-body {
+  .little-milestones-rules-body {
     padding: 10px;
   }
 
-  .kid-score-rules-view {
+  .little-milestones-rules-view {
     font-size: 0.82em;
     line-height: 1.5;
   }
 
-  .kid-score-rules-textarea {
+  .little-milestones-rules-textarea {
     min-height: 100px;
     font-size: 0.84em;
   }
 
-  .kid-score-rules-actions {
+  .little-milestones-rules-actions {
     margin-top: 10px;
     justify-content: stretch;
   }
 
-  .kid-score-rules-save-btn,
-  .kid-score-rules-cancel-btn {
+  .little-milestones-rules-save-btn,
+  .little-milestones-rules-cancel-btn {
     flex: 1;
     min-height: 40px;
   }
@@ -4486,7 +4486,7 @@ textarea.custom-form-name-input {
   }
 
   /* Grand banner mobile */
-  .kid-score-grand-banner {
+  .little-milestones-grand-banner {
     flex-wrap: wrap;
     justify-content: center;
     gap: 12px;
@@ -4526,12 +4526,12 @@ textarea.custom-form-name-input {
 /* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
   }
 
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 68px;
     padding: 18px 4px 8px;
   }
@@ -4540,12 +4540,12 @@ textarea.custom-form-name-input {
   .card-name { font-size: 0.72em; }
   .card-points { font-size: 0.7em; }
 
-  .kid-score-summary-cards {
+  .little-milestones-summary-cards {
     grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
 
-  .kid-score-emoji-picker {
+  .little-milestones-emoji-picker {
     grid-template-columns: repeat(6, 1fr);
   }
 
@@ -4564,14 +4564,14 @@ textarea.custom-form-name-input {
     font-size: 0.78em;
   }
 
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     padding: 14px 10px;
     font-size: 1.05em;
     min-height: 48px;
     height: auto;
   }
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     padding: 14px 16px;
     font-size: 1.05em;
     min-height: 48px;
@@ -4621,7 +4621,7 @@ textarea.custom-form-name-input {
     min-height: 36px;
   }
 
-  .kid-score-chart {
+  .little-milestones-chart {
     min-width: 420px;
   }
 }
@@ -4629,16 +4629,16 @@ textarea.custom-form-name-input {
 /* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .kid-score-grid {
+  .little-milestones-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .kid-score-value-overlay {
+  .little-milestones-value-overlay {
     align-items: center;
   }
 
   /* Touch-friendly card sizing */
-  .kid-score-card {
+  .little-milestones-card {
     min-height: 80px;
     padding: 18px 8px 12px;
     -webkit-tap-highlight-color: transparent;
@@ -4646,13 +4646,13 @@ textarea.custom-form-name-input {
   }
 
   /* Larger tap targets for tabs and buttons */
-  .kid-score-main-tab {
+  .little-milestones-main-tab {
     min-height: 48px;
     padding: 14px 10px;
   }
 
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     min-height: 42px;
     padding: 10px 12px;
   }
@@ -4668,18 +4668,18 @@ textarea.custom-form-name-input {
   }
 
   /* Bottom actions sizing */
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     padding: 14px 10px;
     border-radius: 12px;
   }
 
   /* Prevent iOS zoom on inputs */
-  .kid-score-modal.is-mobile-ios .date-nav-display,
-  .kid-score-modal.is-mobile-ios .kid-score-rules-textarea,
-  .kid-score-modal.is-mobile-ios .custom-form-name-input,
-  .kid-score-modal.is-mobile-ios .value-popup-input {
+  .little-milestones-modal.is-mobile-ios .date-nav-display,
+  .little-milestones-modal.is-mobile-ios .little-milestones-rules-textarea,
+  .little-milestones-modal.is-mobile-ios .custom-form-name-input,
+  .little-milestones-modal.is-mobile-ios .value-popup-input {
     font-size: 16px;
   }
 }
@@ -4688,14 +4688,14 @@ textarea.custom-form-name-input {
 
 @media (min-width: 769px) and (max-width: 1024px) {
   /* Critical touch rules for large tablets */
-  .kid-score-card {
+  .little-milestones-card {
     -webkit-tap-highlight-color: transparent;
     touch-action: pan-y;
   }
 
-  .kid-score-main-tab,
-  .kid-score-user-btn,
-  .kid-score-user-add-btn {
+  .little-milestones-main-tab,
+  .little-milestones-user-btn,
+  .little-milestones-user-add-btn {
     min-height: 44px;
   }
 
@@ -4703,8 +4703,8 @@ textarea.custom-form-name-input {
     min-height: 44px;
   }
 
-  .kid-score-save-btn,
-  .kid-score-stats-btn {
+  .little-milestones-save-btn,
+  .little-milestones-stats-btn {
     min-height: 46px;
     border-radius: 12px;
   }

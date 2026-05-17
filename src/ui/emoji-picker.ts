@@ -20,7 +20,7 @@ export function showEmojiPicker(
   }
 
   const overlay = document.createElement("div");
-  overlay.className = "kid-score-value-overlay";
+  overlay.className = "little-milestones-value-overlay";
   overlay.addClass("is-emoji-picker");
   const isMobilePicker = getMobilePlatform() !== "desktop";
   if (isMobilePicker) {
@@ -28,7 +28,7 @@ export function showEmojiPicker(
   }
 
   const popup = document.createElement("div");
-  popup.className = "kid-score-emoji-fullpicker";
+  popup.className = "little-milestones-emoji-fullpicker";
   const overlayStateId = "emoji-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
   let pushedHistoryState = false;
 

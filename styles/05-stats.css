@@ -1,17 +1,17 @@
 /* ─── Stats Modal ────────────────────────────────────────────────────────────── */
 
-.kid-score-stats-modal {
+.little-milestones-stats-modal {
   max-width: 600px;
   padding: 8px;
 }
 
-.kid-score-tabs {
+.little-milestones-tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.kid-score-tab {
+.little-milestones-tab {
   padding: 6px 18px;
   border-radius: 20px;
   border: 1px solid var(--background-modifier-border);
@@ -21,13 +21,13 @@
   transition: all 0.15s;
 }
 
-.kid-score-tab.is-active {
+.little-milestones-tab.is-active {
   background: var(--interactive-accent);
   color: white;
   border-color: var(--interactive-accent);
 }
 
-.kid-score-summary-cards {
+.little-milestones-summary-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -62,7 +62,7 @@
 }
 
 /* Completion rates */
-.kid-score-item-completion {
+.little-milestones-item-completion {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -106,7 +106,7 @@
 }
 
 /* Chart */
-.kid-score-chart {
+.little-milestones-chart {
   display: block;
   width: 100%;
   height: auto;
@@ -115,29 +115,29 @@
   margin-bottom: 20px;
 }
 
-.kid-score-chart-wrap {
+.little-milestones-chart-wrap {
   width: 100%;
 }
 
 /* Month table */
-.kid-score-month-table-wrap {
+.little-milestones-month-table-wrap {
   width: 100%;
 }
 
-.kid-score-month-table {
+.little-milestones-month-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.88em;
 }
 
-.kid-score-month-table th,
-.kid-score-month-table td {
+.little-milestones-month-table th,
+.little-milestones-month-table td {
   padding: 6px 12px;
   border-bottom: 1px solid var(--background-modifier-border);
   text-align: left;
 }
 
-.kid-score-month-table th {
+.little-milestones-month-table th {
   background: var(--background-secondary);
   font-weight: 600;
   color: var(--text-muted);
@@ -201,7 +201,7 @@
 
 /* ─── Calendar Picker ────────────────────────────────────────────────────────── */
 
-.kid-score-calendar-popup {
+.little-milestones-calendar-popup {
   background: var(--background-primary);
   border-radius: 12px;
   padding: 16px;

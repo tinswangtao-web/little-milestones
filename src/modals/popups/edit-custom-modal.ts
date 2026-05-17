@@ -18,11 +18,11 @@ export class EditCustomModal extends BaseMobileModal {
   }
 
   onOpen(): void {
-    this.modalEl.addClass("kid-score-edit-modal");
+    this.modalEl.addClass("little-milestones-edit-modal");
     super.onOpen();
     this.titleEl.setText("✏️ 编辑临时事项");
     const c = this.contentEl;
-    c.addClass("kid-score-custom-form");
+    c.addClass("little-milestones-custom-form");
 
     const mainRow = c.createDiv({ cls: "custom-form-row custom-form-main-row" });
     mainRow.createSpan({ cls: "custom-form-label", text: "事项" });

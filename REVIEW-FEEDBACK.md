@@ -2,7 +2,7 @@
 
 > 审核来源：Obsidian Community 自动化审核系统（2026-05-17）
 > 审核版本：commit c2e3edf（main 分支最新）
-> 插件 ID：kid-score | 名称：🌱 Little Milestones | 版本：2.0.0
+> 插件 ID：little-milestones | 名称：🌱 Little Milestones | 版本：2.0.0
 
 ---
 
@@ -12,10 +12,10 @@
 
 | # | 类别 | 问题 | 位置 |
 |---|------|------|------|
-| E1 | Manifest | The plugin ID in manifest.json (`little-milestones`) does not match the existing plugin ID (`kid-score`) | manifest.json:2 |
+| E1 | Manifest | The plugin ID in manifest.json (`little-milestones`) does not match the existing plugin ID (`little-milestones`) | manifest.json:2 |
 | E2 | README | Repository is missing a README file. A README is required and should describe what the plugin does, how to install it, and how to use it. | 仓库根目录 |
 
-> **注意**：E1 是因为我们刚把 manifest.json 的 id 改回 `kid-score` 但还未创建新的 GitHub Release，所以当前 Release 中的 manifest.json 还是旧的 `little-milestones`。E2 是旧 Release 的扫描结果，README 已经添加到仓库中但同样还未包含在 Release 中。**两者都需要通过创建新的 GitHub Release 来解决。**
+> **注意**：E1 是因为我们刚把 manifest.json 的 id 改回 `little-milestones` 但还未创建新的 GitHub Release，所以当前 Release 中的 manifest.json 还是旧的 `little-milestones`。E2 是旧 Release 的扫描结果，README 已经添加到仓库中但同样还未包含在 Release 中。**两者都需要通过创建新的 GitHub Release 来解决。**
 
 ### 🟡 Warning（建议修复）
 
@@ -31,14 +31,14 @@
 | W8 | CSS lint | Unexpected duplicate selector `.diary-preview-btn`, first used at line 1356 | styles.css:1711 |
 | W9 | CSS lint | Unexpected duplicate selector `.completion-row`, first used at line 1888 | styles.css:2113 |
 | W10 | CSS lint | Unexpected duplicate selector `.completion-name`, first used at line 3382 | styles.css:3413 |
-| W11 | CSS lint | Unexpected duplicate selector `.kid-score-cat-row`, first used at line 3554 | styles.css:4368 |
+| W11 | CSS lint | Unexpected duplicate selector `.little-milestones-cat-row`, first used at line 3554 | styles.css:4368 |
 | W12 | CSS lint | Unexpected duplicate selector `.settings-item-note-row`, first used at line 4150 | styles.css:4374 |
 | W13 | CSS lint | Avoid `:has` — it can cause significant performance issues due to broad selector invalidation. | styles.css:4199, 4202, styles/07-mobile.css:983, 986 |
 | W14 | CSS lint | Unexpected duplicate selector `.desktop-diary-panel .diary-module-grid`, first used at line 266 | styles/04-diary.css:280 |
 | W15 | CSS lint | Unexpected duplicate selector `.diary-preview-btn`, first used at line 107 | styles/04-diary.css:462 |
 | W16 | CSS lint | Unexpected duplicate selector `.completion-row`, first used at line 72 | styles/05-stats.css:297 |
 | W17 | CSS lint | Unexpected duplicate selector `.completion-name`, first used at line 166 | styles/07-mobile.css:197 |
-| W18 | CSS lint | Unexpected duplicate selector `.kid-score-cat-row`, first used at line 338 | styles/07-mobile.css:1152 |
+| W18 | CSS lint | Unexpected duplicate selector `.little-milestones-cat-row`, first used at line 338 | styles/07-mobile.css:1152 |
 | W19 | CSS lint | Unexpected duplicate selector `.settings-item-note-row`, first used at line 934 | styles/07-mobile.css:1158 |
 
 ### 🟢 Pass（通过）
@@ -69,13 +69,13 @@
 编译后的 `styles.css` 中大量选择器重复定义，根因是 desktop/mobile 响应式覆盖和不同 CSS 模块文件中的独立定义。
 
 高频重复选择器统计：
-- `.kid-score-card` — 5次
-- `.kid-score-user-add-btn` — 5次
-- `.kid-score-stats-btn` — 5次
+- `.little-milestones-card` — 5次
+- `.little-milestones-user-add-btn` — 5次
+- `.little-milestones-stats-btn` — 5次
 - `.diary-tool-btn` — 5次
 - `.settings-note-input` — 4次
-- `.kid-score-main-tab` — 4次
-- `.kid-score-grid` — 4次
+- `.little-milestones-main-tab` — 4次
+- `.little-milestones-grid` — 4次
 - `.date-nav-btn` — 4次
 - `.custom-delete-btn` — 4次
 
@@ -156,4 +156,4 @@
 | 🟡 P1 | 6 | 依赖版本锁定、内存泄漏风险、类型安全、事件清理 |
 | 🟢 P2 | 4 | 架构优化、缓存策略、TypeScript strict、类型声明 |
 
-**最关键的下一步**：创建一个新的 GitHub Release（版本 2.0.1），包含最新的 manifest.json（id=kid-score）、README.md、main.js、styles.css，这将自动解决 E1、E2、W3 三个 Error/Warning。
+**最关键的下一步**：创建一个新的 GitHub Release（版本 2.0.1），包含最新的 manifest.json（id=little-milestones）、README.md、main.js、styles.css，这将自动解决 E1、E2、W3 三个 Error/Warning。

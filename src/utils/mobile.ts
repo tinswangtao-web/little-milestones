@@ -61,7 +61,7 @@ export function attachModalDragGesture(modal: Modal): DragCleanup | null {
     updateBounds();
     dragging = true;
     modalEl.classList.add("is-dragging-position");
-    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-start"));
+    modalEl.dispatchEvent(new CustomEvent("little-milestones:manual-drag-start"));
   };
 
   const onTouchMove = (e: TouchEvent) => {
@@ -76,7 +76,7 @@ export function attachModalDragGesture(modal: Modal): DragCleanup | null {
     if (!dragging) return;
     dragging = false;
     modalEl.classList.remove("is-dragging-position");
-    modalEl.dispatchEvent(new CustomEvent("kid-score:manual-drag-end"));
+    modalEl.dispatchEvent(new CustomEvent("little-milestones:manual-drag-end"));
   };
 
   modalEl.addEventListener("touchstart", onTouchStart, { passive: false });
