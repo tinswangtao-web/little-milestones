@@ -44,14 +44,15 @@
   }
 
   /* ── Score cards ── */
-  .kid-score-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .kid-score-grid-mobile {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .kid-score-card {
@@ -80,8 +81,8 @@
 
   /* ── Stats / Summary ── */
   .kid-score-summary-cards {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   /* ── Bottom actions ── */
@@ -290,8 +291,8 @@
   }
 
   .settings-item-row {
-    grid-template-columns: 44px 1fr 60px 32px !important;
-    gap: 6px !important;
+    grid-template-columns: 44px 1fr 60px 32px;
+    gap: 6px;
   }
 
   .kid-score-settings .setting-item {
@@ -433,9 +434,9 @@
   }
 
   .kid-score-edit-modal .custom-form-main-row {
-    flex-wrap: wrap !important;
+    flex-wrap: wrap;
     gap: 6px;
-    align-items: center !important;
+    align-items: center;
   }
 
   .kid-score-edit-modal .custom-form-main-row .custom-form-label {
@@ -489,13 +490,13 @@
 
   /* ── Emoji picker ── */
   .kid-score-emoji-picker {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
     border-radius: 14px 14px 0 0;
     padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
     grid-template-columns: repeat(8, 1fr);
@@ -653,18 +654,18 @@
     flex: 0 0 min(50vh, 320px);
   }
   .kid-score-main-tab {
-    padding: 14px 10px !important;
-    font-size: 1.05em !important;
-    min-height: 48px !important;
-    height: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1.5 !important;
+    padding: 14px 10px;
+    font-size: 1.05em;
+    min-height: 48px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.5;
   }
 
   .kid-score-main-tab-mobile {
-    min-height: 48px !important;
+    min-height: 48px;
   }
 
   /* ── Diary modules ── */
@@ -1077,14 +1078,14 @@
 
   /* Settings v2 mobile */
   .settings-item-row-v2.header-row {
-    display: none !important;
+    display: none;
   }
 
   .settings-item-row-v2 {
-    grid-template-columns: 24px 40px minmax(0, 1fr) 36px !important;
-    gap: 8px !important;
+    grid-template-columns: 24px 40px minmax(0, 1fr) 36px;
+    gap: 8px;
     align-items: start;
-    padding: 0 !important;
+    padding: 0;
     border-bottom: none;
     font-size: 0.88em;
   }
@@ -1323,9 +1324,10 @@
 /* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
-  .kid-score-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px !important;
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
   }
 
   .kid-score-card {
@@ -1338,12 +1340,12 @@
   .card-points { font-size: 0.7em; }
 
   .kid-score-summary-cards {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
 
   .kid-score-emoji-picker {
-    grid-template-columns: repeat(6, 1fr) !important;
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .diary-quick-btn {
@@ -1362,10 +1364,10 @@
   }
 
   .kid-score-main-tab {
-    padding: 14px 10px !important;
-    font-size: 1.05em !important;
-    min-height: 48px !important;
-    height: auto !important;
+    padding: 14px 10px;
+    font-size: 1.05em;
+    min-height: 48px;
+    height: auto;
   }
   .kid-score-user-btn,
   .kid-score-user-add-btn {
@@ -1389,7 +1391,7 @@
 
   /* Emoji picker extra-small */
   .emoji-fp-grid {
-    grid-template-columns: repeat(6, 1fr) !important;
+    grid-template-columns: repeat(6, 1fr);
   }
   .emoji-fp-btn {
     font-size: 1.4em;
@@ -1398,7 +1400,7 @@
 
   /* Settings v2 extra-small */
   .settings-item-row-v2 {
-    grid-template-columns: 22px 36px minmax(0, 1fr) 34px !important;
+    grid-template-columns: 22px 36px minmax(0, 1fr) 34px;
     font-size: 0.82em;
   }
 
@@ -1426,7 +1428,8 @@
 /* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .kid-score-grid {
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
     grid-template-columns: repeat(3, 1fr);
   }
 

@@ -254,12 +254,12 @@
   flex-shrink: 0;
 }
 
-.kid-score-user-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  height: auto !important;
-  min-height: 32px !important;
-  padding: 6px 14px !important;
+.vertical-tab-content .kid-score-settings-users .kid-score-user-btn {
+  display: inline-flex;
+  align-items: center;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 14px;
   border-radius: 20px;
   border: 1.5px solid var(--interactive-accent);
   background: transparent;
@@ -414,8 +414,8 @@
   cursor: grabbing;
 }
 
-.settings-drag-ghost {
-  padding: 6px 8px !important;
+.vertical-tab-content .settings-drag-ghost {
+  padding: 6px 8px;
 }
 
 /* .settings-cat-select base style is now in the unified block above */

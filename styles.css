@@ -812,11 +812,11 @@ button,
 }
 
 /* Ensure flex layout is not overridden by Obsidian theme inside modals */
-.kid-score-edit-modal .custom-form-row,
-.kid-score-import-modal .custom-form-row {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
+.modal.kid-score-edit-modal .modal-content .custom-form-row,
+.modal.kid-score-import-modal .modal-content .custom-form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 10px;
   margin-bottom: 10px;
 }
@@ -836,9 +836,9 @@ button,
   min-width: 0;
 }
 
-.custom-form-main-row .diary-tool-btn {
+.modal.kid-score-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
   flex: 0 0 auto;
-  margin-left: 0 !important;
+  margin-left: 0;
   min-width: 36px;
   height: 36px;
   padding: 0 10px;
@@ -2377,12 +2377,12 @@ textarea.custom-form-name-input {
   flex-shrink: 0;
 }
 
-.kid-score-user-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  height: auto !important;
-  min-height: 32px !important;
-  padding: 6px 14px !important;
+.vertical-tab-content .kid-score-settings-users .kid-score-user-btn {
+  display: inline-flex;
+  align-items: center;
+  height: auto;
+  min-height: 32px;
+  padding: 6px 14px;
   border-radius: 20px;
   border: 1.5px solid var(--interactive-accent);
   background: transparent;
@@ -2537,8 +2537,8 @@ textarea.custom-form-name-input {
   cursor: grabbing;
 }
 
-.settings-drag-ghost {
-  padding: 6px 8px !important;
+.vertical-tab-content .settings-drag-ghost {
+  padding: 6px 8px;
 }
 
 /* .settings-cat-select base style is now in the unified block above */
@@ -3249,14 +3249,15 @@ textarea.custom-form-name-input {
   }
 
   /* ── Score cards ── */
-  .kid-score-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .kid-score-grid-mobile {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   .kid-score-card {
@@ -3285,8 +3286,8 @@ textarea.custom-form-name-input {
 
   /* ── Stats / Summary ── */
   .kid-score-summary-cards {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
   }
 
   /* ── Bottom actions ── */
@@ -3495,8 +3496,8 @@ textarea.custom-form-name-input {
   }
 
   .settings-item-row {
-    grid-template-columns: 44px 1fr 60px 32px !important;
-    gap: 6px !important;
+    grid-template-columns: 44px 1fr 60px 32px;
+    gap: 6px;
   }
 
   .kid-score-settings .setting-item {
@@ -3638,9 +3639,9 @@ textarea.custom-form-name-input {
   }
 
   .kid-score-edit-modal .custom-form-main-row {
-    flex-wrap: wrap !important;
+    flex-wrap: wrap;
     gap: 6px;
-    align-items: center !important;
+    align-items: center;
   }
 
   .kid-score-edit-modal .custom-form-main-row .custom-form-label {
@@ -3694,13 +3695,13 @@ textarea.custom-form-name-input {
 
   /* ── Emoji picker ── */
   .kid-score-emoji-picker {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
     border-radius: 14px 14px 0 0;
     padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
     grid-template-columns: repeat(8, 1fr);
@@ -3858,18 +3859,18 @@ textarea.custom-form-name-input {
     flex: 0 0 min(50vh, 320px);
   }
   .kid-score-main-tab {
-    padding: 14px 10px !important;
-    font-size: 1.05em !important;
-    min-height: 48px !important;
-    height: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    line-height: 1.5 !important;
+    padding: 14px 10px;
+    font-size: 1.05em;
+    min-height: 48px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.5;
   }
 
   .kid-score-main-tab-mobile {
-    min-height: 48px !important;
+    min-height: 48px;
   }
 
   /* ── Diary modules ── */
@@ -4282,14 +4283,14 @@ textarea.custom-form-name-input {
 
   /* Settings v2 mobile */
   .settings-item-row-v2.header-row {
-    display: none !important;
+    display: none;
   }
 
   .settings-item-row-v2 {
-    grid-template-columns: 24px 40px minmax(0, 1fr) 36px !important;
-    gap: 8px !important;
+    grid-template-columns: 24px 40px minmax(0, 1fr) 36px;
+    gap: 8px;
     align-items: start;
-    padding: 0 !important;
+    padding: 0;
     border-bottom: none;
     font-size: 0.88em;
   }
@@ -4528,9 +4529,10 @@ textarea.custom-form-name-input {
 /* ── Extra-small screen (≤360px) ───────────────────────────────────────────── */
 
 @media (max-width: 360px) {
-  .kid-score-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 6px !important;
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
   }
 
   .kid-score-card {
@@ -4543,12 +4545,12 @@ textarea.custom-form-name-input {
   .card-points { font-size: 0.7em; }
 
   .kid-score-summary-cards {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
 
   .kid-score-emoji-picker {
-    grid-template-columns: repeat(6, 1fr) !important;
+    grid-template-columns: repeat(6, 1fr);
   }
 
   .diary-quick-btn {
@@ -4567,10 +4569,10 @@ textarea.custom-form-name-input {
   }
 
   .kid-score-main-tab {
-    padding: 14px 10px !important;
-    font-size: 1.05em !important;
-    min-height: 48px !important;
-    height: auto !important;
+    padding: 14px 10px;
+    font-size: 1.05em;
+    min-height: 48px;
+    height: auto;
   }
   .kid-score-user-btn,
   .kid-score-user-add-btn {
@@ -4594,7 +4596,7 @@ textarea.custom-form-name-input {
 
   /* Emoji picker extra-small */
   .emoji-fp-grid {
-    grid-template-columns: repeat(6, 1fr) !important;
+    grid-template-columns: repeat(6, 1fr);
   }
   .emoji-fp-btn {
     font-size: 1.4em;
@@ -4603,7 +4605,7 @@ textarea.custom-form-name-input {
 
   /* Settings v2 extra-small */
   .settings-item-row-v2 {
-    grid-template-columns: 22px 36px minmax(0, 1fr) 34px !important;
+    grid-template-columns: 22px 36px minmax(0, 1fr) 34px;
     font-size: 0.82em;
   }
 
@@ -4631,7 +4633,8 @@ textarea.custom-form-name-input {
 /* ── Tablet landscape / mid-size (481–768px) ───────────────────────────────── */
 
 @media (min-width: 481px) and (max-width: 768px) {
-  .kid-score-grid {
+  
+  .kid-score-grid {.modal.kid-score-modal .kid-score-modal-content {
     grid-template-columns: repeat(3, 1fr);
   }
 
@@ -4715,6 +4718,6 @@ textarea.custom-form-name-input {
 /* Appendix sentinel: keep in file but hide the marker line(s) in CodeMirror (edit / Live Preview). */
 
 .markdown-source-view .cm-line.lm-boundary-sentinel-line {
-  display: none !important;
+  display: none;
 }
 

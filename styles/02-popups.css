@@ -316,11 +316,11 @@
 }
 
 /* Ensure flex layout is not overridden by Obsidian theme inside modals */
-.kid-score-edit-modal .custom-form-row,
-.kid-score-import-modal .custom-form-row {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
+.modal.kid-score-edit-modal .modal-content .custom-form-row,
+.modal.kid-score-import-modal .modal-content .custom-form-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 10px;
   margin-bottom: 10px;
 }
@@ -340,9 +340,9 @@
   min-width: 0;
 }
 
-.custom-form-main-row .diary-tool-btn {
+.modal.kid-score-edit-modal .modal-content .custom-form-main-row .diary-tool-btn {
   flex: 0 0 auto;
-  margin-left: 0 !important;
+  margin-left: 0;
   min-width: 36px;
   height: 36px;
   padding: 0 10px;
