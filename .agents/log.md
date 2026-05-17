@@ -250,3 +250,5 @@
 [2026-05-17 23:38 +0800] code-ai | deployed to Vault (.obsidian/plugins/kid-score) under user authorization; MATCH main.js (042c32d98df4), styles.css (69488c1fb9b1), manifest.json (5cb6781443ab) all passed successfully; awaiting user verification.
 [2026-05-17 23:41 +0800] code-ai | migrated user data.json (9964 bytes) from old little-milestones directory to new kid-score directory in vault under user direction to preserve all historical settings; awaiting user confirmation.
 [2026-05-17 23:46 +0800] code-ai | task 2026-05-17-fix-plugin-id-mismatch completed; git commit and push executed successfully under explicit user authorization; no locks held.
+[2026-05-18 00:07 +0800] code-ai | started task 2026-05-18-fix-release-metadata-mismatch to resolve Obsidian community audit warnings on mismatched release ID and versions.json; release workflow, git tag 2.0.1, and GitHub Release 2.0.1 will be updated/recreated.
+

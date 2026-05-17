@@ -49,7 +49,6 @@ jobs:
             main.js
             styles.css
             manifest.json
-            versions.json
           draft: false
           generate_release_notes: true
         env:
