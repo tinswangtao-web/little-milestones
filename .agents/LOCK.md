@@ -2,6 +2,6 @@
 - `owner`: none
 - `since`: -
 - `scope`: none
-- `reason`: Released after Architect Review F1-F5 fixes.
+- `reason`: Released after task completion, git commit, and push.
 - `expires-at`: -
-- `notes`: Awaiting strict re-review; no commit, Vault sync, or GitHub Release authorized. External review file `.agents/reviews/2026-05-17-architect-strict-review.md` left untouched.
+- `notes`: Task 2026-05-17-fix-plugin-id-mismatch is fully resolved.

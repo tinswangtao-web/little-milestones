@@ -178,7 +178,7 @@
 
 同步到 Obsidian Vault **不是**实现的隐含步骤。
 
-默认 `npm run deploy` 的目标目录见 `scripts/deploy.mjs` 中的 `DEFAULT_VAULT_PLUGIN_DIR`。可用环境变量 `LITTLE_MILESTONES_VAULT_DIR` 指向同一插件目录（`.obsidian/plugins/little-milestones`）以覆盖。
+默认 `npm run deploy` 的目标目录见 `scripts/deploy.mjs` 中的 `DEFAULT_VAULT_PLUGIN_DIR`。可用环境变量 `KID_SCORE_VAULT_DIR` 或 `LITTLE_MILESTONES_VAULT_DIR` 指向同一插件目录（`.obsidian/plugins/kid-score`）以覆盖。
 
 本仓库额外约定：
 

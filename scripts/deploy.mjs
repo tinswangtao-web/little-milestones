@@ -6,11 +6,11 @@ import crypto from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, "..");
-// Override with env LITTLE_MILESTONES_VAULT_DIR if the vault lives elsewhere.
+// Override with env KID_SCORE_VAULT_DIR or LITTLE_MILESTONES_VAULT_DIR if the vault lives elsewhere.
 const DEFAULT_VAULT_PLUGIN_DIR =
-  "/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/little-milestones";
+  "/Users/tins-macmini/Documents/Tins'Vault/.obsidian/plugins/kid-score";
 const VAULT_PLUGIN_DIR =
-  process.env.LITTLE_MILESTONES_VAULT_DIR || DEFAULT_VAULT_PLUGIN_DIR;
+  process.env.KID_SCORE_VAULT_DIR || process.env.LITTLE_MILESTONES_VAULT_DIR || DEFAULT_VAULT_PLUGIN_DIR;
 const skipBuild = process.argv.includes("--no-build");
 const verifyOnly = process.argv.includes("--verify-only");
 const files = ["main.js", "styles.css", "manifest.json"];
@@ -93,7 +93,9 @@ function verifyVaultHashes() {
   if (!ok) process.exit(1);
 }
 
-const vaultSource = process.env.LITTLE_MILESTONES_VAULT_DIR
+const vaultSource = process.env.KID_SCORE_VAULT_DIR
+  ? "KID_SCORE_VAULT_DIR"
+  : process.env.LITTLE_MILESTONES_VAULT_DIR
   ? "LITTLE_MILESTONES_VAULT_DIR"
   : "default path";
 console.log(`Vault target (${vaultSource}): ${VAULT_PLUGIN_DIR}`);
