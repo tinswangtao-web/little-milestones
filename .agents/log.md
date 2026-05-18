@@ -253,6 +253,8 @@
 [2026-05-18 00:07 +0800] code-ai | started task 2026-05-18-fix-release-metadata-mismatch to resolve Obsidian community audit warnings on mismatched release ID and versions.json; release workflow, git tag 2.0.1, and GitHub Release 2.0.1 will be updated/recreated.
 [2026-05-18 00:15 +0800] code-ai | task 2026-05-18-fix-release-metadata-mismatch completed; git tag 2.0.1 and GitHub Release recreated successfully; versions.json excluded from release assets; no locks held.
 [2026-05-18 20:12 +0800] code-ai | started task 2026-05-18-fix-vault-enumeration to resolve Obsidian community audit recommendation regarding vault-wide file scanning; getFiles() will be replaced with scoped folder traversal.
+[2026-05-18 20:18 +0800] code-ai | task 2026-05-18-fix-vault-enumeration completed; vault.getFiles() refactored to folder-scoped traversal in DayDataStore; git tag 2.0.1 and GitHub Release updated; no locks held.
+
 
 
 
