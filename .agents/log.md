@@ -255,6 +255,8 @@
 [2026-05-18 20:12 +0800] code-ai | started task 2026-05-18-fix-vault-enumeration to resolve Obsidian community audit recommendation regarding vault-wide file scanning; getFiles() will be replaced with scoped folder traversal.
 [2026-05-18 20:18 +0800] code-ai | task 2026-05-18-fix-vault-enumeration completed; vault.getFiles() refactored to folder-scoped traversal in DayDataStore; git tag 2.0.1 and GitHub Release updated; no locks held.
 [2026-05-18 20:32 +0800] code-ai | started task 2026-05-18-release-version-2.1.0 to release version 2.1.0 under user request; will update manifest version fields, build, deploy, and trigger a fresh release scan.
+[2026-05-18 20:36 +0800] code-ai | task 2026-05-18-release-version-2.1.0 completed; version bumped to 2.1.0 in manifests and lockfiles; git tag 2.1.0 and GitHub Release 2.1.0 created and verified successfully; no locks held.
+
 
 
 
