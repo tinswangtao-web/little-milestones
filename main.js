@@ -8289,9 +8289,7 @@ var DayDataStore = class {
   }
   async renameUserInFiles(oldName, newName) {
     const dirPath = (0, import_obsidian20.normalizePath)(this.plugin.currentUser.savePath);
-    const files = this.plugin.app.vault.getFiles().filter(
-      (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
-    );
+    const files = this.getMarkdownFilesUnderFolder(dirPath);
     let errorCount = 0;
     for (const file of files) {
       try {
@@ -8333,9 +8331,7 @@ var DayDataStore = class {
     const oldDir = (0, import_obsidian20.normalizePath)(oldPath);
     const newDir = (0, import_obsidian20.normalizePath)(newPath);
     if (oldDir === newDir) return;
-    const files = this.plugin.app.vault.getFiles().filter(
-      (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
-    );
+    const files = this.getMarkdownFilesUnderFolder(oldDir);
     if (files.length === 0) return;
     const conflicts = files.map((file) => this.getMigratedFilePath(file.path, oldDir, newDir)).filter((targetPath) => {
       const existing = this.plugin.app.vault.getAbstractFileByPath(targetPath);
@@ -8375,9 +8371,7 @@ var DayDataStore = class {
     if (!preferFreshRead && cached && cached.path === dirPath && Date.now() - cached.timestamp < 5e3) {
       return cached.data;
     }
-    const files = this.plugin.app.vault.getFiles().filter(
-      (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
-    );
+    const files = this.getMarkdownFilesUnderFolder(dirPath);
     const results = [];
     const seenDates = /* @__PURE__ */ new Set();
     for (const file of files) {
@@ -8390,6 +8384,26 @@ var DayDataStore = class {
     const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
     this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
     return sorted;
+  }
+  getMarkdownFilesUnderFolder(dirPath) {
+    const folder = this.plugin.app.vault.getAbstractFileByPath(dirPath);
+    if (!folder || !(folder instanceof import_obsidian20.TFolder)) {
+      return [];
+    }
+    const files = [];
+    const traverse = (item) => {
+      if (item instanceof import_obsidian20.TFile) {
+        if (item.extension === "md") {
+          files.push(item);
+        }
+      } else if (item instanceof import_obsidian20.TFolder) {
+        for (const child of item.children) {
+          traverse(child);
+        }
+      }
+    };
+    traverse(folder);
+    return files;
   }
   buildDayDataFromFrontmatter(frontmatter, dateStr, content) {
     const scores = this.normalizeScores(frontmatter.scores);

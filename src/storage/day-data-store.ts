@@ -1,4 +1,4 @@
-import { MarkdownView, Notice, TFile, normalizePath, parseYaml } from "obsidian";
+import { MarkdownView, Notice, TFile, TFolder, TAbstractFile, normalizePath, parseYaml } from "obsidian";
 import type { CustomScoreItem, DayData, DiaryModuleValues } from "../types";
 import type KidScorePlugin from "../main";
 import { DIARY_MARKER, makeDefaultDiaryModules, USER_CONTENT_BOUNDARY_MARKERS } from "../constants";
@@ -319,11 +319,7 @@ export class DayDataStore {
 
   async renameUserInFiles(oldName: string, newName: string): Promise<void> {
     const dirPath = normalizePath(this.plugin.currentUser.savePath);
-    const files = this.plugin.app.vault
-      .getFiles()
-      .filter(
-        (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
-      );
+    const files = this.getMarkdownFilesUnderFolder(dirPath);
     let errorCount = 0;
 
     for (const file of files) {
@@ -371,11 +367,7 @@ export class DayDataStore {
     const newDir = normalizePath(newPath);
     if (oldDir === newDir) return;
 
-    const files = this.plugin.app.vault
-      .getFiles()
-      .filter(
-        (file) => file.path.startsWith(oldDir + "/") && file.extension === "md"
-      );
+    const files = this.getMarkdownFilesUnderFolder(oldDir);
     if (files.length === 0) return;
 
     const conflicts = files
@@ -429,11 +421,7 @@ export class DayDataStore {
       return cached.data;
     }
 
-    const files = this.plugin.app.vault
-      .getFiles()
-      .filter(
-        (file) => file.path.startsWith(dirPath + "/") && file.extension === "md"
-      );
+    const files = this.getMarkdownFilesUnderFolder(dirPath);
     const results: DayData[] = [];
     const seenDates = new Set<string>();
 
@@ -448,6 +436,27 @@ export class DayDataStore {
     const sorted = results.sort((a, b) => compareDateStrings(a.date, b.date));
     this._allScoresCache = { data: sorted, path: dirPath, timestamp: Date.now() };
     return sorted;
+  }
+
+  private getMarkdownFilesUnderFolder(dirPath: string): TFile[] {
+    const folder = this.plugin.app.vault.getAbstractFileByPath(dirPath);
+    if (!folder || !(folder instanceof TFolder)) {
+      return [];
+    }
+    const files: TFile[] = [];
+    const traverse = (item: TAbstractFile) => {
+      if (item instanceof TFile) {
+        if (item.extension === "md") {
+          files.push(item);
+        }
+      } else if (item instanceof TFolder) {
+        for (const child of item.children) {
+          traverse(child);
+        }
+      }
+    };
+    traverse(folder);
+    return files;
   }
 
   private buildDayDataFromFrontmatter(
