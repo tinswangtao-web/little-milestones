@@ -5396,6 +5396,7 @@ function renderScorePanel({
   onAddItem,
   onAddCustom,
   onSetTotalDisplay,
+  onSetCustomItemsContainer,
   onAfterRulesSaved
 }) {
   if (plugin.currentUser.items.length === 0) {
@@ -5440,6 +5441,7 @@ function renderScorePanel({
     text: "\u{1F4CC} \u4E34\u65F6\u4E8B\u9879",
     cls: "little-milestones-section-title"
   });
+  onSetCustomItemsContainer(layout.customItemsContainer);
   renderCustomItems();
   const addCustomBtn = layout.customSection.createEl("button", {
     text: "\uFF0B \u6DFB\u52A0\u4E34\u65F6\u52A0\u51CF\u5206",
@@ -5634,6 +5636,9 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
         onSetTotalDisplay: (element) => {
           this.totalDisplay = element;
         },
+        onSetCustomItemsContainer: (element) => {
+          this.customItemsContainer = element;
+        },
         onAfterRulesSaved: () => this.updateTotalDisplay()
       });
       this.customItemsContainer = (renderedScorePanel == null ? void 0 : renderedScorePanel.customItemsContainer) || null;
@@ -5668,13 +5673,7 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
         onModulesChanged: async () => {
           this.syncDiaryContent();
           this.saveDiaryDraft();
-          this.pendingRenderState = {
-            scores: { ...this.scores },
-            customItems: this.customItems.map((item) => ({ ...item })),
-            diaryContent: this.diaryContent,
-            diaryModules: { ...this.diaryModules },
-            diaryUiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts)
-          };
+          this.captureRenderState();
           await this.plugin.saveSettings();
           this.activeTab = "diary";
           await this.renderModal();
@@ -5754,6 +5753,15 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   captureScoreScrollTop() {
     if (this.activeTab !== "score") return;
     this.pendingScoreScrollTop = this.contentEl.scrollTop;
+  }
+  captureRenderState() {
+    this.pendingRenderState = {
+      scores: { ...this.scores },
+      customItems: this.customItems.map((item) => ({ ...item })),
+      diaryContent: this.diaryContent,
+      diaryModules: { ...this.diaryModules },
+      diaryUiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts)
+    };
   }
   bindMobileTabSwipe(scorePanel, diaryPanel, scoreTab, diaryTab) {
     if (!this.isTouchOptimizedMode()) return;
@@ -5936,6 +5944,7 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
       quickOnly,
       onValue: callback,
       onRefresh: async () => {
+        this.captureRenderState();
         await this.renderModal();
       }
     });
@@ -5943,6 +5952,7 @@ var DailyScoringModal = class _DailyScoringModal extends BaseMobileModal {
   showAddItemPopup(category) {
     this.captureScoreScrollTop();
     openAddItemModal(this.app, this.plugin, category, async () => {
+      this.captureRenderState();
       this.activeTab = "score";
       await this.renderModal();
     });

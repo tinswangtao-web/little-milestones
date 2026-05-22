@@ -197,6 +197,9 @@ export class DailyScoringModal extends BaseMobileModal {
         onSetTotalDisplay: (element) => {
           this.totalDisplay = element;
         },
+        onSetCustomItemsContainer: (element) => {
+          this.customItemsContainer = element;
+        },
         onAfterRulesSaved: () => this.updateTotalDisplay(),
       });
       this.customItemsContainer = renderedScorePanel?.customItemsContainer || null;
@@ -233,13 +236,7 @@ export class DailyScoringModal extends BaseMobileModal {
         onModulesChanged: async () => {
           this.syncDiaryContent();
           this.saveDiaryDraft();
-          this.pendingRenderState = {
-            scores: { ...this.scores },
-            customItems: this.customItems.map((item) => ({ ...item })),
-            diaryContent: this.diaryContent,
-            diaryModules: { ...this.diaryModules },
-            diaryUiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
-          };
+          this.captureRenderState();
           await this.plugin.saveSettings();
           this.activeTab = "diary";
           await this.renderModal();
@@ -317,6 +314,16 @@ export class DailyScoringModal extends BaseMobileModal {
   private captureScoreScrollTop(): void {
     if (this.activeTab !== "score") return;
     this.pendingScoreScrollTop = this.contentEl.scrollTop;
+  }
+
+  private captureRenderState(): void {
+    this.pendingRenderState = {
+      scores: { ...this.scores },
+      customItems: this.customItems.map((item) => ({ ...item })),
+      diaryContent: this.diaryContent,
+      diaryModules: { ...this.diaryModules },
+      diaryUiDrafts: cloneDiaryUiDrafts(this.diaryUiDrafts),
+    };
   }
 
   private bindMobileTabSwipe(
@@ -528,6 +535,7 @@ export class DailyScoringModal extends BaseMobileModal {
       quickOnly,
       onValue: callback,
       onRefresh: async () => {
+        this.captureRenderState();
         await this.renderModal();
       },
     });
@@ -536,6 +544,7 @@ export class DailyScoringModal extends BaseMobileModal {
   showAddItemPopup(category: string) {
     this.captureScoreScrollTop();
     openAddItemModal(this.app, this.plugin, category, async () => {
+      this.captureRenderState();
       this.activeTab = "score";
       await this.renderModal();
     });

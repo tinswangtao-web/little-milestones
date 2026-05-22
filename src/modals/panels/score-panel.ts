@@ -18,6 +18,7 @@ interface RenderScorePanelOptions {
   onAddItem: (category: string) => void;
   onAddCustom: () => void;
   onSetTotalDisplay: (element: HTMLElement) => void;
+  onSetCustomItemsContainer: (element: HTMLElement) => void;
   onAfterRulesSaved: () => void;
 }
 
@@ -33,6 +34,7 @@ export function renderScorePanel({
   onAddItem,
   onAddCustom,
   onSetTotalDisplay,
+  onSetCustomItemsContainer,
   onAfterRulesSaved,
 }: RenderScorePanelOptions) {
   if (plugin.currentUser.items.length === 0) {
@@ -86,6 +88,7 @@ export function renderScorePanel({
     text: "📌 临时事项",
     cls: "little-milestones-section-title",
   });
+  onSetCustomItemsContainer(layout.customItemsContainer);
   renderCustomItems();
   const addCustomBtn = layout.customSection.createEl("button", {
     text: "＋ 添加临时加减分",

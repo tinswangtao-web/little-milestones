@@ -256,9 +256,7 @@
 [2026-05-18 20:18 +0800] code-ai | task 2026-05-18-fix-vault-enumeration completed; vault.getFiles() refactored to folder-scoped traversal in DayDataStore; git tag 2.0.1 and GitHub Release updated; no locks held.
 [2026-05-18 20:32 +0800] code-ai | started task 2026-05-18-release-version-2.1.0 to release version 2.1.0 under user request; will update manifest version fields, build, deploy, and trigger a fresh release scan.
 [2026-05-18 20:36 +0800] code-ai | task 2026-05-18-release-version-2.1.0 completed; version bumped to 2.1.0 in manifests and lockfiles; git tag 2.1.0 and GitHub Release 2.1.0 created and verified successfully; no locks held.
-
-
-
-
-
-
+[2026-05-22 22:14 +0800] architect | reviewed Builder implementation of captureRenderState() fix; no blocking issues; 1 new method + 3 call sites, all equivalent to spec; recommend Vault sync for user acceptance.
+[2026-05-22 22:00 +0800] builder | implemented fix for 2026-05-22-fix-score-state-lost-on-item-change: added captureRenderState() method, called in showAddItemPopup/showCustomValuePopup/onRefresh/onModulesChanged callbacks; replaced inline pendingRenderState construction in onModulesChanged; tsc+build+node check passed; awaiting Architect review
+[2026-05-22 23:12 +0800] architect | user tested deployed fix: scores now preserved ✅ but custom items invisible after renderModal. Root cause: renderCustomItems() called inside renderScorePanel BEFORE this.customItemsContainer is set to the new DOM element → renders into detached old container. Fix: add onSetCustomItemsContainer callback to renderScorePanel, call before renderCustomItems. Updated task card.
+[2026-05-22 23:30 +0800] architect | completed Round 2 review for score state lost on item change: verified callback-based customItemsContainer layout fix; compile/build/node syntax/git diff checks all passed; filed Round 2 review output; released write lock, awaiting user deploy/verification and commit approval.

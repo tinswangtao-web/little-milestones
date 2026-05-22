@@ -1,7 +1,7 @@
 ## Write Lock
 - `owner`: none
-- `since`: -
+- `since`: none
 - `scope`: none
-- `reason`: Released after 2.1.0 release task completion.
-- `expires-at`: -
-- `notes`: Version 2.1.0 successfully published and verified.
+- `reason`: none
+- `expires-at`: none
+- `notes`: Lock released. Review complete. Awaiting user verification and sync.
