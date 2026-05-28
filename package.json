@@ -1,6 +1,6 @@
 {
   "name": "little-milestones",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Daily record plugin for kids — behavior scoring, diary, diet & activity tracking",
   "main": "main.js",
   "scripts": {
