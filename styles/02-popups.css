@@ -491,11 +491,6 @@ textarea.custom-form-name-input {
   margin-bottom: 8px;
   border-bottom: 1px solid var(--background-modifier-border);
 }
-@supports (scrollbar-width: none) {
-  .emoji-fp-tabs {
-    scrollbar-width: none;
-  }
-}
 .emoji-fp-tabs::-webkit-scrollbar {
   display: none;
 }

@@ -677,12 +677,6 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  @supports (scrollbar-width: none) {
-    .diary-toolbar {
-      scrollbar-width: none;
-    }
-  }
-
   .diary-toolbar::-webkit-scrollbar {
     display: none;
   }
